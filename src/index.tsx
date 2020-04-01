@@ -1,0 +1,18 @@
+import { StylesProvider } from "@material-ui/styles";
+import { App } from "App";
+import { Provider } from "mobx-react";
+import React from "react";
+import ReactDOM from "react-dom";
+import { AppStore } from "stores/AppStore";
+import "./index.css";
+
+const store = new AppStore();
+
+ReactDOM.render(
+    <Provider store={store}>
+        <StylesProvider injectFirst={true}>
+            <App />
+        </StylesProvider>
+    </Provider>,
+    document.getElementById("root"),
+);
