@@ -1,0 +1,9 @@
+.shellScreen {
+    position: relative;
+    background: #c4c4c4;
+    box-sizing: border-box;
+    width: 100vw;
+    height: 100vh;
+    background: url("../../../assets/images/wallpaper.jpg");
+    background-size: cover;
+}
