@@ -15,3 +15,74 @@ code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
         monospace;
 }
+
+.react-resizable {
+    position: absolute;
+}
+
+.react-resizable-handle {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    cursor: e-resize;
+}
+
+.react-resizable-handle-sw {
+    bottom: 0;
+    left: 0;
+    width: 15px;
+    height: 15px;
+    cursor: sw-resize;
+}
+.react-resizable-handle-se {
+    bottom: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    cursor: se-resize;
+}
+.react-resizable-handle-nw {
+    top: 0;
+    left: 0;
+    width: 15px;
+    height: 15px;
+    cursor: nw-resize;
+    z-index: 2;
+}
+.react-resizable-handle-ne {
+    top: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    cursor: ne-resize;
+    z-index: 2;
+}
+
+.react-resizable-handle-w {
+    top: 7px;
+    left: 0;
+    height: calc(100% - 14px);
+    cursor: w-resize;
+    z-index: 2;
+}
+
+.react-resizable-handle-e {
+    top: 7px;
+    right: 0;
+    height: calc(100% - 14px);
+    cursor: e-resize;
+    z-index: 2;
+}
+
+.react-resizable-handle-s {
+    bottom: 0;
+    left: 7px;
+    width: calc(100% - 14px);
+    cursor: s-resize;
+}
+.react-resizable-handle-n {
+    top: 0;
+    left: 7px;
+    width: calc(100% - 14px);
+    cursor: n-resize;
+}

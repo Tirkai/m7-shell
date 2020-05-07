@@ -1,9 +1,10 @@
 .appWindow {
+    background: #333;
+}
+.appWindowHint {
     position: absolute;
-    top: 100px;
-    left: 100px;
-    height: 100%;
-    width: 1200px;
-    height: 800px;
+}
+.container {
+    height: calc(100% - 30px);
     background: #333;
 }

@@ -1,11 +1,14 @@
 import { cross, videocam } from "assets/icons";
+import classNames from "classnames";
 import React, { Component } from "react";
 import style from "./style.module.css";
 
 export class AppWindowHeader extends Component {
     render() {
         return (
-            <div className={style.appWindowHeader}>
+            <div
+                className={classNames("appWindowHeader", style.appWindowHeader)}
+            >
                 <div className={style.container}>
                     <div className={style.info}>
                         <div className={style.icon}>
