@@ -1,0 +1,46 @@
+.appLoader {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 30px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #333;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 60px;
+}
+.icon img {
+    width: 64px;
+    height: 64px;
+}
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.disabled {
+    pointer-events: none;
+    opacity: 0;
+    animation: disableAnimation 0.6s;
+}
+
+@keyframes disableAnimation {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

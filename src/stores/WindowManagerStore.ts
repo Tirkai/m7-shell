@@ -15,4 +15,16 @@ export class WindowManagerStore {
     addWindow(appWindow: ApplicationWindow) {
         this.windows.push(appWindow);
     }
+
+    @action
+    closeWindow(appWindow: ApplicationWindow) {
+        const app = this.store.applicationManager.findById(
+            appWindow.application.id,
+        );
+        if (app) {
+            app.setExecuted(false);
+        }
+
+        this.windows.splice(this.windows.indexOf(appWindow), 1);
+    }
 }

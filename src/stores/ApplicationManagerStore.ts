@@ -1,6 +1,7 @@
 import { action, computed, observable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
+import { v4 } from "uuid";
 import { AppStore } from "./AppStore";
 export class ApplicationManagerStore {
     @observable
@@ -25,9 +26,18 @@ export class ApplicationManagerStore {
     executeApplication(app: Application) {
         this.store.windowManager.addWindow(
             new ApplicationWindow(app, {
-                width: 1200,
-                height: 800,
+                id: v4(),
+                width: app.baseWidth,
+                height: app.baseHeight,
             }),
         );
+    }
+
+    findByName(name: string) {
+        return this.applications.find((app) => app.name === name);
+    }
+
+    findById(id: string) {
+        return this.applications.find((app) => app.id === id);
     }
 }

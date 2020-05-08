@@ -1,9 +1,15 @@
-import { cross, videocam } from "assets/icons";
+import { cross } from "assets/icons";
 import classNames from "classnames";
 import React, { Component } from "react";
 import style from "./style.module.css";
 
-export class AppWindowHeader extends Component {
+interface IAppWindowHeaderProps {
+    icon: string;
+    title: string;
+    onClose: () => void;
+}
+
+export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
     render() {
         return (
             <div
@@ -12,12 +18,15 @@ export class AppWindowHeader extends Component {
                 <div className={style.container}>
                     <div className={style.info}>
                         <div className={style.icon}>
-                            <img src={videocam} />
+                            <img src={this.props.icon} />
                         </div>
-                        <div className={style.title}>АССаД-Видео</div>
+                        <div className={style.title}>{this.props.title}</div>
                     </div>
                     <div className={style.actions}>
-                        <div className={style.actionItem}>
+                        <div
+                            className={style.actionItem}
+                            onClick={this.props.onClose}
+                        >
                             <img src={cross} />
                         </div>
                     </div>

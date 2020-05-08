@@ -1,0 +1,7 @@
+.welcome {
+    padding: 20px;
+    background: white;
+    height: 100%;
+    overflow: auto;
+    box-sizing: border-box;
+}

@@ -1,8 +1,14 @@
 import { Application } from "models/Application";
 import { ExternalApllication } from "models/ExternalApplication";
+import { ShellApplication } from "models/ShellApplication";
 import React, { Component } from "react";
-import Draggable from "react-draggable";
-import { ResizableBox } from "react-resizable";
+import Draggable, { DraggableEventHandler } from "react-draggable";
+import {
+    ResizableBox,
+    ResizeCallbackData,
+    ResizeHandle,
+} from "react-resizable";
+import AppLoader from "../AppLoader/AppLoader";
 import AppWindowHeader from "../AppWindowHeader/AppWindowHeader";
 import style from "./style.module.css";
 
@@ -12,28 +18,46 @@ interface IAppWindowProps {
     height: number;
     isResizing: boolean;
     isDragging: boolean;
-    onResizeStart: () => void;
+    x: number;
+    y: number;
+    onResizeStart: (event: MouseEvent, data: ResizeCallbackData) => void;
     onResizeStop: () => void;
+    onResize: (event: MouseEvent, data: ResizeCallbackData) => void;
     onDragStart: () => void;
     onDragStop: () => void;
+    onDrag: DraggableEventHandler;
+    onClose: () => void;
 }
 
 export class AppWindow extends Component<IAppWindowProps> {
     state = {
-        isResizing: false,
+        isAppReady: false,
     };
 
-    handleResizeStart = () => {
-        this.props.onResizeStart();
+    handleResizeStart = (
+        event: React.SyntheticEvent,
+        data: ResizeCallbackData,
+    ) => {
+        this.props.onResizeStart((event as unknown) as MouseEvent, data);
     };
 
     handleResizeEnd = () => {
         this.props.onResizeStop();
-        // this.setState({
-        //     isResizing: false,
-        // });
-        // console.log("resize stop");
     };
+
+    handleAppReady = () => {
+        this.setState({ isAppReady: true });
+    };
+
+    handleResize = (event: React.SyntheticEvent, data: ResizeCallbackData) => {
+        this.props.onResize((event as unknown) as MouseEvent, data);
+    };
+
+    componentDidMount() {
+        if (this.props.application instanceof ShellApplication) {
+            this.setState({ isAppReady: true });
+        }
+    }
 
     render() {
         let appComponent;
@@ -41,6 +65,7 @@ export class AppWindow extends Component<IAppWindowProps> {
         if (this.props.application instanceof ExternalApllication) {
             appComponent = (
                 <iframe
+                    onLoad={this.handleAppReady}
                     src={this.props.application.url}
                     style={{
                         width: "100%",
@@ -54,42 +79,45 @@ export class AppWindow extends Component<IAppWindowProps> {
                 ></iframe>
             );
         }
+        if (this.props.application instanceof ShellApplication) {
+            appComponent = this.props.application.Component;
+        }
+
+        const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
 
         return (
-            <div
-                className={style.appWindowHint}
-                style={{ top: "100px", left: "100px" }}
+            <Draggable
+                handle=".appWindowHeader"
+                onStart={this.props.onDragStart}
+                onStop={this.props.onDragStop}
+                onDrag={this.props.onDrag}
+                position={{
+                    x: this.props.x,
+                    y: this.props.y,
+                }}
             >
-                <Draggable
-                    handle=".appWindowHeader"
-                    onStart={this.props.onDragStart}
-                    onStop={this.props.onDragStop}
-                >
-                    <div className={style.appWindow}>
-                        <ResizableBox
-                            width={this.props.width}
-                            height={this.props.height}
-                            onResizeStart={this.handleResizeStart}
-                            onResizeStop={this.handleResizeEnd}
-                            resizeHandles={[
-                                "sw",
-                                "se",
-                                "nw",
-                                "ne",
-                                "w",
-                                "e",
-                                "n",
-                                "s",
-                            ]}
-                        >
-                            <AppWindowHeader />
-                            <div className={style.container}>
-                                {appComponent}
-                            </div>
-                        </ResizableBox>
-                    </div>
-                </Draggable>
-            </div>
+                <div className={style.appWindow}>
+                    <ResizableBox
+                        width={this.props.width}
+                        height={this.props.height}
+                        onResizeStart={this.handleResizeStart}
+                        onResizeStop={this.handleResizeEnd}
+                        onResize={this.handleResize}
+                        resizeHandles={resizeDirections as ResizeHandle[]}
+                    >
+                        <AppWindowHeader
+                            icon={this.props.application.icon}
+                            title={this.props.application.name}
+                            onClose={this.props.onClose}
+                        />
+                        <AppLoader
+                            icon={this.props.application.icon}
+                            disabled={this.state.isAppReady}
+                        />
+                        <div className={style.container}>{appComponent}</div>
+                    </ResizableBox>
+                </div>
+            </Draggable>
         );
     }
 }
