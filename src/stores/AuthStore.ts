@@ -1,6 +1,8 @@
 import Axios from "axios";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
+import { BrokerMessageType } from "m7-shell-broker";
 import { action, observable } from "mobx";
+import { ExternalApllication } from "models/ExternalApplication";
 import { authEndpoint } from "utils/endpoints";
 import { JsonRpcPayload } from "utils/JsonRpcPayload";
 import { AppStore } from "./AppStore";
@@ -27,6 +29,11 @@ export class AuthStore {
         this.jwtToken = token;
         localStorage.setItem(this.localStorageTokenKey, this.jwtToken);
         Axios.defaults.headers.common.Authorization = this.jwtToken;
+    }
+
+    @action
+    injectAuthTokenInExternalApplication(app: ExternalApllication) {
+        app.broker.dispatch(BrokerMessageType.UpdateAuthToken, this.jwtToken);
     }
 
     @action

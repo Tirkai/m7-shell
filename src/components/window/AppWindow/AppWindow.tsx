@@ -1,3 +1,7 @@
+import { IStore } from "interfaces/common/IStore";
+import { BrokerMessageType } from "m7-shell-broker";
+import { computed } from "mobx";
+import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
 import { ExternalApllication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
@@ -12,7 +16,7 @@ import AppLoader from "../AppLoader/AppLoader";
 import AppWindowHeader from "../AppWindowHeader/AppWindowHeader";
 import style from "./style.module.css";
 
-interface IAppWindowProps {
+interface IAppWindowProps extends IStore {
     application: Application;
     width: number;
     height: number;
@@ -29,10 +33,17 @@ interface IAppWindowProps {
     onClose: () => void;
 }
 
+@inject("store")
+@observer
 export class AppWindow extends Component<IAppWindowProps> {
     state = {
         isAppReady: false,
     };
+
+    @computed
+    get store() {
+        return this.props.store!;
+    }
 
     handleResizeStart = (
         event: React.SyntheticEvent,
@@ -43,6 +54,21 @@ export class AppWindow extends Component<IAppWindowProps> {
 
     handleResizeEnd = () => {
         this.props.onResizeStop();
+    };
+
+    handleFrameLoaded = (frameRef: HTMLIFrameElement) => {
+        const context = frameRef?.contentWindow;
+        if (context) {
+            const app = this.props.application;
+            if (app instanceof ExternalApllication && context) {
+                app.setBrokerContext(context);
+
+                app.broker.subscribe(BrokerMessageType.Connected, () =>
+                    this.store.auth.injectAuthTokenInExternalApplication(app),
+                );
+            }
+            this.handleAppReady();
+        }
     };
 
     handleAppReady = () => {
@@ -59,14 +85,14 @@ export class AppWindow extends Component<IAppWindowProps> {
         }
     }
 
+    appComponent: JSX.Element | null = null;
     render() {
-        let appComponent;
-
         if (this.props.application instanceof ExternalApllication) {
-            appComponent = (
+            this.appComponent = (
                 <iframe
                     onLoad={this.handleAppReady}
                     src={this.props.application.url}
+                    ref={this.handleFrameLoaded}
                     style={{
                         width: "100%",
                         height: "100%",
@@ -80,7 +106,7 @@ export class AppWindow extends Component<IAppWindowProps> {
             );
         }
         if (this.props.application instanceof ShellApplication) {
-            appComponent = this.props.application.Component;
+            this.appComponent = this.props.application.Component;
         }
 
         const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
@@ -114,7 +140,9 @@ export class AppWindow extends Component<IAppWindowProps> {
                             icon={this.props.application.icon}
                             disabled={this.state.isAppReady}
                         />
-                        <div className={style.container}>{appComponent}</div>
+                        <div className={style.container}>
+                            {this.appComponent && this.appComponent}
+                        </div>
                     </ResizableBox>
                 </div>
             </Draggable>

@@ -85,7 +85,6 @@ export class ApplicationWindow {
         this.lockedHeight = this.height;
         this.lockedX = this.x;
         this.lockedY = this.y;
-        console.log({ rop: this.resizeOriginPoint.x });
     }
 
     @action

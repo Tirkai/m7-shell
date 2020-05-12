@@ -12,7 +12,6 @@ export class ShellStore {
 
     @action
     setAppMenuShow(value: boolean) {
-        console.log("++", value);
         this.appMenuShow = value;
     }
 }
