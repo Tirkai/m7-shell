@@ -9,6 +9,13 @@ body {
     background: #fafafa;
     min-height: 100vh;
     user-select: none;
+    background: url("./assets/images/wallpaper.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.MuiFormLabel-root {
+    z-index: 1;
 }
 
 code {

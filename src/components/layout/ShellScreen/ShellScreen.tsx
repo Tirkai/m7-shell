@@ -6,10 +6,8 @@ import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApllication } from "models/ExternalApplication";
-import { ShellApplication } from "models/ShellApplication";
 import React, { Component } from "react";
 import { ResizeCallbackData } from "react-resizable";
-import { WelcomeShellApp } from "shell-apps/WelcomeShellApp/WelcomeShellApp";
 import { v4 } from "uuid";
 import style from "./style.module.css";
 
@@ -42,16 +40,6 @@ export class ShellScreen extends Component<IStore> {
         );
 
         this.store.applicationManager.addApplication(
-            new ShellApplication({
-                id: v4(),
-                name: "WelcomeShellApp",
-                Component: <WelcomeShellApp />,
-                baseWidth: 500,
-                baseHeight: 600,
-            }),
-        );
-
-        this.store.applicationManager.addApplication(
             new ExternalApllication({
                 id: v4(),
                 name: "MobxDocs",
@@ -61,13 +49,11 @@ export class ShellScreen extends Component<IStore> {
             }),
         );
 
-        const welcome = this.store.applicationManager.findByName(
-            "WelcomeShellApp",
-        );
-        console.log(welcome);
-        if (welcome) {
-            this.store.applicationManager.executeApplication(welcome);
-        }
+        // const welcome = this.store.applicationManager.findByName("MobxDocs");
+        // console.log(welcome);
+        // if (welcome) {
+        //     this.store.applicationManager.executeApplication(welcome);
+        // }
     }
 
     hanldeWindowResizeStart = (

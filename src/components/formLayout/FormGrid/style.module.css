@@ -1,0 +1,4 @@
+.formGrid {
+    display: grid;
+    grid-gap: 24px;
+}
