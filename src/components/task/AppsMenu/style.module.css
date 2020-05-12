@@ -11,6 +11,7 @@
     box-sizing: border-box;
     pointer-events: none;
 }
+
 .visible {
     opacity: 1;
     transform: translateY(0);
@@ -20,7 +21,10 @@
 .container {
     display: grid;
     grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(auto-fit, 100px);
     grid-gap: 12px;
     padding: 24px;
     box-sizing: border-box;
+    height: 100%;
+    background: #222222cc;
 }

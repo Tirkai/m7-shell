@@ -1,4 +1,5 @@
 import { apps } from "assets/icons";
+import { BlurBackground } from "components/layout/BlurBackground/BlurBackground";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
@@ -35,22 +36,26 @@ export class TaskBar extends Component<IStore> {
                 />
 
                 <div className={style.taskBar}>
-                    <TaskBarItem
-                        onClick={() =>
-                            this.handleShowAppsMenu(
-                                !this.props.store?.shell.appMenuShow,
-                            )
-                        }
-                    >
-                        <img src={apps} />
-                    </TaskBarItem>
-                    {this.props.store?.windowManager.windows.map(
-                        (appWindow) => (
-                            <TaskBarItem executed onClick={() => {}}>
-                                <img src={appWindow.application.icon} />
+                    <BlurBackground>
+                        <div className={style.container}>
+                            <TaskBarItem
+                                onClick={() =>
+                                    this.handleShowAppsMenu(
+                                        !this.props.store?.shell.appMenuShow,
+                                    )
+                                }
+                            >
+                                <img src={apps} />
                             </TaskBarItem>
-                        ),
-                    )}
+                            {this.props.store?.windowManager.windows.map(
+                                (appWindow) => (
+                                    <TaskBarItem executed onClick={() => {}}>
+                                        <img src={appWindow.application.icon} />
+                                    </TaskBarItem>
+                                ),
+                            )}
+                        </div>
+                    </BlurBackground>
                 </div>
             </>
         );

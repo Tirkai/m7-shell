@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { BlurBackground } from "components/layout/BlurBackground/BlurBackground";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
 import React, { Component } from "react";
@@ -20,16 +21,18 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                     [style.visible]: this.props.isShow,
                 })}
             >
-                <div className={style.container}>
-                    {this.props.applications.map((app) => (
-                        <AppsMenuItem
-                            key={app.id}
-                            icon={app.icon}
-                            title={app.name}
-                            onClick={() => this.props.onExecuteApp(app)}
-                        />
-                    ))}
-                </div>
+                <BlurBackground>
+                    <div className={style.container}>
+                        {this.props.applications.map((app) => (
+                            <AppsMenuItem
+                                key={app.id}
+                                icon={app.icon}
+                                title={app.name}
+                                onClick={() => this.props.onExecuteApp(app)}
+                            />
+                        ))}
+                    </div>
+                </BlurBackground>
             </div>
         );
     }

@@ -1,0 +1,24 @@
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.blurWrapper {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+.blur {
+    background: url("../../../assets/images/wallpaper.jpg");
+    filter: url("../../../assets/filters/blur.svg#blur");
+    background-attachment: fixed;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+}
+.content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}

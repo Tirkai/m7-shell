@@ -12,6 +12,7 @@ import { ResizeCallbackData } from "react-resizable";
 import { WelcomeShellApp } from "shell-apps/WelcomeShellApp/WelcomeShellApp";
 import { v4 } from "uuid";
 import style from "./style.module.css";
+
 @inject("store")
 @observer
 export class ShellScreen extends Component<IStore> {
@@ -47,6 +48,16 @@ export class ShellScreen extends Component<IStore> {
                 Component: <WelcomeShellApp />,
                 baseWidth: 500,
                 baseHeight: 600,
+            }),
+        );
+
+        this.store.applicationManager.addApplication(
+            new ExternalApllication({
+                id: v4(),
+                name: "MobxDocs",
+                url: "https://mobx.js.org/refguide/observable-decorator.html",
+                baseWidth: 500,
+                baseHeight: 700,
             }),
         );
 
@@ -103,6 +114,7 @@ export class ShellScreen extends Component<IStore> {
                         onClose={() => this.handleCloseWindow(appWindow)}
                     />
                 ))}
+
                 <TaskBar />
             </div>
         );
