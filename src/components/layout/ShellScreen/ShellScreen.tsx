@@ -32,8 +32,8 @@ export class ShellScreen extends Component<IStore> {
         this.store.applicationManager.addApplication(
             new ExternalApllication({
                 id: v4(),
-                name: "ExampleExternalApp",
-                url: "http://tirkai.ru",
+                name: "Отчеты",
+                url: "http://reports.test1",
                 baseWidth: 800,
                 baseHeight: 600,
             }),

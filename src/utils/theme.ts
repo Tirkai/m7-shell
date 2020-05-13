@@ -5,6 +5,9 @@ const theme = createMuiTheme({
         primary: {
             main: "#096DD9",
         },
+        secondary: {
+            main: "#c4c4c4",
+        },
     },
 
     overrides: {
@@ -32,7 +35,10 @@ const theme = createMuiTheme({
             },
             underline: {
                 "&:before": {
-                    display: "none",
+                    borderBottom: "1px solid #c4c4c4",
+                },
+                "&:hover:not($disabled):before": {
+                    borderBottom: "1px solid #a2a2a2",
                 },
             },
         },

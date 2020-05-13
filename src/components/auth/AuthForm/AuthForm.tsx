@@ -35,6 +35,7 @@ export class AuthForm extends Component<IAuthFormProps> {
                 <form onSubmit={this.handleSubmit}>
                     <FormItem>
                         <TextField
+                            autoFocus
                             onChange={this.handleChangeLogin}
                             value={this.state.login}
                             label="Логин"

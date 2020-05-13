@@ -1,5 +1,5 @@
+import { BrokerMessageType } from "@algont/m7-shell-broker";
 import { IStore } from "interfaces/common/IStore";
-import { BrokerMessageType } from "m7-shell-broker";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";

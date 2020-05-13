@@ -1,5 +1,7 @@
 import apps from "./apps.svg";
 import cross from "./cross.svg";
+import notificationsNone from "./notifications-none.svg";
+import notifications from "./notifications.svg";
 import unknownApp from "./unknown.svg";
 import videocam from "./video.svg";
-export { apps, videocam, cross, unknownApp };
+export { apps, videocam, cross, unknownApp, notifications, notificationsNone };

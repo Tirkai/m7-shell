@@ -1,5 +1,5 @@
+import { ShellMessageBroker } from "@algont/m7-shell-broker";
 import { IExternalApplicationOptions } from "interfaces/options/IExternalApplicationOptions";
-import { ShellMessageBroker } from "m7-shell-broker";
 import { Application } from "./Application";
 export class ExternalApllication extends Application {
     url: string;
@@ -13,5 +13,14 @@ export class ExternalApllication extends Application {
     setBrokerContext(context: Window) {
         this.broker.setContext(context);
         return this;
+    }
+
+    setExecuted(value: boolean) {
+        try {
+            this.broker?.unsubscribeAll();
+            this.isExecuted = value;
+        } catch (e) {
+            console.error(e);
+        }
     }
 }

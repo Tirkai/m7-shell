@@ -9,5 +9,13 @@
 }
 .container {
     display: flex;
+    justify-content: space-between;
     background: rgba(0, 0, 0, 0.8);
+}
+.tasks {
+    display: flex;
+}
+
+.actions {
+    display: flex;
 }

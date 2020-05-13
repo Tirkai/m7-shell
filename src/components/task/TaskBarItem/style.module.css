@@ -26,3 +26,6 @@
     background: #b3b3b3;
     content: "";
 }
+.autoWidth {
+    width: auto;
+}

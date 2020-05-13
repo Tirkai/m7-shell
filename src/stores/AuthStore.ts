@@ -1,6 +1,6 @@
+import { BrokerMessageType } from "@algont/m7-shell-broker";
 import Axios from "axios";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
-import { BrokerMessageType } from "m7-shell-broker";
 import { action, observable } from "mobx";
 import { ExternalApllication } from "models/ExternalApplication";
 import { authEndpoint } from "utils/endpoints";
