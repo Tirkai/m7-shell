@@ -4,6 +4,7 @@ import { action } from "mobx";
 
 export class Application {
     id: string;
+    key: string;
     name: string;
     icon: string;
     baseWidth: number;
@@ -13,6 +14,7 @@ export class Application {
     constructor(options: IApplicationOptions) {
         this.id = options.id;
         this.name = options.name;
+        this.key = options.key ?? options.id;
         this.icon = options.icon ?? unknownApp;
         this.baseWidth = options.baseWidth ?? 1200;
         this.baseHeight = options.baseHeight ?? 800;

@@ -24,18 +24,20 @@ export class ApplicationManagerStore {
 
     @action
     executeApplication(app: Application) {
-        app.setExecuted(true);
-        this.store.windowManager.addWindow(
-            new ApplicationWindow(app, {
-                id: v4(),
-                width: app.baseWidth,
-                height: app.baseHeight,
-            }),
-        );
+        if (!app.isExecuted) {
+            app.setExecuted(true);
+            this.store.windowManager.addWindow(
+                new ApplicationWindow(app, {
+                    id: v4(),
+                    width: app.baseWidth,
+                    height: app.baseHeight,
+                }),
+            );
+        }
     }
 
-    findByName(name: string) {
-        return this.applications.find((app) => app.name === name);
+    findByKey(key: string) {
+        return this.applications.find((app) => app.key === key);
     }
 
     findById(id: string) {

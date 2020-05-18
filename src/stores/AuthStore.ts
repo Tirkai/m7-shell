@@ -38,20 +38,41 @@ export class AuthStore {
 
     @action
     async login(login: string, password: string) {
-        const response = await Axios.post<IJsonRpcResponse<string>>(
-            authEndpoint.url,
-            new JsonRpcPayload("login", {
-                login,
-                password,
-                parameters: {},
-            }),
-        );
+        try {
+            const response = await Axios.post<IJsonRpcResponse<string>>(
+                authEndpoint.url,
+                new JsonRpcPayload("login", {
+                    login,
+                    password,
+                    parameters: {},
+                }),
+            );
 
-        if (!response.data.error) {
-            this.setToken(response.data.result);
-            this.isAuthorized = true;
-        } else {
-            alert(response.data.error.message);
+            if (!response.data.error) {
+                this.setToken(response.data.result);
+                this.isAuthorized = true;
+            } else {
+                alert(response.data.error.message);
+            }
+        } catch (e) {
+            alert(e);
+        }
+    }
+
+    @action
+    async logout() {
+        try {
+            await Axios.post(
+                authEndpoint.url,
+                new JsonRpcPayload("logout", {
+                    token: this.jwtToken,
+                }),
+            );
+            localStorage.removeItem(this.localStorageTokenKey);
+            this.jwtToken = "";
+            this.isAuthorized = false;
+        } catch (e) {
+            alert(e);
         }
     }
 }

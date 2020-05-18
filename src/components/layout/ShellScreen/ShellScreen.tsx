@@ -10,7 +10,6 @@ import React, { Component } from "react";
 import { ResizeCallbackData } from "react-resizable";
 import { v4 } from "uuid";
 import style from "./style.module.css";
-
 @inject("store")
 @observer
 export class ShellScreen extends Component<IStore> {
@@ -42,10 +41,11 @@ export class ShellScreen extends Component<IStore> {
         this.store.applicationManager.addApplication(
             new ExternalApllication({
                 id: v4(),
-                name: "MobxDocs",
-                url: "https://mobx.js.org/refguide/observable-decorator.html",
-                baseWidth: 500,
-                baseHeight: 700,
+                name: "Accounts",
+                key: "Accounts",
+                url: "http://accounts.test1/me",
+                baseWidth: 700,
+                baseHeight: 600,
             }),
         );
 
