@@ -63,9 +63,9 @@ export class AppWindow extends Component<IAppWindowProps> {
             if (app instanceof ExternalApllication && context) {
                 app.setBrokerContext(context);
 
-                app.broker.subscribe(BrokerMessageType.Connected, () =>
-                    this.store.auth.injectAuthTokenInExternalApplication(app),
-                );
+                app.broker.subscribe(BrokerMessageType.Connected, () => {
+                    this.store.auth.injectAuthTokenInExternalApplication(app);
+                });
             }
             this.handleAppReady();
         }

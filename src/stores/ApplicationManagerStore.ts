@@ -24,6 +24,7 @@ export class ApplicationManagerStore {
 
     @action
     executeApplication(app: Application) {
+        app.setExecuted(true);
         this.store.windowManager.addWindow(
             new ApplicationWindow(app, {
                 id: v4(),
