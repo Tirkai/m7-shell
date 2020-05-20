@@ -1,8 +1,10 @@
 import { BrokerMessageType } from "@algont/m7-shell-broker";
+import classNames from "classnames";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
+import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApllication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
 import React, { Component } from "react";
@@ -14,14 +16,17 @@ import {
 } from "react-resizable";
 import AppLoader from "../AppLoader/AppLoader";
 import AppWindowHeader from "../AppWindowHeader/AppWindowHeader";
+import { AppWindowUnfocusedOverlay } from "../AppWindowUnfocusedOverlay/AppWindowUnfocusedOverlay";
 import style from "./style.module.css";
 
 interface IAppWindowProps extends IStore {
     application: Application;
+    window: ApplicationWindow;
     width: number;
     height: number;
     isResizing: boolean;
     isDragging: boolean;
+    isFocused: boolean;
     x: number;
     y: number;
     onResizeStart: (event: MouseEvent, data: ResizeCallbackData) => void;
@@ -79,6 +84,11 @@ export class AppWindow extends Component<IAppWindowProps> {
         this.props.onResize((event as unknown) as MouseEvent, data);
     };
 
+    handleFocus = () => {
+        this.store.windowManager.focusWindow(this.props.window);
+        console.log(this.props.window.depthIndex);
+    };
+
     componentDidMount() {
         if (this.props.application instanceof ShellApplication) {
             this.setState({ isAppReady: true });
@@ -122,7 +132,10 @@ export class AppWindow extends Component<IAppWindowProps> {
                     y: this.props.y,
                 }}
             >
-                <div className={style.appWindow}>
+                <div
+                    className={style.appWindow}
+                    style={{ zIndex: this.props.window.depthIndex }}
+                >
                     <ResizableBox
                         width={this.props.width}
                         height={this.props.height}
@@ -131,17 +144,25 @@ export class AppWindow extends Component<IAppWindowProps> {
                         onResize={this.handleResize}
                         resizeHandles={resizeDirections as ResizeHandle[]}
                     >
-                        <AppWindowHeader
-                            icon={this.props.application.icon}
-                            title={this.props.application.name}
-                            onClose={this.props.onClose}
-                        />
-                        <AppLoader
-                            icon={this.props.application.icon}
-                            disabled={this.state.isAppReady}
-                        />
-                        <div className={style.container}>
-                            {this.appComponent && this.appComponent}
+                        <div
+                            className={style.windowContainer}
+                            onMouseDown={this.handleFocus}
+                        >
+                            <AppWindowHeader
+                                icon={this.props.application.icon}
+                                title={this.props.application.name}
+                                onClose={this.props.onClose}
+                            />
+                            <AppLoader
+                                icon={this.props.application.icon}
+                                disabled={this.state.isAppReady}
+                            />
+                            <div className={classNames(style.content)}>
+                                {this.appComponent && this.appComponent}
+                            </div>
+                            <AppWindowUnfocusedOverlay
+                                visible={!this.props.isFocused}
+                            />
                         </div>
                     </ResizableBox>
                 </div>

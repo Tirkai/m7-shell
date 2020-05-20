@@ -85,6 +85,7 @@ export class ShellScreen extends Component<IStore> {
                     <AppWindow
                         key={appWindow.id}
                         {...appWindow}
+                        window={appWindow}
                         onResizeStart={(event, data) =>
                             this.hanldeWindowResizeStart(appWindow, event, data)
                         }

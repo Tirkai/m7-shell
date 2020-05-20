@@ -1,5 +1,6 @@
 import { apps, notificationsNone } from "assets/icons";
 import { BlurBackground } from "components/layout/BlurBackground/BlurBackground";
+import { AppWindow } from "components/window/AppWindow/AppWindow";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
@@ -25,6 +26,10 @@ export class TaskBar extends Component<IStore> {
     handleExecuteApp = (app: Application) => {
         this.store.shell.setAppMenuShow(false);
         this.store.applicationManager.executeApplication(app);
+    };
+
+    handleFocusAppWindow = (appWindow: AppWindow) => {
+        this.store.windowManager;
     };
 
     render() {

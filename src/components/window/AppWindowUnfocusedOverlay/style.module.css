@@ -1,0 +1,7 @@
+.overlay {
+    top: 30px;
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 30px);
+    z-index: 50;
+}

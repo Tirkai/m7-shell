@@ -15,6 +15,12 @@ export class ApplicationWindow {
     application: Application;
 
     @observable
+    depthIndex: number = 1;
+
+    @observable
+    isFocused: boolean = false;
+
+    @observable
     width: number;
 
     @observable
@@ -122,5 +128,15 @@ export class ApplicationWindow {
             this.setPosition(this.lockedX, event.clientY);
             this.setSize(this.lockedWidth - deltaX, this.lockedHeight + deltaY);
         }
+    }
+
+    @action
+    setDepthIndex(value: number) {
+        this.depthIndex = value;
+    }
+
+    @action
+    setFocused(value: boolean) {
+        this.isFocused = value;
     }
 }

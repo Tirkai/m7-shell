@@ -10,6 +10,7 @@
     transition: transform ease 0.3s, opacity 0.3s 0.1s;
     box-sizing: border-box;
     pointer-events: none;
+    z-index: 100;
 }
 
 .visible {
