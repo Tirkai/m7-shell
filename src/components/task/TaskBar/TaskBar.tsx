@@ -28,9 +28,7 @@ export class TaskBar extends Component<IStore> {
         this.store.applicationManager.executeApplication(app);
     };
 
-    handleFocusAppWindow = (appWindow: AppWindow) => {
-        this.store.windowManager;
-    };
+    handleFocusAppWindow = (appWindow: AppWindow) => {};
 
     render() {
         return (
