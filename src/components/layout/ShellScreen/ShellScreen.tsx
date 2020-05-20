@@ -6,8 +6,10 @@ import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApllication } from "models/ExternalApplication";
+import { ShellApplication } from "models/ShellApplication";
 import React, { Component } from "react";
 import { ResizeCallbackData } from "react-resizable";
+import EmiterLogger from "shell-apps/EmiterLogger/EmiterLogger";
 import { v4 } from "uuid";
 import style from "./style.module.css";
 @inject("store")
@@ -48,12 +50,16 @@ export class ShellScreen extends Component<IStore> {
                 baseHeight: 600,
             }),
         );
-
-        // const welcome = this.store.applicationManager.findByName("MobxDocs");
-        // console.log(welcome);
-        // if (welcome) {
-        //     this.store.applicationManager.executeApplication(welcome);
-        // }
+        this.store.applicationManager.addApplication(
+            new ShellApplication({
+                id: v4(),
+                name: "EmiterLogger",
+                key: "EmiterLogger",
+                Component: <EmiterLogger />,
+                baseWidth: 700,
+                baseHeight: 600,
+            }),
+        );
     }
 
     hanldeWindowResizeStart = (

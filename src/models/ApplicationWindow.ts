@@ -77,14 +77,14 @@ export class ApplicationWindow {
 
     @action
     setPosition(x: number, y: number) {
-        this.x = x;
-        this.y = y;
+        this.x = Math.floor(x);
+        this.y = Math.floor(y);
     }
 
     @action
     setSize(width: number, height: number) {
-        this.width = width;
-        this.height = height;
+        this.width = Math.floor(width);
+        this.height = Math.floor(height);
     }
 
     @action

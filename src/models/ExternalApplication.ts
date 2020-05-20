@@ -1,23 +1,23 @@
-import { ShellMessageBroker } from "@algont/m7-shell-broker";
+import { ShellMessageEmiter } from "@algont/m7-shell-emiter";
 import { IExternalApplicationOptions } from "interfaces/options/IExternalApplicationOptions";
 import { Application } from "./Application";
 export class ExternalApllication extends Application {
     url: string;
-    broker: ShellMessageBroker;
+    emiter: ShellMessageEmiter;
     constructor(options: IExternalApplicationOptions) {
         super(options);
         this.url = options.url;
-        this.broker = new ShellMessageBroker();
+        this.emiter = new ShellMessageEmiter();
     }
 
-    setBrokerContext(context: Window) {
-        this.broker.setContext(context);
+    setEmiterContext(context: Window) {
+        this.emiter.setContext(context);
         return this;
     }
 
     setExecuted(value: boolean) {
         try {
-            this.broker?.unsubscribeAll();
+            this.emiter?.clear();
             this.isExecuted = value;
         } catch (e) {
             console.error(e);

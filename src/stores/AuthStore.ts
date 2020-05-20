@@ -1,4 +1,4 @@
-import { BrokerMessageType } from "@algont/m7-shell-broker";
+import { EmiterMessageType } from "@algont/m7-shell-emiter";
 import Axios from "axios";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { action, observable } from "mobx";
@@ -33,7 +33,7 @@ export class AuthStore {
 
     @action
     injectAuthTokenInExternalApplication(app: ExternalApllication) {
-        app.broker.dispatch(BrokerMessageType.UpdateAuthToken, this.jwtToken);
+        app.emiter.emit(EmiterMessageType.UpdateAuthToken, this.jwtToken);
     }
 
     @action

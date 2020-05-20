@@ -1,4 +1,4 @@
-import { BrokerMessageType } from "@algont/m7-shell-broker";
+import { EmiterMessageType } from "@algont/m7-shell-emiter";
 import classNames from "classnames";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
@@ -66,9 +66,9 @@ export class AppWindow extends Component<IAppWindowProps> {
         if (context) {
             const app = this.props.application;
             if (app instanceof ExternalApllication && context) {
-                app.setBrokerContext(context);
+                app.setEmiterContext(context);
 
-                app.broker.subscribe(BrokerMessageType.Connected, () => {
+                app.emiter.on(EmiterMessageType.Connected, () => {
                     this.store.auth.injectAuthTokenInExternalApplication(app);
                 });
             }
