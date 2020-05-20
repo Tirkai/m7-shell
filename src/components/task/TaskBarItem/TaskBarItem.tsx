@@ -6,6 +6,7 @@ interface ITaskBarItemProps {
     onClick: () => void;
     autoWidth?: boolean;
     executed?: boolean;
+    focused?: boolean;
 }
 
 export class TaskBarItem extends Component<ITaskBarItemProps> {
@@ -15,6 +16,7 @@ export class TaskBarItem extends Component<ITaskBarItemProps> {
                 className={classNames(style.taskBarItem, {
                     [style.executed]: this.props.executed,
                     [style.autoWidth]: this.props.autoWidth,
+                    [style.focused]: this.props.focused,
                 })}
                 onClick={this.props.onClick}
             >

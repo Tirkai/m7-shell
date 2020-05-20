@@ -1,10 +1,10 @@
 import { apps, notificationsNone } from "assets/icons";
 import { BlurBackground } from "components/layout/BlurBackground/BlurBackground";
-import { AppWindow } from "components/window/AppWindow/AppWindow";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
+import { ApplicationWindow } from "models/ApplicationWindow";
 import React, { Component } from "react";
 import { AppsMenu } from "../AppsMenu/AppsMenu";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
@@ -28,7 +28,9 @@ export class TaskBar extends Component<IStore> {
         this.store.applicationManager.executeApplication(app);
     };
 
-    handleFocusAppWindow = (appWindow: AppWindow) => {};
+    handleFocusAppWindow = (appWindow: ApplicationWindow) => {
+        this.store.windowManager.focusWindow(appWindow);
+    };
 
     render() {
         return (
@@ -57,7 +59,12 @@ export class TaskBar extends Component<IStore> {
                                     (appWindow) => (
                                         <TaskBarItem
                                             executed
-                                            onClick={() => {}}
+                                            focused={appWindow.isFocused}
+                                            onClick={() =>
+                                                this.handleFocusAppWindow(
+                                                    appWindow,
+                                                )
+                                            }
                                         >
                                             <img
                                                 src={appWindow.application.icon}

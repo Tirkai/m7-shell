@@ -123,7 +123,7 @@ export class AppWindow extends Component<IAppWindowProps> {
 
         return (
             <Draggable
-                handle=".appWindowHeader"
+                handle=".appHeaderInfoBar"
                 onStart={this.props.onDragStart}
                 onStop={this.props.onDragStop}
                 onDrag={this.props.onDrag}
@@ -143,6 +143,7 @@ export class AppWindow extends Component<IAppWindowProps> {
                         onResizeStop={this.handleResizeEnd}
                         onResize={this.handleResize}
                         resizeHandles={resizeDirections as ResizeHandle[]}
+                        minConstraints={[300, 200]}
                     >
                         <div
                             className={style.windowContainer}

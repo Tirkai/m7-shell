@@ -13,6 +13,7 @@
 
 .info {
     display: flex;
+    flex-grow: 1;
     height: 100%;
 }
 
@@ -23,6 +24,7 @@
     width: 30px;
     height: 100%;
     margin-right: 5px;
+    pointer-events: none;
 }
 .icon img {
     height: 16px;
