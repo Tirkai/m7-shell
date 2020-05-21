@@ -43,6 +43,8 @@ interface IAppWindowProps extends IStore {
 export class AppWindow extends Component<IAppWindowProps> {
     state = {
         isAppReady: false,
+        hasBackward: false,
+        hasReload: false,
     };
 
     @computed
@@ -89,9 +91,26 @@ export class AppWindow extends Component<IAppWindowProps> {
         console.log(this.props.window.depthIndex);
     };
 
+    handleShowBackward = (value: boolean) => {
+        this.setState({ hasBackward: value });
+    };
+
+    handleShowReload = (value: boolean) => {
+        this.setState({ hasReload: value });
+    };
+
     componentDidMount() {
-        if (this.props.application instanceof ShellApplication) {
+        const app = this.props.application;
+        if (app instanceof ShellApplication) {
             this.setState({ isAppReady: true });
+        }
+        if (app instanceof ExternalApllication) {
+            app.emiter.on(EmiterMessageType.EnableBackwardButton, (payload) =>
+                this.handleShowBackward(payload),
+            );
+            app.emiter.on(EmiterMessageType.EnableReloadButton, (payload) =>
+                this.handleShowReload(payload),
+            );
         }
     }
 
@@ -153,6 +172,12 @@ export class AppWindow extends Component<IAppWindowProps> {
                                 icon={this.props.application.icon}
                                 title={this.props.application.name}
                                 onClose={this.props.onClose}
+                                hasBackward={this.state.hasBackward}
+                                hasReload={this.state.hasReload}
+                                onBackward={() => {}}
+                                onReload={() => {}}
+                                onCollapse={() => {}}
+                                onFullscreen={() => {}}
                             />
                             <AppLoader
                                 icon={this.props.application.icon}

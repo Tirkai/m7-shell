@@ -39,17 +39,8 @@
 }
 
 .actions {
-    height: 100%;
-}
-.actionItem {
-    height: 100%;
-    width: 30px;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-.actionItem img {
-    width: 16px;
-    height: 16px;
+    height: 100%;
+    position: relative;
+    z-index: 5;
 }

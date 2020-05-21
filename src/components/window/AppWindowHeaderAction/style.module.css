@@ -1,0 +1,16 @@
+.action {
+    height: 100%;
+    width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.action img {
+    width: 12px;
+    height: 12px;
+}
+
+.action:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
