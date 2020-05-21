@@ -45,8 +45,8 @@ export class ShellScreen extends Component<IStore> {
                 id: v4(),
                 name: "Accounts",
                 key: "Accounts",
-                url: "http://accounts.test1/me",
-                baseWidth: 700,
+                url: "http://localhost:3001",
+                baseWidth: 500,
                 baseHeight: 600,
             }),
         );

@@ -9,6 +9,7 @@ interface IAppWindowHeaderProps {
     title: string;
     hasBackward?: boolean;
     hasReload?: boolean;
+    onDoubleClick?: () => void;
     onClose: () => void;
     onFullscreen: () => void;
     onCollapse: () => void;
@@ -21,6 +22,7 @@ export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
         return (
             <div
                 className={classNames("appWindowHeader", style.appWindowHeader)}
+                onDoubleClick={this.props.onDoubleClick}
             >
                 <div className={style.container}>
                     <div className={style.actions}>

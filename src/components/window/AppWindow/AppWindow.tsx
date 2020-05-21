@@ -98,6 +98,15 @@ export class AppWindow extends Component<IAppWindowProps> {
         this.setState({ hasReload: value });
     };
 
+    handleFullScreen = () => {
+        this.props.window.setFullScreen(!this.props.window.isFullScreen);
+    };
+
+    handleHeaderDoubleClick = () => {
+        const appWindow = this.props.window;
+        appWindow.setFullScreen(!appWindow.isFullScreen);
+    };
+
     componentDidMount() {
         const app = this.props.application;
         if (app instanceof ShellApplication) {
@@ -139,7 +148,7 @@ export class AppWindow extends Component<IAppWindowProps> {
         }
 
         const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
-
+        const taskBarWidth = 48;
         return (
             <Draggable
                 handle=".appHeaderInfoBar"
@@ -147,8 +156,8 @@ export class AppWindow extends Component<IAppWindowProps> {
                 onStop={this.props.onDragStop}
                 onDrag={this.props.onDrag}
                 position={{
-                    x: this.props.x,
-                    y: this.props.y,
+                    x: this.props.window.bounds.x,
+                    y: this.props.window.bounds.y,
                 }}
             >
                 <div
@@ -156,8 +165,8 @@ export class AppWindow extends Component<IAppWindowProps> {
                     style={{ zIndex: this.props.window.depthIndex }}
                 >
                     <ResizableBox
-                        width={this.props.width}
-                        height={this.props.height}
+                        width={this.props.window.bounds.width}
+                        height={this.props.window.bounds.height}
                         onResizeStart={this.handleResizeStart}
                         onResizeStop={this.handleResizeEnd}
                         onResize={this.handleResize}
@@ -172,12 +181,13 @@ export class AppWindow extends Component<IAppWindowProps> {
                                 icon={this.props.application.icon}
                                 title={this.props.application.name}
                                 onClose={this.props.onClose}
+                                onDoubleClick={this.handleHeaderDoubleClick}
                                 hasBackward={this.state.hasBackward}
                                 hasReload={this.state.hasReload}
                                 onBackward={() => true}
                                 onReload={() => true}
                                 onCollapse={() => true}
-                                onFullscreen={() => true}
+                                onFullscreen={() => this.handleFullScreen()}
                             />
                             <AppLoader
                                 icon={this.props.application.icon}

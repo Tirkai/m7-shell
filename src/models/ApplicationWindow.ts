@@ -1,5 +1,5 @@
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 import { ResizeCallbackData } from "react-resizable";
 import { Application } from "./Application";
 
@@ -24,6 +24,9 @@ export class ApplicationWindow {
     isFocused: boolean = false;
 
     @observable
+    isFullScreen: boolean = false;
+
+    @observable
     width: number;
 
     @observable
@@ -34,6 +37,19 @@ export class ApplicationWindow {
 
     @observable
     y: number;
+
+    @computed
+    get bounds() {
+        const TASKBAR_HEIGHT = 48;
+        return {
+            x: !this.isFullScreen ? this.x : 0,
+            y: !this.isFullScreen ? this.y : 0,
+            width: !this.isFullScreen ? this.width : window.innerWidth,
+            height: !this.isFullScreen
+                ? this.height
+                : window.innerHeight - TASKBAR_HEIGHT,
+        };
+    }
 
     @observable
     resizeOriginPoint: { x: number; y: number } = { x: 0, y: 0 };
@@ -141,5 +157,10 @@ export class ApplicationWindow {
     @action
     setFocused(value: boolean) {
         this.isFocused = value;
+    }
+
+    @action
+    setFullScreen(value: boolean) {
+        this.isFullScreen = value;
     }
 }
