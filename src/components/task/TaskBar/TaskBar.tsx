@@ -53,7 +53,7 @@ export class TaskBar extends Component<IStore> {
                                         )
                                     }
                                 >
-                                    <img src={apps} />
+                                    <img src={apps} alt="Applications" />
                                 </TaskBarItem>
                                 {this.props.store?.windowManager.windows.map(
                                     (appWindow) => (
@@ -68,17 +68,21 @@ export class TaskBar extends Component<IStore> {
                                         >
                                             <img
                                                 src={appWindow.application.icon}
+                                                alt="App Icon"
                                             />
                                         </TaskBarItem>
                                     ),
                                 )}
                             </div>
                             <div className={style.actions}>
-                                <TaskBarItem onClick={() => {}} autoWidth>
+                                <TaskBarItem onClick={() => true} autoWidth>
                                     <TaskBarDateTime />
                                 </TaskBarItem>
-                                <TaskBarItem onClick={() => {}}>
-                                    <img src={notificationsNone} />
+                                <TaskBarItem onClick={() => true}>
+                                    <img
+                                        src={notificationsNone}
+                                        alt="Notifications"
+                                    />
                                 </TaskBarItem>
                             </div>
                         </div>

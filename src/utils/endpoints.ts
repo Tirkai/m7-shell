@@ -1,5 +1,5 @@
 import { JsonRpcEndpoint } from "./JsonRpcEndpoint";
 
 export const authEndpoint = new JsonRpcEndpoint(
-    "http://accounts.test1/jsonrpc/auth",
+    "http://accounts.c9s/jsonrpc/auth/v2",
 );

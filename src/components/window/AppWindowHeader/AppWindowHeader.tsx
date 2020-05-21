@@ -43,7 +43,7 @@ export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
                     </div>
                     <div className={classNames("appHeaderInfoBar", style.info)}>
                         <div className={style.icon}>
-                            <img src={this.props.icon} />
+                            <img src={this.props.icon} alt="App Icon" />
                         </div>
                         <div className={style.title}>{this.props.title}</div>
                     </div>

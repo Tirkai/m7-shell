@@ -30,7 +30,7 @@ export class WindowManagerStore {
         if (minIndex && maxIndex) {
             this.windows.forEach((item) => {
                 let index = 0;
-                if (item.id == appWindow.id) {
+                if (item.id === appWindow.id) {
                     index = maxIndex - minIndex + 2;
                     appWindow.setFocused(true);
                 } else {

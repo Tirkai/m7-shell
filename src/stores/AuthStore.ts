@@ -44,7 +44,6 @@ export class AuthStore {
                 new JsonRpcPayload("login", {
                     login,
                     password,
-                    parameters: {},
                 }),
             );
 

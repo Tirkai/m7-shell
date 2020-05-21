@@ -17,7 +17,7 @@ export class AppLoader extends Component<IAppLoaderProps> {
             >
                 <div className={style.container}>
                     <div className={style.icon}>
-                        <img src={this.props.icon} />
+                        <img src={this.props.icon} alt="App Icon" />
                     </div>
                     <div className={style.loader}>
                         <CircularProgress />

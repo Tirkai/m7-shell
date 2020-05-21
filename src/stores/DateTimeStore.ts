@@ -30,9 +30,10 @@ export class DateTimeStore {
 
     @action
     init() {
+        const timeout = 1000;
         setInterval(() => {
             this.date = moment().format(this.dateFormat);
             this.time = moment().format(this.timeFormat);
-        }, 1000);
+        }, timeout);
     }
 }

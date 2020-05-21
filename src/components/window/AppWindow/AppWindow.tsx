@@ -88,7 +88,6 @@ export class AppWindow extends Component<IAppWindowProps> {
 
     handleFocus = () => {
         this.store.windowManager.focusWindow(this.props.window);
-        console.log(this.props.window.depthIndex);
     };
 
     handleShowBackward = (value: boolean) => {
@@ -122,6 +121,7 @@ export class AppWindow extends Component<IAppWindowProps> {
                     onLoad={this.handleAppReady}
                     src={this.props.application.url}
                     ref={this.handleFrameLoaded}
+                    title={this.props.application.name}
                     style={{
                         width: "100%",
                         height: "100%",
@@ -174,10 +174,10 @@ export class AppWindow extends Component<IAppWindowProps> {
                                 onClose={this.props.onClose}
                                 hasBackward={this.state.hasBackward}
                                 hasReload={this.state.hasReload}
-                                onBackward={() => {}}
-                                onReload={() => {}}
-                                onCollapse={() => {}}
-                                onFullscreen={() => {}}
+                                onBackward={() => true}
+                                onReload={() => true}
+                                onCollapse={() => true}
+                                onFullscreen={() => true}
                             />
                             <AppLoader
                                 icon={this.props.application.icon}

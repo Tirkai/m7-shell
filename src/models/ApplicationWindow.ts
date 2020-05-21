@@ -10,8 +10,8 @@ interface IApplicationWindowOptions {
 }
 
 export class ApplicationWindow {
-    private minWidth = 300;
-    private minHeight = 200;
+    minWidth: number = 300;
+    minHeight: number = 200;
 
     id: string;
 

@@ -27,15 +27,15 @@ export class AppsMenu extends Component<IAppsMenuProps> {
         this.store.shell.setAppMenuShow(false);
     };
 
-    getWithAwayListenerWrapper = (Component: JSX.Element) => {
+    getWithAwayListenerWrapper = (AppMenuComponent: JSX.Element) => {
         if (this.store.shell.appMenuShow) {
             return (
                 <ClickAwayListener onClickAway={this.handleClickAway}>
-                    {Component}
+                    {AppMenuComponent}
                 </ClickAwayListener>
             );
         }
-        return Component;
+        return AppMenuComponent;
     };
 
     render() {
@@ -51,7 +51,7 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                             <div className={style.search}>
                                 <AppsMenuSearch
                                     value={""}
-                                    onChange={() => {}}
+                                    onChange={() => true}
                                 />
                             </div>
                             <div className={style.appsList}>

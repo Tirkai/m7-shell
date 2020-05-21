@@ -12,7 +12,7 @@ export class AppWindowHeaderAction extends Component<
     render() {
         return (
             <div className={style.action} onClick={this.props.onClick}>
-                <img src={this.props.icon} />
+                <img src={this.props.icon} alt="Window Action" />
             </div>
         );
     }

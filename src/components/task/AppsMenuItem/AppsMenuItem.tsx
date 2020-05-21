@@ -11,7 +11,7 @@ export class AppsMenuItem extends Component<IAppsMenuItemProps> {
         return (
             <div className={style.appsMenuItem} onClick={this.props.onClick}>
                 <div className={style.icon}>
-                    <img src={this.props.icon} />
+                    <img src={this.props.icon} alt="App Icon" />
                 </div>
                 <div className={style.title}>{this.props.title}</div>
             </div>
