@@ -1,6 +1,7 @@
 import { action, computed, observable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
+import { registeredApps } from "registeredApps";
 import { v4 } from "uuid";
 import { AppStore } from "./AppStore";
 export class ApplicationManagerStore {
@@ -9,7 +10,7 @@ export class ApplicationManagerStore {
 
     @computed
     get executedApplications() {
-        return this.applications;
+        return this.applications.filter((item) => item.isExecuted);
     }
 
     private store: AppStore;
@@ -20,6 +21,11 @@ export class ApplicationManagerStore {
     @action
     addApplication(app: Application) {
         this.applications.push(app);
+    }
+
+    @action
+    addApplicationsList(apps: Application[]) {
+        this.applications = [...this.applications, ...apps];
     }
 
     @action
@@ -34,6 +40,12 @@ export class ApplicationManagerStore {
                 }),
             );
         }
+    }
+
+    @action
+    fetchApplications() {
+        this.applications = [];
+        this.addApplicationsList(registeredApps);
     }
 
     findByKey(key: string) {

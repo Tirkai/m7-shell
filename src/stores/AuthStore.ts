@@ -1,5 +1,6 @@
 import { EmiterMessageType } from "@algont/m7-shell-emiter";
 import Axios from "axios";
+import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { action, observable } from "mobx";
 import { ExternalApllication } from "models/ExternalApplication";
@@ -7,8 +8,13 @@ import { authEndpoint } from "utils/endpoints";
 import { JsonRpcPayload } from "utils/JsonRpcPayload";
 import { AppStore } from "./AppStore";
 export class AuthStore {
-    private readonly localStorageTokenKey: string = "TOKEN";
-    jwtToken: string = "";
+    private readonly localStorageAccessTokenKey: string = "ACCESS_TOKEN";
+    private readonly localStorageRefreshTokenKey: string = "REFRESH_TOKEN";
+    private readonly localStorageUserLogin: string = "USER_LOGIN";
+
+    accessToken: string = "";
+    refreshToken: string = "";
+    userLogin: string = "";
 
     @observable
     isAuthorized: boolean = false;
@@ -17,29 +23,75 @@ export class AuthStore {
     constructor(store: AppStore) {
         this.store = store;
 
-        const token = localStorage.getItem(this.localStorageTokenKey);
-        if (token) {
-            this.setToken(token);
+        const authToken = localStorage.getItem(this.localStorageAccessTokenKey);
+        const refreshToken = localStorage.getItem(
+            this.localStorageRefreshTokenKey,
+        );
+        const userLogin = localStorage.getItem(this.localStorageUserLogin);
+
+        if (authToken && refreshToken && userLogin) {
+            this.setToken(authToken, refreshToken);
+            this.userLogin = userLogin;
             this.isAuthorized = true;
+            this.startUpdateAuthTokenLoop();
         }
     }
 
     @action
-    setToken(token: string) {
-        this.jwtToken = token;
-        localStorage.setItem(this.localStorageTokenKey, this.jwtToken);
-        Axios.defaults.headers.common.Authorization = this.jwtToken;
+    setToken(authToken: string, refreshToken: string) {
+        this.accessToken = authToken;
+        this.refreshToken = refreshToken;
+        localStorage.setItem(this.localStorageAccessTokenKey, this.accessToken);
+        localStorage.setItem(
+            this.localStorageRefreshTokenKey,
+            this.refreshToken,
+        );
+        Axios.defaults.headers.common.Authorization = this.accessToken;
     }
 
     @action
     injectAuthTokenInExternalApplication(app: ExternalApllication) {
-        app.emiter.emit(EmiterMessageType.UpdateAuthToken, this.jwtToken);
+        app.emiter.emit(EmiterMessageType.UpdateAuthToken, {
+            token: this.accessToken,
+            login: this.userLogin,
+        });
+    }
+
+    startUpdateAuthTokenLoop() {
+        const updateTokenDelay = 15 * 60 * 1000; // Every 15 minutes
+        this.renewToken();
+        setInterval(async () => {
+            this.renewToken();
+        }, updateTokenDelay);
+    }
+
+    async renewToken() {
+        const response = await Axios.post<IJsonRpcResponse<IAuthResponse>>(
+            authEndpoint.url,
+            new JsonRpcPayload("renew", {
+                token: this.refreshToken,
+            }),
+        );
+        if (!response.data.error) {
+            const result = response.data.result;
+            this.setToken(result.access_token, result.refresh_token);
+            this.store.applicationManager.executedApplications.forEach(
+                (item) => {
+                    if (item instanceof ExternalApllication) {
+                        item.emiter.emit(EmiterMessageType.UpdateAuthToken, {
+                            token: this.accessToken,
+                            login: this.userLogin,
+                        });
+                    }
+                },
+            );
+        }
     }
 
     @action
     async login(login: string, password: string) {
         try {
-            const response = await Axios.post<IJsonRpcResponse<string>>(
+            const response = await Axios.post<IJsonRpcResponse<IAuthResponse>>(
                 authEndpoint.url,
                 new JsonRpcPayload("login", {
                     login,
@@ -48,8 +100,19 @@ export class AuthStore {
             );
 
             if (!response.data.error) {
-                this.setToken(response.data.result);
+                this.setToken(
+                    response.data.result.access_token,
+                    response.data.result.refresh_token,
+                );
+
                 this.isAuthorized = true;
+                this.userLogin = login;
+
+                localStorage.setItem(
+                    this.localStorageUserLogin,
+                    this.userLogin,
+                );
+                this.startUpdateAuthTokenLoop();
             } else {
                 alert(response.data.error.message);
             }
@@ -64,11 +127,11 @@ export class AuthStore {
             await Axios.post(
                 authEndpoint.url,
                 new JsonRpcPayload("logout", {
-                    token: this.jwtToken,
+                    token: this.accessToken,
                 }),
             );
-            localStorage.removeItem(this.localStorageTokenKey);
-            this.jwtToken = "";
+            localStorage.removeItem(this.localStorageAccessTokenKey);
+            this.accessToken = "";
             this.isAuthorized = false;
         } catch (e) {
             alert(e);

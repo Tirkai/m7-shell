@@ -37,5 +37,3 @@ export class EmiterLogger extends Component {
         );
     }
 }
-
-export default EmiterLogger;

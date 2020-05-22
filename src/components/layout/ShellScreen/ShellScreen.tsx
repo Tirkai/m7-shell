@@ -1,16 +1,11 @@
-import { videocam } from "assets/icons";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { AppWindow } from "components/window/AppWindow/AppWindow";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationWindow } from "models/ApplicationWindow";
-import { ExternalApllication } from "models/ExternalApplication";
-import { ShellApplication } from "models/ShellApplication";
 import React, { Component } from "react";
 import { ResizeCallbackData } from "react-resizable";
-import EmiterLogger from "shell-apps/EmiterLogger/EmiterLogger";
-import { v4 } from "uuid";
 import style from "./style.module.css";
 @inject("store")
 @observer
@@ -21,45 +16,7 @@ export class ShellScreen extends Component<IStore> {
     }
 
     componentDidMount() {
-        this.store.applicationManager.addApplication(
-            new ExternalApllication({
-                id: v4(),
-                name: "АССаД-Видео",
-                url: "http://video.test1/lab/setup",
-                icon: videocam,
-            }),
-        );
-
-        this.store.applicationManager.addApplication(
-            new ExternalApllication({
-                id: v4(),
-                name: "Отчеты",
-                url: "http://reports.test1",
-                baseWidth: 800,
-                baseHeight: 600,
-            }),
-        );
-
-        this.store.applicationManager.addApplication(
-            new ExternalApllication({
-                id: v4(),
-                name: "Accounts",
-                key: "Accounts",
-                url: "http://localhost:3001",
-                baseWidth: 500,
-                baseHeight: 600,
-            }),
-        );
-        this.store.applicationManager.addApplication(
-            new ShellApplication({
-                id: v4(),
-                name: "EmiterLogger",
-                key: "EmiterLogger",
-                Component: <EmiterLogger />,
-                baseWidth: 700,
-                baseHeight: 600,
-            }),
-        );
+        this.store.applicationManager.fetchApplications();
     }
 
     hanldeWindowResizeStart = (

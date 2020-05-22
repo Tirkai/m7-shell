@@ -46,6 +46,7 @@ export class AuthForm extends Component<IAuthFormProps> {
                             onChange={this.handleChangePassword}
                             value={this.state.password}
                             label="Пароль"
+                            type="password"
                         />
                     </FormItem>
                     <FormItem>

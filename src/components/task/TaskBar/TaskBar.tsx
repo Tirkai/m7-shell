@@ -58,6 +58,7 @@ export class TaskBar extends Component<IStore> {
                                 {this.props.store?.windowManager.windows.map(
                                     (appWindow) => (
                                         <TaskBarItem
+                                            key={appWindow.id}
                                             executed
                                             focused={appWindow.isFocused}
                                             onClick={() =>
