@@ -30,6 +30,9 @@ export class TaskBar extends Component<IStore> {
 
     handleFocusAppWindow = (appWindow: ApplicationWindow) => {
         this.store.windowManager.focusWindow(appWindow);
+        if (appWindow.isCollapsed) {
+            this.store.windowManager.expandWindow(appWindow);
+        }
     };
 
     render() {

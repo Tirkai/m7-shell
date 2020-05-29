@@ -58,9 +58,9 @@ export class AuthStore {
     }
 
     startUpdateAuthTokenLoop() {
-        const updateTokenDelay = 15 * 60 * 1000; // Every 15 minutes
+        const updateTokenDelay = 5 * 60 * 1000; // Every 5 minutes
         this.renewToken();
-        setInterval(async () => {
+        setInterval(() => {
             this.renewToken();
         }, updateTokenDelay);
     }
@@ -85,6 +85,7 @@ export class AuthStore {
                     }
                 },
             );
+            console.log("Update token:", this.accessToken);
         }
     }
 
@@ -113,9 +114,8 @@ export class AuthStore {
                     this.userLogin,
                 );
                 this.startUpdateAuthTokenLoop();
-            } else {
-                alert(response.data.error.message);
             }
+            return response.data;
         } catch (e) {
             alert(e);
         }

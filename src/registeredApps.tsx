@@ -24,9 +24,9 @@ export const registeredApps: Application[] = [
         id: v4(),
         name: "Accounts",
         key: "Accounts",
-        url: "http://video.test1/accounts",
+        url: "http://localhost:3001",
         baseWidth: 800,
-        baseHeight: 600,
+        baseHeight: 650,
     }),
     new ShellApplication({
         id: v4(),

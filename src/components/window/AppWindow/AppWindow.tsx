@@ -102,6 +102,10 @@ export class AppWindow extends Component<IAppWindowProps> {
         this.props.window.setFullScreen(!this.props.window.isFullScreen);
     };
 
+    handleCollapse = () => {
+        this.props.window.setCollapsed(true);
+    };
+
     handleHeaderDoubleClick = () => {
         const appWindow = this.props.window;
         appWindow.setFullScreen(!appWindow.isFullScreen);
@@ -161,7 +165,9 @@ export class AppWindow extends Component<IAppWindowProps> {
                 }}
             >
                 <div
-                    className={style.appWindow}
+                    className={classNames(style.appWindow, {
+                        [style.collapsed]: this.props.window.isCollapsed,
+                    })}
                     style={{ zIndex: this.props.window.depthIndex }}
                 >
                     <ResizableBox
@@ -186,7 +192,7 @@ export class AppWindow extends Component<IAppWindowProps> {
                                 hasReload={this.state.hasReload}
                                 onBackward={() => true}
                                 onReload={() => true}
-                                onCollapse={() => true}
+                                onCollapse={() => this.handleCollapse()}
                                 onFullscreen={() => this.handleFullScreen()}
                             />
                             <AppLoader

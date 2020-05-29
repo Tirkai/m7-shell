@@ -27,6 +27,9 @@ export class ApplicationWindow {
     isFullScreen: boolean = false;
 
     @observable
+    isCollapsed: boolean = false;
+
+    @observable
     width: number;
 
     @observable
@@ -162,5 +165,11 @@ export class ApplicationWindow {
     @action
     setFullScreen(value: boolean) {
         this.isFullScreen = value;
+    }
+
+    @action
+    setCollapsed(value: boolean) {
+        this.isFocused = false;
+        this.isCollapsed = value;
     }
 }

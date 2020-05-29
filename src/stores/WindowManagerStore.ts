@@ -43,6 +43,11 @@ export class WindowManagerStore {
     }
 
     @action
+    expandWindow(appWindow: ApplicationWindow) {
+        appWindow.setCollapsed(false);
+    }
+
+    @action
     closeWindow(appWindow: ApplicationWindow) {
         const app = this.store.applicationManager.findById(
             appWindow.application.id,
