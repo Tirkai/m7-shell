@@ -22,8 +22,16 @@ export const registeredApps: Application[] = [
     }),
     new ExternalApllication({
         id: v4(),
-        name: "Accounts",
+        name: "[c9s] Accounts",
         key: "Accounts",
+        url: "http://accounts.c9s",
+        baseWidth: 800,
+        baseHeight: 650,
+    }),
+    new ExternalApllication({
+        id: v4(),
+        name: "[local] Accounts",
+        key: "AccountsLocal",
         url: "http://localhost:3001",
         baseWidth: 800,
         baseHeight: 650,
