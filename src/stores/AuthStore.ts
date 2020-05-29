@@ -86,6 +86,8 @@ export class AuthStore {
                 },
             );
             console.log("Update token:", this.accessToken);
+        } else {
+            this.logout();
         }
     }
 
