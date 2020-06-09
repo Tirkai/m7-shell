@@ -1,23 +1,23 @@
-import { ShellMessageEmiter } from "@algont/m7-shell-emiter";
+import { ShellMessageEmitter } from "@algont/m7-shell-emitter";
 import { IExternalApplicationOptions } from "interfaces/options/IExternalApplicationOptions";
 import { Application } from "./Application";
 export class ExternalApllication extends Application {
     url: string;
-    emiter: ShellMessageEmiter;
+    emitter: ShellMessageEmitter;
     constructor(options: IExternalApplicationOptions) {
         super(options);
         this.url = options.url;
-        this.emiter = new ShellMessageEmiter();
+        this.emitter = new ShellMessageEmitter();
     }
 
     setEmiterContext(context: Window) {
-        this.emiter.setContext(context);
+        this.emitter.setContext(context);
         return this;
     }
 
     setExecuted(value: boolean) {
         try {
-            this.emiter?.clear();
+            this.emitter?.clear();
             this.isExecuted = value;
         } catch (e) {
             console.error(e);

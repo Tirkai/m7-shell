@@ -1,4 +1,4 @@
-import { EmiterMessageType } from "@algont/m7-shell-emiter";
+import { ShellMessageType } from "@algont/m7-shell-emitter";
 import Axios from "axios";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
@@ -51,7 +51,7 @@ export class AuthStore {
 
     @action
     injectAuthTokenInExternalApplication(app: ExternalApllication) {
-        app.emiter.emit(EmiterMessageType.UpdateAuthToken, {
+        app.emitter.emit(ShellMessageType.UpdateAuthToken, {
             token: this.accessToken,
             login: this.userLogin,
         });
@@ -78,7 +78,7 @@ export class AuthStore {
             this.store.applicationManager.executedApplications.forEach(
                 (item) => {
                     if (item instanceof ExternalApllication) {
-                        item.emiter.emit(EmiterMessageType.UpdateAuthToken, {
+                        item.emitter.emit(ShellMessageType.UpdateAuthToken, {
                             token: this.accessToken,
                             login: this.userLogin,
                         });

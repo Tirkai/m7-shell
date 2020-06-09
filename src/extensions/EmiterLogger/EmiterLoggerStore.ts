@@ -1,9 +1,9 @@
-import { EmiterMessage } from "@algont/m7-shell-emiter";
+import { EmitterMessage } from "@algont/m7-shell-emitter";
 import { action, observable } from "mobx";
 
 export class EmiterLoggerStore {
     @observable
-    events: EmiterMessage<unknown>[] = [];
+    events: EmitterMessage<unknown>[] = [];
 
     @observable
     isInited: boolean = false;
@@ -11,15 +11,15 @@ export class EmiterLoggerStore {
     @action
     init() {
         if (!this.isInited) {
-            window.addEventListener("emiterSubmitMessage", ((
-                event: CustomEvent<EmiterMessage<unknown>>,
+            window.addEventListener("emitterSubmitMessage", ((
+                event: CustomEvent<EmitterMessage<unknown>>,
             ) => {
-                const message: EmiterMessage<unknown> = event.detail;
+                const message: EmitterMessage<unknown> = event.detail;
                 this.addEvent(message);
             }) as EventListener);
 
             window.addEventListener("message", (event: MessageEvent) => {
-                const message: EmiterMessage<unknown> = event.data;
+                const message: EmitterMessage<unknown> = event.data;
                 this.addEvent(message);
             });
             this.isInited = true;
@@ -27,7 +27,7 @@ export class EmiterLoggerStore {
     }
 
     @action
-    addEvent(event: EmiterMessage<unknown>) {
+    addEvent(event: EmitterMessage<unknown>) {
         if (event.type?.indexOf("M7") > -1) {
             this.events.unshift(event);
         }

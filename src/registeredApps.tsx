@@ -36,6 +36,22 @@ export const registeredApps: Application[] = [
         baseWidth: 800,
         baseHeight: 650,
     }),
+    new ExternalApllication({
+        id: v4(),
+        name: "Legacy Accounts [test1]",
+        key: "AccountsTest1",
+        url: "http://accounts.test1",
+        baseWidth: 800,
+        baseHeight: 650,
+    }),
+    new ExternalApllication({
+        id: v4(),
+        name: "ME [local]",
+        key: "AccountsMe",
+        url: "http://localhost:3001/#/me",
+        baseWidth: 800,
+        baseHeight: 650,
+    }),
     new ShellApplication({
         id: v4(),
         name: "EmiterLogger",

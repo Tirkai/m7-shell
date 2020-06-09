@@ -33,7 +33,7 @@ export class AppsProfilePreview extends Component<IStore> {
     };
 
     handleOpenAccountManager = () => {
-        const app = this.store.applicationManager.findByKey("Accounts");
+        const app = this.store.applicationManager.findByKey("AccountsMe");
         if (app) {
             this.store.applicationManager.executeApplication(app);
         }

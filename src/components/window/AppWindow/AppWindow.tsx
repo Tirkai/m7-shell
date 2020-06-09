@@ -1,4 +1,4 @@
-import { EmiterMessageType } from "@algont/m7-shell-emiter";
+import { AppMessageType } from "@algont/m7-shell-emitter";
 import classNames from "classnames";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
@@ -70,7 +70,7 @@ export class AppWindow extends Component<IAppWindowProps> {
             if (app instanceof ExternalApllication && context) {
                 app.setEmiterContext(context);
 
-                app.emiter.on(EmiterMessageType.Connected, () => {
+                app.emitter.on(AppMessageType.Connected, () => {
                     this.store.auth.injectAuthTokenInExternalApplication(app);
                 });
             }
@@ -117,10 +117,10 @@ export class AppWindow extends Component<IAppWindowProps> {
             this.setState({ isAppReady: true });
         }
         if (app instanceof ExternalApllication) {
-            app.emiter.on(EmiterMessageType.EnableBackwardButton, (payload) =>
+            app.emitter.on(AppMessageType.EnableBackwardButton, (payload) =>
                 this.handleShowBackward(payload),
             );
-            app.emiter.on(EmiterMessageType.EnableReloadButton, (payload) =>
+            app.emitter.on(AppMessageType.EnableReloadButton, (payload) =>
                 this.handleShowReload(payload),
             );
         }

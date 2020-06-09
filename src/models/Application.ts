@@ -10,6 +10,7 @@ export class Application {
     baseWidth: number;
     baseHeight: number;
     isExecuted: boolean = false;
+    isVisibleInStartMenu: boolean = true;
 
     constructor(options: IApplicationOptions) {
         this.id = options.id;
@@ -18,6 +19,7 @@ export class Application {
         this.icon = options.icon ?? unknownApp;
         this.baseWidth = options.baseWidth ?? 1200;
         this.baseHeight = options.baseHeight ?? 800;
+        this.isVisibleInStartMenu = options.isVisibleInStartMenu ?? true;
     }
 
     @action

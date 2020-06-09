@@ -5,4 +5,5 @@ export interface IApplicationOptions {
     icon?: string;
     baseWidth?: number;
     baseHeight?: number;
+    isVisibleInStartMenu?: boolean;
 }
