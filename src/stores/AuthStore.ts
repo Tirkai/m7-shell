@@ -58,7 +58,7 @@ export class AuthStore {
     }
 
     startUpdateAuthTokenLoop() {
-        const updateTokenDelay = 5 * 60 * 1000; // Every 5 minutes
+        const updateTokenDelay = 15 * 60 * 1000; // Every 15 minutes
         this.renewToken();
         setInterval(() => {
             this.renewToken();

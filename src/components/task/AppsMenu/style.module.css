@@ -42,6 +42,10 @@
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(auto-fit, 100px);
     grid-gap: 12px;
+    height: 625px;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 3px;
 }
 .sidebar {
     display: flex;
