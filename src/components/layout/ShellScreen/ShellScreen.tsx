@@ -4,8 +4,10 @@ import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationWindow } from "models/ApplicationWindow";
+import { ExternalApllication } from "models/ExternalApplication";
 import React, { Component } from "react";
 import { ResizeCallbackData } from "react-resizable";
+import { v4 } from "uuid";
 import style from "./style.module.css";
 @inject("store")
 @observer
@@ -17,6 +19,31 @@ export class ShellScreen extends Component<IStore> {
 
     componentDidMount() {
         this.store.applicationManager.fetchApplications();
+
+        const urlParams = new URL(window.location.href).searchParams;
+
+        const autoRunApp = urlParams.get("autoRunApp");
+
+        const autoRunUrl = urlParams.get("autoRunUrl");
+
+        console.debug({ autoRunApp, autoRunUrl });
+
+        if (autoRunApp) {
+            const app = this.store.applicationManager.findByKey(autoRunApp);
+            if (app) {
+                this.store.applicationManager.executeApplication(app);
+            }
+        }
+
+        if (autoRunUrl) {
+            const app = new ExternalApllication({
+                id: v4(),
+                name: autoRunUrl,
+                url: autoRunUrl,
+            });
+
+            this.store.applicationManager.executeApplication(app);
+        }
     }
 
     hanldeWindowResizeStart = (

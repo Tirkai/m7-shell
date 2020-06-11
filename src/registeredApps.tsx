@@ -11,6 +11,7 @@ import { v4 } from "uuid";
 export const registeredApps: Application[] = [
     new ExternalApllication({
         id: v4(),
+        key: "VideoLive",
         name: "Видео. Просмотр",
         url: `http://video.${UPPER_LEVEL_DOMAIN}/live`,
         icon: videocam,
@@ -18,12 +19,14 @@ export const registeredApps: Application[] = [
     new ExternalApllication({
         id: v4(),
         name: "Видео. Архив",
+        key: "VideoArchive",
         url: `http://video.${UPPER_LEVEL_DOMAIN}/archive`,
         icon: videocam,
     }),
     new ExternalApllication({
         id: v4(),
         name: "Видео. Настройки",
+        key: "VideoSetup",
         url: `http://video.${UPPER_LEVEL_DOMAIN}/setup`,
         icon: videocam,
     }),
