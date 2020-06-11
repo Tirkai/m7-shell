@@ -58,4 +58,9 @@ export class WindowManagerStore {
 
         this.windows.splice(this.windows.indexOf(appWindow), 1);
     }
+
+    @action
+    closeAllWindows() {
+        this.windows = [];
+    }
 }

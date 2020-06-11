@@ -43,6 +43,11 @@ export class ApplicationManagerStore {
     }
 
     @action
+    destroyUserSession() {
+        this.applications.forEach((app) => app.setExecuted(false));
+    }
+
+    @action
     fetchApplications() {
         this.applications = [];
         this.addApplicationsList(registeredApps);

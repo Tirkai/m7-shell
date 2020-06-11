@@ -27,8 +27,11 @@ export class AppsProfilePreview extends Component<IStore> {
         this.setState({ showMenu: value });
     };
 
-    handleLogout = () => {
-        this.store.auth.logout();
+    handleLogout = async () => {
+        await this.store.auth.logout();
+        this.store.applicationManager.destroyUserSession();
+        this.store.windowManager.closeAllWindows();
+        this.store.shell.setAppMenuShow(false);
         this.setState({ showMenu: false });
     };
 
@@ -36,6 +39,7 @@ export class AppsProfilePreview extends Component<IStore> {
         const app = this.store.applicationManager.findByKey("AccountsMe");
         if (app) {
             this.store.applicationManager.executeApplication(app);
+            this.store.shell.setAppMenuShow(false);
         }
         this.setState({ showMenu: false });
     };

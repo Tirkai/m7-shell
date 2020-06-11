@@ -51,6 +51,14 @@ export const registeredApps: Application[] = [
         baseWidth: 800,
         baseHeight: 650,
     }),
+    new ExternalApllication({
+        id: v4(),
+        name: `AccountsMe [local]`,
+        key: "AccountsMe",
+        url: `http://localhost:3001/#/me`,
+        baseWidth: 800,
+        baseHeight: 650,
+    }),
     new ShellApplication({
         id: v4(),
         name: "CustomExecutor",
