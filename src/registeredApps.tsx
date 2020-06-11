@@ -11,8 +11,20 @@ import { v4 } from "uuid";
 export const registeredApps: Application[] = [
     new ExternalApllication({
         id: v4(),
-        name: "АССаД-Видео",
-        url: "http://video.test1/lab/setup",
+        name: "Видео. Просмотр",
+        url: `http://video.${UPPER_LEVEL_DOMAIN}/live`,
+        icon: videocam,
+    }),
+    new ExternalApllication({
+        id: v4(),
+        name: "Видео. Архив",
+        url: `http://video.${UPPER_LEVEL_DOMAIN}/archive`,
+        icon: videocam,
+    }),
+    new ExternalApllication({
+        id: v4(),
+        name: "Видео. Настройки",
+        url: `http://video.${UPPER_LEVEL_DOMAIN}/setup`,
         icon: videocam,
     }),
     new ExternalApllication({
@@ -20,6 +32,14 @@ export const registeredApps: Application[] = [
         name: `Accounts [${UPPER_LEVEL_DOMAIN}]`,
         key: "Accounts",
         url: `http://accounts.${UPPER_LEVEL_DOMAIN}`,
+        baseWidth: 800,
+        baseHeight: 650,
+    }),
+    new ExternalApllication({
+        id: v4(),
+        name: `Reports`,
+        key: "Reports",
+        url: `http://reports.${UPPER_LEVEL_DOMAIN}`,
         baseWidth: 800,
         baseHeight: 650,
     }),
