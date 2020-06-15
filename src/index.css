@@ -92,3 +92,16 @@ code {
     width: calc(100% - 14px);
     cursor: n-resize;
 }
+
+div::-webkit-scrollbar {
+    width: 5px;
+}
+
+div::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+div::-webkit-scrollbar-track {
+    background-color: transparent;
+}

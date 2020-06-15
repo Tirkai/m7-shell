@@ -46,7 +46,9 @@ export class AuthStore {
             this.localStorageRefreshTokenKey,
             this.refreshToken,
         );
-        Axios.defaults.headers.common.Authorization = this.accessToken;
+        Axios.defaults.headers.common[
+            "X-M7-Authorization-Token"
+        ] = this.accessToken;
     }
 
     @action

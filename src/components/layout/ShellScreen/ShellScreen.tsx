@@ -17,8 +17,8 @@ export class ShellScreen extends Component<IStore> {
         return this.props.store!;
     }
 
-    componentDidMount() {
-        this.store.applicationManager.fetchApplications();
+    async componentDidMount() {
+        await this.store.applicationManager.fetchApplications();
 
         const urlParams = new URL(window.location.href).searchParams;
 
@@ -30,6 +30,7 @@ export class ShellScreen extends Component<IStore> {
 
         if (autoRunApp) {
             const app = this.store.applicationManager.findByKey(autoRunApp);
+
             if (app) {
                 this.store.applicationManager.executeApplication(app);
             }

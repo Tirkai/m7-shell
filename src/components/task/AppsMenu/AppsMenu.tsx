@@ -9,6 +9,7 @@ import React, { Component } from "react";
 import { AppsMenuItem } from "../AppsMenuItem/AppsMenuItem";
 import AppsMenuSearch from "../AppsMenuSearch/AppsMenuSearch";
 import AppsProfilePreview from "../AppsProfilePreview/AppsProfilePreview";
+import { AppsShellLogo } from "../AppsShellLogo/AppsShellLogo";
 import style from "./style.module.css";
 
 interface IAppsMenuProps extends IStore {
@@ -47,6 +48,14 @@ export class AppsMenu extends Component<IAppsMenuProps> {
             >
                 <BlurBackground>
                     <div className={style.container}>
+                        <div className={style.sidebar}>
+                            <div className={style.sidebarTop}>
+                                <AppsShellLogo />
+                            </div>
+                            <div className={style.sidebarBottom}>
+                                <AppsProfilePreview />
+                            </div>
+                        </div>
                         <div className={style.content}>
                             <div className={style.search}>
                                 <AppsMenuSearch
@@ -66,9 +75,6 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                                     />
                                 ))}
                             </div>
-                        </div>
-                        <div className={style.sidebar}>
-                            <AppsProfilePreview />
                         </div>
                     </div>
                 </BlurBackground>

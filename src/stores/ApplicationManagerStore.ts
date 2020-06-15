@@ -1,7 +1,13 @@
+import Axios from "axios";
+import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
+import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicationResponse";
 import { action, computed, observable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
+import { ExternalApllication } from "models/ExternalApplication";
 import { registeredApps } from "registeredApps";
+import { portalEndpoint } from "utils/endpoints";
+import { JsonRpcPayload } from "utils/JsonRpcPayload";
 import { v4 } from "uuid";
 import { AppStore } from "./AppStore";
 export class ApplicationManagerStore {
@@ -26,6 +32,7 @@ export class ApplicationManagerStore {
     @action
     addApplicationsList(apps: Application[]) {
         this.applications = [...this.applications, ...apps];
+        return this;
     }
 
     @action
@@ -48,8 +55,26 @@ export class ApplicationManagerStore {
     }
 
     @action
-    fetchApplications() {
+    async fetchApplications() {
         this.applications = [];
+
+        const response = await Axios.post<
+            IJsonRpcResponse<IPortalApplicationResponse[]>
+        >(portalEndpoint.url, new JsonRpcPayload("getComponents"));
+
+        if (!response.data.error) {
+            const portalApplications = response.data.result.map(
+                (item) =>
+                    new ExternalApllication({
+                        id: item.id,
+                        name: item.name,
+                        url: item.guiUrl,
+                        icon: item.iconUrl,
+                        key: item.id,
+                    }),
+            );
+            this.addApplicationsList(portalApplications);
+        }
         this.addApplicationsList(registeredApps);
     }
 

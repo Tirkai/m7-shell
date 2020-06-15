@@ -48,7 +48,11 @@ export class AppsProfilePreview extends Component<IStore> {
         return (
             <>
                 <div className={style.appsProfilePreview}>
-                    <Avatar src={avatar} onClick={this.handleClick} />
+                    <Avatar
+                        src={avatar}
+                        className={style.avatar}
+                        onClick={this.handleClick}
+                    />
                 </div>
                 <Menu
                     open={this.state.showMenu}

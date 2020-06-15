@@ -17,8 +17,8 @@ export class Application {
         this.name = options.name;
         this.key = options.key ?? options.id;
         this.icon = options.icon ?? unknownApp;
-        this.baseWidth = options.baseWidth ?? 1200;
-        this.baseHeight = options.baseHeight ?? 800;
+        this.baseWidth = options.baseWidth ?? 1000;
+        this.baseHeight = options.baseHeight ?? 700;
         this.isVisibleInStartMenu = options.isVisibleInStartMenu ?? true;
     }
 

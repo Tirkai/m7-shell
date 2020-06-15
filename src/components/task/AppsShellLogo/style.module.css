@@ -1,0 +1,12 @@
+.appsShellLogo {
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    font-size: 14px;
+    background: linear-gradient(-45deg, #096dd9, #4d98e8);
+    width: 32px;
+    height: 32px;
+}
