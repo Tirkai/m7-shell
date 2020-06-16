@@ -69,13 +69,27 @@ export class AppWindow extends Component<IAppWindowProps> {
             const app = this.props.application;
             if (app instanceof ExternalApllication && context) {
                 app.setEmiterContext(context);
-
-                app.emitter.on(AppMessageType.Connected, () => {
-                    this.store.auth.injectAuthTokenInExternalApplication(app);
-                });
+                this.handleBindingEmitterEvents(app);
             }
             this.handleAppReady();
         }
+    };
+
+    handleBindingEmitterEvents = (app: ExternalApllication) => {
+        app.emitter.on(AppMessageType.Connected, () =>
+            this.store.auth.injectAuthTokenInExternalApplication(app),
+        );
+
+        app.emitter.on(AppMessageType.ForceRecieveToken, () =>
+            this.store.auth.injectAuthTokenInExternalApplication(app),
+        );
+
+        app.emitter.on(AppMessageType.EnableBackwardButton, (payload) =>
+            this.handleShowBackward(payload),
+        );
+        app.emitter.on(AppMessageType.EnableReloadButton, (payload) =>
+            this.handleShowReload(payload),
+        );
     };
 
     handleAppReady = () => {
@@ -115,14 +129,6 @@ export class AppWindow extends Component<IAppWindowProps> {
         const app = this.props.application;
         if (app instanceof ShellApplication) {
             this.setState({ isAppReady: true });
-        }
-        if (app instanceof ExternalApllication) {
-            app.emitter.on(AppMessageType.EnableBackwardButton, (payload) =>
-                this.handleShowBackward(payload),
-            );
-            app.emitter.on(AppMessageType.EnableReloadButton, (payload) =>
-                this.handleShowReload(payload),
-            );
         }
     }
 
