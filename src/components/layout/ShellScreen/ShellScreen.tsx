@@ -6,6 +6,7 @@ import { inject, observer } from "mobx-react";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApllication } from "models/ExternalApplication";
 import React, { Component } from "react";
+import { DraggableData, DraggableEvent } from "react-draggable";
 import { ResizeCallbackData } from "react-resizable";
 import { v4 } from "uuid";
 import style from "./style.module.css";
@@ -68,6 +69,14 @@ export class ShellScreen extends Component<IStore> {
         this.store.windowManager.closeWindow(appWindow);
     };
 
+    handleDrag = (
+        appWindow: ApplicationWindow,
+        event: DraggableEvent,
+        data: DraggableData,
+    ) => {
+        appWindow.setPosition(data.x, data.y);
+    };
+
     render() {
         return (
             <div className={style.shellScreen}>
@@ -87,7 +96,7 @@ export class ShellScreen extends Component<IStore> {
                         onDragStart={() => appWindow.setDragging(true)}
                         onDragStop={() => appWindow.setDragging(false)}
                         onDrag={(event, data) =>
-                            appWindow.setPosition(data.x, data.y)
+                            this.handleDrag(appWindow, event, data)
                         }
                         onClose={() => this.handleCloseWindow(appWindow)}
                     />

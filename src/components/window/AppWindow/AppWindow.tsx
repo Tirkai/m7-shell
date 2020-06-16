@@ -159,6 +159,18 @@ export class AppWindow extends Component<IAppWindowProps> {
 
         const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
         const taskBarWidth = 48;
+
+        const boundsVisibilityPercentModifier = 0.25;
+        const boundsInvisibilityPercentModifier = 0.75;
+
+        const topBound = 0;
+        const leftBound = -this.props.width * boundsInvisibilityPercentModifier;
+        const rightBound =
+            window.innerWidth -
+            this.props.width * boundsVisibilityPercentModifier;
+        const bottomBound =
+            window.innerHeight -
+            this.props.height * boundsVisibilityPercentModifier;
         return (
             <Draggable
                 handle=".appHeaderInfoBar"
@@ -168,6 +180,12 @@ export class AppWindow extends Component<IAppWindowProps> {
                 position={{
                     x: this.props.window.bounds.x,
                     y: this.props.window.bounds.y,
+                }}
+                bounds={{
+                    top: topBound,
+                    left: leftBound,
+                    right: rightBound,
+                    bottom: bottomBound,
                 }}
             >
                 <div
