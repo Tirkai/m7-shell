@@ -10,7 +10,7 @@ export class ExternalApllication extends Application {
         this.emitter = new ShellMessageEmitter();
     }
 
-    setEmiterContext(context: Window) {
+    setEmitterContext(context: Window) {
         this.emitter.setContext(context);
         return this;
     }

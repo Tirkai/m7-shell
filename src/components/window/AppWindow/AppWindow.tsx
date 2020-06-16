@@ -68,7 +68,7 @@ export class AppWindow extends Component<IAppWindowProps> {
         if (context) {
             const app = this.props.application;
             if (app instanceof ExternalApllication && context) {
-                app.setEmiterContext(context);
+                app.setEmitterContext(context);
                 this.handleBindingEmitterEvents(app);
             }
             this.handleAppReady();
@@ -181,6 +181,7 @@ export class AppWindow extends Component<IAppWindowProps> {
                     x: this.props.window.bounds.x,
                     y: this.props.window.bounds.y,
                 }}
+                disabled={this.props.window.isFullScreen}
                 bounds={{
                     top: topBound,
                     left: leftBound,
