@@ -4,4 +4,5 @@
 .avatar {
     width: 32px;
     height: 32px;
+    background: linear-gradient(-45deg, #096dd9, #4d98e8);
 }

@@ -1,0 +1,45 @@
+.dropdownMenu {
+    display: inline-flex;
+    position: absolute;
+    flex-direction: column;
+    background: #222;
+    color: white;
+    min-width: 200px;
+    max-width: 600px;
+    border: 1px solid #666;
+    pointer-events: none;
+    transition: ease 0.1s;
+    opacity: 0;
+    border-radius: 4px;
+    overflow: hidden;
+    z-index: 100;
+}
+.show {
+    pointer-events: all;
+    opacity: 1;
+}
+.dropdownContainer {
+    position: relative;
+}
+.dropdownListener {
+    display: inherit;
+}
+
+.topLeft {
+    top: 0;
+    left: 0;
+}
+
+.bottomLeft {
+    bottom: 0;
+    left: 0;
+}
+
+.topRight {
+    top: 0;
+    right: 0;
+}
+.bottomRight {
+    bottom: 0;
+    right: 0;
+}

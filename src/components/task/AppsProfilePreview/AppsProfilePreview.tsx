@@ -1,5 +1,6 @@
-import { Avatar, Menu, MenuItem } from "@material-ui/core";
-import avatar from "assets/images/avatar.png";
+import { Avatar } from "@material-ui/core";
+import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
+import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
@@ -13,19 +14,6 @@ export class AppsProfilePreview extends Component<IStore> {
     get store() {
         return this.props.store!;
     }
-
-    state = {
-        menuAnchor: null,
-        showMenu: false,
-    };
-
-    handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        this.setState({ menuAnchor: event.target, showMenu: true });
-    };
-
-    handleShowMenu = (value: boolean) => {
-        this.setState({ showMenu: value });
-    };
 
     handleLogout = async () => {
         await this.store.auth.logout();
@@ -48,22 +36,22 @@ export class AppsProfilePreview extends Component<IStore> {
         return (
             <>
                 <div className={style.appsProfilePreview}>
-                    <Avatar
-                        src={avatar}
-                        className={style.avatar}
-                        onClick={this.handleClick}
-                    />
+                    <DropdownMenu
+                        position="bottomLeft"
+                        render={[
+                            <DropdownMenuItem
+                                onClick={this.handleOpenAccountManager}
+                            >
+                                Изменить аккаунт
+                            </DropdownMenuItem>,
+                            <DropdownMenuItem onClick={this.handleLogout}>
+                                Выйти
+                            </DropdownMenuItem>,
+                        ]}
+                    >
+                        <Avatar className={style.avatar} />
+                    </DropdownMenu>
                 </div>
-                <Menu
-                    open={this.state.showMenu}
-                    anchorEl={this.state.menuAnchor}
-                    onClose={() => this.handleShowMenu(false)}
-                >
-                    <MenuItem onClick={this.handleOpenAccountManager}>
-                        Настройки аккаунта
-                    </MenuItem>
-                    <MenuItem onClick={this.handleLogout}>Выход</MenuItem>
-                </Menu>
             </>
         );
     }
