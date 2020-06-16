@@ -39,6 +39,10 @@ export class AppsMenu extends Component<IAppsMenuProps> {
         return AppMenuComponent;
     };
 
+    handleSearch = (value: string) => {
+        this.store.applicationManager.setSearch(value);
+    };
+
     render() {
         return this.getWithAwayListenerWrapper(
             <div
@@ -59,21 +63,36 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                         <div className={style.content}>
                             <div className={style.search}>
                                 <AppsMenuSearch
-                                    value={""}
-                                    onChange={() => true}
+                                    value={this.store.applicationManager.search}
+                                    onChange={this.handleSearch}
                                 />
                             </div>
                             <div className={style.appsList}>
-                                {this.props.applications.map((app) => (
-                                    <AppsMenuItem
-                                        key={app.id}
-                                        icon={app.icon}
-                                        title={app.name}
-                                        onClick={() =>
-                                            this.props.onExecuteApp(app)
-                                        }
-                                    />
-                                ))}
+                                {this.store.applicationManager.isSearching
+                                    ? this.store.applicationManager.findedApplicatons.map(
+                                          (app) => (
+                                              <AppsMenuItem
+                                                  key={app.id}
+                                                  icon={app.icon}
+                                                  title={app.name}
+                                                  onClick={() =>
+                                                      this.props.onExecuteApp(
+                                                          app,
+                                                      )
+                                                  }
+                                              />
+                                          ),
+                                      )
+                                    : this.props.applications.map((app) => (
+                                          <AppsMenuItem
+                                              key={app.id}
+                                              icon={app.icon}
+                                              title={app.name}
+                                              onClick={() =>
+                                                  this.props.onExecuteApp(app)
+                                              }
+                                          />
+                                      ))}
                             </div>
                         </div>
                     </div>

@@ -14,6 +14,27 @@ export class ApplicationManagerStore {
     @observable
     applications: Application[] = [];
 
+    @observable
+    search: string = "";
+
+    @action
+    setSearch(value: string) {
+        this.search = value;
+    }
+
+    @computed
+    get findedApplicatons() {
+        return this.applications.filter(
+            (app) =>
+                app.name.toLowerCase().indexOf(this.search.toLowerCase()) > -1,
+        );
+    }
+
+    @computed
+    get isSearching() {
+        return this.search.length > 0;
+    }
+
     @computed
     get executedApplications() {
         return this.applications.filter((item) => item.isExecuted);
