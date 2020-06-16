@@ -35,6 +35,10 @@ export class TaskBar extends Component<IStore> {
         }
     };
 
+    handleShowNotificationHub = (value: boolean) => {
+        this.store.shell.setNotificationHubShow(value);
+    };
+
     render() {
         return (
             <>
@@ -82,7 +86,14 @@ export class TaskBar extends Component<IStore> {
                                 <TaskBarItem onClick={() => true} autoWidth>
                                     <TaskBarDateTime />
                                 </TaskBarItem>
-                                <TaskBarItem onClick={() => true}>
+                                <TaskBarItem
+                                    onClick={() =>
+                                        this.handleShowNotificationHub(
+                                            !this.store.shell
+                                                .notificationHubShow,
+                                        )
+                                    }
+                                >
                                     <img
                                         src={notificationsNone}
                                         alt="Notifications"

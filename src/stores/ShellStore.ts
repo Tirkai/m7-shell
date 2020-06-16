@@ -6,21 +6,40 @@ export class ShellStore {
     @observable
     appMenuShow: boolean = false;
 
+    @observable
+    notificationHubShow: boolean = false;
+
+    focusEvent = new CustomEvent(ShellEvents.FocusShellControls);
+
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
 
+        window.addEventListener(ShellEvents.DesktopClick, () => {
+            this.setAppMenuShow(false);
+            this.setNotificationHubShow(false);
+            this.store.windowManager.clearFocus();
+        });
+
         window.addEventListener(ShellEvents.FocusAnyWindow, () => {
             this.setAppMenuShow(false);
+            this.setNotificationHubShow(false);
         });
     }
 
     @action
     setAppMenuShow(value: boolean) {
-        const event = new CustomEvent(
-            value ? ShellEvents.StartMenuOpen : ShellEvents.StartMenuClose,
-        );
         this.appMenuShow = value;
-        window.dispatchEvent(event);
+        if (value) {
+            window.dispatchEvent(this.focusEvent);
+        }
+    }
+
+    @action
+    setNotificationHubShow(value: boolean) {
+        this.notificationHubShow = value;
+        if (value) {
+            window.dispatchEvent(this.focusEvent);
+        }
     }
 }

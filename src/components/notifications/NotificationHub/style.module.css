@@ -1,0 +1,36 @@
+.notificationHub {
+    display: none;
+    width: 400px;
+    position: absolute;
+    bottom: 48px;
+    right: 0;
+    color: white;
+    z-index: 100;
+}
+.show {
+    display: block;
+}
+.container {
+    background: #222222cc;
+    height: 100%;
+}
+
+.content {
+    padding: 24px;
+}
+.title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+.notificationsList {
+    display: grid;
+    grid-gap: 12px;
+    max-height: 625px;
+    min-height: 300px;
+}
+.notificationItem {
+    padding: 24px;
+    background: #444;
+    box-sizing: border-box;
+    border-radius: 4px;
+}

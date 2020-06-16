@@ -1,5 +1,7 @@
+import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { AppWindow } from "components/window/AppWindow/AppWindow";
+import { ShellEvents } from "enum/ShellEvents";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
@@ -77,10 +79,17 @@ export class ShellScreen extends Component<IStore> {
         appWindow.setPosition(data.x, data.y);
     };
 
+    handleClickDesktop = () => {
+        window.dispatchEvent(new CustomEvent(ShellEvents.DesktopClick));
+    };
+
     render() {
         return (
             <div className={style.shellScreen}>
-                {this.store.windowManager.windows.length}
+                <div
+                    className={style.desktop}
+                    onClick={this.handleClickDesktop}
+                ></div>
                 {this.store.windowManager.windows.map((appWindow) => (
                     <AppWindow
                         key={appWindow.id}
@@ -103,6 +112,7 @@ export class ShellScreen extends Component<IStore> {
                 ))}
 
                 <TaskBar />
+                <NotificationHub />
             </div>
         );
     }

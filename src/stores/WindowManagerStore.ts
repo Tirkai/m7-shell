@@ -12,7 +12,7 @@ export class WindowManagerStore {
     constructor(store: AppStore) {
         this.store = store;
 
-        window.addEventListener(ShellEvents.StartMenuOpen, () =>
+        window.addEventListener(ShellEvents.FocusShellControls, () =>
             this.clearFocus(),
         );
     }
