@@ -45,3 +45,6 @@
     position: relative;
     z-index: 5;
 }
+.focused {
+    background: #0a3965;
+}

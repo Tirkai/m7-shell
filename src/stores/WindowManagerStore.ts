@@ -45,6 +45,7 @@ export class WindowManagerStore {
     @action
     expandWindow(appWindow: ApplicationWindow) {
         appWindow.setCollapsed(false);
+        appWindow.setFocused(true);
     }
 
     @action

@@ -192,6 +192,7 @@ export class AppWindow extends Component<IAppWindowProps> {
                             <AppWindowHeader
                                 icon={this.props.application.icon}
                                 title={this.props.application.name}
+                                isFocused={this.props.isFocused}
                                 onClose={this.props.onClose}
                                 onDoubleClick={this.handleHeaderDoubleClick}
                                 hasBackward={this.state.hasBackward}
