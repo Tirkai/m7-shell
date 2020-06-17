@@ -1,6 +1,6 @@
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { action, computed, observable } from "mobx";
-import { ResizeCallbackData } from "react-resizable";
+import { ResizeHandle } from "react-resizable";
 import { Application } from "./Application";
 
 interface IApplicationWindowOptions {
@@ -10,9 +10,6 @@ interface IApplicationWindowOptions {
 }
 
 export class ApplicationWindow {
-    minWidth: number = 300;
-    minHeight: number = 200;
-
     id: string;
 
     application: Application;
@@ -40,6 +37,16 @@ export class ApplicationWindow {
 
     @observable
     y: number;
+
+    @computed
+    get minYPosition() {
+        return this.y + this.height - this.application.minHeight;
+    }
+
+    @computed
+    get minXPosition() {
+        return this.x + this.width - this.application.minWidth;
+    }
 
     @computed
     get bounds() {
@@ -80,8 +87,8 @@ export class ApplicationWindow {
         this.id = options.id;
         this.width = options.width;
         this.height = options.height;
-        this.x = window.innerWidth / 2 - this.width / 2;
-        this.y = window.innerHeight / 2 - this.height / 2;
+        this.x = Math.floor(window.innerWidth / 2 - this.width / 2);
+        this.y = Math.floor(window.innerHeight / 2 - this.height / 2);
     }
 
     @action
@@ -116,38 +123,42 @@ export class ApplicationWindow {
     }
 
     @action
-    resize(event: MouseEvent, data: ResizeCallbackData) {
-        const handle = data.handle;
+    resize(
+        handle: ResizeHandle,
+        position: { x: number; y: number },
+        size: { width: number; height: number },
+    ) {
+        // const handle = data.handle;
         const dir = ResizeHandleDirection;
-        const deltaX = this.resizeOriginPoint.x - event.clientX;
-        const deltaY = this.resizeOriginPoint.y - event.clientY;
+        const deltaX = this.resizeOriginPoint.x - position.x;
+        const deltaY = this.resizeOriginPoint.y - position.y;
         if (
             handle === dir.East ||
             handle === dir.SouthEast ||
             handle === dir.South
         ) {
-            this.setSize(data.size.width, data.size.height);
+            this.setSize(size.width, size.height);
             return;
         }
 
         if (handle === dir.West) {
-            this.setPosition(event.clientX, this.y);
+            this.setPosition(position.x, this.y);
             this.setSize(this.lockedWidth + deltaX, this.height);
         }
         if (handle === dir.North) {
-            this.setPosition(this.x, event.clientY);
+            this.setPosition(this.x, position.y);
             this.setSize(this.width, this.lockedHeight + deltaY);
         }
         if (handle === dir.SouthWest) {
-            this.setPosition(event.clientX, this.lockedY);
+            this.setPosition(position.x, this.lockedY);
             this.setSize(this.lockedWidth + deltaX, this.lockedHeight - deltaY);
         }
         if (handle === dir.NorthWest) {
-            this.setPosition(event.clientX, event.clientY);
+            this.setPosition(position.x, position.y);
             this.setSize(this.lockedWidth + deltaX, this.lockedHeight + deltaY);
         }
         if (handle === dir.NorthEast) {
-            this.setPosition(this.lockedX, event.clientY);
+            this.setPosition(this.lockedX, position.y);
             this.setSize(this.lockedWidth - deltaX, this.lockedHeight + deltaY);
         }
     }

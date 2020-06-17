@@ -1,6 +1,7 @@
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { AppWindow } from "components/window/AppWindow/AppWindow";
+import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { ShellEvents } from "enum/ShellEvents";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
@@ -64,7 +65,44 @@ export class ShellScreen extends Component<IStore> {
         event: MouseEvent,
         data: ResizeCallbackData,
     ) => {
-        appWindow.resize(event, data);
+        const size = data.size;
+        let position = { x: event.clientX, y: event.clientY };
+
+        if (
+            data.handle === ResizeHandleDirection.NorthEast ||
+            data.handle === ResizeHandleDirection.NorthWest ||
+            data.handle === ResizeHandleDirection.SouthEast ||
+            data.handle === ResizeHandleDirection.SouthWest
+        ) {
+            if (
+                appWindow.width < appWindow.application.minWidth ||
+                appWindow.height < appWindow.application.minHeight
+            ) {
+                // return;
+                position = {
+                    x: appWindow.minXPosition,
+                    y: appWindow.minYPosition,
+                };
+                event.preventDefault();
+            }
+        } else {
+            if (appWindow.width < appWindow.application.minWidth) {
+                //
+
+                position = {
+                    x: appWindow.minXPosition,
+                    y: event.clientY,
+                };
+            }
+            if (appWindow.height < appWindow.application.minHeight) {
+                position = {
+                    x: event.clientX,
+                    y: appWindow.minYPosition,
+                };
+            }
+        }
+
+        appWindow.resize(data.handle, position, size);
     };
 
     handleCloseWindow = (appWindow: ApplicationWindow) => {

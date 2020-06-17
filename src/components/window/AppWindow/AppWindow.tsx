@@ -201,8 +201,12 @@ export class AppWindow extends Component<IAppWindowProps> {
                         onResizeStart={this.handleResizeStart}
                         onResizeStop={this.handleResizeEnd}
                         onResize={this.handleResize}
+                        axis={this.props.window.isFullScreen ? "none" : "both"}
                         resizeHandles={resizeDirections as ResizeHandle[]}
-                        minConstraints={[300, 200]}
+                        minConstraints={[
+                            this.props.application.minWidth,
+                            this.props.application.minHeight,
+                        ]}
                     >
                         <div
                             className={style.windowContainer}

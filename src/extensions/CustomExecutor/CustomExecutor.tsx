@@ -21,7 +21,6 @@ export class CustomExecutor extends Component<IStore> {
 
     handleCreateAppInstance = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log(this.state.link);
 
         const id = v4();
 
