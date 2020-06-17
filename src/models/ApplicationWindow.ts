@@ -57,7 +57,7 @@ export class ApplicationWindow {
             width: !this.isFullScreen ? this.width : window.innerWidth,
             height: !this.isFullScreen
                 ? this.height
-                : window.innerHeight - TASKBAR_HEIGHT,
+                : window.innerHeight - TASKBAR_HEIGHT + 1,
         };
     }
 

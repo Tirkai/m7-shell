@@ -9,6 +9,9 @@ export class ShellStore {
     @observable
     notificationHubShow: boolean = false;
 
+    @observable
+    enabledDevMode: boolean = false;
+
     focusEvent = new CustomEvent(ShellEvents.FocusShellControls);
 
     private store: AppStore;
@@ -41,5 +44,10 @@ export class ShellStore {
         if (value) {
             window.dispatchEvent(this.focusEvent);
         }
+    }
+
+    @action
+    setDevMode(value: boolean) {
+        this.enabledDevMode = value;
     }
 }

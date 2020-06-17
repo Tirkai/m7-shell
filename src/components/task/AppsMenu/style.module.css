@@ -53,3 +53,10 @@
     border-right: 1px solid rgba(255, 255, 255, 0.05);
     padding: 24px 6px;
 }
+.logo {
+    cursor: pointer;
+}
+.notFoundApps {
+    grid-column: span 3;
+    color: white;
+}

@@ -15,6 +15,7 @@ export const registeredApps: Application[] = [
         url: `http://accounts.${UPPER_LEVEL_DOMAIN}/#/me`,
         baseWidth: 800,
         baseHeight: 650,
+        isVisibleInStartMenu: false,
     }),
     new ExternalApllication({
         id: v4(),
@@ -23,6 +24,7 @@ export const registeredApps: Application[] = [
         url: `http://localhost:3001/#/me`,
         baseWidth: 800,
         baseHeight: 650,
+        isVisibleInStartMenu: false,
     }),
     new ExternalApllication({
         id: v4(),
@@ -31,6 +33,16 @@ export const registeredApps: Application[] = [
         url: "http://localhost:3001",
         baseWidth: 800,
         baseHeight: 650,
+        isVisibleInStartMenu: false,
+    }),
+    new ExternalApllication({
+        id: v4(),
+        name: "Лицензионная защита",
+        key: "License",
+        url: `http://license.${UPPER_LEVEL_DOMAIN}`,
+        baseWidth: 800,
+        baseHeight: 650,
+        isVisibleInStartMenu: false,
     }),
     new ShellApplication({
         id: v4(),
@@ -39,6 +51,7 @@ export const registeredApps: Application[] = [
         Component: <CustomExecutor />,
         baseWidth: 500,
         baseHeight: 200,
+        isVisibleInStartMenu: false,
     }),
     new ShellApplication({
         id: v4(),
@@ -47,5 +60,6 @@ export const registeredApps: Application[] = [
         Component: <EmiterLogger />,
         baseWidth: 700,
         baseHeight: 600,
+        isVisibleInStartMenu: false,
     }),
 ];

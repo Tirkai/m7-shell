@@ -1,5 +1,7 @@
 import { ClickAwayListener } from "@material-ui/core";
 import classNames from "classnames";
+import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
+import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
 import { BlurBackground } from "components/layout/BlurBackground/BlurBackground";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
@@ -43,7 +45,22 @@ export class AppsMenu extends Component<IAppsMenuProps> {
         this.store.applicationManager.setSearch(value);
     };
 
+    handleExecuteLicenseApp = () => {
+        const app = this.store.applicationManager.findByKey("License");
+        if (app) {
+            this.store.applicationManager.executeApplication(app);
+        }
+    };
+
+    handleEnableDevMode = (value: boolean) => {
+        this.store.shell.setDevMode(value);
+    };
+
     render() {
+        const applicationsList = !this.store.shell.enabledDevMode
+            ? this.store.applicationManager.displayedApplications
+            : this.store.applicationManager.applications;
+
         return this.getWithAwayListenerWrapper(
             <div
                 className={classNames(style.appsMenu, {
@@ -54,7 +71,35 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                     <div className={style.container}>
                         <div className={style.sidebar}>
                             <div className={style.sidebarTop}>
-                                <AppsShellLogo />
+                                <div className={style.logo}>
+                                    <DropdownMenu
+                                        render={[
+                                            <DropdownMenuItem
+                                                onClick={
+                                                    this.handleExecuteLicenseApp
+                                                }
+                                            >
+                                                Лицензионная защита
+                                            </DropdownMenuItem>,
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    this.handleEnableDevMode(
+                                                        !this.store.shell
+                                                            .enabledDevMode,
+                                                    )
+                                                }
+                                            >
+                                                Режим отладки (
+                                                {this.store.shell.enabledDevMode
+                                                    ? "включен"
+                                                    : "выключен"}
+                                                )
+                                            </DropdownMenuItem>,
+                                        ]}
+                                    >
+                                        <AppsShellLogo />
+                                    </DropdownMenu>
+                                </div>
                             </div>
                             <div className={style.sidebarBottom}>
                                 <AppsProfilePreview />
@@ -83,7 +128,7 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                                               />
                                           ),
                                       )
-                                    : this.props.applications.map((app) => (
+                                    : applicationsList.map((app) => (
                                           <AppsMenuItem
                                               key={app.id}
                                               icon={app.icon}
@@ -93,6 +138,15 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                                               }
                                           />
                                       ))}
+                                {this.store.applicationManager.isSearching &&
+                                this.store.applicationManager.findedApplicatons
+                                    .length <= 0 ? (
+                                    <div className={style.notFoundApps}>
+                                        Ничего не найдено
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
                             </div>
                         </div>
                     </div>

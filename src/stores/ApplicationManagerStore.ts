@@ -24,10 +24,15 @@ export class ApplicationManagerStore {
 
     @computed
     get findedApplicatons() {
-        return this.applications.filter(
+        return this.displayedApplications.filter(
             (app) =>
                 app.name.toLowerCase().indexOf(this.search.toLowerCase()) > -1,
         );
+    }
+
+    @computed
+    get displayedApplications() {
+        return this.applications.filter((item) => item.isVisibleInStartMenu);
     }
 
     @computed
