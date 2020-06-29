@@ -78,7 +78,6 @@ export class ShellScreen extends Component<IStore> {
                 appWindow.width < appWindow.application.minWidth ||
                 appWindow.height < appWindow.application.minHeight
             ) {
-                // return;
                 position = {
                     x: appWindow.minXPosition,
                     y: appWindow.minYPosition,
@@ -87,8 +86,6 @@ export class ShellScreen extends Component<IStore> {
             }
         } else {
             if (appWindow.width < appWindow.application.minWidth) {
-                //
-
                 position = {
                     x: appWindow.minXPosition,
                     y: event.clientY,

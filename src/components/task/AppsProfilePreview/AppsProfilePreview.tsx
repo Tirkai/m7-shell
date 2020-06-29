@@ -40,11 +40,15 @@ export class AppsProfilePreview extends Component<IStore> {
                         position="bottomLeft"
                         render={[
                             <DropdownMenuItem
+                                key="accounts"
                                 onClick={this.handleOpenAccountManager}
                             >
                                 Изменить аккаунт
                             </DropdownMenuItem>,
-                            <DropdownMenuItem onClick={this.handleLogout}>
+                            <DropdownMenuItem
+                                key="logout"
+                                onClick={this.handleLogout}
+                            >
                                 Выйти
                             </DropdownMenuItem>,
                         ]}

@@ -1,0 +1,48 @@
+.notificationGroup {
+    display: block;
+}
+.notificationGroup:hover .actions {
+    display: block;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+}
+.icon {
+    display: flex;
+    align-items: center;
+    margin-right: 5px;
+}
+.icon img {
+    width: 16px;
+    height: 16px;
+}
+
+.content {
+    display: block;
+}
+
+.actions {
+    display: none;
+}
+
+.actionItem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+.actionItem img {
+    width: 12px;
+}

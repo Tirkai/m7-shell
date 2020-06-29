@@ -2,7 +2,6 @@ import { ClickAwayListener } from "@material-ui/core";
 import classNames from "classnames";
 import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
 import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
-import { BlurBackground } from "components/layout/BlurBackground/BlurBackground";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
@@ -67,68 +66,56 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                     [style.visible]: this.props.isShow,
                 })}
             >
-                <BlurBackground>
-                    <div className={style.container}>
-                        <div className={style.sidebar}>
-                            <div className={style.sidebarTop}>
-                                <div className={style.logo}>
-                                    <DropdownMenu
-                                        render={[
-                                            <DropdownMenuItem
-                                                onClick={
-                                                    this.handleExecuteLicenseApp
-                                                }
-                                            >
-                                                Лицензионная защита
-                                            </DropdownMenuItem>,
-                                            <DropdownMenuItem
-                                                onClick={() =>
-                                                    this.handleEnableDevMode(
-                                                        !this.store.shell
-                                                            .enabledDevMode,
-                                                    )
-                                                }
-                                            >
-                                                Режим отладки (
-                                                {this.store.shell.enabledDevMode
-                                                    ? "включен"
-                                                    : "выключен"}
+                <div className={style.container}>
+                    <div className={style.sidebar}>
+                        <div className={style.sidebarTop}>
+                            <div className={style.logo}>
+                                <DropdownMenu
+                                    render={[
+                                        <DropdownMenuItem
+                                            key={"licence"}
+                                            onClick={
+                                                this.handleExecuteLicenseApp
+                                            }
+                                        >
+                                            Лицензионная защита
+                                        </DropdownMenuItem>,
+                                        <DropdownMenuItem
+                                            key={"devmode"}
+                                            onClick={() =>
+                                                this.handleEnableDevMode(
+                                                    !this.store.shell
+                                                        .enabledDevMode,
                                                 )
-                                            </DropdownMenuItem>,
-                                        ]}
-                                    >
-                                        <AppsShellLogo />
-                                    </DropdownMenu>
-                                </div>
-                            </div>
-                            <div className={style.sidebarBottom}>
-                                <AppsProfilePreview />
+                                            }
+                                        >
+                                            Режим отладки (
+                                            {this.store.shell.enabledDevMode
+                                                ? "включен"
+                                                : "выключен"}
+                                            )
+                                        </DropdownMenuItem>,
+                                    ]}
+                                >
+                                    <AppsShellLogo />
+                                </DropdownMenu>
                             </div>
                         </div>
-                        <div className={style.content}>
-                            <div className={style.search}>
-                                <AppsMenuSearch
-                                    value={this.store.applicationManager.search}
-                                    onChange={this.handleSearch}
-                                />
-                            </div>
-                            <div className={style.appsList}>
-                                {this.store.applicationManager.isSearching
-                                    ? this.store.applicationManager.findedApplicatons.map(
-                                          (app) => (
-                                              <AppsMenuItem
-                                                  key={app.id}
-                                                  icon={app.icon}
-                                                  title={app.name}
-                                                  onClick={() =>
-                                                      this.props.onExecuteApp(
-                                                          app,
-                                                      )
-                                                  }
-                                              />
-                                          ),
-                                      )
-                                    : applicationsList.map((app) => (
+                        <div className={style.sidebarBottom}>
+                            <AppsProfilePreview />
+                        </div>
+                    </div>
+                    <div className={style.content}>
+                        <div className={style.search}>
+                            <AppsMenuSearch
+                                value={this.store.applicationManager.search}
+                                onChange={this.handleSearch}
+                            />
+                        </div>
+                        <div className={style.appsList}>
+                            {this.store.applicationManager.isSearching
+                                ? this.store.applicationManager.findedApplicatons.map(
+                                      (app) => (
                                           <AppsMenuItem
                                               key={app.id}
                                               icon={app.icon}
@@ -137,20 +124,30 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                                                   this.props.onExecuteApp(app)
                                               }
                                           />
-                                      ))}
-                                {this.store.applicationManager.isSearching &&
-                                this.store.applicationManager.findedApplicatons
-                                    .length <= 0 ? (
-                                    <div className={style.notFoundApps}>
-                                        Ничего не найдено
-                                    </div>
-                                ) : (
-                                    ""
-                                )}
-                            </div>
+                                      ),
+                                  )
+                                : applicationsList.map((app) => (
+                                      <AppsMenuItem
+                                          key={app.id}
+                                          icon={app.icon}
+                                          title={app.name}
+                                          onClick={() =>
+                                              this.props.onExecuteApp(app)
+                                          }
+                                      />
+                                  ))}
+                            {this.store.applicationManager.isSearching &&
+                            this.store.applicationManager.findedApplicatons
+                                .length <= 0 ? (
+                                <div className={style.notFoundApps}>
+                                    Ничего не найдено
+                                </div>
+                            ) : (
+                                ""
+                            )}
                         </div>
                     </div>
-                </BlurBackground>
+                </div>
             </div>,
         );
     }

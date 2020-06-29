@@ -2,10 +2,16 @@
     display: none;
     width: 400px;
     position: absolute;
-    bottom: 48px;
-    right: 0;
+    bottom: 54px;
+    right: 6px;
     color: white;
     z-index: 100;
+    background: url("../../../assets/images/wallpaper_blur.jpg");
+    background-attachment: fixed;
+    background-position: right;
+    border-radius: 4px;
+    overflow: hidden;
+    max-height: calc(100vh - 60px);
 }
 .show {
     display: block;
@@ -17,16 +23,18 @@
 
 .content {
     padding: 24px;
+    padding-right: 0;
 }
 .title {
     font-size: 24px;
     margin-bottom: 20px;
 }
 .notificationsList {
-    display: grid;
-    grid-gap: 12px;
     max-height: 625px;
     min-height: 300px;
+    align-items: flex-start;
+    overflow: auto;
+    padding-right: 24px;
 }
 .notificationItem {
     padding: 24px;

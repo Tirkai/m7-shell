@@ -1,8 +1,7 @@
 .appsMenu {
     position: absolute;
-    bottom: 48px;
-    left: 0;
-    background: #333;
+    bottom: 54px;
+    left: 6px;
     opacity: 0;
     transform: translateY(calc(25%));
     transition: transform ease 0.3s, opacity 0.3s 0.1s;
@@ -10,6 +9,10 @@
     pointer-events: none;
     z-index: 100;
     max-height: calc(100vh - 48px);
+    background: url("../../../assets/images/wallpaper_blur.jpg");
+    background-attachment: fixed;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 .visible {

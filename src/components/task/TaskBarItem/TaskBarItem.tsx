@@ -7,6 +7,7 @@ interface ITaskBarItemProps {
     autoWidth?: boolean;
     executed?: boolean;
     focused?: boolean;
+    badge?: string;
 }
 
 export class TaskBarItem extends Component<ITaskBarItemProps> {
@@ -20,7 +21,12 @@ export class TaskBarItem extends Component<ITaskBarItemProps> {
                 })}
                 onClick={this.props.onClick}
             >
-                {this.props.children}
+                {this.props.badge ? (
+                    <div className={style.badge}>{this.props.badge}</div>
+                ) : (
+                    ""
+                )}
+                <div className={style.content}>{this.props.children}</div>
             </div>
         );
     }

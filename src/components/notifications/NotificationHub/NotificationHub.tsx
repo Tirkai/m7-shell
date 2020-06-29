@@ -1,9 +1,12 @@
 import classNames from "classnames";
-import { BlurBackground } from "components/layout/BlurBackground/BlurBackground";
 import { IStore } from "interfaces/common/IStore";
+import { uniq } from "lodash";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
+import { Application } from "models/Application";
 import React, { Component } from "react";
+import { NotificationCard } from "../NotificationCard/NotificationCard";
+import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
 import style from "./style.module.css";
 
 @inject("store")
@@ -11,28 +14,66 @@ import style from "./style.module.css";
 export class NotificationHub extends Component<IStore> {
     @computed
     get store() {
-        return this.props.store!.shell;
+        return this.props.store!;
     }
 
+    handleClearGroup = (id: string) => {
+        this.store.notification.removeNotifications(
+            this.store.notification.notifications.filter(
+                (item) => item.applicationId === id,
+            ),
+        );
+    };
+
     render() {
+        const apps = new Map<string, Application | undefined>();
+        const uniqueIds = uniq(
+            this.store.notification.notifications.map(
+                (item) => item.applicationId,
+            ),
+        );
+        uniqueIds.forEach((item) =>
+            apps.set(item, this.store.applicationManager.findById(item)),
+        );
+
         return (
             <div
                 className={classNames(style.notificationHub, {
-                    [style.show]: this.store.notificationHubShow,
+                    [style.show]: this.store.shell.notificationHubShow,
                 })}
             >
-                <BlurBackground>
-                    <div className={style.container}>
-                        <div className={style.content}>
-                            <div className={style.title}>Уведомления</div>
-                            <div className={style.notificationsList}>
-                                <div className={style.notificationItem}>
-                                    Нет уведомлений
-                                </div>
-                            </div>
+                <div className={style.container}>
+                    <div className={style.content}>
+                        <div className={style.title}>Уведомления</div>
+                        <div className={style.notificationsList}>
+                            {uniqueIds.length
+                                ? uniqueIds.map((appId) => (
+                                      <NotificationGroup
+                                          key={appId}
+                                          onClear={() =>
+                                              this.handleClearGroup(appId)
+                                          }
+                                          icon={apps.get(appId)?.icon ?? ""}
+                                          title={apps.get(appId)?.name ?? ""}
+                                      >
+                                          {this.store.notification.notifications
+                                              .filter(
+                                                  (item) =>
+                                                      item.applicationId ===
+                                                      appId,
+                                              )
+                                              .map((notification) => (
+                                                  <NotificationCard
+                                                      key={notification.id}
+                                                      {...notification}
+                                                  />
+                                              ))}
+                                      </NotificationGroup>
+                                  ))
+                                : "Нет уведомлений"}
                         </div>
                     </div>
-                </BlurBackground>
+                </div>
             </div>
         );
     }
