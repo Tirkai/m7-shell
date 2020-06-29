@@ -2,16 +2,16 @@
     display: none;
     width: 400px;
     position: absolute;
-    bottom: 54px;
-    right: 6px;
+    bottom: 48px;
+    right: 0px;
     color: white;
     z-index: 100;
     background: url("../../../assets/images/wallpaper_blur.jpg");
     background-attachment: fixed;
     background-position: right;
-    border-radius: 4px;
     overflow: hidden;
     max-height: calc(100vh - 60px);
+    border-top-left-radius: 4px;
 }
 .show {
     display: block;
@@ -22,8 +22,7 @@
 }
 
 .content {
-    padding: 24px;
-    padding-right: 0;
+    padding: 24px 0 0 24px;
 }
 .title {
     font-size: 24px;
@@ -35,6 +34,7 @@
     align-items: flex-start;
     overflow: auto;
     padding-right: 24px;
+    padding-bottom: 24px;
 }
 .notificationItem {
     padding: 24px;
