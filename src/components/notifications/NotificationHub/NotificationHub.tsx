@@ -17,12 +17,25 @@ export class NotificationHub extends Component<IStore> {
         return this.props.store!;
     }
 
+    state = {
+        isScrolled: false,
+    };
+
     handleClearGroup = (id: string) => {
         this.store.notification.removeNotifications(
             this.store.notification.notifications.filter(
                 (item) => item.applicationId === id,
             ),
         );
+    };
+
+    handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+        if (this.state.isScrolled && event.currentTarget.scrollTop <= 0) {
+            this.setState({ isScrolled: false });
+        }
+        if (!this.state.isScrolled && event.currentTarget.scrollTop > 0) {
+            this.setState({ isScrolled: true });
+        }
     };
 
     render() {
@@ -44,8 +57,17 @@ export class NotificationHub extends Component<IStore> {
             >
                 <div className={style.container}>
                     <div className={style.content}>
-                        <div className={style.title}>Уведомления</div>
-                        <div className={style.notificationsList}>
+                        <div
+                            className={classNames(style.title, {
+                                [style.titleAfterScroll]: this.state.isScrolled,
+                            })}
+                        >
+                            Уведомления
+                        </div>
+                        <div
+                            className={style.notificationsList}
+                            onScroll={this.handleScroll}
+                        >
                             {uniqueIds.length
                                 ? uniqueIds.map((appId) => (
                                       <NotificationGroup

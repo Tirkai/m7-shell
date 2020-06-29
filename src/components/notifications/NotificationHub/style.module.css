@@ -22,23 +22,29 @@
 }
 
 .content {
-    padding: 24px 0 0 24px;
+    display: block;
 }
 .title {
+    display: flex;
+    align-self: center;
+    padding: 12px 24px;
+    border-bottom: 1px solid transparent;
     font-size: 24px;
-    margin-bottom: 20px;
+    transition: ease 0.3s;
 }
 .notificationsList {
     max-height: 625px;
     min-height: 300px;
     align-items: flex-start;
     overflow: auto;
-    padding-right: 24px;
-    padding-bottom: 24px;
+    padding: 0 24px 24px 24px;
 }
 .notificationItem {
     padding: 24px;
     background: #444;
     box-sizing: border-box;
     border-radius: 4px;
+}
+.titleAfterScroll {
+    border-bottom: 1px solid #ffffff0d;
 }
