@@ -1,3 +1,7 @@
+import {
+    AUTH_TOKEN_HEADER,
+    NOTIFICATIONS_WEBSOCKET_URL,
+} from "constants/config";
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
 import { action, computed, observable } from "mobx";
 import { NotificationModel } from "models/NotificationModel";
@@ -29,60 +33,65 @@ export class NotificationStore {
             new NotificationModel({
                 id: v4(),
                 applicationId: "73pxZKbkgFYmfTps9fR7Ck",
-                text,
+                text: text.substr(0, Math.floor(Math.random() * 200)),
                 title,
                 url: "http://localhost/",
             }),
             new NotificationModel({
                 id: v4(),
                 applicationId: "73pxZKbkgFYmfTps9fR7Ck",
-                text,
+                text: text.substr(0, Math.floor(Math.random() * 200 + 5)),
                 title,
                 url: "http://localhost/",
             }),
             new NotificationModel({
                 id: v4(),
                 applicationId: "iX4nJN0VKUO9SSQ6fxsKQ",
-                text,
+                text: text.substr(0, Math.floor(Math.random() * 200)),
                 title,
                 url: "http://localhost/",
             }),
             new NotificationModel({
                 id: v4(),
                 applicationId: "iX4nJN0VKUO9SSQ6fxsKQ",
-                text,
+                text: text.substr(0, Math.floor(Math.random() * 200)),
+
                 title,
                 url: "http://localhost/",
             }),
             new NotificationModel({
                 id: v4(),
                 applicationId: "iX4nJN0VKUO9SSQ6fxsKQ",
-                text,
+                text: text.substr(0, Math.floor(Math.random() * 200)),
+
                 title,
                 url: "http://localhost/",
             }),
             new NotificationModel({
                 id: v4(),
                 applicationId: "iX4nJN0VKUO9SSQ6fxsKQ",
-                text,
+                text: text.substr(0, Math.floor(Math.random() * 200)),
+
                 title,
                 url: "http://localhost/",
             }),
         );
     }
 
-    connectToNotificationsSocket() {
-        this.socket = io("http://localhost");
+    connectToNotificationsSocket(token: string) {
+        const socket = io.connect(NOTIFICATIONS_WEBSOCKET_URL, {
+            transportOptions: {
+                polling: {
+                    extraHeaders: {
+                        [AUTH_TOKEN_HEADER]: token,
+                    },
+                },
+            },
+        });
 
-        this.socket.on("connect", () => (this.isConnected = true));
-
-        this.socket.on("disconnect", () => (this.isConnected = false));
-
-        this.socket.on("notification", (notification: INotificationResponse) =>
-            this.addNotification(notification),
-        );
-
-        this.socket.on("notificationCount", this.updateNotificationCount);
+        socket.on("add_notification", () => {
+            alert("add_notification");
+        });
     }
 
     @action

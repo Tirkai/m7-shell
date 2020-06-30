@@ -1,5 +1,6 @@
 import { ShellMessageType } from "@algont/m7-shell-emitter";
 import Axios from "axios";
+import { AUTH_TOKEN_HEADER } from "constants/config";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { action, observable } from "mobx";
@@ -46,9 +47,7 @@ export class AuthStore {
             this.localStorageRefreshTokenKey,
             this.refreshToken,
         );
-        Axios.defaults.headers.common[
-            "X-M7-Authorization-Token"
-        ] = this.accessToken;
+        Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
     }
 
     @action

@@ -49,6 +49,10 @@ export class ShellScreen extends Component<IStore> {
 
             this.store.applicationManager.executeApplication(app);
         }
+
+        this.store.notification.connectToNotificationsSocket(
+            this.store.auth.accessToken,
+        );
     }
 
     hanldeWindowResizeStart = (
