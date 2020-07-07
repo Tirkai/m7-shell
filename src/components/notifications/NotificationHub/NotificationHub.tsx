@@ -4,6 +4,7 @@ import { uniq } from "lodash";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
+import { NotificationModel } from "models/NotificationModel";
 import React, { Component } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
@@ -26,6 +27,14 @@ export class NotificationHub extends Component<IStore> {
             this.store.notification.notifications.filter(
                 (item) => item.applicationId === id,
             ),
+            this.store.auth.userLogin,
+        );
+    };
+
+    handleCloseNotification = (notification: NotificationModel) => {
+        this.store.notification.removeNotifications(
+            [notification],
+            this.store.auth.userLogin,
         );
     };
 
@@ -88,6 +97,11 @@ export class NotificationHub extends Component<IStore> {
                                                   <NotificationCard
                                                       key={notification.id}
                                                       {...notification}
+                                                      onClose={() =>
+                                                          this.handleCloseNotification(
+                                                              notification,
+                                                          )
+                                                      }
                                                   />
                                               ))}
                                       </NotificationGroup>

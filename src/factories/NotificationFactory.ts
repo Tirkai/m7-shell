@@ -1,23 +1,18 @@
-import { NotificationDataType } from "enum/NotificationDataType";
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
 import { NotificationModel } from "models/NotificationModel";
 
 export class NotificationFactory {
-    static createNotification(data: INotificationResponse) {
-        const getDataField = (type: NotificationDataType) =>
-            data.data.find((item) => item.data_type === type)?.data ?? "";
+    static createNotification(notificationData: INotificationResponse) {
+        const title = notificationData.data?.CONTENT_TITLE ?? "Без заголовка";
+        const text = notificationData.data?.CONTENT_TEXT ?? "";
+        const url = notificationData.data?.ACTION_URL ?? "";
 
-        const title = getDataField(NotificationDataType.ContentTitle);
-        const text = getDataField(NotificationDataType.ContentText);
-        const url = getDataField(NotificationDataType.ActionUrl);
-
-        const notification = new NotificationModel({
-            id: data.notification.ntf_id,
-            applicationId: data.notification.app_id,
+        return new NotificationModel({
+            id: notificationData.ntf_id,
+            applicationId: notificationData.app_id,
             title,
             text,
             url,
         });
-        return notification;
     }
 }

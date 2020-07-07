@@ -1,4 +1,5 @@
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
+import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { AppWindow } from "components/window/AppWindow/AppWindow";
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
@@ -151,6 +152,7 @@ export class ShellScreen extends Component<IStore> {
                 ))}
 
                 <TaskBar />
+                <NotificationToasts />
                 <NotificationHub />
             </div>
         );

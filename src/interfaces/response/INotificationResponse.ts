@@ -1,15 +1,10 @@
-import { NotificationDataType } from "enum/NotificationDataType";
-
 export interface INotificationResponse {
-    notification: {
-        ntf_id: string;
-        app_id: string;
-        ntf_data: string;
+    ntf_id: string;
+    app_id: string;
+    ntf_data: string;
+    data: {
+        ACTION_URL: string;
+        CONTENT_TEXT: string;
+        CONTENT_TITLE: string;
     };
-    data: [
-        {
-            data_type: NotificationDataType;
-            data: string;
-        },
-    ];
 }

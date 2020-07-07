@@ -1,0 +1,28 @@
+.notificationToasts {
+    position: fixed;
+    bottom: 48px;
+    right: 0;
+    padding: 24px;
+}
+.toastItem {
+    margin-bottom: 12px;
+    width: 300px;
+    animation: fadeIn 0.3s;
+    transition: ease 0.3s;
+}
+
+.isHidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    0% {
+        transform: translateX(150%);
+        max-height: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        max-height: 100vh;
+    }
+}

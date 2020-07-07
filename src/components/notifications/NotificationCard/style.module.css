@@ -7,9 +7,13 @@
     border-radius: 4px;
     margin-bottom: 10px;
 }
+
 .notificationCard:hover {
     border: 1px solid #c2c2c2;
     background: #555;
+}
+.notificationCard:hover .actions {
+    opacity: 1;
 }
 .container {
     display: block;
@@ -30,5 +34,12 @@
     padding: 12px;
 }
 .actions {
-    color: white;
+    opacity: 0;
+    display: flex;
+}
+.actionItem {
+}
+.actionItem img {
+    width: 12px;
+    height: 12px;
 }
