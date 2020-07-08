@@ -83,6 +83,10 @@ export class NotificationStore {
         });
     }
 
+    removeToast(toast: ToastNotification) {
+        this.toasts.splice(this.toasts.indexOf(toast), 1);
+    }
+
     async connectToNotificationsSocket(token: string) {
         await this.fetchNotifications();
         if (this.socket === null) {

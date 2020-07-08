@@ -3,6 +3,7 @@
     bottom: 48px;
     right: 0;
     padding: 24px;
+    z-index: 100;
 }
 .toastItem {
     margin-bottom: 12px;
@@ -12,7 +13,7 @@
 }
 
 .isHidden {
-    display: none;
+    animation: fadeOut 0.3s;
 }
 
 @keyframes fadeIn {
@@ -24,5 +25,16 @@
     100% {
         transform: translateX(0);
         max-height: 100vh;
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        transform: translateX(0);
+        max-height: 100vh;
+    }
+    100% {
+        transform: translateX(150%);
+        max-height: 0;
     }
 }

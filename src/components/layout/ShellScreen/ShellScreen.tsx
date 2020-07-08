@@ -132,7 +132,6 @@ export class ShellScreen extends Component<IStore> {
                 ></div>
                 {this.store.windowManager.windows.map((appWindow) => (
                     <AppWindow
-                        key={appWindow.id}
                         {...appWindow}
                         window={appWindow}
                         onResizeStart={(event, data) =>

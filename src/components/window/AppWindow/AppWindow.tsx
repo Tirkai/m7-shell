@@ -38,13 +38,21 @@ interface IAppWindowProps extends IStore {
     onClose: () => void;
 }
 
+interface IAppWindowState {
+    isAppReady: boolean;
+    hasBackward: boolean;
+    hasReload: boolean;
+    customUrl: string;
+}
+
 @inject("store")
 @observer
-export class AppWindow extends Component<IAppWindowProps> {
+export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
     state = {
         isAppReady: false,
         hasBackward: false,
         hasReload: false,
+        customUrl: "",
     };
 
     @computed
@@ -138,7 +146,7 @@ export class AppWindow extends Component<IAppWindowProps> {
             this.appComponent = (
                 <iframe
                     onLoad={this.handleAppReady}
-                    src={this.props.application.url}
+                    src={this.props.application.applicationUrl}
                     ref={this.handleFrameLoaded}
                     title={this.props.application.name}
                     style={{

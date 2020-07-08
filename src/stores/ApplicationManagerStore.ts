@@ -75,6 +75,21 @@ export class ApplicationManagerStore {
         }
     }
 
+    executeApplicationWithUrl(app: ExternalApllication, url: string) {
+        if (!app.isExecuted) {
+            app.setExecuted(true).setCustomUrl(url);
+            this.store.windowManager.addWindow(
+                new ApplicationWindow(app, {
+                    id: v4(),
+                    width: app.baseWidth,
+                    height: app.baseHeight,
+                }),
+            );
+        } else {
+            app.setCustomUrl(url);
+        }
+    }
+
     @action
     destroyUserSession() {
         this.applications.forEach((app) => app.setExecuted(false));

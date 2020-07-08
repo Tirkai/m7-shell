@@ -29,5 +29,6 @@ export class Application {
     @action
     setExecuted(value: boolean) {
         this.isExecuted = value;
+        return this;
     }
 }

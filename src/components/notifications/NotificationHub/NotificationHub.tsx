@@ -4,6 +4,7 @@ import { uniq } from "lodash";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
+import { ExternalApllication } from "models/ExternalApplication";
 import { NotificationModel } from "models/NotificationModel";
 import React, { Component } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
@@ -44,6 +45,13 @@ export class NotificationHub extends Component<IStore> {
         }
         if (!this.state.isScrolled && event.currentTarget.scrollTop > 0) {
             this.setState({ isScrolled: true });
+        }
+    };
+
+    handleRunApplication = (appId: string, url: string) => {
+        const app = this.store.applicationManager.findById(appId);
+        if (app instanceof ExternalApllication) {
+            this.store.applicationManager.executeApplicationWithUrl(app, url);
         }
     };
 
@@ -97,6 +105,12 @@ export class NotificationHub extends Component<IStore> {
                                                   <NotificationCard
                                                       key={notification.id}
                                                       {...notification}
+                                                      onClick={() =>
+                                                          this.handleRunApplication(
+                                                              notification.applicationId,
+                                                              notification.url,
+                                                          )
+                                                      }
                                                       onClose={() =>
                                                           this.handleCloseNotification(
                                                               notification,
