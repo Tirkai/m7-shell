@@ -17,6 +17,7 @@ import {
     notificationsEndpoint,
 } from "utils/endpoints";
 import { JsonRpcPayload } from "utils/JsonRpcPayload";
+import { AppStore } from "./AppStore";
 
 const title = `Сообщение о событии`;
 
@@ -35,7 +36,12 @@ export class NotificationStore {
     @observable
     count = 0;
 
-    async fetchNotifications() {
+    private store: AppStore;
+    constructor(store: AppStore) {
+        this.store = store;
+    }
+
+    async fetchNotifications(login: string) {
         return new Promise(async (resolve) => {
             const appsResponse = await Axios.post<IJsonRpcResponse<string[]>>(
                 legacyNotificationEndpoint.url,
@@ -45,7 +51,9 @@ export class NotificationStore {
             const countResponse = await Axios.post<IJsonRpcResponse<number>>(
                 notificationsEndpoint.url,
                 new JsonRpcPayload("get_count_by_filter", {
-                    filter: {},
+                    filter: {
+                        login: { values: [login] },
+                    },
                 }),
             );
 
@@ -63,6 +71,7 @@ export class NotificationStore {
                             app_id: {
                                 values: [id],
                             },
+                            login: { values: [login] },
                         },
                         limit: 5,
                         offset: 0,
@@ -88,7 +97,7 @@ export class NotificationStore {
     }
 
     async connectToNotificationsSocket(token: string) {
-        await this.fetchNotifications();
+        await this.fetchNotifications(this.store.auth.userLogin);
         if (this.socket === null) {
             this.socket = io.connect(NOTIFICATIONS_WEBSOCKET_URL, {
                 transportOptions: {
@@ -150,6 +159,6 @@ export class NotificationStore {
         notifications.forEach((item) => {
             this.notifications.splice(this.notifications.indexOf(item), 1);
         });
-        this.fetchNotifications();
+        this.fetchNotifications(this.store.auth.userLogin);
     }
 }

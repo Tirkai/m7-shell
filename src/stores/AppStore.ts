@@ -18,7 +18,7 @@ export class AppStore {
         this.applicationManager = new ApplicationManagerStore(this);
         this.windowManager = new WindowManagerStore(this);
         this.shell = new ShellStore(this);
-        this.notification = new NotificationStore();
+        this.notification = new NotificationStore(this);
         console.warn("STORE", this);
     }
 }
