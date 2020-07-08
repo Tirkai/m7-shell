@@ -15,7 +15,6 @@ export class NotificationToasts extends Component<IStore> {
     }
 
     render() {
-        console.log("123");
         return (
             <div className={style.notificationToasts}>
                 {this.store.notification.toasts.map((item) => (

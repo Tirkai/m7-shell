@@ -44,7 +44,9 @@ export class NotificationStore {
 
             const countResponse = await Axios.post<IJsonRpcResponse<number>>(
                 notificationsEndpoint.url,
-                new JsonRpcPayload("get_count_by_filter", { filter: {} }),
+                new JsonRpcPayload("get_count_by_filter", {
+                    filter: {},
+                }),
             );
 
             this.count = countResponse.data.result;
@@ -64,7 +66,7 @@ export class NotificationStore {
                         },
                         limit: 5,
                         offset: 0,
-                        order: 0,
+                        order: {},
                     }),
                 );
                 return response.data.result.map((item) =>
@@ -73,8 +75,8 @@ export class NotificationStore {
             });
 
             Promise.all(notifications).then((values) => {
-                const notifications = values.filter((item) => item.length);
-                this.notifications = flatten(notifications);
+                const notificationsList = values.filter((item) => item.length);
+                this.notifications = flatten(notificationsList);
             });
 
             resolve();
@@ -131,7 +133,7 @@ export class NotificationStore {
         notifications: NotificationModel[],
         login: string,
     ) {
-        const response = Axios.post<IJsonRpcResponse>(
+        const response = await Axios.post<IJsonRpcResponse>(
             notificationsEndpoint.url,
             new JsonRpcPayload("drop_user_notifications", {
                 user_notifications: notifications.map((item) => ({
