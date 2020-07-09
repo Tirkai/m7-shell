@@ -1,4 +1,5 @@
 import { Alert } from "@material-ui/lab";
+import logo from "assets/images/logo.svg";
 import { AuthForm } from "components/auth/AuthForm/AuthForm";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
@@ -49,16 +50,24 @@ export class AuthScreen extends Component<IStore> {
     render() {
         return (
             <div className={style.authScreen}>
-                <div className={style.container}>
-                    <div className={style.content}>
-                        <AuthForm onSubmit={this.handleLogin} />
-                        {this.state.isShowNotify ? (
-                            <Alert variant="filled" severity="error">
-                                {this.state.notifyText}
-                            </Alert>
-                        ) : (
-                            ""
-                        )}
+                <div className={style.overlay}>
+                    <div className={style.container}>
+                        <div className={style.logo}>
+                            <img src={logo} alt="Logo" />
+                        </div>
+                        <div className={style.description}>
+                            Единая служба авторизации
+                        </div>
+                        <div className={style.content}>
+                            <AuthForm onSubmit={this.handleLogin} />
+                            {this.state.isShowNotify ? (
+                                <Alert variant="filled" severity="error">
+                                    {this.state.notifyText}
+                                </Alert>
+                            ) : (
+                                ""
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

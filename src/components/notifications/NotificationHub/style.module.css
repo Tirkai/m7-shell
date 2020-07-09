@@ -9,6 +9,7 @@
     background: url("../../../assets/images/wallpaper_blur.jpg");
     background-attachment: fixed;
     background-position: right;
+    background-size: cover;
     overflow: hidden;
     height: calc(100vh - 48px);
     border-top-left-radius: 4px;
