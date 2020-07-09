@@ -2,6 +2,7 @@ import { Avatar } from "@material-ui/core";
 import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
 import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
 import { IStore } from "interfaces/common/IStore";
+import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import React, { Component } from "react";
@@ -43,13 +44,13 @@ export class AppsProfilePreview extends Component<IStore> {
                                 key="accounts"
                                 onClick={this.handleOpenAccountManager}
                             >
-                                Изменить аккаунт
+                                {strings.startMenu.editAccount}
                             </DropdownMenuItem>,
                             <DropdownMenuItem
                                 key="logout"
                                 onClick={this.handleLogout}
                             >
-                                Выйти
+                                {strings.startMenu.logout}
                             </DropdownMenuItem>,
                         ]}
                     >

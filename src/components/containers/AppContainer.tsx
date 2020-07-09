@@ -3,7 +3,6 @@ import ShellScreen from "components/layout/ShellScreen/ShellScreen";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
-import moment from "moment";
 import "moment/locale/ru";
 import React, { Component } from "react";
 
@@ -15,20 +14,8 @@ export class AppContainer extends Component<IStore> {
         return this.props.store!;
     }
 
-    componentDidMount() {
-        moment.locale("ru");
-    }
-
     render() {
-        return (
-            <>
-                {this.store.auth.isAuthorized ? (
-                    <ShellScreen />
-                ) : (
-                    <AuthScreen />
-                )}
-            </>
-        );
+        return this.store.auth.isAuthorized ? <ShellScreen /> : <AuthScreen />;
     }
 }
 

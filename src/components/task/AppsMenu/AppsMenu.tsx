@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
 import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
 import { IStore } from "interfaces/common/IStore";
+import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
@@ -78,7 +79,10 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                                                 this.handleExecuteLicenseApp
                                             }
                                         >
-                                            Лицензионная защита
+                                            {
+                                                strings.definedApplications
+                                                    .license
+                                            }
                                         </DropdownMenuItem>,
                                         <DropdownMenuItem
                                             key={"devmode"}
@@ -89,10 +93,10 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                                                 )
                                             }
                                         >
-                                            Режим отладки (
+                                            {strings.startMenu.devMode} (
                                             {this.store.shell.enabledDevMode
-                                                ? "включен"
-                                                : "выключен"}
+                                                ? strings.state.on
+                                                : strings.state.off}
                                             )
                                         </DropdownMenuItem>,
                                     ]}
@@ -140,7 +144,7 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                             this.store.applicationManager.findedApplicatons
                                 .length <= 0 ? (
                                 <div className={style.notFoundApps}>
-                                    Ничего не найдено
+                                    {strings.state.notFound}
                                 </div>
                             ) : (
                                 ""

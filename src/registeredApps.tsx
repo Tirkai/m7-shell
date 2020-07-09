@@ -1,6 +1,7 @@
 import { UPPER_LEVEL_DOMAIN } from "constants/config";
 import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
 import { EmiterLogger } from "extensions/EmiterLogger/EmiterLogger";
+import { strings } from "locale";
 import { Application } from "models/Application";
 import { ExternalApllication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
@@ -10,7 +11,7 @@ import { v4 } from "uuid";
 export const registeredApps: Application[] = [
     new ExternalApllication({
         id: v4(),
-        name: `AccountsMe [${UPPER_LEVEL_DOMAIN}]`,
+        name: strings.definedApplications.accountsMe,
         key: "AccountsMe",
         url: `http://accounts.${UPPER_LEVEL_DOMAIN}/#/me`,
         baseWidth: 800,
@@ -37,7 +38,7 @@ export const registeredApps: Application[] = [
     }),
     new ExternalApllication({
         id: v4(),
-        name: "Лицензионная защита",
+        name: strings.definedApplications.license,
         key: "License",
         url: `http://license.${UPPER_LEVEL_DOMAIN}`,
         baseWidth: 800,
