@@ -3,6 +3,7 @@ import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ExternalApllication } from "models/ExternalApplication";
+import { NotificationModel } from "models/NotificationModel";
 import { ToastNotification } from "models/ToastNotification";
 import React, { Component } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
@@ -27,6 +28,7 @@ export class NotificationToasts extends Component<IStore> {
             );
         }
         toast.setShow(false);
+        this.handleRemoveNotification(toast.notification);
     };
 
     handleFadeOutAnimationEnd = (
@@ -36,6 +38,18 @@ export class NotificationToasts extends Component<IStore> {
         if (event.animationName === style.fadeOut) {
             this.store.notification.removeToast(toast);
         }
+    };
+
+    handleClose = (toast: ToastNotification) => {
+        toast.setShow(false);
+        this.handleRemoveNotification(toast.notification);
+    };
+
+    handleRemoveNotification = (notification: NotificationModel) => {
+        this.store.notification.removeNotifications(
+            [notification],
+            this.store.auth.userLogin,
+        );
     };
 
     render() {
@@ -54,7 +68,7 @@ export class NotificationToasts extends Component<IStore> {
                         <NotificationCard
                             {...item.notification}
                             onClick={() => this.handleRunApplication(item)}
-                            onClose={() => item.setShow(false)}
+                            onClose={() => this.handleClose(item)}
                         />
                     </div>
                 ))}

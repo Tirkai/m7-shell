@@ -6,6 +6,7 @@
     box-sizing: border-box;
     border-radius: 4px;
     margin-bottom: 10px;
+    position: relative;
 }
 
 .notificationCard:hover {
@@ -17,21 +18,27 @@
 }
 .container {
     display: block;
-}
-.header {
-    display: block;
     padding: 12px;
 }
 .header {
     display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #ffffff0d;
+    justify-content: flex-end;
+    padding: 12px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 .title {
     color: white;
+    margin-bottom: 3px;
 }
 .content {
-    padding: 12px;
+    margin-bottom: 6px;
+}
+.content .text {
+    color: #c4c4c4;
 }
 .actions {
     opacity: 0;
@@ -42,4 +49,12 @@
 .actionItem img {
     width: 12px;
     height: 12px;
+}
+.date {
+    font-size: 12px;
+    color: #c4c4c4;
+}
+.isRemoving {
+    opacity: 0.5;
+    transition: ease 0.3s;
 }

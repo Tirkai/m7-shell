@@ -75,7 +75,7 @@ export class NotificationStore {
                         },
                         limit: 5,
                         offset: 0,
-                        order: {},
+                        order: [{ field: "ntf_date", direction: "desc" }],
                     }),
                 );
                 return response.data.result.map((item) =>
@@ -155,10 +155,6 @@ export class NotificationStore {
                 })),
             }),
         );
-
-        notifications.forEach((item) => {
-            this.notifications.splice(this.notifications.indexOf(item), 1);
-        });
         this.fetchNotifications(this.store.auth.userLogin);
     }
 }

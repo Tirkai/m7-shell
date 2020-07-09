@@ -13,6 +13,7 @@ export class NotificationFactory {
             title,
             text,
             url,
+            date: notificationData.ntf_date,
         });
     }
 }

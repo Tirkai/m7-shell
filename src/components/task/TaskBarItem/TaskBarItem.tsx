@@ -29,7 +29,7 @@ export class TaskBarItem extends Component<ITaskBarItemProps> {
                             [style.smallBadge]: isBigNumber,
                         })}
                     >
-                        {this.props.badge}
+                        {!isBigNumber ? this.props.badge : "99+"}
                     </div>
                 ) : (
                     ""

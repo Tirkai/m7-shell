@@ -101,6 +101,7 @@ export class NotificationHub extends Component<IStore> {
                                                       item.applicationId ===
                                                       appId,
                                               )
+                                              .slice(0, 5)
                                               .map((notification) => (
                                                   <NotificationCard
                                                       key={notification.id}
