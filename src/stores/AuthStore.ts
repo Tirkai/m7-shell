@@ -1,11 +1,12 @@
 import { ShellMessageType } from "@algont/m7-shell-emitter";
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
+import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { action, observable } from "mobx";
 import { ExternalApllication } from "models/ExternalApplication";
-import { authEndpoint } from "utils/endpoints";
+import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { JsonRpcPayload } from "utils/JsonRpcPayload";
 import { AppStore } from "./AppStore";
 export class AuthStore {
@@ -16,6 +17,9 @@ export class AuthStore {
     accessToken: string = "";
     refreshToken: string = "";
     userLogin: string = "";
+
+    @observable
+    userName: string = "";
 
     @observable
     isAuthorized: boolean = false;
@@ -35,7 +39,28 @@ export class AuthStore {
             this.userLogin = userLogin;
             this.isAuthorized = true;
             this.startUpdateAuthTokenLoop();
+            this.fetchUsername();
         }
+
+        window.addEventListener("focus", async () => this.verifyToken());
+    }
+
+    async verifyToken() {
+        const response = await Axios.post<
+            IJsonRpcResponse<AccessTokenVerifyStatus>
+        >(
+            authEndpoint.url,
+            new JsonRpcPayload("verify", {
+                token: this.accessToken,
+            }),
+        );
+        if (!response.data.error) {
+            const status = response.data.result;
+
+            if (status !== AccessTokenVerifyStatus.Ok) {
+                this.logout();
+            }
+        } else this.logout();
     }
 
     @action
@@ -117,10 +142,23 @@ export class AuthStore {
                     this.userLogin,
                 );
                 this.startUpdateAuthTokenLoop();
+
+                this.fetchUsername();
             }
             return response.data;
         } catch (e) {
             alert(e);
+        }
+    }
+
+    @action
+    async fetchUsername() {
+        const userNameResponse = await Axios.post<
+            IJsonRpcResponse<{ name: string }>
+        >(meEndpoint.url, new JsonRpcPayload("get_me"));
+        if (!userNameResponse.data.error) {
+            const user = userNameResponse.data.result;
+            this.userName = user.name;
         }
     }
 

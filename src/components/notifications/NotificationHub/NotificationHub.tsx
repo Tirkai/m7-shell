@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { uniq } from "lodash";
@@ -50,9 +51,19 @@ export class NotificationHub extends Component<IStore> {
     };
 
     handleRunApplication = (appId: string, url: string) => {
+        const { shell, applicationManager, windowManager } = this.store;
         const app = this.store.applicationManager.findById(appId);
+
         if (app instanceof ExternalApllication) {
-            this.store.applicationManager.executeApplicationWithUrl(app, url);
+            shell.setActivePanel(ShellPanelType.None);
+
+            applicationManager.executeApplicationWithUrl(app, url);
+
+            const appWindow = windowManager.findWindowByApp(app);
+
+            if (appWindow) {
+                windowManager.focusWindow(appWindow);
+            }
         }
     };
 

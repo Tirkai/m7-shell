@@ -6,7 +6,11 @@
 
 .avatar {
     font-size: 14px;
-    background: linear-gradient(-45deg, #096dd9, #4d98e8);
+    background: transparent;
+    border: 1px solid #444;
     width: 32px;
     height: 32px;
+}
+.avatar:hover {
+    background: #444;
 }

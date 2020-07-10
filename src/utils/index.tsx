@@ -13,3 +13,11 @@ export const mapRoutes = (routes: IBrowserRoute[]) =>
             />
         );
     });
+
+export const getInitials = (value: string) =>
+    value
+        .split(" ")
+        .slice(0, 2)
+        .map((item) => item.substring(0, 1))
+        .join("")
+        .toUpperCase();

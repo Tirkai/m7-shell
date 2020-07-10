@@ -1,11 +1,11 @@
 import { apps, notifications, notificationsNone } from "assets/icons";
+import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import React, { Component } from "react";
-import { AppsMenu } from "../AppsMenu/AppsMenu";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
 import style from "./style.module.css";
@@ -19,11 +19,14 @@ export class TaskBar extends Component<IStore> {
     }
 
     handleShowAppsMenu = (value: boolean) => {
-        this.store.shell.setAppMenuShow(value);
+        this.store.shell.setActivePanel(
+            value ? ShellPanelType.StartMenu : ShellPanelType.None,
+        );
     };
 
     handleExecuteApp = (app: Application) => {
-        this.store.shell.setAppMenuShow(false);
+        this.store.shell.setActivePanel(ShellPanelType.None);
+
         this.store.applicationManager.executeApplication(app);
     };
 
@@ -35,18 +38,14 @@ export class TaskBar extends Component<IStore> {
     };
 
     handleShowNotificationHub = (value: boolean) => {
-        this.store.shell.setNotificationHubShow(value);
+        this.store.shell.setActivePanel(
+            value ? ShellPanelType.NotificationHub : ShellPanelType.None,
+        );
     };
 
     render() {
         return (
             <>
-                <AppsMenu
-                    applications={this.store.applicationManager.applications}
-                    isShow={this.store.shell.appMenuShow}
-                    onExecuteApp={this.handleExecuteApp}
-                />
-
                 <div className={style.taskBar}>
                     <div className={style.container}>
                         <div className={style.tasks}>

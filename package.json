@@ -1,6 +1,6 @@
 {
-    "name": "react-template",
-    "version": "0.0.1",
+    "name": "m7-shell",
+    "version": "0.11.4",
     "private": true,
     "dependencies": {
         "@algont/m7-shell-emitter": "^0.5.0",
@@ -40,6 +40,7 @@
     },
     "scripts": {
         "start": "react-scripts start",
+        "stage": "npm version patch --git-tag-version=false",
         "build": "react-scripts build",
         "prettier": "prettier --write \"./**/*.{ts,tsx,css}\"",
         "prettier-watch": "onchange 'src/**/*.{ts,tsx,css}' -- prettier --write {{changed}}",

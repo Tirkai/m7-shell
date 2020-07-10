@@ -4,4 +4,6 @@ export enum ShellEvents {
     FocusAnyWindow = "focusAnyWindow",
     StartMenuOpen = "startMenuOpen",
     StartMenuClose = "startMenuClose",
+    NotificationHubOpen = "notificationHubOpen",
+    NotificationHubClose = "notificationHubClose",
 }

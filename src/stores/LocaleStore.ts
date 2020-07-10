@@ -4,7 +4,7 @@ import moment from "moment";
 
 export class LocaleStore {
     @observable
-    language: string = "en";
+    language: string = window.navigator.language;
 
     constructor() {
         this.setLocale(this.language);

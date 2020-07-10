@@ -1,11 +1,13 @@
 import { Avatar } from "@material-ui/core";
 import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
 import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
+import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import React, { Component } from "react";
+import { getInitials } from "utils";
 import style from "./style.module.css";
 
 @inject("store")
@@ -20,7 +22,7 @@ export class AppsProfilePreview extends Component<IStore> {
         await this.store.auth.logout();
         this.store.applicationManager.destroyUserSession();
         this.store.windowManager.closeAllWindows();
-        this.store.shell.setAppMenuShow(false);
+        this.store.shell.setActivePanel(ShellPanelType.StartMenu);
         this.setState({ showMenu: false });
     };
 
@@ -28,12 +30,14 @@ export class AppsProfilePreview extends Component<IStore> {
         const app = this.store.applicationManager.findByKey("AccountsMe");
         if (app) {
             this.store.applicationManager.executeApplication(app);
-            this.store.shell.setAppMenuShow(false);
+            this.store.shell.setActivePanel(ShellPanelType.None);
         }
         this.setState({ showMenu: false });
     };
 
     render() {
+        const userInitials = getInitials(this.store.auth.userName);
+
         return (
             <>
                 <div className={style.appsProfilePreview}>
@@ -54,7 +58,7 @@ export class AppsProfilePreview extends Component<IStore> {
                             </DropdownMenuItem>,
                         ]}
                     >
-                        <Avatar className={style.avatar} />
+                        <Avatar className={style.avatar}>{userInitials}</Avatar>
                     </DropdownMenu>
                 </div>
             </>

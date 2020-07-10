@@ -4,7 +4,7 @@
     left: 0;
     opacity: 0;
     transform: translateY(calc(25%));
-    transition: transform ease 0.3s, opacity 0.3s 0.1s;
+    transition: transform ease 0.3s, opacity 0.3s;
     box-sizing: border-box;
     pointer-events: none;
     z-index: 100;
