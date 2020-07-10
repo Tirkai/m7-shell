@@ -25,7 +25,7 @@ export const ru = {
         search: "Поиск",
         licence: "Лицензионная защита",
         logout: "Выйти",
-        editAccount: "Изменить аккаунт",
+        editAccount: "Изменить профиль",
         devMode: "Режим отладки",
     },
     notification: {

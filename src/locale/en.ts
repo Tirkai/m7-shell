@@ -25,7 +25,7 @@ export const en = {
         search: "Search",
         licence: "License",
         logout: "Logout",
-        editAccount: "Edit Account",
+        editAccount: "Edit Profile",
         devMode: "Dev Mode",
     },
     notification: {
