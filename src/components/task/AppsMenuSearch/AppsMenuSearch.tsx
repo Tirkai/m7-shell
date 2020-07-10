@@ -16,7 +16,9 @@ export class AppsMenuSearch extends Component<IAppsMenuSearch> {
             <input
                 className={style.input}
                 onChange={this.handleChange}
+                value={this.props.value}
                 placeholder="Поиск"
+                maxLength={100}
             />
         );
     }

@@ -4,10 +4,31 @@
 
 .container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    margin-bottom: 200px;
+}
+
+.overlay {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
     height: 100%;
+    animation: fadeIn 1s;
+}
+.logo {
+    margin-bottom: 12px;
+    width: 200px;
+}
+.description {
+    margin-bottom: 24px;
+    color: white;
+}
+.logo img {
+    width: 100%;
 }
 .content {
     background: white;
@@ -15,4 +36,13 @@
     height: 230px;
     box-sizing: border-box;
     border-radius: 4px;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }

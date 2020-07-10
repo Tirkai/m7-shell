@@ -6,4 +6,6 @@ export interface IApplicationOptions {
     baseWidth?: number;
     baseHeight?: number;
     isVisibleInStartMenu?: boolean;
+    minWidth?: number;
+    minHeight?: number;
 }

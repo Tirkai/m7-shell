@@ -11,6 +11,7 @@
 }
 .blur {
     background: url("../../../assets/images/wallpaper.jpg");
+
     filter: url("../../../assets/filters/blur.svg#blur");
     background-attachment: fixed;
     background-size: cover;

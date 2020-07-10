@@ -24,3 +24,7 @@
 .collapsed {
     display: none;
 }
+
+.fullScreen {
+    border-radius: 0;
+}

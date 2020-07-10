@@ -7,10 +7,13 @@ interface ITaskBarItemProps {
     autoWidth?: boolean;
     executed?: boolean;
     focused?: boolean;
+    badge?: string | number;
 }
 
 export class TaskBarItem extends Component<ITaskBarItemProps> {
     render() {
+        const isBigNumber = +(this.props.badge ?? 0) >= 100;
+
         return (
             <div
                 className={classNames(style.taskBarItem, {
@@ -20,7 +23,18 @@ export class TaskBarItem extends Component<ITaskBarItemProps> {
                 })}
                 onClick={this.props.onClick}
             >
-                {this.props.children}
+                {this.props.badge ? (
+                    <div
+                        className={classNames(style.badge, {
+                            [style.smallBadge]: isBigNumber,
+                        })}
+                    >
+                        {!isBigNumber ? this.props.badge : "99+"}
+                    </div>
+                ) : (
+                    ""
+                )}
+                <div className={style.content}>{this.props.children}</div>
             </div>
         );
     }

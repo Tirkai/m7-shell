@@ -1,3 +1,4 @@
+import { ShellEvents } from "enum/ShellEvents";
 import { max, min } from "lodash";
 import { action, observable } from "mobx";
 import { ApplicationWindow } from "models/ApplicationWindow";
@@ -10,7 +11,14 @@ export class WindowManagerStore {
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
+
+        window.addEventListener(ShellEvents.FocusShellControls, () =>
+            this.clearFocus(),
+        );
     }
+
+    @observable
+    focusedWindow: ApplicationWindow | null = null;
 
     @action
     addWindow(appWindow: ApplicationWindow) {
@@ -20,6 +28,8 @@ export class WindowManagerStore {
 
     @action
     focusWindow(appWindow: ApplicationWindow) {
+        window.dispatchEvent(new CustomEvent(ShellEvents.FocusAnyWindow));
+
         if (appWindow.isFocused) return;
         const indexes = [...this.windows.map((item) => item.depthIndex)];
 
@@ -40,11 +50,13 @@ export class WindowManagerStore {
                 item.setDepthIndex(index);
             });
         }
+        this.focusedWindow = appWindow;
     }
 
     @action
     expandWindow(appWindow: ApplicationWindow) {
         appWindow.setCollapsed(false);
+        appWindow.setFocused(true);
     }
 
     @action
@@ -57,5 +69,16 @@ export class WindowManagerStore {
         }
 
         this.windows.splice(this.windows.indexOf(appWindow), 1);
+    }
+
+    @action
+    closeAllWindows() {
+        this.windows = [];
+    }
+
+    @action
+    clearFocus() {
+        this.focusedWindow?.setFocused(false);
+        this.focusedWindow = null;
     }
 }

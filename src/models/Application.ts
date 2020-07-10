@@ -9,6 +9,8 @@ export class Application {
     icon: string;
     baseWidth: number;
     baseHeight: number;
+    minWidth: number;
+    minHeight: number;
     isExecuted: boolean = false;
     isVisibleInStartMenu: boolean = true;
 
@@ -17,13 +19,16 @@ export class Application {
         this.name = options.name;
         this.key = options.key ?? options.id;
         this.icon = options.icon ?? unknownApp;
-        this.baseWidth = options.baseWidth ?? 1200;
-        this.baseHeight = options.baseHeight ?? 800;
+        this.baseWidth = options.baseWidth ?? 1000;
+        this.baseHeight = options.baseHeight ?? 700;
+        this.minWidth = options.minWidth ?? 400;
+        this.minHeight = options.minHeight ?? 300;
         this.isVisibleInStartMenu = options.isVisibleInStartMenu ?? true;
     }
 
     @action
     setExecuted(value: boolean) {
         this.isExecuted = value;
+        return this;
     }
 }

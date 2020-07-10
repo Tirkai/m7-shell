@@ -1,0 +1,51 @@
+.notificationHub {
+    display: none;
+    width: 400px;
+    position: absolute;
+    bottom: 48px;
+    right: 0px;
+    color: white;
+    z-index: 100;
+    background: url("../../../assets/images/wallpaper_blur.jpg");
+    background-attachment: fixed;
+    background-position: right;
+    background-size: cover;
+    overflow: hidden;
+    height: calc(100vh - 48px);
+    border-top-left-radius: 4px;
+}
+.show {
+    display: block;
+}
+.container {
+    background: #222222cc;
+    height: 100%;
+}
+
+.content {
+    display: block;
+    height: calc(100% - 60px);
+}
+.title {
+    display: flex;
+    align-self: center;
+    padding: 12px 24px;
+    border-bottom: 1px solid transparent;
+    font-size: 24px;
+    transition: ease 0.3s;
+}
+.notificationsList {
+    height: 100%;
+    align-items: flex-start;
+    overflow: auto;
+    padding: 0 24px 24px 24px;
+}
+.notificationItem {
+    padding: 24px;
+    background: #444;
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+.titleAfterScroll {
+    border-bottom: 1px solid #ffffff0d;
+}

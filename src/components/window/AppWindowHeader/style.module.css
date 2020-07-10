@@ -1,6 +1,7 @@
 .appWindowHeader {
     height: 30px;
-    background: #00519c;
+    background: #222;
+    /* background: #00519c; */
     width: 100%;
 }
 .container {
@@ -43,4 +44,7 @@
     height: 100%;
     position: relative;
     z-index: 5;
+}
+.focused {
+    background: #0a3965;
 }

@@ -6,11 +6,15 @@
     width: 100%;
     display: flex;
     z-index: 100;
+    background: url("../../../assets/images/wallpaper_blur.jpg");
+    background-size: cover;
+    background-attachment: fixed;
 }
 .container {
     display: flex;
+    width: 100%;
     justify-content: space-between;
-    background: rgba(0, 0, 0, 0.8);
+    background: #000c;
 }
 .tasks {
     display: flex;

@@ -9,6 +9,7 @@ interface IAppWindowHeaderProps {
     title: string;
     hasBackward?: boolean;
     hasReload?: boolean;
+    isFocused: boolean;
     onDoubleClick?: () => void;
     onClose: () => void;
     onFullscreen: () => void;
@@ -21,7 +22,11 @@ export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
     render() {
         return (
             <div
-                className={classNames("appWindowHeader", style.appWindowHeader)}
+                className={classNames(
+                    "appWindowHeader",
+                    style.appWindowHeader,
+                    { [style.focused]: this.props.isFocused },
+                )}
                 onDoubleClick={this.props.onDoubleClick}
             >
                 <div className={style.container}>

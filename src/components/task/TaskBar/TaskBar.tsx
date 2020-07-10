@@ -1,5 +1,4 @@
-import { apps, notificationsNone } from "assets/icons";
-import { BlurBackground } from "components/layout/BlurBackground/BlurBackground";
+import { apps, notifications, notificationsNone } from "assets/icons";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
@@ -35,6 +34,10 @@ export class TaskBar extends Component<IStore> {
         }
     };
 
+    handleShowNotificationHub = (value: boolean) => {
+        this.store.shell.setNotificationHubShow(value);
+    };
+
     render() {
         return (
             <>
@@ -45,52 +48,62 @@ export class TaskBar extends Component<IStore> {
                 />
 
                 <div className={style.taskBar}>
-                    <BlurBackground>
-                        <div className={style.container}>
-                            <div className={style.tasks}>
-                                <TaskBarItem
-                                    onClick={() =>
-                                        this.handleShowAppsMenu(
-                                            !this.props.store?.shell
-                                                .appMenuShow,
-                                        )
-                                    }
-                                >
-                                    <img src={apps} alt="Applications" />
-                                </TaskBarItem>
-                                {this.props.store?.windowManager.windows.map(
-                                    (appWindow) => (
-                                        <TaskBarItem
-                                            key={appWindow.id}
-                                            executed
-                                            focused={appWindow.isFocused}
-                                            onClick={() =>
-                                                this.handleFocusAppWindow(
-                                                    appWindow,
-                                                )
-                                            }
-                                        >
-                                            <img
-                                                src={appWindow.application.icon}
-                                                alt="App Icon"
-                                            />
-                                        </TaskBarItem>
-                                    ),
-                                )}
-                            </div>
-                            <div className={style.actions}>
-                                <TaskBarItem onClick={() => true} autoWidth>
-                                    <TaskBarDateTime />
-                                </TaskBarItem>
-                                <TaskBarItem onClick={() => true}>
-                                    <img
-                                        src={notificationsNone}
-                                        alt="Notifications"
-                                    />
-                                </TaskBarItem>
-                            </div>
+                    <div className={style.container}>
+                        <div className={style.tasks}>
+                            <TaskBarItem
+                                onClick={() =>
+                                    this.handleShowAppsMenu(
+                                        !this.props.store?.shell.appMenuShow,
+                                    )
+                                }
+                            >
+                                <img src={apps} alt="Applications" />
+                            </TaskBarItem>
+                            {this.props.store?.windowManager.windows.map(
+                                (appWindow) => (
+                                    <TaskBarItem
+                                        key={appWindow.id}
+                                        executed
+                                        focused={appWindow.isFocused}
+                                        onClick={() =>
+                                            this.handleFocusAppWindow(appWindow)
+                                        }
+                                    >
+                                        <img
+                                            src={appWindow.application.icon}
+                                            alt="App Icon"
+                                        />
+                                    </TaskBarItem>
+                                ),
+                            )}
                         </div>
-                    </BlurBackground>
+                        <div className={style.actions}>
+                            <TaskBarItem onClick={() => true} autoWidth>
+                                <TaskBarDateTime />
+                            </TaskBarItem>
+                            <TaskBarItem
+                                badge={
+                                    this.store.notification.count > 0
+                                        ? this.store.notification.count.toString()
+                                        : undefined
+                                }
+                                onClick={() =>
+                                    this.handleShowNotificationHub(
+                                        !this.store.shell.notificationHubShow,
+                                    )
+                                }
+                            >
+                                <img
+                                    src={
+                                        this.store.notification.count > 0
+                                            ? notifications
+                                            : notificationsNone
+                                    }
+                                    alt="Notifications"
+                                />
+                            </TaskBarItem>
+                        </div>
+                    </div>
                 </div>
             </>
         );

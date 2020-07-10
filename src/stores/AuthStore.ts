@@ -1,5 +1,6 @@
 import { ShellMessageType } from "@algont/m7-shell-emitter";
 import Axios from "axios";
+import { AUTH_TOKEN_HEADER } from "constants/config";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { action, observable } from "mobx";
@@ -46,7 +47,7 @@ export class AuthStore {
             this.localStorageRefreshTokenKey,
             this.refreshToken,
         );
-        Axios.defaults.headers.common.Authorization = this.accessToken;
+        Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
     }
 
     @action
@@ -58,7 +59,7 @@ export class AuthStore {
     }
 
     startUpdateAuthTokenLoop() {
-        const updateTokenDelay = 5 * 60 * 1000; // Every 5 minutes
+        const updateTokenDelay = 15 * 60 * 1000; // Every 15 minutes
         this.renewToken();
         setInterval(() => {
             this.renewToken();
@@ -85,7 +86,7 @@ export class AuthStore {
                     }
                 },
             );
-            console.log("Update token:", this.accessToken);
+            console.debug("Update token:", this.accessToken);
         } else {
             this.logout();
         }

@@ -1,0 +1,11 @@
+.dropdownMenuItem {
+    display: inline-flex;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    color: white;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.dropdownMenuItem:hover {
+    background: #444;
+}

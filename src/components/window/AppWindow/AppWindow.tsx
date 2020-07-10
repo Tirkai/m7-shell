@@ -38,13 +38,21 @@ interface IAppWindowProps extends IStore {
     onClose: () => void;
 }
 
+interface IAppWindowState {
+    isAppReady: boolean;
+    hasBackward: boolean;
+    hasReload: boolean;
+    customUrl: string;
+}
+
 @inject("store")
 @observer
-export class AppWindow extends Component<IAppWindowProps> {
+export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
     state = {
         isAppReady: false,
         hasBackward: false,
         hasReload: false,
+        customUrl: "",
     };
 
     @computed
@@ -68,14 +76,28 @@ export class AppWindow extends Component<IAppWindowProps> {
         if (context) {
             const app = this.props.application;
             if (app instanceof ExternalApllication && context) {
-                app.setEmiterContext(context);
-
-                app.emitter.on(AppMessageType.Connected, () => {
-                    this.store.auth.injectAuthTokenInExternalApplication(app);
-                });
+                app.setEmitterContext(context);
+                this.handleBindingEmitterEvents(app);
             }
             this.handleAppReady();
         }
+    };
+
+    handleBindingEmitterEvents = (app: ExternalApllication) => {
+        app.emitter.on(AppMessageType.Connected, () =>
+            this.store.auth.injectAuthTokenInExternalApplication(app),
+        );
+
+        app.emitter.on(AppMessageType.ForceRecieveToken, () =>
+            this.store.auth.injectAuthTokenInExternalApplication(app),
+        );
+
+        app.emitter.on(AppMessageType.EnableBackwardButton, (payload) =>
+            this.handleShowBackward(payload),
+        );
+        app.emitter.on(AppMessageType.EnableReloadButton, (payload) =>
+            this.handleShowReload(payload),
+        );
     };
 
     handleAppReady = () => {
@@ -116,14 +138,6 @@ export class AppWindow extends Component<IAppWindowProps> {
         if (app instanceof ShellApplication) {
             this.setState({ isAppReady: true });
         }
-        if (app instanceof ExternalApllication) {
-            app.emitter.on(AppMessageType.EnableBackwardButton, (payload) =>
-                this.handleShowBackward(payload),
-            );
-            app.emitter.on(AppMessageType.EnableReloadButton, (payload) =>
-                this.handleShowReload(payload),
-            );
-        }
     }
 
     appComponent: JSX.Element | null = null;
@@ -132,7 +146,7 @@ export class AppWindow extends Component<IAppWindowProps> {
             this.appComponent = (
                 <iframe
                     onLoad={this.handleAppReady}
-                    src={this.props.application.url}
+                    src={this.props.application.applicationUrl}
                     ref={this.handleFrameLoaded}
                     title={this.props.application.name}
                     style={{
@@ -153,6 +167,18 @@ export class AppWindow extends Component<IAppWindowProps> {
 
         const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
         const taskBarWidth = 48;
+
+        const boundsVisibilityPercentModifier = 0.25;
+        const boundsInvisibilityPercentModifier = 0.75;
+
+        const topBound = 0;
+        const leftBound = -this.props.width * boundsInvisibilityPercentModifier;
+        const rightBound =
+            window.innerWidth -
+            this.props.width * boundsVisibilityPercentModifier;
+        const bottomBound =
+            window.innerHeight -
+            this.props.height * boundsVisibilityPercentModifier;
         return (
             <Draggable
                 handle=".appHeaderInfoBar"
@@ -162,6 +188,13 @@ export class AppWindow extends Component<IAppWindowProps> {
                 position={{
                     x: this.props.window.bounds.x,
                     y: this.props.window.bounds.y,
+                }}
+                disabled={this.props.window.isFullScreen}
+                bounds={{
+                    top: topBound,
+                    left: leftBound,
+                    right: rightBound,
+                    bottom: bottomBound,
                 }}
             >
                 <div
@@ -176,16 +209,24 @@ export class AppWindow extends Component<IAppWindowProps> {
                         onResizeStart={this.handleResizeStart}
                         onResizeStop={this.handleResizeEnd}
                         onResize={this.handleResize}
+                        axis={this.props.window.isFullScreen ? "none" : "both"}
                         resizeHandles={resizeDirections as ResizeHandle[]}
-                        minConstraints={[300, 200]}
+                        minConstraints={[
+                            this.props.application.minWidth,
+                            this.props.application.minHeight,
+                        ]}
                     >
                         <div
-                            className={style.windowContainer}
+                            className={classNames(style.windowContainer, {
+                                [style.fullScreen]: this.props.window
+                                    .isFullScreen,
+                            })}
                             onMouseDown={this.handleFocus}
                         >
                             <AppWindowHeader
                                 icon={this.props.application.icon}
                                 title={this.props.application.name}
+                                isFocused={this.props.isFocused}
                                 onClose={this.props.onClose}
                                 onDoubleClick={this.handleHeaderDoubleClick}
                                 hasBackward={this.state.hasBackward}

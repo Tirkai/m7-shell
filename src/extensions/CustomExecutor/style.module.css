@@ -1,0 +1,7 @@
+.customExecutor {
+    padding: 12px;
+}
+.container {
+    display: flex;
+    justify-content: space-between;
+}

@@ -2,15 +2,18 @@
     position: absolute;
     bottom: 48px;
     left: 0;
-    width: 430px;
-    height: 700px;
-    background: #333;
     opacity: 0;
     transform: translateY(calc(25%));
     transition: transform ease 0.3s, opacity 0.3s 0.1s;
     box-sizing: border-box;
     pointer-events: none;
     z-index: 100;
+    max-height: calc(100vh - 48px);
+    background: url("../../../assets/images/wallpaper_blur.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    border-top-right-radius: 4px;
+    overflow: hidden;
 }
 
 .visible {
@@ -21,9 +24,7 @@
 }
 .container {
     display: grid;
-    grid-template-columns: 1fr 64px;
-    grid-gap: 12px;
-    padding: 24px;
+    grid-template-columns: 48px 1fr;
     box-sizing: border-box;
     height: 100%;
     background: #222222cc;
@@ -32,6 +33,7 @@
 
 .content {
     display: block;
+    padding: 24px 24px 0 24px;
 }
 
 .search {
@@ -42,12 +44,23 @@
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(auto-fit, 100px);
     grid-gap: 12px;
+    height: 625px;
+    overflow: hidden;
+    overflow-y: auto;
+    padding-right: 2px;
 }
 .sidebar {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* justify-content: flex-end; */
-    border-left: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 0 6px;
+    justify-content: space-between;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 24px 6px;
+}
+.logo {
+    cursor: pointer;
+}
+.notFoundApps {
+    grid-column: span 3;
+    color: white;
 }
