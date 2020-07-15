@@ -26,7 +26,8 @@ export const en = {
         licence: "License",
         logout: "Logout",
         editAccount: "Edit Account",
-        devMode: "Dev Mode",
+        devModeOn: "Dev Mode (on)",
+        devModeOff: "Dev Mode (off)",
     },
     notification: {
         title: "Notifications",

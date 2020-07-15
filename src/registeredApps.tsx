@@ -11,6 +11,15 @@ import { v4 } from "uuid";
 export const registeredApps: Application[] = [
     new ExternalApllication({
         id: v4(),
+        name: "People",
+        key: "People",
+        url: `http://people.${UPPER_LEVEL_DOMAIN}`,
+        baseWidth: 400,
+        baseHeight: 500,
+        isVisibleInStartMenu: true,
+    }),
+    new ExternalApllication({
+        id: v4(),
         name: strings.definedApplications.accountsMe,
         key: "AccountsMe",
         url: `http://accounts.${UPPER_LEVEL_DOMAIN}/#/me`,

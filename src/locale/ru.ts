@@ -26,7 +26,8 @@ export const ru = {
         licence: "Лицензионная защита",
         logout: "Выйти",
         editAccount: "Изменить аккаунт",
-        devMode: "Режим отладки",
+        devModeOn: "Режим отладки (включен)",
+        devModeOff: "Режим отладки (выключен)",
     },
     notification: {
         title: "Уведомления",
