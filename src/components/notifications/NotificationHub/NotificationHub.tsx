@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { IStore } from "interfaces/common/IStore";
+import { strings } from "locale";
 import { uniq } from "lodash";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
@@ -79,7 +80,7 @@ export class NotificationHub extends Component<IStore> {
                                 [style.titleAfterScroll]: this.state.isScrolled,
                             })}
                         >
-                            Уведомления
+                            {strings.notification.title}
                         </div>
                         <div
                             className={style.notificationsList}
@@ -121,7 +122,7 @@ export class NotificationHub extends Component<IStore> {
                                               ))}
                                       </NotificationGroup>
                                   ))
-                                : "Нет уведомлений"}
+                                : strings.notification.noMoreNotifications}
                         </div>
                     </div>
                 </div>

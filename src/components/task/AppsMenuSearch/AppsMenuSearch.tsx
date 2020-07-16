@@ -1,3 +1,4 @@
+import { strings } from "locale";
 import React, { Component } from "react";
 import style from "./style.module.css";
 
@@ -17,7 +18,7 @@ export class AppsMenuSearch extends Component<IAppsMenuSearch> {
                 className={style.input}
                 onChange={this.handleChange}
                 value={this.props.value}
-                placeholder="Поиск"
+                placeholder={strings.startMenu.search}
                 maxLength={100}
             />
         );

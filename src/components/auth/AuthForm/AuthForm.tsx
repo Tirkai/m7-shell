@@ -1,5 +1,6 @@
 import { Button, TextField } from "@material-ui/core";
 import { FormItem } from "components/formLayout/FormItem/FormItem";
+import { strings } from "locale";
 import React, { ChangeEvent, Component } from "react";
 import style from "./style.module.css";
 
@@ -38,14 +39,14 @@ export class AuthForm extends Component<IAuthFormProps> {
                             autoFocus
                             onChange={this.handleChangeLogin}
                             value={this.state.login}
-                            label="Логин"
+                            label={strings.form.fields.login}
                         />
                     </FormItem>
                     <FormItem>
                         <TextField
                             onChange={this.handleChangePassword}
                             value={this.state.password}
-                            label="Пароль"
+                            label={strings.form.fields.password}
                             type="password"
                         />
                     </FormItem>
@@ -55,7 +56,7 @@ export class AuthForm extends Component<IAuthFormProps> {
                             variant="contained"
                             color="primary"
                         >
-                            Вход
+                            {strings.actions.login}
                         </Button>
                     </FormItem>
                 </form>
