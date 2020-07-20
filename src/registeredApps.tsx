@@ -9,7 +9,15 @@ import React from "react";
 import { v4 } from "uuid";
 
 export const registeredApps: Application[] = [
-    //TODO выпилить после стабилизации и добавления в портальный сервис
+    new ExternalApllication({
+        id: v4(),
+        name: "People",
+        key: "People",
+        url: `http://people.${UPPER_LEVEL_DOMAIN}/#/`,
+        baseWidth: 800,
+        baseHeight: 650,
+        isVisibleInStartMenu: true,
+    }),
     new ExternalApllication({
         id: v4(),
         name: "Terminal",
