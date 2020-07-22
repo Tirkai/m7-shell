@@ -26,19 +26,30 @@ export class NotificationHub extends Component<IStore> {
     };
 
     handleClearGroup = (id: string) => {
-        this.store.notification.removeNotifications(
-            this.store.notification.notifications.filter(
-                (item) => item.applicationId === id,
-            ),
-            this.store.auth.userLogin,
+        const notifications = this.store.notification.notifications.filter(
+            (item) => item.applicationId === id,
         );
+
+        notifications.forEach(item => item.setDisplayed(false));
+
+        setTimeout(() => {
+            this.store.notification.removeNotifications(
+                notifications,
+                this.store.auth.userLogin,
+            );
+        }, 300);
     };
 
     handleCloseNotification = (notification: NotificationModel) => {
-        this.store.notification.removeNotifications(
-            [notification],
-            this.store.auth.userLogin,
-        );
+
+        notification.setDisplayed(false);
+
+        setTimeout(() => {
+            this.store.notification.removeNotifications(
+                [notification],
+                this.store.auth.userLogin,
+            );
+        }, 300);   
     };
 
     handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
