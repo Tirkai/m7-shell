@@ -120,6 +120,11 @@ export class NotificationStore {
                 (response: INotificationCountResponse) =>
                     this.updateNotificationCount(response.total),
             );
+
+            this.socket.on("disconnect", () => {
+                this.socket?.close();
+                this.connectToNotificationsSocket(this.store.auth.accessToken);
+            });
         }
     }
 

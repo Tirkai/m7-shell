@@ -1,4 +1,5 @@
 import { ShellMessageType } from "@algont/m7-shell-emitter";
+import { JsonRpcPayload, JsonRpcResult } from "@algont/m7-utils";
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
 import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
@@ -7,7 +8,6 @@ import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { action, observable } from "mobx";
 import { ExternalApllication } from "models/ExternalApplication";
 import { authEndpoint, meEndpoint } from "utils/endpoints";
-import { JsonRpcPayload } from "utils/JsonRpcPayload";
 import { AppStore } from "./AppStore";
 export class AuthStore {
     private readonly localStorageAccessTokenKey: string = "ACCESS_TOKEN";
@@ -42,7 +42,14 @@ export class AuthStore {
             this.fetchUsername();
         }
 
-        window.addEventListener("focus", async () => this.verifyToken());
+        window.addEventListener("focus", async () => {
+            const verifyStatus = await this.verifyToken();
+            if (verifyStatus.result) {
+                this.renewToken();
+            } else {
+                this.logout();
+            }
+        });
     }
 
     async verifyToken() {
@@ -54,13 +61,11 @@ export class AuthStore {
                 token: this.accessToken,
             }),
         );
-        if (!response.data.error) {
-            const status = response.data.result;
 
-            if (status !== AccessTokenVerifyStatus.Ok) {
-                this.logout();
-            }
-        } else this.logout();
+        return new JsonRpcResult({
+            status: !response.data.error,
+            result: response.data.result === AccessTokenVerifyStatus.Ok,
+        });
     }
 
     @action
@@ -84,7 +89,7 @@ export class AuthStore {
     }
 
     startUpdateAuthTokenLoop() {
-        const updateTokenDelay = 15 * 60 * 1000; // Every 15 minutes
+        const updateTokenDelay = 5 * 60 * 1000; // Every 5 minutes
         this.renewToken();
         setInterval(() => {
             this.renewToken();
@@ -111,7 +116,6 @@ export class AuthStore {
                     }
                 },
             );
-            console.debug("Update token:", this.accessToken);
         } else {
             this.logout();
         }
@@ -165,7 +169,7 @@ export class AuthStore {
     @action
     async logout() {
         try {
-            await Axios.post(
+            const response = await Axios.post<IJsonRpcResponse<unknown>>(
                 authEndpoint.url,
                 new JsonRpcPayload("logout", {
                     token: this.accessToken,
@@ -174,6 +178,10 @@ export class AuthStore {
             localStorage.removeItem(this.localStorageAccessTokenKey);
             this.accessToken = "";
             this.isAuthorized = false;
+
+            return new JsonRpcResult({
+                status: !response.data.error
+            });
         } catch (e) {
             alert(e);
         }
