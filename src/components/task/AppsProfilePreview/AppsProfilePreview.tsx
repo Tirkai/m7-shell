@@ -1,3 +1,4 @@
+import { UtilsFunctions } from "@algont/m7-utils";
 import { Avatar } from "@material-ui/core";
 import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
 import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
@@ -7,7 +8,6 @@ import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import React, { Component } from "react";
-import { getInitials } from "utils";
 import style from "./style.module.css";
 
 @inject("store")
@@ -36,8 +36,9 @@ export class AppsProfilePreview extends Component<IStore> {
     };
 
     render() {
-        const userInitials = getInitials(this.store.auth.userName);
-
+        const userInitials = UtilsFunctions.getInitials(
+            this.store.auth.userName,
+        );
         return (
             <>
                 <div className={style.appsProfilePreview}>
@@ -58,7 +59,22 @@ export class AppsProfilePreview extends Component<IStore> {
                             </DropdownMenuItem>,
                         ]}
                     >
-                        <Avatar className={style.avatar}>{userInitials}</Avatar>
+                        <Avatar
+                            style={{
+                                background: `linear-gradient(-45deg, ${UtilsFunctions.stringToHslColor(
+                                    userInitials,
+                                    75,
+                                    60,
+                                )}, ${UtilsFunctions.stringToHslColor(
+                                    userInitials,
+                                    75,
+                                    75,
+                                )})`,
+                            }}
+                            className={style.avatar}
+                        >
+                            {userInitials}
+                        </Avatar>
                     </DropdownMenu>
                 </div>
             </>

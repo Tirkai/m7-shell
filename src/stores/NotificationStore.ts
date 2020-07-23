@@ -1,3 +1,4 @@
+import { JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
 import {
     AUTH_TOKEN_HEADER,
@@ -16,7 +17,6 @@ import {
     legacyNotificationEndpoint,
     notificationsEndpoint,
 } from "utils/endpoints";
-import { JsonRpcPayload } from "utils/JsonRpcPayload";
 import { AppStore } from "./AppStore";
 
 const title = `Сообщение о событии`;

@@ -1,3 +1,4 @@
+import { JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicationResponse";
@@ -7,7 +8,6 @@ import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApllication } from "models/ExternalApplication";
 import { registeredApps } from "registeredApps";
 import { portalEndpoint } from "utils/endpoints";
-import { JsonRpcPayload } from "utils/JsonRpcPayload";
 import { v4 } from "uuid";
 import { AppStore } from "./AppStore";
 export class ApplicationManagerStore {
