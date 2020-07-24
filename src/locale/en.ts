@@ -1,10 +1,11 @@
 export const en = {
     auth: {
-        unexpectedError: "An unexpected error has occurred",
+        authenticateError: "Invalid username or password",
         authenticateUserNotFound: "User not found",
         authenticateUserNotActive: "User is not active",
         authenticateUserExpired: "User activity has expired",
         authenticateBadPassword: "Invalid password",
+        authenticateUnknownNode: "Unknown node",
         description: "Unified Authorization Service",
     },
     actions: {

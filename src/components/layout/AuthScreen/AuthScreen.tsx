@@ -39,7 +39,7 @@ export class AuthScreen extends Component<IStore> {
                 isShowNotify: true,
                 notifyText: errorKey?.length
                     ? errorLocaleStrings[errorKey]
-                    : strings.auth.unexpectedError,
+                    : strings.auth.authenticateError,
             });
 
             this.notifyTimeout = setTimeout(() => {

@@ -1,10 +1,11 @@
 export const ru = {
     auth: {
-        unexpectedError: "Произошла неизвестная ошибка",
+        authenticateError: "Неверный логин или пароль",
         authenticateUserNotFound: "Пользователь не найден",
         authenticateUserNotActive: "Пользователь не активен",
         authenticateUserExpired: "Срок активности пользователя истек",
         authenticateBadPassword: "Неверный пароль",
+        authenticateUnknownNode: "Неизвестный узел",
         description: "Единая служба авторизации",
     },
     actions: {
