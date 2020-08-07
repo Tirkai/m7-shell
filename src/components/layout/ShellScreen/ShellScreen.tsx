@@ -33,8 +33,6 @@ export class ShellScreen extends Component<IStore> {
 
         const autoRunUrl = urlParams.get("autoRunUrl");
 
-        console.debug({ autoRunApp, autoRunUrl });
-
         if (autoRunApp) {
             const app = this.store.applicationManager.findByKey(autoRunApp);
 

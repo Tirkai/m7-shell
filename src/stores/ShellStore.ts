@@ -15,7 +15,7 @@ export class ShellStore {
     }
 
     @observable
-    enabledDevMode: boolean = false;
+    enabledDevMode: boolean = process.env.NODE_ENV === "development";
 
     @observable
     activePanel: ShellPanelType = ShellPanelType.None;

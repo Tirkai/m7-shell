@@ -3,19 +3,28 @@ import { JsonRpcPayload, JsonRpcResult } from "@algont/m7-utils";
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
 import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
+import { IRefrashTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
-import { action, observable } from "mobx";
+import { Base64 } from "js-base64";
+import { action, computed, observable } from "mobx";
 import { ExternalApllication } from "models/ExternalApplication";
+import moment, { Moment } from "moment";
 import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
+
 export class AuthStore {
     private readonly localStorageAccessTokenKey: string = "ACCESS_TOKEN";
     private readonly localStorageRefreshTokenKey: string = "REFRESH_TOKEN";
     private readonly localStorageUserLogin: string = "USER_LOGIN";
 
+    @observable
     accessToken: string = "";
+
+    @observable
     refreshToken: string = "";
+
+    @observable
     userLogin: string = "";
 
     @observable
@@ -23,6 +32,50 @@ export class AuthStore {
 
     @observable
     isAuthorized: boolean = false;
+
+    @observable
+    deltaTime: number = 0;
+
+    @observable
+    renewTime: Moment = moment();
+
+    @observable
+    createTime: Moment = moment();
+
+    @observable
+    currentTime: Moment = moment();
+
+    @observable
+    timeOffset: number = 30000;
+
+    decodeToken<T>(token: string) {
+        const [, expireSection] = token.split(".");
+
+        if (expireSection) {
+            const decodedData = (JSON.parse(
+                Base64.decode(expireSection),
+            ) as unknown) as T;
+            return decodedData;
+        } else {
+            return null;
+        }
+    }
+
+    @computed
+    get remainingTokenTime() {
+        const time = -this.currentTime.diff(this.renewTime) + this.deltaTime;
+        return !isNaN(time) ? time : 0;
+    }
+
+    @computed
+    get remainingTokenTimeInSeconds() {
+        return Math.floor((this.remainingTokenTime + this.timeOffset) / 1000);
+    }
+
+    @computed
+    get isTokenExpired() {
+        return this.remainingTokenTime <= 0;
+    }
 
     private store: AppStore;
     constructor(store: AppStore) {
@@ -38,18 +91,12 @@ export class AuthStore {
             this.setToken(authToken, refreshToken);
             this.userLogin = userLogin;
             this.isAuthorized = true;
-            this.startUpdateAuthTokenLoop();
             this.fetchUsername();
         }
 
-        window.addEventListener("focus", async () => {
-            const verifyStatus = await this.verifyToken();
-            if (verifyStatus.result) {
-                this.renewToken();
-            } else {
-                this.logout();
-            }
-        });
+        setInterval(() => {
+            this.currentTime = moment();
+        }, 1000);
     }
 
     async verifyToken() {
@@ -69,14 +116,37 @@ export class AuthStore {
     }
 
     @action
-    setToken(authToken: string, refreshToken: string) {
-        this.accessToken = authToken;
+    setToken(accessToken: string, refreshToken: string) {
+        this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         localStorage.setItem(this.localStorageAccessTokenKey, this.accessToken);
         localStorage.setItem(
             this.localStorageRefreshTokenKey,
             this.refreshToken,
         );
+
+        const refreshTokenData = this.decodeToken<IRefrashTokenMetadata>(
+            refreshToken,
+        );
+
+        this.createTime = moment.utc(refreshTokenData?.created);
+        this.renewTime = moment.utc(refreshTokenData?.renew);
+
+        const localStorageDelta = localStorage.getItem("DELTA");
+
+        if (!localStorageDelta) {
+            this.deltaTime = this.currentTime.diff(this.createTime);
+            localStorage.setItem("DELTA", this.deltaTime.toString());
+        } else {
+            this.deltaTime = parseInt(localStorageDelta);
+        }
+
+        const delay = this.remainingTokenTime + this.timeOffset;
+
+        setTimeout(() => {
+            this.renewToken();
+        }, delay);
+
         Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
     }
 
@@ -86,14 +156,6 @@ export class AuthStore {
             token: this.accessToken,
             login: this.userLogin,
         });
-    }
-
-    startUpdateAuthTokenLoop() {
-        const updateTokenDelay = 5 * 60 * 1000; // Every 5 minutes
-        this.renewToken();
-        setInterval(() => {
-            this.renewToken();
-        }, updateTokenDelay);
     }
 
     async renewToken() {
@@ -145,7 +207,6 @@ export class AuthStore {
                     this.localStorageUserLogin,
                     this.userLogin,
                 );
-                this.startUpdateAuthTokenLoop();
 
                 this.fetchUsername();
             }
@@ -180,7 +241,7 @@ export class AuthStore {
             this.isAuthorized = false;
 
             return new JsonRpcResult({
-                status: !response.data.error
+                status: !response.data.error,
             });
         } catch (e) {
             alert(e);
