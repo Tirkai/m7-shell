@@ -4,6 +4,7 @@ import {
     AUTH_TOKEN_HEADER,
     NOTIFICATIONS_WEBSOCKET_URL,
 } from "constants/config";
+import { ShellEvents } from "enum/ShellEvents";
 import { NotificationFactory } from "factories/NotificationFactory";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { INotificationCountResponse } from "interfaces/response/INotificationCountResponse";
@@ -113,9 +114,13 @@ export class NotificationStore {
     }
 
     async connectToNotificationsSocket(token: string) {
-        const reconnect = () => {
+        const closeSocket = () => {
             this.socket?.close();
             this.socket = null;
+        };
+
+        const reconnectSocket = () => {
+            closeSocket();
             this.connectToNotificationsSocket(this.store.auth.accessToken);
         };
 
@@ -144,11 +149,19 @@ export class NotificationStore {
                         this.updateNotificationCount(response.total),
                 );
 
-                this.socket.on("disconnect", () => reconnect());
+                this.socket.on("disconnect", () => reconnectSocket());
+
+                window.addEventListener(
+                    ShellEvents.Logout,
+                    () => closeSocket(),
+                    {
+                        once: true,
+                    },
+                );
             }
         } catch (e) {
             console.error(e);
-            setTimeout(() => reconnect(), 3000);
+            setTimeout(() => reconnectSocket(), 3000);
         }
     }
 

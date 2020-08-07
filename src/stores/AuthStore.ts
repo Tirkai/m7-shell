@@ -3,6 +3,7 @@ import { JsonRpcPayload, JsonRpcResult } from "@algont/m7-utils";
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
 import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
+import { ShellEvents } from "enum/ShellEvents";
 import { IRefrashTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
@@ -236,6 +237,9 @@ export class AuthStore {
                     token: this.accessToken,
                 }),
             );
+
+            dispatchEvent(new CustomEvent(ShellEvents.Logout));
+
             localStorage.removeItem(this.localStorageAccessTokenKey);
             this.accessToken = "";
             this.isAuthorized = false;

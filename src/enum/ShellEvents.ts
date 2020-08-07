@@ -6,4 +6,5 @@ export enum ShellEvents {
     StartMenuClose = "startMenuClose",
     NotificationHubOpen = "notificationHubOpen",
     NotificationHubClose = "notificationHubClose",
+    Logout = "logout",
 }
