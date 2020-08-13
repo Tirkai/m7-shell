@@ -100,7 +100,7 @@ export class NotificationStore {
                         );
                         this.notifications = flatten(notificationsList ?? []);
                     })
-                    .catch(() => alert("1"));
+                    .catch((e) => console.error(e));
 
                 resolve();
             } catch (e) {

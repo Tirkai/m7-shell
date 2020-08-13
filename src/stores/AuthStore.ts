@@ -166,6 +166,7 @@ export class AuthStore {
                 token: this.refreshToken,
             }),
         );
+        localStorage.removeItem("DELTA");
         if (!response.data.error) {
             const result = response.data.result;
             this.setToken(result.access_token, result.refresh_token);
