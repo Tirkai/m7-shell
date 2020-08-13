@@ -77,11 +77,9 @@ export class AppsMenu extends Component<IStore> {
                                                 )
                                             }
                                         >
-                                            {strings.startMenu.devMode} (
                                             {this.store.shell.enabledDevMode
-                                                ? strings.state.on
-                                                : strings.state.off}
-                                            )
+                                                ? strings.startMenu.devModeOn
+                                                : strings.startMenu.devModeOff}
                                         </DropdownMenuItem>,
                                     ]}
                                 >
