@@ -95,8 +95,23 @@ export class AuthStore {
             this.fetchUsername();
         }
 
+        const checkoutRemainingTime = () => {
+            const diff =
+                this.renewTime.diff(this.currentTime) +
+                this.deltaTime +
+                this.timeOffset;
+            return diff >= 0;
+        };
+
+        window.addEventListener("focus", () => checkoutRemainingTime());
+
         setInterval(() => {
             this.currentTime = moment();
+
+            const hasRemainedTime = checkoutRemainingTime();
+            if (!hasRemainedTime) {
+                this.renewToken();
+            }
         }, 1000);
     }
 
@@ -144,9 +159,9 @@ export class AuthStore {
 
         const delay = this.remainingTokenTime + this.timeOffset;
 
-        setTimeout(() => {
-            this.renewToken();
-        }, delay);
+        // setTimeout(() => {
+        //     this.renewToken();
+        // }, delay);
 
         Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
     }
