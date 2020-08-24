@@ -15,10 +15,13 @@ import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
 export class AuthStore {
-    private readonly localStorageAccessTokenKey: string = "ACCESS_TOKEN";
-    private readonly localStorageRefreshTokenKey: string = "REFRESH_TOKEN";
+    private readonly localStorageAccessTokenKey: string =
+        "ACCESS_TOKEN_" + process.env.REACT_APP_BUILD;
+    private readonly localStorageRefreshTokenKey: string =
+        "REFRESH_TOKEN_" + process.env.REACT_APP_BUILD;
     private readonly localStorageUserLogin: string = "USER_LOGIN";
-
+    private readonly localStorageDelta: string =
+        "DELTA_" + process.env.REACT_APP_BUILD;
     @observable
     accessToken: string = "";
 
@@ -107,10 +110,11 @@ export class AuthStore {
 
         setInterval(() => {
             this.currentTime = moment();
-
-            const hasRemainedTime = checkoutRemainingTime();
-            if (!hasRemainedTime) {
-                this.renewToken();
+            if (this.isAuthorized) {
+                const hasRemainedTime = checkoutRemainingTime();
+                if (!hasRemainedTime) {
+                    this.renewToken();
+                }
             }
         }, 1000);
     }
@@ -135,11 +139,6 @@ export class AuthStore {
     setToken(accessToken: string, refreshToken: string) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
-        localStorage.setItem(this.localStorageAccessTokenKey, this.accessToken);
-        localStorage.setItem(
-            this.localStorageRefreshTokenKey,
-            this.refreshToken,
-        );
 
         const refreshTokenData = this.decodeToken<IRefrashTokenMetadata>(
             refreshToken,
@@ -148,21 +147,25 @@ export class AuthStore {
         this.createTime = moment.utc(refreshTokenData?.created);
         this.renewTime = moment.utc(refreshTokenData?.renew);
 
-        const localStorageDelta = localStorage.getItem("DELTA");
+        const localStorageDelta = localStorage.getItem(this.localStorageDelta);
 
         if (!localStorageDelta) {
             this.deltaTime = this.currentTime.diff(this.createTime);
-            localStorage.setItem("DELTA", this.deltaTime.toString());
+            localStorage.setItem(
+                this.localStorageDelta,
+                this.deltaTime.toString(),
+            );
         } else {
             this.deltaTime = parseInt(localStorageDelta);
         }
 
         const delay = this.remainingTokenTime + this.timeOffset;
+        localStorage.setItem(this.localStorageAccessTokenKey, this.accessToken);
 
-        // setTimeout(() => {
-        //     this.renewToken();
-        // }, delay);
-
+        localStorage.setItem(
+            this.localStorageRefreshTokenKey,
+            this.refreshToken,
+        );
         Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
     }
 
@@ -181,7 +184,7 @@ export class AuthStore {
                 token: this.refreshToken,
             }),
         );
-        localStorage.removeItem("DELTA");
+        localStorage.removeItem(this.localStorageDelta);
         if (!response.data.error) {
             const result = response.data.result;
             this.setToken(result.access_token, result.refresh_token);
