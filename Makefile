@@ -26,7 +26,7 @@ install:
 	npm install
 
 build: clean-build install
-	grunt release
+	npm run build
 
 deb: clean-deb
 	bash deb/build.sh $(VERSION)

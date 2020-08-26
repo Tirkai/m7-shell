@@ -17,7 +17,7 @@ echo "Version: $VERSION"
 echo "START local build"
 
 mkdir -pv ./deb/debinstall/$SETUP_PATH/
-cp -r ./dist/* ./deb/debinstall/$SETUP_PATH/
+cp -r ./build/* ./deb/debinstall/$SETUP_PATH/
 
 sed -i "/Version:/c\Version: $VERSION" ./deb/debinstall/DEBIAN/control
 
