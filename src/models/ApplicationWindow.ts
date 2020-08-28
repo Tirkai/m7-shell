@@ -7,6 +7,7 @@ interface IApplicationWindowOptions {
     id: string;
     width: number;
     height: number;
+    isFullscreen?: boolean;
 }
 
 export class ApplicationWindow {
@@ -89,6 +90,7 @@ export class ApplicationWindow {
         this.height = options.height;
         this.x = Math.floor(window.innerWidth / 2 - this.width / 2);
         this.y = Math.floor(window.innerHeight / 2 - this.height / 2);
+        this.isFullScreen = options.isFullscreen ?? false;
     }
 
     @action

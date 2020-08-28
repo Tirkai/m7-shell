@@ -1,4 +1,5 @@
 import { apps, notifications, notificationsNone } from "assets/icons";
+import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
@@ -43,6 +44,10 @@ export class TaskBar extends Component<IStore> {
         );
     };
 
+    handleCloseWindow = (appWindow: ApplicationWindow) => {
+        this.store.windowManager.closeWindow(appWindow);
+    };
+
     render() {
         return (
             <>
@@ -58,7 +63,7 @@ export class TaskBar extends Component<IStore> {
                             >
                                 <img src={apps} alt="Applications" />
                             </TaskBarItem>
-                            {this.props.store?.windowManager.windows.map(
+                            {this.store.windowManager.windows.map(
                                 (appWindow) => (
                                     <TaskBarItem
                                         key={appWindow.id}
@@ -67,6 +72,17 @@ export class TaskBar extends Component<IStore> {
                                         onClick={() =>
                                             this.handleFocusAppWindow(appWindow)
                                         }
+                                        menu={[
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    this.handleCloseWindow(
+                                                        appWindow,
+                                                    )
+                                                }
+                                            >
+                                                Закрыть
+                                            </DropdownMenuItem>,
+                                        ]}
                                     >
                                         <img
                                             src={appWindow.application.icon}

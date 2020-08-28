@@ -33,12 +33,18 @@
 
 .content {
     display: block;
-    padding: 24px 24px 0 24px;
+    /* padding: 24px 24px 0 24px; */
 }
 
 .search {
-    margin-bottom: 12px;
+    padding: 12px;
 }
+
+.appsListWrapper {
+    border-radius: 4px;
+    overflow: hidden;
+}
+
 .appsList {
     display: grid;
     grid-template-columns: repeat(3, 100px);
@@ -47,7 +53,7 @@
     height: 625px;
     overflow: hidden;
     overflow-y: auto;
-    padding-right: 2px;
+    padding: 0 12px 12px 12px;
 }
 .sidebar {
     display: flex;
@@ -55,7 +61,7 @@
     align-items: center;
     justify-content: space-between;
     border-right: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 24px 6px;
+    padding: 12px 6px;
 }
 .logo {
     cursor: pointer;

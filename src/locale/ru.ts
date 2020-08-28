@@ -1,11 +1,18 @@
 export const ru = {
+    error: {
+        anOccurredError: "Произошла ошибка",
+        connectionError: "Не удалось установить соединение с сервером",
+        applicationService: "Сервис приложений недоступен",
+    },
     auth: {
-        authenticateError: "Неверный логин или пароль",
-        authenticateUserNotFound: "Пользователь не найден",
-        authenticateUserNotActive: "Пользователь не активен",
-        authenticateUserExpired: "Срок активности пользователя истек",
-        authenticateBadPassword: "Неверный пароль",
-        authenticateUnknownNode: "Неизвестный узел",
+        error: {
+            authenticateError: "Неверный логин или пароль",
+            authenticateUserNotFound: "Пользователь не найден",
+            authenticateUserNotActive: "Пользователь не активен",
+            authenticateUserExpired: "Срок активности пользователя истек",
+            authenticateBadPassword: "Неверный пароль",
+            authenticateUnknownNode: "Неизвестный узел",
+        },
         description: "Единая служба авторизации",
     },
     actions: {

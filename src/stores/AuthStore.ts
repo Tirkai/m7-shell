@@ -8,6 +8,7 @@ import { IRefrashTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { Base64 } from "js-base64";
+import { strings } from "locale";
 import { action, computed, observable } from "mobx";
 import { ExternalApllication } from "models/ExternalApplication";
 import moment, { Moment } from "moment";
@@ -232,7 +233,10 @@ export class AuthStore {
             }
             return response.data;
         } catch (e) {
-            alert(e);
+            this.store.message.showMessage(
+                strings.error.anOccurredError,
+                strings.error.connectionError,
+            );
         }
     }
 
@@ -267,7 +271,11 @@ export class AuthStore {
                 status: !response.data.error,
             });
         } catch (e) {
-            alert(e);
+            this.isAuthorized = false;
+            this.store.message.showMessage(
+                strings.error.anOccurredError,
+                strings.error.connectionError,
+            );
         }
     }
 }

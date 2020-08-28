@@ -1,11 +1,18 @@
 export const en = {
+    error: {
+        anOccurredError: "An occurred error",
+        connectionError: "Failed to establish a connection to the server",
+        applicationService: "App service unavailable",
+    },
     auth: {
-        authenticateError: "Invalid username or password",
-        authenticateUserNotFound: "User not found",
-        authenticateUserNotActive: "User is not active",
-        authenticateUserExpired: "User activity has expired",
-        authenticateBadPassword: "Invalid password",
-        authenticateUnknownNode: "Unknown node",
+        error: {
+            authenticateError: "Invalid username or password",
+            authenticateUserNotFound: "User not found",
+            authenticateUserNotActive: "User is not active",
+            authenticateUserExpired: "User activity has expired",
+            authenticateBadPassword: "Invalid password",
+            authenticateUnknownNode: "Unknown node",
+        },
         description: "Unified Authorization Service",
     },
     actions: {

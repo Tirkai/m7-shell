@@ -96,10 +96,23 @@ export class AppsMenu extends Component<IStore> {
                                 onChange={this.handleSearch}
                             />
                         </div>
-                        <div className={style.appsList}>
-                            {this.store.applicationManager.isSearching
-                                ? this.store.applicationManager.findedApplicatons.map(
-                                      (app) => (
+                        <div className={style.appsListWrapper}>
+                            <div className={style.appsList}>
+                                {this.store.applicationManager.isSearching
+                                    ? this.store.applicationManager.findedApplicatons.map(
+                                          (app) => (
+                                              <AppsMenuItem
+                                                  key={app.id}
+                                                  icon={app.icon}
+                                                  title={app.name}
+                                                  isExecuted={app.isExecuted}
+                                                  onClick={() =>
+                                                      this.handleExecuteApp(app)
+                                                  }
+                                              />
+                                          ),
+                                      )
+                                    : applicationsList.map((app) => (
                                           <AppsMenuItem
                                               key={app.id}
                                               icon={app.icon}
@@ -109,28 +122,17 @@ export class AppsMenu extends Component<IStore> {
                                                   this.handleExecuteApp(app)
                                               }
                                           />
-                                      ),
-                                  )
-                                : applicationsList.map((app) => (
-                                      <AppsMenuItem
-                                          key={app.id}
-                                          icon={app.icon}
-                                          title={app.name}
-                                          isExecuted={app.isExecuted}
-                                          onClick={() =>
-                                              this.handleExecuteApp(app)
-                                          }
-                                      />
-                                  ))}
-                            {this.store.applicationManager.isSearching &&
-                            this.store.applicationManager.findedApplicatons
-                                .length <= 0 ? (
-                                <div className={style.notFoundApps}>
-                                    {strings.state.notFound}
-                                </div>
-                            ) : (
-                                ""
-                            )}
+                                      ))}
+                                {this.store.applicationManager.isSearching &&
+                                this.store.applicationManager.findedApplicatons
+                                    .length <= 0 ? (
+                                    <div className={style.notFoundApps}>
+                                        {strings.state.notFound}
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
