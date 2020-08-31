@@ -1,0 +1,7 @@
+Package: m7-shell
+Version:
+Maintainer: Algont Developers <inbox@algont.ru>
+Architecture: all
+Section: devel
+Priority: optional
+Description: m7-shell
