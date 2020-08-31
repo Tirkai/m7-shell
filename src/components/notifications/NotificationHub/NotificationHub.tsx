@@ -1,3 +1,4 @@
+import empty from "assets/images/empty.svg";
 import classNames from "classnames";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
@@ -30,7 +31,7 @@ export class NotificationHub extends Component<IStore> {
             (item) => item.applicationId === id,
         );
 
-        notifications.forEach(item => item.setDisplayed(false));
+        notifications.forEach((item) => item.setDisplayed(false));
 
         setTimeout(() => {
             this.store.notification.removeNotifications(
@@ -41,7 +42,6 @@ export class NotificationHub extends Component<IStore> {
     };
 
     handleCloseNotification = (notification: NotificationModel) => {
-
         notification.setDisplayed(false);
 
         setTimeout(() => {
@@ -49,7 +49,7 @@ export class NotificationHub extends Component<IStore> {
                 [notification],
                 this.store.auth.userLogin,
             );
-        }, 300);   
+        }, 300);
     };
 
     handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
@@ -108,43 +108,55 @@ export class NotificationHub extends Component<IStore> {
                             className={style.notificationsList}
                             onScroll={this.handleScroll}
                         >
-                            {uniqueIds.length
-                                ? uniqueIds.map((appId) => (
-                                      <NotificationGroup
-                                          key={appId}
-                                          onClear={() =>
-                                              this.handleClearGroup(appId)
-                                          }
-                                          icon={apps.get(appId)?.icon ?? ""}
-                                          title={apps.get(appId)?.name ?? ""}
-                                      >
-                                          {this.store.notification.notifications
-                                              .filter(
-                                                  (item) =>
-                                                      item.applicationId ===
-                                                      appId,
-                                              )
-                                              .slice(0, 5)
-                                              .map((notification) => (
-                                                  <NotificationCard
-                                                      key={notification.id}
-                                                      {...notification}
-                                                      onClick={() =>
-                                                          this.handleRunApplication(
-                                                              notification.applicationId,
-                                                              notification.url,
-                                                          )
-                                                      }
-                                                      onClose={() =>
-                                                          this.handleCloseNotification(
-                                                              notification,
-                                                          )
-                                                      }
-                                                  />
-                                              ))}
-                                      </NotificationGroup>
-                                  ))
-                                : strings.notification.noMoreNotifications}
+                            {uniqueIds.length ? (
+                                uniqueIds.map((appId) => (
+                                    <NotificationGroup
+                                        key={appId}
+                                        onClear={() =>
+                                            this.handleClearGroup(appId)
+                                        }
+                                        icon={apps.get(appId)?.icon ?? ""}
+                                        title={apps.get(appId)?.name ?? ""}
+                                    >
+                                        {this.store.notification.notifications
+                                            .filter(
+                                                (item) =>
+                                                    item.applicationId ===
+                                                    appId,
+                                            )
+                                            .slice(0, 5)
+                                            .map((notification) => (
+                                                <NotificationCard
+                                                    key={notification.id}
+                                                    {...notification}
+                                                    onClick={() =>
+                                                        this.handleRunApplication(
+                                                            notification.applicationId,
+                                                            notification.url,
+                                                        )
+                                                    }
+                                                    onClose={() =>
+                                                        this.handleCloseNotification(
+                                                            notification,
+                                                        )
+                                                    }
+                                                />
+                                            ))}
+                                    </NotificationGroup>
+                                ))
+                            ) : (
+                                <div className={style.noMoreNotifications}>
+                                    <div className={style.emptyIcon}>
+                                        <img src={empty} alt="Empty" />
+                                    </div>
+                                    <div className={style.emptyText}>
+                                        {
+                                            strings.notification
+                                                .noMoreNotifications
+                                        }
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

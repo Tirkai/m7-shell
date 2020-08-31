@@ -40,3 +40,15 @@
     background: #27ae60;
     margin-right: 5px;
 }
+
+.iconWrapper,
+.iconWrapper div {
+    display: flex;
+    align-items: center;
+    height: 20px;
+    width: 16px;
+}
+
+.svgNode {
+    fill: white !important;
+}

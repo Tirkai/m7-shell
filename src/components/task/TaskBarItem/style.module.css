@@ -7,7 +7,7 @@
     height: 48px;
     color: white;
 }
-.taskBarItem img {
+.taskBarItem svg {
     width: 24px;
     height: 24px;
 }

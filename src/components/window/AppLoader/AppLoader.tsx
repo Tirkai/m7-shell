@@ -1,3 +1,4 @@
+import { SVGIcon } from "@algont/m7-ui";
 import { CircularProgress } from "@material-ui/core";
 import classNames from "classnames";
 import React, { Component } from "react";
@@ -17,7 +18,11 @@ export class AppLoader extends Component<IAppLoaderProps> {
             >
                 <div className={style.container}>
                     <div className={style.icon}>
-                        <img src={this.props.icon} alt="App Icon" />
+                        <SVGIcon
+                            source={this.props.icon}
+                            size={{ width: "64px", height: "64px" }}
+                            color="#00519c"
+                        />
                     </div>
                     <div className={style.loader}>
                         <CircularProgress />

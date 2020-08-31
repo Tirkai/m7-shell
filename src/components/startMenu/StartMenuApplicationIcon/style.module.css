@@ -12,6 +12,12 @@
     width: 16px;
     height: 16px;
 }
+
+.startMenuApplicationIcon svg {
+    width: 16px;
+    height: 16px;
+}
+
 .startMenuApplicationIcon img[src*=".png"] {
     width: 32px;
     height: 32px;

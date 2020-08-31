@@ -54,3 +54,21 @@
 .titleAfterScroll {
     border-bottom: 1px solid #ffffff0d;
 }
+
+.noMoreNotifications {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+}
+
+.emptyIcon {
+    display: block;
+}
+.emptyIcon img {
+    width: 100px;
+}
+.emptyText {
+    padding: 12px;
+}

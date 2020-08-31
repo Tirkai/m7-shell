@@ -1,3 +1,4 @@
+import { SVGIcon } from "@algont/m7-ui";
 import classNames from "classnames";
 import { StartMenuApplicationIcon } from "components/startMenu/StartMenuApplicationIcon/StartMenuApplicationIcon";
 import React, { Component } from "react";
@@ -19,7 +20,11 @@ export class AppsMenuItem extends Component<IAppsMenuItemProps> {
                 onClick={this.props.onClick}
             >
                 <StartMenuApplicationIcon>
-                    <img src={this.props.icon} alt="App Icon" />
+                    <SVGIcon
+                        source={this.props.icon}
+                        size={{ width: "16px", height: "16px" }}
+                        color="white"
+                    />
                 </StartMenuApplicationIcon>
 
                 <div className={style.title}>
