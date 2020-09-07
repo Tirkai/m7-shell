@@ -8,14 +8,12 @@ interface INotificationCardProps {
     text: string;
     title: string;
     date: string;
+    isDisplayed: boolean;
     onClose: () => void;
     onClick: () => void;
 }
 
 export class NotificationCard extends Component<INotificationCardProps> {
-    state = {
-        isRemoving: false,
-    };
 
     handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         this.props.onClick();
@@ -24,9 +22,6 @@ export class NotificationCard extends Component<INotificationCardProps> {
 
     handleClose = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         event.stopPropagation();
-        this.setState({
-            isRemoving: true,
-        });
         this.props.onClose();
     };
     render() {
@@ -34,7 +29,7 @@ export class NotificationCard extends Component<INotificationCardProps> {
         return (
             <div
                 className={classNames(style.notificationCard, {
-                    [style.isRemoving]: this.state.isRemoving,
+                    [style.isRemoving]: !this.props.isDisplayed,
                 })}
                 onClick={this.handleClick}
             >

@@ -3,16 +3,25 @@ import classNames from "classnames";
 import React, { Component } from "react";
 import style from "./style.module.css";
 
-type DropdownPosition = "topRight" | "bottomRight" | "bottomLeft" | "topLeft";
+type DropdownPosition =
+    | "topCenter"
+    | "topRight"
+    | "bottomRight"
+    | "bottomCenter"
+    | "bottomLeft"
+    | "topLeft"
+    | "topEdge";
 
 interface IDropdownMenuProps {
-    render: JSX.Element | JSX.Element[];
+    render: JSX.Element[];
     position?: DropdownPosition;
+    trigger?: "click" | "context";
 }
 
 export class DropdownMenu extends Component<IDropdownMenuProps> {
     static defaultProps = {
         position: "topLeft",
+        trigger: "click",
     };
 
     state = {
@@ -31,7 +40,16 @@ export class DropdownMenu extends Component<IDropdownMenuProps> {
                 <div className={style.dropdownContainer}>
                     <div
                         className={style.dropdownListener}
-                        onClick={() => this.handleShowDropdown(true)}
+                        onClick={
+                            this.props.trigger === "click"
+                                ? () => this.handleShowDropdown(true)
+                                : undefined
+                        }
+                        onContextMenu={
+                            this.props.trigger === "context"
+                                ? () => this.handleShowDropdown(true)
+                                : undefined
+                        }
                     >
                         {this.props.children}
                     </div>
@@ -39,13 +57,16 @@ export class DropdownMenu extends Component<IDropdownMenuProps> {
                         className={classNames(
                             style.dropdownMenu,
                             {
-                                [style.show]: this.state.show,
+                                [style.show]:
+                                    this.state.show && this.props.render.length,
                             },
                             style[this.props.position ?? "topLeft"],
                         )}
                         onClick={() => this.handleShowDropdown(false)}
                     >
-                        {this.props.render}
+                        <div className={style.container}>
+                            {this.props.render}
+                        </div>
                     </div>
                 </div>
             </ClickAwayListener>

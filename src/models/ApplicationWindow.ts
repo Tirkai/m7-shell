@@ -1,4 +1,6 @@
+import { TASKBAR_HEIGHT } from "constants/config";
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
+import { IPinArea } from "interfaces/window/IPinArea";
 import { action, computed, observable } from "mobx";
 import { ResizeHandle } from "react-resizable";
 import { Application } from "./Application";
@@ -7,6 +9,7 @@ interface IApplicationWindowOptions {
     id: string;
     width: number;
     height: number;
+    isFullscreen?: boolean;
 }
 
 export class ApplicationWindow {
@@ -38,6 +41,9 @@ export class ApplicationWindow {
     @observable
     y: number;
 
+    @observable
+    pinArea: IPinArea | null = null;
+
     @computed
     get minYPosition() {
         return this.y + this.height - this.application.minHeight;
@@ -50,7 +56,6 @@ export class ApplicationWindow {
 
     @computed
     get bounds() {
-        const TASKBAR_HEIGHT = 48;
         return {
             x: !this.isFullScreen ? this.x : 0,
             y: !this.isFullScreen ? this.y : 0,
@@ -89,6 +94,7 @@ export class ApplicationWindow {
         this.height = options.height;
         this.x = Math.floor(window.innerWidth / 2 - this.width / 2);
         this.y = Math.floor(window.innerHeight / 2 - this.height / 2);
+        this.isFullScreen = options.isFullscreen ?? false;
     }
 
     @action
@@ -99,6 +105,16 @@ export class ApplicationWindow {
     @action
     setDragging(value: boolean) {
         this.isDragging = value;
+
+        if (!this.isDragging && this.pinArea) {
+            if (!this.pinArea.isFullscreen) {
+                this.setSize(this.pinArea.width, this.pinArea.height);
+                this.setPosition(this.pinArea.left, this.pinArea.top);
+            } else {
+                this.setFullScreen(true);
+            }
+            this.setPinArea(null);
+        }
     }
 
     @action
@@ -182,5 +198,10 @@ export class ApplicationWindow {
     setCollapsed(value: boolean) {
         this.isFocused = false;
         this.isCollapsed = value;
+    }
+
+    @action
+    setPinArea(area: IPinArea | null) {
+        this.pinArea = area;
     }
 }

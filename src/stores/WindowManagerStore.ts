@@ -1,6 +1,7 @@
 import { ShellEvents } from "enum/ShellEvents";
 import { max, min } from "lodash";
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
+import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { AppStore } from "./AppStore";
 
@@ -20,6 +21,15 @@ export class WindowManagerStore {
     @observable
     focusedWindow: ApplicationWindow | null = null;
 
+    @computed
+    get draggedWindow() {
+        return this.windows.find((item) => item.isDragging);
+    }
+
+    findWindowByApp(app: Application) {
+        return this.windows.find((item) => item.application.id === app.id);
+    }
+
     @action
     addWindow(appWindow: ApplicationWindow) {
         this.windows.push(appWindow);
@@ -31,6 +41,9 @@ export class WindowManagerStore {
         window.dispatchEvent(new CustomEvent(ShellEvents.FocusAnyWindow));
 
         if (appWindow.isFocused) return;
+
+        if (appWindow.isCollapsed) this.expandWindow(appWindow);
+
         const indexes = [...this.windows.map((item) => item.depthIndex)];
 
         const minIndex = min(indexes);

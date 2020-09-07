@@ -10,20 +10,45 @@
     border-radius: 4px;
     border: 1px solid transparent;
 }
-.appsMenuItem img {
-    width: 32px;
-    height: 32px;
-}
+
 .appsMenuItem:hover {
     background: #555;
     border: 1px solid #c2c2c2;
     cursor: pointer;
 }
+
+.appsMenuItem.executed:hover {
+    border: 1px solid transparent;
+    background: #444;
+    cursor: default;
+}
+
 .title {
     position: absolute;
     bottom: 0;
     left: 0;
+    display: flex;
+    align-items: center;
     padding: 3px;
     color: white;
     font-size: 12px;
+}
+.executeStatus {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #27ae60;
+    margin-right: 5px;
+}
+
+.iconWrapper,
+.iconWrapper div {
+    display: flex;
+    align-items: center;
+    height: 20px;
+    width: 16px;
+}
+
+.svgNode {
+    fill: white !important;
 }

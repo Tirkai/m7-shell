@@ -1,15 +1,17 @@
+import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
-import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
+import { IAppParams } from "interfaces/app/IAppParams";
 import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicationResponse";
+import { strings } from "locale";
 import { action, computed, observable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApllication } from "models/ExternalApplication";
 import { registeredApps } from "registeredApps";
 import { portalEndpoint } from "utils/endpoints";
-import { JsonRpcPayload } from "utils/JsonRpcPayload";
 import { v4 } from "uuid";
 import { AppStore } from "./AppStore";
+
 export class ApplicationManagerStore {
     @observable
     applications: Application[] = [];
@@ -62,16 +64,41 @@ export class ApplicationManagerStore {
     }
 
     @action
-    executeApplication(app: Application) {
-        if (!app.isExecuted) {
-            app.setExecuted(true);
-            this.store.windowManager.addWindow(
-                new ApplicationWindow(app, {
-                    id: v4(),
-                    width: app.baseWidth,
-                    height: app.baseHeight,
-                }),
-            );
+    async executeApplication(app: Application) {
+        const errorTitle = strings.error.anOccurredError;
+        const serviceErrorText = strings.error.applicationService;
+        try {
+            if (!app.isExecuted) {
+                const applicationParamsResponse = await Axios.post<
+                    IJsonRpcResponse<IAppParams>
+                >(
+                    portalEndpoint.url,
+                    new JsonRpcPayload("getComponentShellParams", {
+                        component_id: app.id,
+                    }),
+                );
+
+                if (!applicationParamsResponse.data.error) {
+                    const appParams = applicationParamsResponse.data.result;
+
+                    app.setExecuted(true);
+                    this.store.windowManager.addWindow(
+                        new ApplicationWindow(app, {
+                            id: v4(),
+                            width: appParams.width ?? app.baseWidth,
+                            height: appParams.height ?? app.baseHeight,
+                            isFullscreen: appParams.maximize ?? false,
+                        }),
+                    );
+                } else {
+                    this.store.message.showMessage(
+                        errorTitle,
+                        serviceErrorText,
+                    );
+                }
+            }
+        } catch (e) {
+            this.store.message.showMessage(errorTitle, serviceErrorText);
         }
     }
 
@@ -97,26 +124,33 @@ export class ApplicationManagerStore {
 
     @action
     async fetchApplications() {
-        this.applications = [];
+        try {
+            this.applications = [];
 
-        const response = await Axios.post<
-            IJsonRpcResponse<IPortalApplicationResponse[]>
-        >(portalEndpoint.url, new JsonRpcPayload("getComponents"));
+            const response = await Axios.post<
+                IJsonRpcResponse<IPortalApplicationResponse[]>
+            >(portalEndpoint.url, new JsonRpcPayload("getComponents"));
 
-        if (!response.data.error) {
-            const portalApplications = response.data.result.map(
-                (item) =>
-                    new ExternalApllication({
-                        id: item.id,
-                        name: item.name,
-                        url: item.guiUrl,
-                        icon: item.iconUrl,
-                        key: item.id,
-                    }),
+            if (!response.data.error) {
+                const portalApplications = response.data.result.map(
+                    (item) =>
+                        new ExternalApllication({
+                            id: item.id,
+                            name: item.name,
+                            url: item.guiUrl,
+                            icon: item.iconUrl,
+                            key: item.id,
+                        }),
+                );
+                this.addApplicationsList(portalApplications);
+            }
+            this.addApplicationsList(registeredApps);
+        } catch (e) {
+            this.store.message.showMessage(
+                strings.error.anOccurredError,
+                strings.error.applicationService,
             );
-            this.addApplicationsList(portalApplications);
         }
-        this.addApplicationsList(registeredApps);
     }
 
     findByKey(key: string) {

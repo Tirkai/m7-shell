@@ -1,3 +1,4 @@
+import { SVGIcon } from "@algont/m7-ui";
 import { cross } from "assets/icons";
 import React, { Component } from "react";
 import style from "./style.module.css";
@@ -16,7 +17,7 @@ export class NotificationGroup extends Component<INotificationGroup> {
                 <div className={style.header}>
                     <div className={style.title}>
                         <div className={style.icon}>
-                            <img src={this.props.icon} alt="Notification" />
+                            <SVGIcon source={this.props.icon} color="white" />
                         </div>
                         <div className={style.titleText}>
                             {this.props.title}
@@ -27,7 +28,7 @@ export class NotificationGroup extends Component<INotificationGroup> {
                             className={style.actionItem}
                             onClick={this.handleClearGroup}
                         >
-                            <img src={cross} alt="Clear" />
+                            <SVGIcon source={cross} color="white" />
                         </div>
                     </div>
                 </div>

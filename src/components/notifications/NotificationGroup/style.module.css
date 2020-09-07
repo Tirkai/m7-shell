@@ -21,7 +21,7 @@
     align-items: center;
     margin-right: 5px;
 }
-.icon img {
+.icon svg {
     width: 16px;
     height: 16px;
 }
@@ -43,6 +43,6 @@
     height: 16px;
     cursor: pointer;
 }
-.actionItem img {
+.actionItem svg {
     width: 12px;
 }

@@ -1,48 +1,66 @@
 import { ShellEvents } from "enum/ShellEvents";
-import { action, observable } from "mobx";
+import { ShellPanelType } from "enum/ShellPanelType";
+import { action, computed, observable } from "mobx";
 import { AppStore } from "./AppStore";
 
 export class ShellStore {
-    @observable
-    appMenuShow: boolean = false;
+    @computed
+    get appMenuShow() {
+        return this.activePanel === ShellPanelType.StartMenu;
+    }
+
+    @computed
+    get notificationHubShow() {
+        return this.activePanel === ShellPanelType.NotificationHub;
+    }
 
     @observable
-    notificationHubShow: boolean = false;
+    enabledDevMode: boolean = process.env.NODE_ENV === "development";
 
     @observable
-    enabledDevMode: boolean = false;
-
-    focusEvent = new CustomEvent(ShellEvents.FocusShellControls);
+    activePanel: ShellPanelType = ShellPanelType.None;
 
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
 
         window.addEventListener(ShellEvents.DesktopClick, () => {
-            this.setAppMenuShow(false);
-            this.setNotificationHubShow(false);
+            this.activePanel = ShellPanelType.None;
             this.store.windowManager.clearFocus();
         });
 
         window.addEventListener(ShellEvents.FocusAnyWindow, () => {
-            this.setAppMenuShow(false);
-            this.setNotificationHubShow(false);
+            this.activePanel = ShellPanelType.None;
+        });
+
+        window.addEventListener(ShellEvents.StartMenuOpen, () => {
+            this.store.windowManager.clearFocus();
+        });
+
+        window.addEventListener(ShellEvents.NotificationHubOpen, () => {
+            this.store.windowManager.clearFocus();
         });
     }
 
     @action
-    setAppMenuShow(value: boolean) {
-        this.appMenuShow = value;
-        if (value) {
-            window.dispatchEvent(this.focusEvent);
-        }
-    }
+    setActivePanel(panel: ShellPanelType) {
+        this.activePanel = panel;
 
-    @action
-    setNotificationHubShow(value: boolean) {
-        this.notificationHubShow = value;
-        if (value) {
-            window.dispatchEvent(this.focusEvent);
+        switch (panel) {
+            case ShellPanelType.StartMenu: {
+                window.dispatchEvent(
+                    new CustomEvent(ShellEvents.StartMenuOpen),
+                );
+                break;
+            }
+            case ShellPanelType.NotificationHub: {
+                window.dispatchEvent(
+                    new CustomEvent(ShellEvents.NotificationHubOpen),
+                );
+                break;
+            }
+            default:
+                break;
         }
     }
 

@@ -1,0 +1,24 @@
+.startMenuApplicationIcon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(-45deg, #096dd9, #4d98e8);
+    border-radius: 50%;
+    transition: ease 0.3s;
+}
+.startMenuApplicationIcon img[src*=".svg"] {
+    width: 16px;
+    height: 16px;
+}
+
+.startMenuApplicationIcon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.startMenuApplicationIcon img[src*=".png"] {
+    width: 32px;
+    height: 32px;
+}

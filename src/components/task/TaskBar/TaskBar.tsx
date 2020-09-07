@@ -1,11 +1,13 @@
+import { SVGIcon } from "@algont/m7-ui";
 import { apps, notifications, notificationsNone } from "assets/icons";
+import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
+import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import React, { Component } from "react";
-import { AppsMenu } from "../AppsMenu/AppsMenu";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
 import style from "./style.module.css";
@@ -19,11 +21,14 @@ export class TaskBar extends Component<IStore> {
     }
 
     handleShowAppsMenu = (value: boolean) => {
-        this.store.shell.setAppMenuShow(value);
+        this.store.shell.setActivePanel(
+            value ? ShellPanelType.StartMenu : ShellPanelType.None,
+        );
     };
 
     handleExecuteApp = (app: Application) => {
-        this.store.shell.setAppMenuShow(false);
+        this.store.shell.setActivePanel(ShellPanelType.None);
+
         this.store.applicationManager.executeApplication(app);
     };
 
@@ -35,18 +40,18 @@ export class TaskBar extends Component<IStore> {
     };
 
     handleShowNotificationHub = (value: boolean) => {
-        this.store.shell.setNotificationHubShow(value);
+        this.store.shell.setActivePanel(
+            value ? ShellPanelType.NotificationHub : ShellPanelType.None,
+        );
+    };
+
+    handleCloseWindow = (appWindow: ApplicationWindow) => {
+        this.store.windowManager.closeWindow(appWindow);
     };
 
     render() {
         return (
             <>
-                <AppsMenu
-                    applications={this.store.applicationManager.applications}
-                    isShow={this.store.shell.appMenuShow}
-                    onExecuteApp={this.handleExecuteApp}
-                />
-
                 <div className={style.taskBar}>
                     <div className={style.container}>
                         <div className={style.tasks}>
@@ -57,9 +62,9 @@ export class TaskBar extends Component<IStore> {
                                     )
                                 }
                             >
-                                <img src={apps} alt="Applications" />
+                                <SVGIcon source={apps} color="white" />
                             </TaskBarItem>
-                            {this.props.store?.windowManager.windows.map(
+                            {this.store.windowManager.windows.map(
                                 (appWindow) => (
                                     <TaskBarItem
                                         key={appWindow.id}
@@ -68,10 +73,21 @@ export class TaskBar extends Component<IStore> {
                                         onClick={() =>
                                             this.handleFocusAppWindow(appWindow)
                                         }
+                                        menu={[
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    this.handleCloseWindow(
+                                                        appWindow,
+                                                    )
+                                                }
+                                            >
+                                                Закрыть
+                                            </DropdownMenuItem>,
+                                        ]}
                                     >
-                                        <img
-                                            src={appWindow.application.icon}
-                                            alt="App Icon"
+                                        <SVGIcon
+                                            source={appWindow.application.icon}
+                                            color="white"
                                         />
                                     </TaskBarItem>
                                 ),
@@ -93,14 +109,19 @@ export class TaskBar extends Component<IStore> {
                                     )
                                 }
                             >
-                                <img
-                                    src={
-                                        this.store.notification.count > 0
-                                            ? notifications
-                                            : notificationsNone
-                                    }
-                                    alt="Notifications"
-                                />
+                                {this.store.notification.count > 0 ? (
+                                    <SVGIcon
+                                        key={"notificationsExist"}
+                                        source={notifications}
+                                        color="white"
+                                    />
+                                ) : (
+                                    <SVGIcon
+                                        key="notificationsNotExist"
+                                        source={notificationsNone}
+                                        color="white"
+                                    />
+                                )}
                             </TaskBarItem>
                         </div>
                     </div>

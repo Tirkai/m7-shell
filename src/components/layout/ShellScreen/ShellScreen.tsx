@@ -1,7 +1,10 @@
+import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
+import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { AppWindow } from "components/window/AppWindow/AppWindow";
+import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/AppWindowPinContainer";
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { ShellEvents } from "enum/ShellEvents";
 import { IStore } from "interfaces/common/IStore";
@@ -31,8 +34,6 @@ export class ShellScreen extends Component<IStore> {
 
         const autoRunUrl = urlParams.get("autoRunUrl");
 
-        console.debug({ autoRunApp, autoRunUrl });
-
         if (autoRunApp) {
             const app = this.store.applicationManager.findByKey(autoRunApp);
 
@@ -56,7 +57,7 @@ export class ShellScreen extends Component<IStore> {
         );
     }
 
-    hanldeWindowResizeStart = (
+    handleWindowResizeStart = (
         appWindow: ApplicationWindow,
         event: MouseEvent,
         data: ResizeCallbackData,
@@ -132,10 +133,11 @@ export class ShellScreen extends Component<IStore> {
                 ></div>
                 {this.store.windowManager.windows.map((appWindow) => (
                     <AppWindow
+                        key={appWindow.id}
                         {...appWindow}
                         window={appWindow}
                         onResizeStart={(event, data) =>
-                            this.hanldeWindowResizeStart(appWindow, event, data)
+                            this.handleWindowResizeStart(appWindow, event, data)
                         }
                         onResizeStop={() => appWindow.setResizing(false)}
                         onResize={(event, data) =>
@@ -150,9 +152,12 @@ export class ShellScreen extends Component<IStore> {
                     />
                 ))}
 
-                <TaskBar />
+                <AppsMenu />
                 <NotificationToasts />
                 <NotificationHub />
+                <TaskBar />
+                <BuildVersion />
+                <AppWindowPinContainer />
             </div>
         );
     }

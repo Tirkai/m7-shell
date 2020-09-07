@@ -1,3 +1,4 @@
+import { SVGIcon } from "@algont/m7-ui";
 import { backward, collapse, cross, fullscreen } from "assets/icons";
 import classNames from "classnames";
 import React, { Component } from "react";
@@ -50,7 +51,11 @@ export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
                     </div>
                     <div className={classNames("appHeaderInfoBar", style.info)}>
                         <div className={style.icon}>
-                            <img src={this.props.icon} alt="App Icon" />
+                            <SVGIcon
+                                source={this.props.icon}
+                                size={{ width: "16px", height: "16px" }}
+                                color="#ffffff"
+                            />
                         </div>
                         <div className={style.title}>{this.props.title}</div>
                     </div>

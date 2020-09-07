@@ -5,7 +5,8 @@
     color: white;
     cursor: pointer;
     white-space: nowrap;
+    font-weight: 300;
 }
 .dropdownMenuItem:hover {
-    background: #444;
+    background: rgba(255, 255, 255, 0.2);
 }

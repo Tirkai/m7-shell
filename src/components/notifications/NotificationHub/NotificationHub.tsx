@@ -1,4 +1,6 @@
+import empty from "assets/images/empty.svg";
 import classNames from "classnames";
+import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { uniq } from "lodash";
@@ -25,19 +27,29 @@ export class NotificationHub extends Component<IStore> {
     };
 
     handleClearGroup = (id: string) => {
-        this.store.notification.removeNotifications(
-            this.store.notification.notifications.filter(
-                (item) => item.applicationId === id,
-            ),
-            this.store.auth.userLogin,
+        const notifications = this.store.notification.notifications.filter(
+            (item) => item.applicationId === id,
         );
+
+        notifications.forEach((item) => item.setDisplayed(false));
+
+        setTimeout(() => {
+            this.store.notification.removeNotifications(
+                notifications,
+                this.store.auth.userLogin,
+            );
+        }, 300);
     };
 
     handleCloseNotification = (notification: NotificationModel) => {
-        this.store.notification.removeNotifications(
-            [notification],
-            this.store.auth.userLogin,
-        );
+        notification.setDisplayed(false);
+
+        setTimeout(() => {
+            this.store.notification.removeNotifications(
+                [notification],
+                this.store.auth.userLogin,
+            );
+        }, 300);
     };
 
     handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
@@ -50,9 +62,19 @@ export class NotificationHub extends Component<IStore> {
     };
 
     handleRunApplication = (appId: string, url: string) => {
+        const { shell, applicationManager, windowManager } = this.store;
         const app = this.store.applicationManager.findById(appId);
+
         if (app instanceof ExternalApllication) {
-            this.store.applicationManager.executeApplicationWithUrl(app, url);
+            shell.setActivePanel(ShellPanelType.None);
+
+            applicationManager.executeApplicationWithUrl(app, url);
+
+            const appWindow = windowManager.findWindowByApp(app);
+
+            if (appWindow) {
+                windowManager.focusWindow(appWindow);
+            }
         }
     };
 
@@ -86,43 +108,55 @@ export class NotificationHub extends Component<IStore> {
                             className={style.notificationsList}
                             onScroll={this.handleScroll}
                         >
-                            {uniqueIds.length
-                                ? uniqueIds.map((appId) => (
-                                      <NotificationGroup
-                                          key={appId}
-                                          onClear={() =>
-                                              this.handleClearGroup(appId)
-                                          }
-                                          icon={apps.get(appId)?.icon ?? ""}
-                                          title={apps.get(appId)?.name ?? ""}
-                                      >
-                                          {this.store.notification.notifications
-                                              .filter(
-                                                  (item) =>
-                                                      item.applicationId ===
-                                                      appId,
-                                              )
-                                              .slice(0, 5)
-                                              .map((notification) => (
-                                                  <NotificationCard
-                                                      key={notification.id}
-                                                      {...notification}
-                                                      onClick={() =>
-                                                          this.handleRunApplication(
-                                                              notification.applicationId,
-                                                              notification.url,
-                                                          )
-                                                      }
-                                                      onClose={() =>
-                                                          this.handleCloseNotification(
-                                                              notification,
-                                                          )
-                                                      }
-                                                  />
-                                              ))}
-                                      </NotificationGroup>
-                                  ))
-                                : strings.notification.noMoreNotifications}
+                            {uniqueIds.length ? (
+                                uniqueIds.map((appId) => (
+                                    <NotificationGroup
+                                        key={appId}
+                                        onClear={() =>
+                                            this.handleClearGroup(appId)
+                                        }
+                                        icon={apps.get(appId)?.icon ?? ""}
+                                        title={apps.get(appId)?.name ?? ""}
+                                    >
+                                        {this.store.notification.notifications
+                                            .filter(
+                                                (item) =>
+                                                    item.applicationId ===
+                                                    appId,
+                                            )
+                                            .slice(0, 5)
+                                            .map((notification) => (
+                                                <NotificationCard
+                                                    key={notification.id}
+                                                    {...notification}
+                                                    onClick={() =>
+                                                        this.handleRunApplication(
+                                                            notification.applicationId,
+                                                            notification.url,
+                                                        )
+                                                    }
+                                                    onClose={() =>
+                                                        this.handleCloseNotification(
+                                                            notification,
+                                                        )
+                                                    }
+                                                />
+                                            ))}
+                                    </NotificationGroup>
+                                ))
+                            ) : (
+                                <div className={style.noMoreNotifications}>
+                                    <div className={style.emptyIcon}>
+                                        <img src={empty} alt="Empty" />
+                                    </div>
+                                    <div className={style.emptyText}>
+                                        {
+                                            strings.notification
+                                                .noMoreNotifications
+                                        }
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

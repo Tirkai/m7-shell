@@ -33,13 +33,13 @@ export class AuthScreen extends Component<IStore> {
 
         if (data?.error) {
             const errorKey = authErrorCodes.get(data.error.code.toString());
-            const errorLocaleStrings = strings.auth as any;
+            const errorLocaleStrings = strings.auth.error as any;
 
             this.setState({
                 isShowNotify: true,
                 notifyText: errorKey?.length
                     ? errorLocaleStrings[errorKey]
-                    : strings.auth.unexpectedError,
+                    : strings.auth.error.authenticateError,
             });
 
             this.notifyTimeout = setTimeout(() => {

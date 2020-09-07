@@ -18,15 +18,24 @@ export class NotificationToasts extends Component<IStore> {
     }
 
     handleRunApplication = (toast: ToastNotification) => {
-        const app = this.store.applicationManager.findById(
+        const { applicationManager, windowManager } = this.store;
+
+        const app = applicationManager.findById(
             toast.notification.applicationId,
         );
         if (app instanceof ExternalApllication) {
-            this.store.applicationManager.executeApplicationWithUrl(
+            applicationManager.executeApplicationWithUrl(
                 app,
                 toast.notification.url,
             );
+
+            const appWindow = windowManager.findWindowByApp(app);
+
+            if (appWindow) {
+                windowManager.focusWindow(appWindow);
+            }
         }
+
         toast.setShow(false);
         this.handleRemoveNotification(toast.notification);
     };

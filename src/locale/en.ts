@@ -1,10 +1,18 @@
 export const en = {
+    error: {
+        anOccurredError: "An occurred error",
+        connectionError: "Failed to establish a connection to the server",
+        applicationService: "App service unavailable",
+    },
     auth: {
-        unexpectedError: "An unexpected error has occurred",
-        authenticateUserNotFound: "User not found",
-        authenticateUserNotActive: "User is not active",
-        authenticateUserExpired: "User activity has expired",
-        authenticateBadPassword: "Invalid password",
+        error: {
+            authenticateError: "Invalid username or password",
+            authenticateUserNotFound: "User not found",
+            authenticateUserNotActive: "User is not active",
+            authenticateUserExpired: "User activity has expired",
+            authenticateBadPassword: "Invalid password",
+            authenticateUnknownNode: "Unknown node",
+        },
         description: "Unified Authorization Service",
     },
     actions: {
@@ -25,9 +33,8 @@ export const en = {
         search: "Search",
         licence: "License",
         logout: "Logout",
-        editAccount: "Edit Account",
-        devModeOn: "Dev Mode (on)",
-        devModeOff: "Dev Mode (off)",
+        editAccount: "Edit Profile",
+        devMode: "Dev Mode",
     },
     notification: {
         title: "Notifications",

@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
 import React, { Component } from "react";
 import style from "./style.module.css";
 
@@ -8,6 +9,7 @@ interface ITaskBarItemProps {
     executed?: boolean;
     focused?: boolean;
     badge?: string | number;
+    menu?: JSX.Element[];
 }
 
 export class TaskBarItem extends Component<ITaskBarItemProps> {
@@ -34,7 +36,13 @@ export class TaskBarItem extends Component<ITaskBarItemProps> {
                 ) : (
                     ""
                 )}
-                <div className={style.content}>{this.props.children}</div>
+                <DropdownMenu
+                    trigger="context"
+                    position="topEdge"
+                    render={this.props.menu ?? []}
+                >
+                    <div className={style.content}>{this.props.children}</div>
+                </DropdownMenu>
             </div>
         );
     }

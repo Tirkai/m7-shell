@@ -1,5 +1,6 @@
 import { AuthScreen } from "components/layout/AuthScreen/AuthScreen";
 import ShellScreen from "components/layout/ShellScreen/ShellScreen";
+import { MessageDialog } from "components/message/MessageDialog/MessageDialog";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
@@ -14,8 +15,24 @@ export class AppContainer extends Component<IStore> {
         return this.props.store!;
     }
 
+    componentDidMount() {
+        window.addEventListener("contextmenu", (event) =>
+            event.preventDefault(),
+        );
+    }
+
     render() {
-        return this.store.auth.isAuthorized ? <ShellScreen /> : <AuthScreen />;
+        return (
+            <>
+                {this.store.auth.isAuthorized ? (
+                    <ShellScreen />
+                ) : (
+                    <AuthScreen />
+                )}
+                ;
+                <MessageDialog />
+            </>
+        );
     }
 }
 

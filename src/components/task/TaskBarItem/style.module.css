@@ -7,7 +7,7 @@
     height: 48px;
     color: white;
 }
-.taskBarItem img {
+.taskBarItem svg {
     width: 24px;
     height: 24px;
 }
@@ -51,8 +51,20 @@
 .content {
     display: flex;
     align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    min-height: 48px;
 }
 
 .smallBadge {
     font-size: 8px;
+}
+
+.menuContainer {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    width: 100%;
 }

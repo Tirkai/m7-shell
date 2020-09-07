@@ -1,5 +1,4 @@
 .notificationHub {
-    display: none;
     width: 400px;
     position: absolute;
     bottom: 48px;
@@ -13,9 +12,15 @@
     overflow: hidden;
     height: calc(100vh - 48px);
     border-top-left-radius: 4px;
+    transition: transform ease 0.3s, opacity 0.3s;
+    pointer-events: none;
+    transform: translateX(50%);
+    opacity: 0;
 }
 .show {
-    display: block;
+    opacity: 1;
+    pointer-events: all;
+    transform: translateX(0);
 }
 .container {
     background: #222222cc;
@@ -24,21 +29,21 @@
 
 .content {
     display: block;
-    height: calc(100% - 60px);
+    height: calc(100% - 30px);
 }
 .title {
     display: flex;
     align-self: center;
-    padding: 12px 24px;
+    padding: 6px 12px;
     border-bottom: 1px solid transparent;
-    font-size: 24px;
+    font-size: 18px;
     transition: ease 0.3s;
 }
 .notificationsList {
     height: 100%;
     align-items: flex-start;
     overflow: auto;
-    padding: 0 24px 24px 24px;
+    padding: 0 12px;
 }
 .notificationItem {
     padding: 24px;
@@ -48,4 +53,22 @@
 }
 .titleAfterScroll {
     border-bottom: 1px solid #ffffff0d;
+}
+
+.noMoreNotifications {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+}
+
+.emptyIcon {
+    display: block;
+}
+.emptyIcon img {
+    width: 100px;
+}
+.emptyText {
+    padding: 12px;
 }

@@ -18,7 +18,8 @@ export class Application {
         this.id = options.id;
         this.name = options.name;
         this.key = options.key ?? options.id;
-        this.icon = options.icon ?? unknownApp;
+        this.icon =
+            options.icon || options.icon?.length ? options.icon : unknownApp;
         this.baseWidth = options.baseWidth ?? 1000;
         this.baseHeight = options.baseHeight ?? 700;
         this.minWidth = options.minWidth ?? 400;

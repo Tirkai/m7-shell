@@ -96,6 +96,11 @@ code {
     cursor: n-resize;
 }
 
+div {
+    scrollbar-color: rgba(0, 0, 0, 0.2);
+    scrollbar-width: thin;
+}
+
 div::-webkit-scrollbar {
     width: 5px;
 }

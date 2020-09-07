@@ -1,0 +1,17 @@
+.appWindowPinArea {
+    position: absolute;
+    z-index: 200;
+}
+
+.visibleArea {
+    position: fixed;
+    background: #e0e0e0;
+    opacity: 0;
+    border-radius: 4px;
+    transition: ease 0.3s;
+    pointer-events: none;
+}
+
+.appWindowPinArea:hover .visibleArea {
+    opacity: 0.35;
+}

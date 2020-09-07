@@ -1,4 +1,3 @@
-import { ClickAwayListener } from "@material-ui/core";
 import classNames from "classnames";
 import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
 import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
@@ -14,32 +13,13 @@ import AppsProfilePreview from "../AppsProfilePreview/AppsProfilePreview";
 import { AppsShellLogo } from "../AppsShellLogo/AppsShellLogo";
 import style from "./style.module.css";
 
-interface IAppsMenuProps extends IStore {
-    isShow: boolean;
-    applications: Application[];
-    onExecuteApp: (app: Application) => void;
-}
 @inject("store")
 @observer
-export class AppsMenu extends Component<IAppsMenuProps> {
+export class AppsMenu extends Component<IStore> {
     @computed
     get store() {
         return this.props.store!;
     }
-    handleClickAway = () => {
-        this.store.shell.setAppMenuShow(false);
-    };
-
-    getWithAwayListenerWrapper = (AppMenuComponent: JSX.Element) => {
-        if (this.store.shell.appMenuShow) {
-            return (
-                <ClickAwayListener onClickAway={this.handleClickAway}>
-                    {AppMenuComponent}
-                </ClickAwayListener>
-            );
-        }
-        return AppMenuComponent;
-    };
 
     handleSearch = (value: string) => {
         this.store.applicationManager.setSearch(value);
@@ -56,15 +36,19 @@ export class AppsMenu extends Component<IAppsMenuProps> {
         this.store.shell.setDevMode(value);
     };
 
+    handleExecuteApp = (app: Application) => {
+        this.store.applicationManager.executeApplication(app);
+    };
+
     render() {
         const applicationsList = !this.store.shell.enabledDevMode
             ? this.store.applicationManager.displayedApplications
             : this.store.applicationManager.applications;
 
-        return this.getWithAwayListenerWrapper(
+        return (
             <div
                 className={classNames(style.appsMenu, {
-                    [style.visible]: this.props.isShow,
+                    [style.visible]: this.store.shell.appMenuShow,
                 })}
             >
                 <div className={style.container}>
@@ -93,9 +77,7 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                                                 )
                                             }
                                         >
-                                            {this.store.shell.enabledDevMode
-                                                ? strings.startMenu.devModeOn
-                                                : strings.startMenu.devModeOff}
+                                            {strings.startMenu.devMode}
                                         </DropdownMenuItem>,
                                     ]}
                                 >
@@ -114,43 +96,47 @@ export class AppsMenu extends Component<IAppsMenuProps> {
                                 onChange={this.handleSearch}
                             />
                         </div>
-                        <div className={style.appsList}>
-                            {this.store.applicationManager.isSearching
-                                ? this.store.applicationManager.findedApplicatons.map(
-                                      (app) => (
+                        <div className={style.appsListWrapper}>
+                            <div className={style.appsList}>
+                                {this.store.applicationManager.isSearching
+                                    ? this.store.applicationManager.findedApplicatons.map(
+                                          (app) => (
+                                              <AppsMenuItem
+                                                  key={app.id}
+                                                  icon={app.icon}
+                                                  title={app.name}
+                                                  isExecuted={app.isExecuted}
+                                                  onClick={() =>
+                                                      this.handleExecuteApp(app)
+                                                  }
+                                              />
+                                          ),
+                                      )
+                                    : applicationsList.map((app) => (
                                           <AppsMenuItem
                                               key={app.id}
                                               icon={app.icon}
                                               title={app.name}
+                                              isExecuted={app.isExecuted}
                                               onClick={() =>
-                                                  this.props.onExecuteApp(app)
+                                                  this.handleExecuteApp(app)
                                               }
                                           />
-                                      ),
-                                  )
-                                : applicationsList.map((app) => (
-                                      <AppsMenuItem
-                                          key={app.id}
-                                          icon={app.icon}
-                                          title={app.name}
-                                          onClick={() =>
-                                              this.props.onExecuteApp(app)
-                                          }
-                                      />
-                                  ))}
-                            {this.store.applicationManager.isSearching &&
-                            this.store.applicationManager.findedApplicatons
-                                .length <= 0 ? (
-                                <div className={style.notFoundApps}>
-                                    {strings.state.notFound}
-                                </div>
-                            ) : (
-                                ""
-                            )}
+                                      ))}
+                                {this.store.applicationManager.isSearching &&
+                                this.store.applicationManager.findedApplicatons
+                                    .length <= 0 ? (
+                                    <div className={style.notFoundApps}>
+                                        {strings.state.notFound}
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>,
+            </div>
         );
     }
 }
