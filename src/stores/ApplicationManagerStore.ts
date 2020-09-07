@@ -1,3 +1,4 @@
+import { AppMessageType } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
 import { IAppParams } from "interfaces/app/IAppParams";
@@ -90,6 +91,20 @@ export class ApplicationManagerStore {
                             isFullscreen: appParams.maximize ?? false,
                         }),
                     );
+
+                    // Bindings
+                    if (app instanceof ExternalApllication) {
+                        app.emitter.on(
+                            AppMessageType.CreateWindowInstance,
+                            (payload: { url: string }) => {
+                                const { url } = payload;
+                                this.createExecutedApllicationInstance(
+                                    app,
+                                    url,
+                                );
+                            },
+                        );
+                    }
                 } else {
                     this.store.message.showMessage(
                         errorTitle,
@@ -115,6 +130,23 @@ export class ApplicationManagerStore {
         } else {
             app.setCustomUrl(url);
         }
+    }
+
+    createExecutedApllicationInstance(app: ExternalApllication, url: string) {
+        const newInstance = new ExternalApllication({
+            ...app,
+            id: v4(),
+            key: app.key,
+            url,
+        });
+
+        const instance = new ApplicationWindow(newInstance, {
+            id: v4(),
+            width: app.baseWidth,
+            height: app.baseHeight,
+        });
+
+        this.store.windowManager.addWindow(instance);
     }
 
     @action
