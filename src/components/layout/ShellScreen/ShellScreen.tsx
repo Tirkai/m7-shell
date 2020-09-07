@@ -4,6 +4,7 @@ import { NotificationToasts } from "components/notifications/NotificationToasts/
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { AppWindow } from "components/window/AppWindow/AppWindow";
+import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/AppWindowPinContainer";
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { ShellEvents } from "enum/ShellEvents";
 import { IStore } from "interfaces/common/IStore";
@@ -56,7 +57,7 @@ export class ShellScreen extends Component<IStore> {
         );
     }
 
-    hanldeWindowResizeStart = (
+    handleWindowResizeStart = (
         appWindow: ApplicationWindow,
         event: MouseEvent,
         data: ResizeCallbackData,
@@ -136,7 +137,7 @@ export class ShellScreen extends Component<IStore> {
                         {...appWindow}
                         window={appWindow}
                         onResizeStart={(event, data) =>
-                            this.hanldeWindowResizeStart(appWindow, event, data)
+                            this.handleWindowResizeStart(appWindow, event, data)
                         }
                         onResizeStop={() => appWindow.setResizing(false)}
                         onResize={(event, data) =>
@@ -156,6 +157,7 @@ export class ShellScreen extends Component<IStore> {
                 <NotificationHub />
                 <TaskBar />
                 <BuildVersion />
+                <AppWindowPinContainer />
             </div>
         );
     }
