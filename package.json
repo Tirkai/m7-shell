@@ -1,6 +1,6 @@
 {
     "name": "m7-shell",
-    "version": "0.15.1",
+    "version": "0.15.2",
     "private": true,
     "dependencies": {
         "@algont/m7-shell-emitter": "^0.6.0",

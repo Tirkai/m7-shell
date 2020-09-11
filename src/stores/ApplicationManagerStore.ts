@@ -178,10 +178,14 @@ export class ApplicationManagerStore {
             }
             this.addApplicationsList(registeredApps);
         } catch (e) {
-            this.store.message.showMessage(
-                strings.error.anOccurredError,
-                strings.error.applicationService,
-            );
+            if (e.response.status !== 401) {
+                this.store.message.showMessage(
+                    strings.error.anOccurredError,
+                    strings.error.applicationService,
+                );
+            } else {
+                this.store.auth.logout();
+            }
         }
     }
 
