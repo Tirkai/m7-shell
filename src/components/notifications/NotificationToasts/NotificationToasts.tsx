@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
-import { ExternalApllication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationModel } from "models/NotificationModel";
 import { ToastNotification } from "models/ToastNotification";
 import React, { Component } from "react";
@@ -23,7 +23,7 @@ export class NotificationToasts extends Component<IStore> {
         const app = applicationManager.findById(
             toast.notification.applicationId,
         );
-        if (app instanceof ExternalApllication) {
+        if (app instanceof ExternalApplication) {
             applicationManager.executeApplicationWithUrl(
                 app,
                 toast.notification.url,

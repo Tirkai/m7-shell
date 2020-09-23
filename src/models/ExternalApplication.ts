@@ -3,7 +3,7 @@ import { IExternalApplicationOptions } from "interfaces/options/IExternalApplica
 import { action, computed, observable } from "mobx";
 import { v4 } from "uuid";
 import { Application } from "./Application";
-export class ExternalApllication extends Application {
+export class ExternalApplication extends Application {
     @observable
     url: string;
 
@@ -44,6 +44,5 @@ export class ExternalApllication extends Application {
     @action
     setCustomUrl(url: string) {
         this.customUrl = url + "?hash=" + v4();
-        console.log({ custom: this.customUrl, app: this.applicationUrl });
     }
 }

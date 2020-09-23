@@ -7,7 +7,7 @@ import { uniq } from "lodash";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
-import { ExternalApllication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationModel } from "models/NotificationModel";
 import React, { Component } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
@@ -65,7 +65,7 @@ export class NotificationHub extends Component<IStore> {
         const { shell, applicationManager, windowManager } = this.store;
         const app = this.store.applicationManager.findById(appId);
 
-        if (app instanceof ExternalApllication) {
+        if (app instanceof ExternalApplication) {
             shell.setActivePanel(ShellPanelType.None);
 
             applicationManager.executeApplicationWithUrl(app, url);

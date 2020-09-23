@@ -11,7 +11,7 @@ import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationWindow } from "models/ApplicationWindow";
-import { ExternalApllication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/ExternalApplication";
 import React, { Component } from "react";
 import { DraggableData, DraggableEvent } from "react-draggable";
 import { ResizeCallbackData } from "react-resizable";
@@ -43,7 +43,7 @@ export class ShellScreen extends Component<IStore> {
         }
 
         if (autoRunUrl) {
-            const app = new ExternalApllication({
+            const app = new ExternalApplication({
                 id: v4(),
                 name: autoRunUrl,
                 url: autoRunUrl,

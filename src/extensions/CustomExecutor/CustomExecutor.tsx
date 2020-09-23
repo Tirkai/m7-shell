@@ -2,7 +2,7 @@ import { Button, TextField } from "@material-ui/core";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
-import { ExternalApllication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/ExternalApplication";
 import React, { Component } from "react";
 import { v4 } from "uuid";
 import style from "./style.module.css";
@@ -24,7 +24,7 @@ export class CustomExecutor extends Component<IStore> {
 
         const id = v4();
 
-        const app = new ExternalApllication({
+        const app = new ExternalApplication({
             id,
             name: `App ${this.state.link}`,
             url: this.state.link,

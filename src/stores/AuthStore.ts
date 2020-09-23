@@ -10,7 +10,7 @@ import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { Base64 } from "js-base64";
 import { strings } from "locale";
 import { action, computed, observable } from "mobx";
-import { ExternalApllication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/ExternalApplication";
 import moment, { Moment } from "moment";
 import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
@@ -171,7 +171,7 @@ export class AuthStore {
     }
 
     @action
-    injectAuthTokenInExternalApplication(app: ExternalApllication) {
+    injectAuthTokenInExternalApplication(app: ExternalApplication) {
         app.emitter.emit(ShellMessageType.UpdateAuthToken, {
             token: this.accessToken,
             login: this.userLogin,
@@ -191,7 +191,7 @@ export class AuthStore {
             this.setToken(result.access_token, result.refresh_token);
             this.store.applicationManager.executedApplications.forEach(
                 (item) => {
-                    if (item instanceof ExternalApllication) {
+                    if (item instanceof ExternalApplication) {
                         item.emitter.emit(ShellMessageType.UpdateAuthToken, {
                             token: this.accessToken,
                             login: this.userLogin,
