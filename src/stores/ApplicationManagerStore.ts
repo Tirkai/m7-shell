@@ -98,7 +98,6 @@ export class ApplicationManagerStore {
                             AppMessageType.CreateWindowInstance,
                             (payload: { url: string }) => {
                                 const { url } = payload;
-                                alert(JSON.stringify(app.id));
                                 this.createExecutedApplicationInstance(
                                     app,
                                     url,
