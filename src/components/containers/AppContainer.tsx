@@ -19,6 +19,9 @@ export class AppContainer extends Component<IStore> {
         window.addEventListener("contextmenu", (event) =>
             event.preventDefault(),
         );
+        window.onbeforeunload = function() {
+            return true;
+        };
     }
 
     render() {
