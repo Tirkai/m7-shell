@@ -5,7 +5,7 @@ import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
-import { ExternalApllication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
 import React, { Component } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
@@ -75,7 +75,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
         const context = frameRef?.contentWindow;
         if (context) {
             const app = this.props.application;
-            if (app instanceof ExternalApllication && context) {
+            if (app instanceof ExternalApplication && context) {
                 app.setEmitterContext(context);
                 this.handleBindingEmitterEvents(app);
             }
@@ -83,7 +83,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
         }
     };
 
-    handleBindingEmitterEvents = (app: ExternalApllication) => {
+    handleBindingEmitterEvents = (app: ExternalApplication) => {
         app.emitter.on(AppMessageType.Connected, () =>
             this.store.auth.injectAuthTokenInExternalApplication(app),
         );
@@ -142,7 +142,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
 
     appComponent: JSX.Element | null = null;
     render() {
-        if (this.props.application instanceof ExternalApllication) {
+        if (this.props.application instanceof ExternalApplication) {
             this.appComponent = (
                 <iframe
                     onLoad={this.handleAppReady}

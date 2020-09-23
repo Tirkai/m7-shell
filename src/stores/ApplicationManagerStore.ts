@@ -7,7 +7,7 @@ import { strings } from "locale";
 import { action, computed, observable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
-import { ExternalApllication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/ExternalApplication";
 import { registeredApps } from "registeredApps";
 import { portalEndpoint } from "utils/endpoints";
 import { v4 } from "uuid";
@@ -93,12 +93,13 @@ export class ApplicationManagerStore {
                     );
 
                     // Bindings
-                    if (app instanceof ExternalApllication) {
+                    if (app instanceof ExternalApplication) {
                         app.emitter.on(
                             AppMessageType.CreateWindowInstance,
                             (payload: { url: string }) => {
                                 const { url } = payload;
-                                this.createExecutedApllicationInstance(
+                                alert(JSON.stringify(app.id));
+                                this.createExecutedApplicationInstance(
                                     app,
                                     url,
                                 );
@@ -117,7 +118,7 @@ export class ApplicationManagerStore {
         }
     }
 
-    executeApplicationWithUrl(app: ExternalApllication, url: string) {
+    executeApplicationWithUrl(app: ExternalApplication, url: string) {
         if (!app.isExecuted) {
             app.setExecuted(true).setCustomUrl(url);
             this.store.windowManager.addWindow(
@@ -132,8 +133,8 @@ export class ApplicationManagerStore {
         }
     }
 
-    createExecutedApllicationInstance(app: ExternalApllication, url: string) {
-        const newInstance = new ExternalApllication({
+    createExecutedApplicationInstance(app: ExternalApplication, url: string) {
+        const newInstance = new ExternalApplication({
             ...app,
             id: v4(),
             key: app.key,
@@ -166,7 +167,7 @@ export class ApplicationManagerStore {
             if (!response.data.error) {
                 const portalApplications = response.data.result.map(
                     (item) =>
-                        new ExternalApllication({
+                        new ExternalApplication({
                             id: item.id,
                             name: item.name,
                             url: item.guiUrl,
@@ -178,7 +179,7 @@ export class ApplicationManagerStore {
             }
             this.addApplicationsList(registeredApps);
         } catch (e) {
-            if (e.response.status !== 401) {
+            if (e?.response?.status !== 401) {
                 this.store.message.showMessage(
                     strings.error.anOccurredError,
                     strings.error.applicationService,
