@@ -3,22 +3,13 @@ import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
 import { EmiterLogger } from "extensions/EmiterLogger/EmiterLogger";
 import { strings } from "locale";
 import { Application } from "models/Application";
-import { ExternalApllication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
 import React from "react";
 import { v4 } from "uuid";
 
 export const registeredApps: Application[] = [
-    new ExternalApllication({
-        id: v4(),
-        name: "People",
-        key: "People",
-        url: `http://people.${UPPER_LEVEL_DOMAIN}`,
-        baseWidth: 400,
-        baseHeight: 500,
-        isVisibleInStartMenu: true,
-    }),
-    new ExternalApllication({
+    new ExternalApplication({
         id: v4(),
         name: strings.definedApplications.accountsMe,
         key: "AccountsMe",
@@ -27,7 +18,7 @@ export const registeredApps: Application[] = [
         baseHeight: 650,
         isVisibleInStartMenu: false,
     }),
-    new ExternalApllication({
+    new ExternalApplication({
         id: v4(),
         name: strings.definedApplications.license,
         key: "License",
@@ -47,8 +38,8 @@ export const registeredApps: Application[] = [
     }),
     new ShellApplication({
         id: v4(),
-        name: "EmiterLogger",
-        key: "EmiterLogger",
+        name: "EmitterLogger",
+        key: "EmitterLogger",
         Component: <EmiterLogger />,
         baseWidth: 700,
         baseHeight: 600,
