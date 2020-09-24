@@ -1,6 +1,6 @@
 {
     "name": "m7-shell",
-    "version": "0.15.2",
+    "version": "0.15.3",
     "private": true,
     "dependencies": {
         "@algont/m7-shell-emitter": "^0.6.0",
@@ -46,6 +46,7 @@
         "start": "react-scripts start",
         "stage": "npm version patch --git-tag-version=false",
         "build": "react-scripts build",
+        "deploy": "ts-node ./scripts/deploy.ts",
         "prettier": "prettier --write \"./**/*.{ts,tsx,css}\"",
         "prettier-watch": "onchange 'src/**/*.{ts,tsx,css}' -- prettier --write {{changed}}",
         "lint": "eslint ./src/**/*.{ts,tsx}",
@@ -98,6 +99,7 @@
         "lint-staged": "^9.4.2",
         "onchange": "^6.1.1",
         "prettier": "^1.19.1",
+        "ssh2-sftp-client": "^5.3.1",
         "storybook-addon-figma": "^0.1.0",
         "storybook-readme": "^5.0.8",
         "tslint": "^5.20.0",

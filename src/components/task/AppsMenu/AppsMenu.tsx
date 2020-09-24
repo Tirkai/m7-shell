@@ -55,34 +55,43 @@ export class AppsMenu extends Component<IStore> {
                     <div className={style.sidebar}>
                         <div className={style.sidebarTop}>
                             <div className={style.logo}>
-                                <DropdownMenu
-                                    render={[
-                                        <DropdownMenuItem
-                                            key={"licence"}
-                                            onClick={
-                                                this.handleExecuteLicenseApp
-                                            }
-                                        >
-                                            {
-                                                strings.definedApplications
-                                                    .license
-                                            }
-                                        </DropdownMenuItem>,
-                                        <DropdownMenuItem
-                                            key={"devmode"}
-                                            onClick={() =>
-                                                this.handleEnableDevMode(
-                                                    !this.store.shell
-                                                        .enabledDevMode,
-                                                )
-                                            }
-                                        >
-                                            {strings.startMenu.devMode}
-                                        </DropdownMenuItem>,
-                                    ]}
-                                >
+                                {this.store.auth.isAdmin ||
+                                this.store.auth.isSysadmin ? (
+                                    <DropdownMenu
+                                        render={[
+                                            <DropdownMenuItem
+                                                key={"licence"}
+                                                onClick={
+                                                    this.handleExecuteLicenseApp
+                                                }
+                                            >
+                                                {
+                                                    strings.definedApplications
+                                                        .license
+                                                }
+                                            </DropdownMenuItem>,
+                                            this.store.auth.isAdmin ? (
+                                                <DropdownMenuItem
+                                                    key={"devmode"}
+                                                    onClick={() =>
+                                                        this.handleEnableDevMode(
+                                                            !this.store.shell
+                                                                .enabledDevMode,
+                                                        )
+                                                    }
+                                                >
+                                                    {strings.startMenu.devMode}
+                                                </DropdownMenuItem>
+                                            ) : (
+                                                <></>
+                                            ),
+                                        ]}
+                                    >
+                                        <AppsShellLogo />
+                                    </DropdownMenu>
+                                ) : (
                                     <AppsShellLogo />
-                                </DropdownMenu>
+                                )}
                             </div>
                         </div>
                         <div className={style.sidebarBottom}>

@@ -1,9 +1,13 @@
 import { ShellEvents } from "enum/ShellEvents";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { action, computed, observable } from "mobx";
+import { DevModeModel } from "models/DevModeModel";
+import moment from "moment";
 import { AppStore } from "./AppStore";
 
 export class ShellStore {
+    localStorageDevModeKey = "DEV_MODE";
+
     @computed
     get appMenuShow() {
         return this.activePanel === ShellPanelType.StartMenu;
@@ -40,6 +44,16 @@ export class ShellStore {
         window.addEventListener(ShellEvents.NotificationHubOpen, () => {
             this.store.windowManager.clearFocus();
         });
+
+        const storagedDevMode = JSON.parse(
+            localStorage.getItem(this.localStorageDevModeKey) ?? "{}",
+        ) as DevModeModel;
+
+        if (storagedDevMode) {
+            if (moment(storagedDevMode.expire).diff(moment()) > 0) {
+                this.setDevMode(storagedDevMode.enabled);
+            }
+        }
     }
 
     @action
@@ -67,5 +81,10 @@ export class ShellStore {
     @action
     setDevMode(value: boolean) {
         this.enabledDevMode = value;
+
+        localStorage.setItem(
+            this.localStorageDevModeKey,
+            JSON.stringify(new DevModeModel(value, moment().add(1, "hour"))),
+        );
     }
 }
