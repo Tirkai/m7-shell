@@ -1,1 +1,14 @@
 #!/bin/sh
+
+VIRTUAL_DOMAIN="shell"
+DOMAIN="$(hostname --domain)"
+HOSTNAME="$(hostname)"
+
+# Set up NGINX
+SERVER_NAME_VARIABLE="SERVER_NAME"
+SERVER_NAME="$VIRTUAL_DOMAIN.$DOMAIN $VIRTUAL_DOMAIN.$HOSTNAME.$DOMAIN"
+NGINX_CONF_PATH="/etc/nginx/conf.d/"
+sed -i -e "s/$SERVER_NAME_VARIABLE/$SERVER_NAME/g" $NGINX_CONF_PATH/$VIRTUAL_DOMAIN.conf
+
+service nginx stop
+service nginx start

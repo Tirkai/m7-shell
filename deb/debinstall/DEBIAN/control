@@ -5,3 +5,4 @@ Architecture: all
 Section: devel
 Priority: optional
 Description: m7-shell
+Depends: nginx
