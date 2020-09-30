@@ -75,7 +75,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
         const context = frameRef?.contentWindow;
         if (context) {
             const app = this.props.application;
-            if (app instanceof ExternalApplication && context) {
+            if (app instanceof ExternalApplication) {
                 app.setEmitterContext(context);
                 this.handleBindingEmitterEvents(app);
             }
@@ -84,9 +84,9 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
     };
 
     handleBindingEmitterEvents = (app: ExternalApplication) => {
-        app.emitter.on(AppMessageType.Connected, () =>
-            this.store.auth.injectAuthTokenInExternalApplication(app),
-        );
+        app.emitter.on(AppMessageType.Connected, () => {
+            this.store.auth.injectAuthTokenInExternalApplication(app);
+        });
 
         app.emitter.on(AppMessageType.ForceRecieveToken, () =>
             this.store.auth.injectAuthTokenInExternalApplication(app),

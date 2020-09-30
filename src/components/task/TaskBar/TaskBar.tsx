@@ -3,6 +3,7 @@ import { apps, notifications, notificationsNone } from "assets/icons";
 import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
+import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
@@ -21,9 +22,16 @@ export class TaskBar extends Component<IStore> {
     }
 
     handleShowAppsMenu = (value: boolean) => {
-        this.store.shell.setActivePanel(
-            value ? ShellPanelType.StartMenu : ShellPanelType.None,
-        );
+        if (this.store.applicationManager.applications.length) {
+            this.store.shell.setActivePanel(
+                value ? ShellPanelType.StartMenu : ShellPanelType.None,
+            );
+        } else {
+            this.store.message.showMessage(
+                strings.error.noAvailableApplications,
+                strings.error.failedGetAvailableApplications,
+            );
+        }
     };
 
     handleExecuteApp = (app: Application) => {

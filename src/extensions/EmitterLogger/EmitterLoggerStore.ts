@@ -1,7 +1,7 @@
 import { EmitterMessage } from "@algont/m7-shell-emitter";
 import { action, observable } from "mobx";
 
-export class EmiterLoggerStore {
+export class EmitterLoggerStore {
     @observable
     events: EmitterMessage<unknown>[] = [];
 

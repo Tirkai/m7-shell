@@ -1,4 +1,8 @@
-import { AppMessageType } from "@algont/m7-shell-emitter";
+import {
+    AppMessageType,
+    EmitterMessage,
+    invokeListeners,
+} from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
 import { IAppParams } from "interfaces/app/IAppParams";
@@ -51,6 +55,33 @@ export class ApplicationManagerStore {
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
+
+        window.onmessage = (event: MessageEvent) => {
+            const message: EmitterMessage<unknown> = event.data;
+            let apps = [];
+
+            apps = this.applications.filter(
+                (item) => item.id === message.appId,
+            );
+
+            // #region Backward compatibility m7-shell-emitter@0.6
+            // Todo: Remove after update all projects
+            if (!message.appId && message.source) {
+                apps = this.applications.filter((item) =>
+                    item instanceof ExternalApplication && message.source
+                        ? item.url.indexOf(message.source) > -1
+                        : false,
+                );
+            }
+            // #endregion
+
+            apps.forEach((app) => {
+                if (app instanceof ExternalApplication) {
+                    invokeListeners(message, app.emitter.listeners);
+                    return;
+                }
+            });
+        };
     }
 
     @action
@@ -98,10 +129,14 @@ export class ApplicationManagerStore {
                             AppMessageType.CreateWindowInstance,
                             (payload: { url: string }) => {
                                 const { url } = payload;
-                                this.createExecutedApplicationInstance(
-                                    app,
-                                    url,
-                                );
+
+                                const findedApp = this.findByUrlPart(url);
+                                if (findedApp instanceof ExternalApplication) {
+                                    this.executeApplicationWithUrl(
+                                        findedApp,
+                                        url,
+                                    );
+                                }
                             },
                         );
                     }
@@ -130,23 +165,6 @@ export class ApplicationManagerStore {
         } else {
             app.setCustomUrl(url);
         }
-    }
-
-    createExecutedApplicationInstance(app: ExternalApplication, url: string) {
-        const newInstance = new ExternalApplication({
-            ...app,
-            id: v4(),
-            key: app.key,
-            url,
-        });
-
-        const instance = new ApplicationWindow(newInstance, {
-            id: v4(),
-            width: app.baseWidth,
-            height: app.baseHeight,
-        });
-
-        this.store.windowManager.addWindow(instance);
     }
 
     @action
@@ -195,5 +213,14 @@ export class ApplicationManagerStore {
 
     findById(id: string) {
         return this.applications.find((app) => app.id === id);
+    }
+
+    findByUrlPart(url: string) {
+        const hostname = new URL(url).hostname;
+        return this.applications.find((app) =>
+            app instanceof ExternalApplication
+                ? app.url.indexOf(hostname) > -1 && app.url.length > 0
+                : false,
+        );
     }
 }

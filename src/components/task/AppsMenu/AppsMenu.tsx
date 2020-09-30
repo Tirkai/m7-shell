@@ -37,7 +37,9 @@ export class AppsMenu extends Component<IStore> {
     };
 
     handleExecuteApp = (app: Application) => {
-        this.store.applicationManager.executeApplication(app);
+        if (app.isAvailable) {
+            this.store.applicationManager.executeApplication(app);
+        }
     };
 
     render() {
@@ -115,6 +117,7 @@ export class AppsMenu extends Component<IStore> {
                                                   icon={app.icon}
                                                   title={app.name}
                                                   isExecuted={app.isExecuted}
+                                                  isAvailable={app.isAvailable}
                                                   onClick={() =>
                                                       this.handleExecuteApp(app)
                                                   }
@@ -127,6 +130,7 @@ export class AppsMenu extends Component<IStore> {
                                               icon={app.icon}
                                               title={app.name}
                                               isExecuted={app.isExecuted}
+                                              isAvailable={app.isAvailable}
                                               onClick={() =>
                                                   this.handleExecuteApp(app)
                                               }
