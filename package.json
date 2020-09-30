@@ -1,5 +1,5 @@
 {
-    "name": "m7-shell-experemental",
+    "name": "m7-shell",
     "version": "0.16.0",
     "private": true,
     "dependencies": {
