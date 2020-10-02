@@ -1,6 +1,8 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { apps, notifications, notificationsNone } from "assets/icons";
+import { apps } from "assets/icons";
 import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
+import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
+import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
@@ -107,8 +109,11 @@ export class TaskBar extends Component<IStore> {
                             </TaskBarItem>
                             <TaskBarItem
                                 badge={
-                                    this.store.notification.count > 0
-                                        ? this.store.notification.count.toString()
+                                    this.store.notification.status ===
+                                    NotificationServiceConnectStatus.Connected
+                                        ? this.store.notification.count > 0
+                                            ? this.store.notification.count.toString()
+                                            : undefined
                                         : undefined
                                 }
                                 onClick={() =>
@@ -117,19 +122,16 @@ export class TaskBar extends Component<IStore> {
                                     )
                                 }
                             >
-                                {this.store.notification.count > 0 ? (
-                                    <SVGIcon
-                                        key={"notificationsExist"}
-                                        source={notifications}
-                                        color="white"
-                                    />
-                                ) : (
-                                    <SVGIcon
-                                        key="notificationsNotExist"
-                                        source={notificationsNone}
-                                        color="white"
-                                    />
-                                )}
+                                <NotificationTaskbarItem
+                                    status={this.store.notification.status}
+                                    exist={
+                                        this.store.notification.status ===
+                                        NotificationServiceConnectStatus.Connected
+                                            ? this.store.notification
+                                                  .notifications.length > 0
+                                            : false
+                                    }
+                                />
                             </TaskBarItem>
                         </div>
                     </div>

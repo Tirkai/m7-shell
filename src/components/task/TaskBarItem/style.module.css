@@ -36,8 +36,8 @@
 
 .badge {
     position: absolute;
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -46,6 +46,7 @@
     right: 5px;
     background: #096dd9;
     font-size: 12px;
+    z-index: 1;
 }
 
 .content {

@@ -1,4 +1,4 @@
-import empty from "assets/images/empty.svg";
+import { empty } from "assets/icons";
 import classNames from "classnames";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
