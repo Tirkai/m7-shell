@@ -3,6 +3,9 @@ export const en = {
         anOccurredError: "An occurred error",
         connectionError: "Failed to establish a connection to the server",
         applicationService: "App service unavailable",
+        noAvailableApplications: "There are no available applications",
+        failedGetAvailableApplications:
+            "Failed to get the list of available applications for this user",
     },
     auth: {
         error: {

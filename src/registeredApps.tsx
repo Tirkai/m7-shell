@@ -1,6 +1,6 @@
 import { UPPER_LEVEL_DOMAIN } from "constants/config";
 import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
-import { EmiterLogger } from "extensions/EmiterLogger/EmiterLogger";
+import { EmitterLogger } from "extensions/EmitterLogger/EmitterLogger";
 import { strings } from "locale";
 import { Application } from "models/Application";
 import { ExternalApplication } from "models/ExternalApplication";
@@ -40,7 +40,7 @@ export const registeredApps: Application[] = [
         id: v4(),
         name: "EmitterLogger",
         key: "EmitterLogger",
-        Component: <EmiterLogger />,
+        Component: <EmitterLogger />,
         baseWidth: 700,
         baseHeight: 600,
         isVisibleInStartMenu: false,

@@ -3,8 +3,10 @@ import { JsonRpcPayload, JsonRpcResult } from "@algont/m7-utils";
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
 import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
+import { RoleType } from "enum/RoleType";
 import { ShellEvents } from "enum/ShellEvents";
-import { IRefrashTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
+import { IAccessTokenMetadata } from "interfaces/auth/IAccessTokenMetadata";
+import { IRefreshTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { Base64 } from "js-base64";
@@ -36,6 +38,9 @@ export class AuthStore {
     userName: string = "";
 
     @observable
+    roles: RoleType[] = [];
+
+    @observable
     isAuthorized: boolean = false;
 
     @observable
@@ -53,12 +58,22 @@ export class AuthStore {
     @observable
     timeOffset: number = 30000;
 
-    decodeToken<T>(token: string) {
-        const [, expireSection] = token.split(".");
+    @computed
+    get isAdmin() {
+        return this.roles.some((item) => item === RoleType.Admin);
+    }
 
-        if (expireSection) {
+    @computed
+    get isSysadmin() {
+        return this.roles.some((item) => item === RoleType.Sysadmin);
+    }
+
+    decodeToken<T>(token: string) {
+        const [, tokenPayload] = token.split(".");
+
+        if (tokenPayload) {
             const decodedData = (JSON.parse(
-                Base64.decode(expireSection),
+                Base64.decode(tokenPayload),
             ) as unknown) as T;
             return decodedData;
         } else {
@@ -141,9 +156,15 @@ export class AuthStore {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
 
-        const refreshTokenData = this.decodeToken<IRefrashTokenMetadata>(
+        const refreshTokenData = this.decodeToken<IRefreshTokenMetadata>(
             refreshToken,
         );
+
+        const accessTokenData = this.decodeToken<IAccessTokenMetadata>(
+            accessToken,
+        );
+
+        this.roles = accessTokenData?.roles ?? [];
 
         this.createTime = moment.utc(refreshTokenData?.created);
         this.renewTime = moment.utc(refreshTokenData?.renew);

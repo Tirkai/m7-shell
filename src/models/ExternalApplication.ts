@@ -13,8 +13,18 @@ export class ExternalApplication extends Application {
     emitter: ShellMessageEmitter;
     constructor(options: IExternalApplicationOptions) {
         super(options);
-        this.url = options.url;
-        this.emitter = new ShellMessageEmitter();
+        this.emitter = new ShellMessageEmitter(this.id);
+        try {
+            const [url, params] = options.url.split("?");
+
+            const urlParams = new URLSearchParams(params);
+            urlParams.set("appId", this.id);
+
+            this.url = url + "?" + urlParams.toString();
+        } catch (e) {
+            this.url = "";
+            this.setAvailable(false);
+        }
     }
 
     setEmitterContext(context: Window) {

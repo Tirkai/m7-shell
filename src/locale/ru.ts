@@ -3,6 +3,9 @@ export const ru = {
         anOccurredError: "Произошла ошибка",
         connectionError: "Не удалось установить соединение с сервером",
         applicationService: "Сервис приложений недоступен",
+        noAvailableApplications: "Нет доступных приложений",
+        failedGetAvailableApplications:
+            "Не удалось получить список доступных приложения для данного пользователя",
     },
     auth: {
         error: {

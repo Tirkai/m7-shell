@@ -52,3 +52,14 @@
 .svgNode {
     fill: white !important;
 }
+
+.unavailable {
+    opacity: 0.5;
+    cursor: default;
+    filter: grayscale(1);
+}
+.unavailable:hover {
+    cursor: default;
+    border: 1px solid transparent;
+    background: #444;
+}

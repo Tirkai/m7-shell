@@ -120,43 +120,57 @@ export class NotificationStore {
         };
 
         const reconnectSocket = () => {
+            console.warn("Trying reconnect notification socket", {
+                token: this.store.auth.accessToken,
+            });
+
             closeSocket();
             this.connectToNotificationsSocket(this.store.auth.accessToken);
         };
 
         try {
-            await this.fetchNotifications(this.store.auth.userLogin);
-            if (this.socket === null) {
-                this.socket = io.connect(NOTIFICATIONS_WEBSOCKET_URL, {
-                    transportOptions: {
-                        polling: {
-                            extraHeaders: {
-                                [AUTH_TOKEN_HEADER]: token,
+            if (token.length > 0) {
+                await this.fetchNotifications(this.store.auth.userLogin);
+                if (this.socket === null) {
+                    this.socket = io.connect(NOTIFICATIONS_WEBSOCKET_URL, {
+                        transportOptions: {
+                            polling: {
+                                extraHeaders: {
+                                    [AUTH_TOKEN_HEADER]: token,
+                                },
                             },
                         },
-                    },
-                });
+                    });
 
-                this.socket.on(
-                    "add_notification",
-                    (response: INotificationResponse) =>
-                        this.addNotification(response),
-                );
+                    this.socket.on(
+                        "add_notification",
+                        (response: INotificationResponse) =>
+                            this.addNotification(
+                                NotificationFactory.createNotification(
+                                    response,
+                                ),
+                            ),
+                    );
 
-                this.socket.on(
-                    "notification_count",
-                    (response: INotificationCountResponse) =>
-                        this.updateNotificationCount(response.total),
-                );
+                    this.socket.on(
+                        "notification_count",
+                        (response: INotificationCountResponse) =>
+                            this.updateNotificationCount(response.total),
+                    );
 
-                this.socket.on("disconnect", () => reconnectSocket());
+                    this.socket.on("disconnect", () => reconnectSocket());
 
-                window.addEventListener(
-                    ShellEvents.Logout,
-                    () => closeSocket(),
-                    {
-                        once: true,
-                    },
+                    window.addEventListener(
+                        ShellEvents.Logout,
+                        () => closeSocket(),
+                        {
+                            once: true,
+                        },
+                    );
+                }
+            } else {
+                console.warn(
+                    "Empty token when auth into the notification service",
                 );
             }
         } catch (e) {
@@ -166,11 +180,7 @@ export class NotificationStore {
     }
 
     @action
-    addNotification(notificationData: INotificationResponse) {
-        const notification = NotificationFactory.createNotification(
-            notificationData,
-        );
-
+    addNotification(notification: NotificationModel) {
         const toast = new ToastNotification(notification);
 
         this.toasts.unshift(new ToastNotification(notification));

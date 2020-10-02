@@ -1,14 +1,14 @@
 import { Table, TableBody, TableCell, TableRow } from "@material-ui/core";
 import { observer } from "mobx-react";
 import React, { Component } from "react";
-import { EmiterLoggerStore } from "./EmiterLoggerStore";
+import { EmitterLoggerStore } from "./EmitterLoggerStore";
 import style from "./style.module.css";
-const emiterLoggerStore: EmiterLoggerStore = new EmiterLoggerStore();
+const emitterLoggerStore: EmitterLoggerStore = new EmitterLoggerStore();
 
 @observer
-export class EmiterLogger extends Component {
+export class EmitterLogger extends Component {
     componentDidMount() {
-        emiterLoggerStore.init();
+        emitterLoggerStore.init();
     }
 
     render() {
@@ -16,8 +16,8 @@ export class EmiterLogger extends Component {
             <div className={style.logger}>
                 <Table size="small">
                     <TableBody>
-                        {emiterLoggerStore.events.length ? (
-                            emiterLoggerStore.events.map((item, index) => (
+                        {emitterLoggerStore.events.length ? (
+                            emitterLoggerStore.events.map((item, index) => (
                                 <TableRow key={index}>
                                     <TableCell>{item.source}</TableCell>
                                     <TableCell>{item.type}</TableCell>

@@ -7,6 +7,7 @@ interface IAppsMenuItemProps {
     icon: string;
     title: string;
     isExecuted: boolean;
+    isAvailable: boolean;
     onClick: () => void;
 }
 
@@ -16,6 +17,7 @@ export class AppsMenuItem extends Component<IAppsMenuItemProps> {
             <div
                 className={classNames(style.appsMenuItem, {
                     [style.executed]: this.props.isExecuted,
+                    [style.unavailable]: !this.props.isAvailable,
                 })}
                 onClick={this.props.onClick}
             >

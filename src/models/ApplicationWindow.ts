@@ -70,16 +70,16 @@ export class ApplicationWindow {
     resizeOriginPoint: { x: number; y: number } = { x: 0, y: 0 };
 
     @observable
-    lockedWidth: number = this.width;
+    lockedWidth: number;
 
     @observable
-    lockedHeight: number = this.height;
+    lockedHeight: number;
 
     @observable
-    lockedX: number = this.x;
+    lockedX: number;
 
     @observable
-    lockedY: number = this.y;
+    lockedY: number;
 
     @observable
     isDragging: boolean = false;
@@ -95,6 +95,10 @@ export class ApplicationWindow {
         this.x = Math.floor(window.innerWidth / 2 - this.width / 2);
         this.y = Math.floor(window.innerHeight / 2 - this.height / 2);
         this.isFullScreen = options.isFullscreen ?? false;
+        this.lockedWidth = this.width;
+        this.lockedHeight = this.height;
+        this.lockedX = this.x;
+        this.lockedY = this.y;
     }
 
     @action
