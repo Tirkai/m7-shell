@@ -7,4 +7,5 @@ export enum ShellEvents {
     NotificationHubOpen = "notificationHubOpen",
     NotificationHubClose = "notificationHubClose",
     Logout = "logout",
+    Resize = "resize",
 }

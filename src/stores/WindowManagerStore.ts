@@ -16,6 +16,14 @@ export class WindowManagerStore {
         window.addEventListener(ShellEvents.FocusShellControls, () =>
             this.clearFocus(),
         );
+
+        window.addEventListener(ShellEvents.Resize, () => {
+            this.windows
+                .filter((item) => item.isFullScreen)
+                .forEach((item) => {
+                    item.recalculateFullScreenSize();
+                });
+        });
     }
 
     @observable

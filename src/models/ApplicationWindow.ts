@@ -148,7 +148,6 @@ export class ApplicationWindow {
         position: { x: number; y: number },
         size: { width: number; height: number },
     ) {
-        // const handle = data.handle;
         const dir = ResizeHandleDirection;
         const deltaX = this.resizeOriginPoint.x - position.x;
         const deltaY = this.resizeOriginPoint.y - position.y;
@@ -207,5 +206,11 @@ export class ApplicationWindow {
     @action
     setPinArea(area: IPinArea | null) {
         this.pinArea = area;
+    }
+
+    @action
+    recalculateFullScreenSize() {
+        this.isFullScreen = false;
+        this.isFullScreen = true;
     }
 }
