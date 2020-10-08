@@ -4,6 +4,7 @@ import {
     AUTH_TOKEN_HEADER,
     NOTIFICATIONS_WEBSOCKET_URL,
 } from "constants/config";
+import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellEvents } from "enum/ShellEvents";
 import { NotificationFactory } from "factories/NotificationFactory";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
@@ -20,8 +21,6 @@ import {
 } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
-const title = `Сообщение о событии`;
-
 export class NotificationStore {
     socket: SocketIOClient.Socket | null = null;
 
@@ -36,6 +35,10 @@ export class NotificationStore {
 
     @observable
     count = 0;
+
+    @observable
+    status: NotificationServiceConnectStatus =
+        NotificationServiceConnectStatus.Default;
 
     private store: AppStore;
     constructor(store: AppStore) {
@@ -142,6 +145,11 @@ export class NotificationStore {
                         },
                     });
 
+                    this.socket.on("connect", () => {
+                        this.status =
+                            NotificationServiceConnectStatus.Connected;
+                    });
+
                     this.socket.on(
                         "add_notification",
                         (response: INotificationResponse) =>
@@ -158,7 +166,11 @@ export class NotificationStore {
                             this.updateNotificationCount(response.total),
                     );
 
-                    this.socket.on("disconnect", () => reconnectSocket());
+                    this.socket.on("disconnect", () => {
+                        this.status =
+                            NotificationServiceConnectStatus.Disconnected;
+                        reconnectSocket();
+                    });
 
                     window.addEventListener(
                         ShellEvents.Logout,
@@ -175,7 +187,10 @@ export class NotificationStore {
             }
         } catch (e) {
             console.error(e);
-            setTimeout(() => reconnectSocket(), 3000);
+            this.status = NotificationServiceConnectStatus.Disconnected;
+            if (this.store.auth.isAuthorized) {
+                setTimeout(() => reconnectSocket(), 3000);
+            }
         }
     }
 
