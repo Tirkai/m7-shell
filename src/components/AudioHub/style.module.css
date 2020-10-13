@@ -1,0 +1,48 @@
+.audioHub {
+    position: absolute;
+    bottom: 48px;
+    right: 0;
+    background: url("/wallpapers/wallpaper_blur.jpg");
+    width: 300px;
+    background-attachment: fixed;
+    background-position: right;
+    background-size: cover;
+    pointer-events: none;
+    transform: translateY(50%);
+    opacity: 0;
+    transition: transform ease 0.3s, opacity 0.3s;
+    z-index: 99;
+}
+
+.container {
+    background: #222222cc;
+    padding: 16px;
+    height: 100%;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    grid-template-rows: 32px;
+    grid-gap: 12px;
+}
+
+.show {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+}
+
+.icon {
+    cursor: pointer;
+}
+
+.icon svg {
+    width: 32px;
+    height: 32px;
+    fill: white;
+}
+
+.slider {
+    background: #096dd9;
+}

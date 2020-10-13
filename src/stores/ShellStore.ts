@@ -18,6 +18,11 @@ export class ShellStore {
         return this.activePanel === ShellPanelType.NotificationHub;
     }
 
+    @computed
+    get audioHubShow() {
+        return this.activePanel === ShellPanelType.AudioHub;
+    }
+
     @observable
     enabledDevMode: boolean = process.env.NODE_ENV === "development";
 
@@ -42,6 +47,10 @@ export class ShellStore {
         });
 
         window.addEventListener(ShellEvents.NotificationHubOpen, () => {
+            this.store.windowManager.clearFocus();
+        });
+
+        window.addEventListener(ShellEvents.AudioHubOpen, () => {
             this.store.windowManager.clearFocus();
         });
 
@@ -71,6 +80,10 @@ export class ShellStore {
                 window.dispatchEvent(
                     new CustomEvent(ShellEvents.NotificationHubOpen),
                 );
+                break;
+            }
+            case ShellPanelType.AudioHub: {
+                window.dispatchEvent(new CustomEvent(ShellEvents.AudioHubOpen));
                 break;
             }
             default:

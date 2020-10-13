@@ -32,7 +32,7 @@ export class AppContainer extends Component<IStore> {
                 ) : (
                     <AuthScreen />
                 )}
-                ;
+
                 <MessageDialog />
             </>
         );
