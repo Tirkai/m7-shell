@@ -1,6 +1,6 @@
 import { SVGIcon } from "@algont/m7-ui";
 import { Slider } from "@material-ui/core";
-import { mute, sound } from "assets/icons";
+import { mute, sound, soundLow, soundMiddle } from "assets/icons";
 import classNames from "classnames";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
@@ -27,6 +27,23 @@ export class AudioHub extends Component<IStore> {
         this.store.audio.setMute(!this.store.audio.isMute);
     };
 
+    getIconByVolume = () => {
+        if (this.store.audio.volume > 0.66) {
+            return <SVGIcon source={sound} key="sound" color="white" />;
+        }
+        if (this.store.audio.volume > 0.33 && this.store.audio.volume <= 0.66) {
+            return (
+                <SVGIcon source={soundMiddle} key="soundMiddle" color="white" />
+            );
+        }
+        if (this.store.audio.volume > 0 && this.store.audio.volume <= 0.33) {
+            return <SVGIcon source={soundLow} key="soundLow" color="white" />;
+        }
+        if (this.store.audio.volume <= 0) {
+            return <SVGIcon source={mute} key="soundLow" color="white" />;
+        }
+    };
+
     render() {
         return (
             <div
@@ -40,7 +57,7 @@ export class AudioHub extends Component<IStore> {
                     <div className={style.content}>
                         <div className={style.icon} onClick={this.handleMute}>
                             {!this.store.audio.isMute ? (
-                                <SVGIcon source={sound} key="soundEnable" />
+                                this.getIconByVolume()
                             ) : (
                                 <SVGIcon source={mute} key="soundDisable" />
                             )}

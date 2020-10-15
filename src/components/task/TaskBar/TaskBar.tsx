@@ -122,6 +122,7 @@ export class TaskBar extends Component<IStore> {
                                 }
                             >
                                 <TaskBarSound
+                                    volume={this.store.audio.volume}
                                     isMuted={this.store.audio.isMute}
                                 />
                             </TaskBarItem>

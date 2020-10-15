@@ -104,6 +104,10 @@ export class AudioStore {
     setMute(value: boolean) {
         this.isMute = value;
 
+        if (this.volume <= 0) {
+            this.volume = 0.01;
+        }
+
         const localStorageSavedValue = (this.isMute ? 1 : 0).toString();
 
         localStorage.setItem(this.localStorageMuteKey, localStorageSavedValue);

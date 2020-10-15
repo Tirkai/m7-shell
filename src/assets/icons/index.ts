@@ -8,6 +8,8 @@ import fullscreen from "./fullscreen.svg";
 import mute from "./mute.svg";
 import notificationsNone from "./notifications-none.svg";
 import notifications from "./notifications.svg";
+import soundLow from "./sound-low.svg";
+import soundMiddle from "./sound-middle.svg";
 import sound from "./sound.svg";
 import unknownApp from "./unknown.svg";
 import videocam from "./video.svg";
@@ -28,4 +30,6 @@ export {
     empty,
     mute,
     sound,
+    soundMiddle,
+    soundLow,
 };
