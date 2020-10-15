@@ -58,6 +58,9 @@ export class AuthStore {
     @observable
     timeOffset: number = 30000;
 
+    @observable
+    checkedAfterStart: boolean = false;
+
     @computed
     get isAdmin() {
         return this.roles.some((item) => item === RoleType.Admin);
@@ -133,6 +136,8 @@ export class AuthStore {
                 }
             }
         }, 1000);
+
+        this.verifyToken();
     }
 
     async verifyToken() {
@@ -144,6 +149,10 @@ export class AuthStore {
                 token: this.accessToken,
             }),
         );
+
+        if (!response.data.error) {
+            this.checkedAfterStart = true;
+        }
 
         return new JsonRpcResult({
             status: !response.data.error,
@@ -244,6 +253,7 @@ export class AuthStore {
 
                 this.isAuthorized = true;
                 this.userLogin = login;
+                this.checkedAfterStart = true;
 
                 localStorage.setItem(
                     this.localStorageUserLogin,

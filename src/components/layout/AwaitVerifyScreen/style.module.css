@@ -1,0 +1,36 @@
+.awaitVerifyScreen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    padding: 16px;
+    animation: fadeIn 1s;
+}
+
+.loader {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.text {
+    color: white;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
