@@ -1,5 +1,6 @@
 import { JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
+import { AudioSource } from "constants/audio";
 import {
     AUTH_TOKEN_HEADER,
     NOTIFICATIONS_WEBSOCKET_URL,
@@ -12,6 +13,7 @@ import { INotificationCountResponse } from "interfaces/response/INotificationCou
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
 import { flatten } from "lodash";
 import { action, observable } from "mobx";
+import { AudioModel } from "models/AudioModel";
 import { NotificationModel } from "models/NotificationModel";
 import { ToastNotification } from "models/ToastNotification";
 import io from "socket.io-client";
@@ -201,6 +203,13 @@ export class NotificationStore {
         this.toasts.unshift(new ToastNotification(notification));
 
         this.notifications.unshift(notification);
+
+        this.store.audio.playAudio(
+            new AudioModel({
+                source: AudioSource.Notification,
+                awaitQueue: false,
+            }),
+        );
     }
 
     @action

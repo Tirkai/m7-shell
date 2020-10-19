@@ -1,4 +1,5 @@
 import { ApplicationManagerStore } from "./ApplicationManagerStore";
+import { AudioStore } from "./AudioStore";
 import { AuthStore } from "./AuthStore";
 import { DateTimeStore } from "./DateTimeStore";
 import { LocaleStore } from "./LocaleStore";
@@ -16,6 +17,7 @@ export class AppStore {
     notification: NotificationStore;
     locale: LocaleStore;
     message: MessageStore;
+    audio: AudioStore;
     constructor() {
         this.auth = new AuthStore(this);
         this.dateTime = new DateTimeStore(this);
@@ -25,6 +27,7 @@ export class AppStore {
         this.notification = new NotificationStore(this);
         this.locale = new LocaleStore(this);
         this.message = new MessageStore(this);
+        this.audio = new AudioStore(this);
         console.warn("STORE", this);
     }
 }

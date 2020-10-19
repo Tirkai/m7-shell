@@ -30,10 +30,10 @@ export class ApplicationWindow {
     isCollapsed: boolean = false;
 
     @observable
-    width: number;
+    width: number = 800;
 
     @observable
-    height: number;
+    height: number = 600;
 
     @observable
     x: number;
@@ -90,8 +90,13 @@ export class ApplicationWindow {
     constructor(app: Application, options: IApplicationWindowOptions) {
         this.application = app;
         this.id = options.id;
-        this.width = options.width;
-        this.height = options.height;
+        this.width =
+            typeof options.width === "number" ? options.width : app.baseWidth;
+        this.height =
+            typeof options.height === "number"
+                ? options.height
+                : app.baseHeight;
+
         this.x = Math.floor(window.innerWidth / 2 - this.width / 2);
         this.y = Math.floor(window.innerHeight / 2 - this.height / 2);
         this.isFullScreen = options.isFullscreen ?? false;

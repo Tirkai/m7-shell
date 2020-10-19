@@ -13,6 +13,7 @@ import { ApplicationWindow } from "models/ApplicationWindow";
 import React, { Component } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
+import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
 import style from "./style.module.css";
 
 @inject("store")
@@ -52,6 +53,12 @@ export class TaskBar extends Component<IStore> {
     handleShowNotificationHub = (value: boolean) => {
         this.store.shell.setActivePanel(
             value ? ShellPanelType.NotificationHub : ShellPanelType.None,
+        );
+    };
+
+    handleShowAudioHub = (value: boolean) => {
+        this.store.shell.setActivePanel(
+            value ? ShellPanelType.AudioHub : ShellPanelType.None,
         );
     };
 
@@ -106,6 +113,18 @@ export class TaskBar extends Component<IStore> {
                         <div className={style.actions}>
                             <TaskBarItem onClick={() => true} autoWidth>
                                 <TaskBarDateTime />
+                            </TaskBarItem>
+                            <TaskBarItem
+                                onClick={() =>
+                                    this.handleShowAudioHub(
+                                        !this.store.shell.audioHubShow,
+                                    )
+                                }
+                            >
+                                <TaskBarSound
+                                    volume={this.store.audio.volume}
+                                    isMuted={this.store.audio.isMute}
+                                />
                             </TaskBarItem>
                             <TaskBarItem
                                 badge={
