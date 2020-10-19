@@ -136,6 +136,17 @@ export class ApplicationManagerStore {
                                         findedApp,
                                         url,
                                     );
+                                } else {
+                                    const instance = new ExternalApplication({
+                                        id: v4(),
+                                        name: app.name,
+                                        url,
+                                        icon: app.icon,
+                                    });
+                                    this.executeApplicationWithUrl(
+                                        instance,
+                                        url,
+                                    );
                                 }
                             },
                         );
@@ -164,6 +175,11 @@ export class ApplicationManagerStore {
             );
         } else {
             app.setCustomUrl(url);
+
+            const appWindow = this.store.windowManager.findWindowByApp(app);
+            if (appWindow) {
+                this.store.windowManager.focusWindow(appWindow);
+            }
         }
     }
 
