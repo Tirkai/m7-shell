@@ -31,6 +31,7 @@ export const ru = {
         off: "выключено",
         on: "включено",
         notFound: "Ничего не найдено",
+        sessionRecovery: "Восстановление сессии",
     },
     startMenu: {
         search: "Поиск",

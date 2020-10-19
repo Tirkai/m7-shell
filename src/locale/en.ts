@@ -31,6 +31,7 @@ export const en = {
         off: "off",
         on: "on",
         notFound: "Not found",
+        sessionRecovery: "Session recovery",
     },
     startMenu: {
         search: "Search",

@@ -1,4 +1,5 @@
 import { AuthScreen } from "components/layout/AuthScreen/AuthScreen";
+import { AwaitVerifyScreen } from "components/layout/AwaitVerifyScreen/AwaitVerifyScreen";
 import ShellScreen from "components/layout/ShellScreen/ShellScreen";
 import { MessageDialog } from "components/message/MessageDialog/MessageDialog";
 import { IStore } from "interfaces/common/IStore";
@@ -28,7 +29,11 @@ export class AppContainer extends Component<IStore> {
         return (
             <>
                 {this.store.auth.isAuthorized ? (
-                    <ShellScreen />
+                    this.store.auth.checkedAfterStart ? (
+                        <ShellScreen />
+                    ) : (
+                        <AwaitVerifyScreen />
+                    )
                 ) : (
                     <AuthScreen />
                 )}
