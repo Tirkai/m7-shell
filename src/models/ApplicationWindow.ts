@@ -1,7 +1,7 @@
 import { TASKBAR_HEIGHT } from "constants/config";
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { IPinArea } from "interfaces/window/IPinArea";
-import { action, computed, observable } from "mobx";
+import { action, makeAutoObservable } from "mobx";
 import { ResizeHandle } from "react-resizable";
 import { Application } from "./Application";
 
@@ -17,44 +17,32 @@ export class ApplicationWindow {
 
     application: Application;
 
-    @observable
     depthIndex: number = 1;
 
-    @observable
     isFocused: boolean = false;
 
-    @observable
     isFullScreen: boolean = false;
 
-    @observable
     isCollapsed: boolean = false;
 
-    @observable
     width: number = 800;
 
-    @observable
     height: number = 600;
 
-    @observable
     x: number;
 
-    @observable
     y: number;
 
-    @observable
     pinArea: IPinArea | null = null;
 
-    @computed
     get minYPosition() {
         return this.y + this.height - this.application.minHeight;
     }
 
-    @computed
     get minXPosition() {
         return this.x + this.width - this.application.minWidth;
     }
 
-    @computed
     get bounds() {
         return {
             x: !this.isFullScreen ? this.x : 0,
@@ -66,28 +54,23 @@ export class ApplicationWindow {
         };
     }
 
-    @observable
     resizeOriginPoint: { x: number; y: number } = { x: 0, y: 0 };
 
-    @observable
     lockedWidth: number;
 
-    @observable
     lockedHeight: number;
 
-    @observable
     lockedX: number;
 
-    @observable
     lockedY: number;
 
-    @observable
     isDragging: boolean = false;
 
-    @observable
     isResizing: boolean = false;
 
     constructor(app: Application, options: IApplicationWindowOptions) {
+        makeAutoObservable(this);
+
         this.application = app;
         this.id = options.id;
         this.width =

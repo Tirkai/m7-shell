@@ -61,7 +61,7 @@ export class NotificationTaskbarItem extends Component<
                             color="grey"
                         />
                         <div className={style.error}>
-                            <img src={error} />
+                            <img src={error} alt="Disconnected" />
                         </div>
                     </div>
                 ) : (

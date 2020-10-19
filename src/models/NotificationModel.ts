@@ -1,4 +1,4 @@
-import { observable, action } from "mobx";
+import { action, makeAutoObservable } from "mobx";
 
 interface INotificationModelOptions {
     id: string;
@@ -16,11 +16,12 @@ export class NotificationModel implements INotificationModelOptions {
     text: string;
     url: string;
     date: string;
-    
-    @observable
+
     isDisplayed: boolean;
- 
+
     constructor(options: INotificationModelOptions) {
+        makeAutoObservable(this);
+
         this.id = options.id;
         this.applicationId = options.applicationId;
         this.title = options.title;
@@ -31,7 +32,7 @@ export class NotificationModel implements INotificationModelOptions {
     }
 
     @action
-    setDisplayed(value: boolean){
+    setDisplayed(value: boolean) {
         this.isDisplayed = value;
     }
 }

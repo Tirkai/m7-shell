@@ -1,14 +1,15 @@
 import { EmitterMessage } from "@algont/m7-shell-emitter";
-import { action, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 
 export class EmitterLoggerStore {
-    @observable
     events: EmitterMessage<unknown>[] = [];
 
-    @observable
     isInited: boolean = false;
 
-    @action
+    constructor() {
+        makeAutoObservable(this);
+    }
+
     init() {
         if (!this.isInited) {
             window.addEventListener("emitterSubmitMessage", ((
@@ -26,7 +27,6 @@ export class EmitterLoggerStore {
         }
     }
 
-    @action
     addEvent(event: EmitterMessage<unknown>) {
         if (event.type?.indexOf("M7") > -1) {
             this.events.unshift(event);

@@ -1,6 +1,6 @@
 import { ShellEvents } from "enum/ShellEvents";
 import { ShellPanelType } from "enum/ShellPanelType";
-import { action, computed, observable } from "mobx";
+import { action, makeAutoObservable } from "mobx";
 import { DevModeModel } from "models/DevModeModel";
 import moment from "moment";
 import { AppStore } from "./AppStore";
@@ -8,51 +8,63 @@ import { AppStore } from "./AppStore";
 export class ShellStore {
     localStorageDevModeKey = "DEV_MODE";
 
-    @computed
     get appMenuShow() {
         return this.activePanel === ShellPanelType.StartMenu;
     }
 
-    @computed
     get notificationHubShow() {
         return this.activePanel === ShellPanelType.NotificationHub;
     }
 
-    @computed
     get audioHubShow() {
         return this.activePanel === ShellPanelType.AudioHub;
     }
 
-    @observable
     enabledDevMode: boolean = process.env.NODE_ENV === "development";
 
-    @observable
     activePanel: ShellPanelType = ShellPanelType.None;
 
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
 
-        window.addEventListener(ShellEvents.DesktopClick, () => {
-            this.activePanel = ShellPanelType.None;
-            this.store.windowManager.clearFocus();
-        });
+        makeAutoObservable(this);
 
-        window.addEventListener(ShellEvents.FocusAnyWindow, () => {
-            this.activePanel = ShellPanelType.None;
-        });
+        window.addEventListener(
+            ShellEvents.DesktopClick,
+            action(() => {
+                this.activePanel = ShellPanelType.None;
+                this.store.windowManager.clearFocus();
+            }),
+        );
 
-        window.addEventListener(ShellEvents.StartMenuOpen, () => {
-            this.store.windowManager.clearFocus();
-        });
+        window.addEventListener(
+            ShellEvents.FocusAnyWindow,
+            action(() => {
+                this.activePanel = ShellPanelType.None;
+            }),
+        );
 
-        window.addEventListener(ShellEvents.NotificationHubOpen, () => {
-            this.store.windowManager.clearFocus();
-        });
+        window.addEventListener(
+            ShellEvents.StartMenuOpen,
+            action(() => {
+                this.store.windowManager.clearFocus();
+            }),
+        );
 
-        window.addEventListener(ShellEvents.AudioHubOpen, () => {
-            this.store.windowManager.clearFocus();
-        });
+        window.addEventListener(
+            ShellEvents.NotificationHubOpen,
+            action(() => {
+                this.store.windowManager.clearFocus();
+            }),
+        );
+
+        window.addEventListener(
+            ShellEvents.AudioHubOpen,
+            action(() => {
+                this.store.windowManager.clearFocus();
+            }),
+        );
 
         const storagedDevMode = JSON.parse(
             localStorage.getItem(this.localStorageDevModeKey) ?? "{}",
@@ -65,7 +77,6 @@ export class ShellStore {
         }
     }
 
-    @action
     setActivePanel(panel: ShellPanelType) {
         this.activePanel = panel;
 
@@ -91,7 +102,6 @@ export class ShellStore {
         }
     }
 
-    @action
     setDevMode(value: boolean) {
         this.enabledDevMode = value;
 

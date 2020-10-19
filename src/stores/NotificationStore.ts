@@ -12,7 +12,7 @@ import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { INotificationCountResponse } from "interfaces/response/INotificationCountResponse";
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
 import { flatten } from "lodash";
-import { action, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { AudioModel } from "models/AudioModel";
 import { NotificationModel } from "models/NotificationModel";
 import { ToastNotification } from "models/ToastNotification";
@@ -26,25 +26,36 @@ import { AppStore } from "./AppStore";
 export class NotificationStore {
     socket: SocketIOClient.Socket | null = null;
 
-    @observable
     toasts: ToastNotification[] = [];
 
-    @observable
-    isConnected: boolean = false;
-
-    @observable
     notifications: NotificationModel[] = [];
 
-    @observable
     count = 0;
 
-    @observable
     status: NotificationServiceConnectStatus =
         NotificationServiceConnectStatus.Default;
 
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
+
+        makeAutoObservable(this);
+    }
+
+    setStatus(status: NotificationServiceConnectStatus) {
+        this.status = status;
+    }
+
+    setNotifications(notifications: NotificationModel[]) {
+        this.notifications = notifications;
+    }
+
+    setCount(count: number) {
+        this.count = count;
+    }
+
+    setToasts(toasts: ToastNotification[]) {
+        this.toasts = toasts;
     }
 
     async fetchNotifications(login: string) {
@@ -68,7 +79,7 @@ export class NotificationStore {
                     }),
                 );
 
-                this.count = countResponse.data.result;
+                this.setCount(countResponse.data.result);
 
                 const servicedApplicationsIds = appsResponse.data.result;
 
@@ -103,7 +114,7 @@ export class NotificationStore {
                         const notificationsList = values.filter(
                             (item) => item?.length,
                         );
-                        this.notifications = flatten(notificationsList ?? []);
+                        this.setNotifications(flatten(notificationsList ?? []));
                     })
                     .catch((e) => console.error(e));
 
@@ -148,8 +159,9 @@ export class NotificationStore {
                     });
 
                     this.socket.on("connect", () => {
-                        this.status =
-                            NotificationServiceConnectStatus.Connected;
+                        this.setStatus(
+                            NotificationServiceConnectStatus.Connected,
+                        );
                     });
 
                     this.socket.on(
@@ -169,8 +181,10 @@ export class NotificationStore {
                     );
 
                     this.socket.on("disconnect", () => {
-                        this.status =
-                            NotificationServiceConnectStatus.Disconnected;
+                        this.setStatus(
+                            NotificationServiceConnectStatus.Disconnected,
+                        );
+
                         reconnectSocket();
                     });
 
@@ -196,14 +210,9 @@ export class NotificationStore {
         }
     }
 
-    @action
     addNotification(notification: NotificationModel) {
-        const toast = new ToastNotification(notification);
-
         this.toasts.unshift(new ToastNotification(notification));
-
         this.notifications.unshift(notification);
-
         this.store.audio.playAudio(
             new AudioModel({
                 source: AudioSource.Notification,
@@ -212,17 +221,15 @@ export class NotificationStore {
         );
     }
 
-    @action
     updateNotificationCount(count: number) {
         this.count = count;
     }
 
-    @action
     async removeNotifications(
         notifications: NotificationModel[],
         login: string,
     ) {
-        const response = await Axios.post<IJsonRpcResponse>(
+        await Axios.post<IJsonRpcResponse>(
             notificationsEndpoint.url,
             new JsonRpcPayload("drop_user_notifications", {
                 user_notifications: notifications.map((item) => ({

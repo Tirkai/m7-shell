@@ -1,18 +1,26 @@
 import { ShellMessageEmitter } from "@algont/m7-shell-emitter";
 import { IExternalApplicationOptions } from "interfaces/options/IExternalApplicationOptions";
-import { action, computed, observable } from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
 import { v4 } from "uuid";
 import { Application } from "./Application";
 export class ExternalApplication extends Application {
-    @observable
     url: string;
 
-    @observable
     customUrl: string = "";
 
     emitter: ShellMessageEmitter;
     constructor(options: IExternalApplicationOptions) {
         super(options);
+
+        makeObservable(this, {
+            url: observable,
+            customUrl: observable,
+            applicationUrl: computed,
+            setEmitterContext: action,
+            setExecuted: action,
+            setCustomUrl: action,
+        });
+
         this.emitter = new ShellMessageEmitter(this.id);
         try {
             const [url, params] = options.url.split("?");
@@ -27,17 +35,15 @@ export class ExternalApplication extends Application {
         }
     }
 
+    get applicationUrl() {
+        return this.customUrl.length ? this.customUrl : this.url;
+    }
+
     setEmitterContext(context: Window) {
         this.emitter.setContext(context);
         return this;
     }
 
-    @computed
-    get applicationUrl() {
-        return this.customUrl.length ? this.customUrl : this.url;
-    }
-
-    @action
     setExecuted(value: boolean) {
         try {
             this.emitter?.clear();
@@ -51,7 +57,6 @@ export class ExternalApplication extends Application {
         return this;
     }
 
-    @action
     setCustomUrl(url: string) {
         this.customUrl = url + "?hash=" + v4();
     }
