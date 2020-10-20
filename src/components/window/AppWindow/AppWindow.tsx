@@ -166,7 +166,6 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
         }
 
         const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
-        const taskBarWidth = 48;
 
         const boundsVisibilityPercentModifier = 0.25;
         const boundsInvisibilityPercentModifier = 0.75;

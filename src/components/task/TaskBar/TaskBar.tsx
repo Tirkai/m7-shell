@@ -92,6 +92,7 @@ export class TaskBar extends Component<IStore> {
                                         }
                                         menu={[
                                             <DropdownMenuItem
+                                                key="close"
                                                 onClick={() =>
                                                     this.handleCloseWindow(
                                                         appWindow,

@@ -1,17 +1,18 @@
 import { ShellEvents } from "enum/ShellEvents";
 import { max, min } from "lodash";
-import { action, computed, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { AppStore } from "./AppStore";
 
 export class WindowManagerStore {
-    @observable
     windows: ApplicationWindow[] = [];
 
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
+
+        makeAutoObservable(this);
 
         window.addEventListener(ShellEvents.FocusShellControls, () =>
             this.clearFocus(),
@@ -26,10 +27,8 @@ export class WindowManagerStore {
         });
     }
 
-    @observable
     focusedWindow: ApplicationWindow | null = null;
 
-    @computed
     get draggedWindow() {
         return this.windows.find((item) => item.isDragging);
     }
@@ -38,13 +37,11 @@ export class WindowManagerStore {
         return this.windows.find((item) => item.application.id === app.id);
     }
 
-    @action
     addWindow(appWindow: ApplicationWindow) {
         this.windows.push(appWindow);
         this.focusWindow(appWindow);
     }
 
-    @action
     focusWindow(appWindow: ApplicationWindow) {
         window.dispatchEvent(new CustomEvent(ShellEvents.FocusAnyWindow));
 
@@ -74,13 +71,11 @@ export class WindowManagerStore {
         this.focusedWindow = appWindow;
     }
 
-    @action
     expandWindow(appWindow: ApplicationWindow) {
         appWindow.setCollapsed(false);
         appWindow.setFocused(true);
     }
 
-    @action
     closeWindow(appWindow: ApplicationWindow) {
         const app = this.store.applicationManager.findById(
             appWindow.application.id,
@@ -92,12 +87,10 @@ export class WindowManagerStore {
         this.windows.splice(this.windows.indexOf(appWindow), 1);
     }
 
-    @action
     closeAllWindows() {
         this.windows = [];
     }
 
-    @action
     clearFocus() {
         this.focusedWindow?.setFocused(false);
         this.focusedWindow = null;

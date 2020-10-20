@@ -11,7 +11,7 @@ import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { Base64 } from "js-base64";
 import { strings } from "locale";
-import { action, computed, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { ExternalApplication } from "models/ExternalApplication";
 import moment, { Moment } from "moment";
 import { authEndpoint, meEndpoint } from "utils/endpoints";
@@ -25,48 +25,35 @@ export class AuthStore {
     private readonly localStorageUserLogin: string = "USER_LOGIN";
     private readonly localStorageDelta: string =
         "DELTA_" + process.env.REACT_APP_BUILD;
-    @observable
+
     accessToken: string = "";
 
-    @observable
     refreshToken: string = "";
 
-    @observable
     userLogin: string = "";
 
-    @observable
     userName: string = "";
 
-    @observable
     roles: RoleType[] = [];
 
-    @observable
     isAuthorized: boolean = false;
 
-    @observable
     deltaTime: number = 0;
 
-    @observable
     renewTime: Moment = moment();
 
-    @observable
     createTime: Moment = moment();
 
-    @observable
     currentTime: Moment = moment();
 
-    @observable
     timeOffset: number = 30000;
 
-    @observable
     checkedAfterStart: boolean = false;
 
-    @computed
     get isAdmin() {
         return this.roles.some((item) => item === RoleType.Admin);
     }
 
-    @computed
     get isSysadmin() {
         return this.roles.some((item) => item === RoleType.Sysadmin);
     }
@@ -84,18 +71,15 @@ export class AuthStore {
         }
     }
 
-    @computed
     get remainingTokenTime() {
         const time = -this.currentTime.diff(this.renewTime) + this.deltaTime;
         return !isNaN(time) ? time : 0;
     }
 
-    @computed
     get remainingTokenTimeInSeconds() {
         return Math.floor((this.remainingTokenTime + this.timeOffset) / 1000);
     }
 
-    @computed
     get isTokenExpired() {
         return this.remainingTokenTime <= 0;
     }
@@ -103,6 +87,8 @@ export class AuthStore {
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
+
+        makeAutoObservable(this);
 
         const authToken = localStorage.getItem(this.localStorageAccessTokenKey);
         const refreshToken = localStorage.getItem(
@@ -128,7 +114,7 @@ export class AuthStore {
         window.addEventListener("focus", () => checkoutRemainingTime());
 
         setInterval(() => {
-            this.currentTime = moment();
+            this.setCurrentTime(moment());
             if (this.isAuthorized) {
                 const hasRemainedTime = checkoutRemainingTime();
                 if (!hasRemainedTime) {
@@ -151,7 +137,7 @@ export class AuthStore {
         );
 
         if (!response.data.error) {
-            this.checkedAfterStart = true;
+            this.setCheckedAfterStart(true);
         }
 
         return new JsonRpcResult({
@@ -160,7 +146,6 @@ export class AuthStore {
         });
     }
 
-    @action
     setToken(accessToken: string, refreshToken: string) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
@@ -190,7 +175,6 @@ export class AuthStore {
             this.deltaTime = parseInt(localStorageDelta);
         }
 
-        const delay = this.remainingTokenTime + this.timeOffset;
         localStorage.setItem(this.localStorageAccessTokenKey, this.accessToken);
 
         localStorage.setItem(
@@ -200,7 +184,6 @@ export class AuthStore {
         Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
     }
 
-    @action
     injectAuthTokenInExternalApplication(app: ExternalApplication) {
         app.emitter.emit(ShellMessageType.UpdateAuthToken, {
             token: this.accessToken,
@@ -234,7 +217,6 @@ export class AuthStore {
         }
     }
 
-    @action
     async login(login: string, password: string) {
         try {
             const response = await Axios.post<IJsonRpcResponse<IAuthResponse>>(
@@ -251,9 +233,9 @@ export class AuthStore {
                     response.data.result.refresh_token,
                 );
 
-                this.isAuthorized = true;
-                this.userLogin = login;
-                this.checkedAfterStart = true;
+                this.setUserLogin(login);
+                this.setAuthorized(true);
+                this.setCheckedAfterStart(true);
 
                 localStorage.setItem(
                     this.localStorageUserLogin,
@@ -271,7 +253,6 @@ export class AuthStore {
         }
     }
 
-    @action
     async fetchUsername() {
         const userNameResponse = await Axios.post<
             IJsonRpcResponse<{ name: string }>
@@ -282,7 +263,6 @@ export class AuthStore {
         }
     }
 
-    @action
     async logout() {
         try {
             const response = await Axios.post<IJsonRpcResponse<unknown>>(
@@ -308,5 +288,21 @@ export class AuthStore {
                 strings.error.connectionError,
             );
         }
+    }
+
+    setCurrentTime(time: Moment) {
+        this.currentTime = time;
+    }
+
+    setAuthorized(value: boolean) {
+        this.isAuthorized = value;
+    }
+
+    setCheckedAfterStart(value: boolean) {
+        this.checkedAfterStart = value;
+    }
+
+    setUserLogin(value: string) {
+        this.userLogin = value;
     }
 }

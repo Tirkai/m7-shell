@@ -1,4 +1,4 @@
-import { action, computed, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { AudioModel } from "models/AudioModel";
 import { AppStore } from "stores/AppStore";
 export class AudioStore {
@@ -8,26 +8,22 @@ export class AudioStore {
 
     constructor(store: AppStore) {
         this.store = store;
+
+        makeAutoObservable(this);
     }
 
-    @observable
     audioPlayer: HTMLAudioElement | null = null;
 
-    @observable
     queue: AudioModel[] = [];
 
-    @observable
     volume: number = 1;
 
-    @observable
     isMute: boolean = false;
 
-    @computed
     get isSoundDisable() {
         return this.isMute || this.volume <= 0;
     }
 
-    @action
     setAudio(audio: HTMLAudioElement) {
         if (audio) {
             this.audioPlayer = audio;
@@ -53,7 +49,6 @@ export class AudioStore {
         }
     }
 
-    @computed
     get isPlaying() {
         return (
             (this.audioPlayer?.duration ?? 0) > 0 &&
@@ -73,7 +68,6 @@ export class AudioStore {
         }
     }
 
-    @action
     playAudio(audio: AudioModel) {
         if (this.audioPlayer && !this.isSoundDisable) {
             if (!this.isPlaying) {
@@ -85,7 +79,6 @@ export class AudioStore {
         }
     }
 
-    @action
     setVolume(value: number) {
         this.volume = value;
         if (this.audioPlayer) {
@@ -100,7 +93,6 @@ export class AudioStore {
         );
     }
 
-    @action
     setMute(value: boolean) {
         this.isMute = value;
 

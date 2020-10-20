@@ -1,6 +1,6 @@
 import { unknownApp } from "assets/icons";
 import { IApplicationOptions } from "interfaces/options/IApplicationOptions";
-import { action, observable } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 
 export class Application {
     id: string;
@@ -12,16 +12,25 @@ export class Application {
     minWidth: number;
     minHeight: number;
 
-    @observable
     isExecuted: boolean = false;
 
-    @observable
     isVisibleInStartMenu: boolean = true;
 
-    @observable
     isAvailable: boolean = true;
 
     constructor(options: IApplicationOptions) {
+        makeObservable(this, {
+            key: observable,
+            name: observable,
+            icon: observable,
+            baseWidth: observable,
+            baseHeight: observable,
+            minWidth: observable,
+            minHeight: observable,
+            setExecuted: action,
+            setAvailable: action,
+        });
+
         this.id = options.id;
         this.name = options.name;
         this.key = options.key ?? options.id;
@@ -34,13 +43,11 @@ export class Application {
         this.isVisibleInStartMenu = options.isVisibleInStartMenu ?? true;
     }
 
-    @action
     setExecuted(value: boolean) {
         this.isExecuted = value;
         return this;
     }
 
-    @action
     setAvailable(value: boolean) {
         this.isAvailable = value;
     }

@@ -1,6 +1,6 @@
 {
     "name": "m7-shell",
-    "version": "0.17.3",
+    "version": "0.18.0",
     "private": true,
     "dependencies": {
         "@algont/m7-shell-emitter": "^0.7.0",
@@ -24,8 +24,9 @@
         "history": "^4.10.1",
         "js-base64": "^3.4.4",
         "lodash": "^4.17.15",
-        "mobx": "^5.15.4",
-        "mobx-react": "^6.2.2",
+        "mobx": "^6.0.1",
+        "mobx-react": "^7.0.0",
+        "mobx-undecorate": "^1.0.2",
         "moment": "^2.26.0",
         "object-hash": "^2.0.3",
         "react": "^16.13.1",
