@@ -129,21 +129,24 @@ export class NotificationStore {
         this.toasts.splice(this.toasts.indexOf(toast), 1);
     }
 
-    async connectToNotificationsSocket(token: string) {
-        const closeSocket = () => {
+    async reconnectToNotificationSocket() {
+        console.warn("Trying reconnect notification socket", {
+            token: this.store.auth.accessToken,
+        });
+
+        await this.disconnectFromNotificationsSocket();
+        this.connectToNotificationsSocket(this.store.auth.accessToken);
+    }
+
+    async disconnectFromNotificationsSocket() {
+        return new Promise((resolve) => {
             this.socket?.close();
             this.socket = null;
-        };
+            resolve();
+        });
+    }
 
-        const reconnectSocket = () => {
-            console.warn("Trying reconnect notification socket", {
-                token: this.store.auth.accessToken,
-            });
-
-            closeSocket();
-            this.connectToNotificationsSocket(this.store.auth.accessToken);
-        };
-
+    async connectToNotificationsSocket(token: string) {
         try {
             if (token.length > 0) {
                 await this.fetchNotifications(this.store.auth.userLogin);
@@ -185,12 +188,14 @@ export class NotificationStore {
                             NotificationServiceConnectStatus.Disconnected,
                         );
 
-                        reconnectSocket();
+                        // this.reconnectToNotificationSocket();
                     });
 
                     window.addEventListener(
                         ShellEvents.Logout,
-                        () => closeSocket(),
+                        () => {
+                            this.disconnectFromNotificationsSocket();
+                        },
                         {
                             once: true,
                         },
@@ -205,7 +210,10 @@ export class NotificationStore {
             console.error(e);
             this.status = NotificationServiceConnectStatus.Disconnected;
             if (this.store.auth.isAuthorized) {
-                setTimeout(() => reconnectSocket(), 3000);
+                setTimeout(
+                    async () => this.reconnectToNotificationSocket(),
+                    3000,
+                );
             }
         }
     }
