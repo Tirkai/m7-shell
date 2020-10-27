@@ -17,6 +17,7 @@ interface IAppWindowHeaderProps {
     onCollapse: () => void;
     onBackward: () => void;
     onReload: () => void;
+    visible: boolean;
 }
 
 export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
@@ -27,6 +28,7 @@ export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
                     "appWindowHeader",
                     style.appWindowHeader,
                     { [style.focused]: this.props.isFocused },
+                    { [style.visible]: this.props.visible },
                 )}
                 onDoubleClick={this.props.onDoubleClick}
             >

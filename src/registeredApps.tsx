@@ -1,6 +1,7 @@
 import { UPPER_LEVEL_DOMAIN } from "constants/config";
 import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
 import { EmitterLogger } from "extensions/EmitterLogger/EmitterLogger";
+import { LaunchQueryBuilder } from "extensions/LaunchQueryBuilder/LaunchQueryBuilder";
 import { strings } from "locale";
 import { Application } from "models/Application";
 import { ExternalApplication } from "models/ExternalApplication";
@@ -13,7 +14,7 @@ export const registeredApps: Application[] = [
         id: v4(),
         name: strings.definedApplications.accountsMe,
         key: "AccountsMe",
-        url: `http://accounts.${UPPER_LEVEL_DOMAIN}/#/me`,
+        url: `http://me.${UPPER_LEVEL_DOMAIN}/#/me`,
         baseWidth: 800,
         baseHeight: 650,
         isVisibleInStartMenu: false,
@@ -41,6 +42,15 @@ export const registeredApps: Application[] = [
         name: "EmitterLogger",
         key: "EmitterLogger",
         Component: <EmitterLogger />,
+        baseWidth: 700,
+        baseHeight: 600,
+        isVisibleInStartMenu: false,
+    }),
+    new ShellApplication({
+        id: v4(),
+        name: "LaunchQueryBuilder",
+        key: "LaunchQueryBuilder",
+        Component: <LaunchQueryBuilder />,
         baseWidth: 700,
         baseHeight: 600,
         isVisibleInStartMenu: false,

@@ -9,6 +9,9 @@
     background: url("../../../assets/images/wallpaper_blur.jpg");
     background-size: cover;
     background-attachment: fixed;
+    transform: translateY(48px);
+    transition: ease 0.3s;
+    pointer-events: none;
 }
 .container {
     display: flex;
@@ -22,4 +25,9 @@
 
 .actions {
     display: flex;
+}
+
+.show {
+    pointer-events: all;
+    transform: translateY(0);
 }

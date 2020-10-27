@@ -234,12 +234,21 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                                 onReload={() => true}
                                 onCollapse={() => this.handleCollapse()}
                                 onFullscreen={() => this.handleFullScreen()}
+                                visible={
+                                    this.store.shell.displayMode
+                                        .showAppWindowHeader
+                                }
                             />
                             <AppLoader
                                 icon={this.props.application.icon}
                                 disabled={this.state.isAppReady}
                             />
-                            <div className={classNames(style.content)}>
+                            <div
+                                className={classNames(style.content, {
+                                    [style.withHeader]: this.store.shell
+                                        .displayMode.showAppWindowHeader,
+                                })}
+                            >
                                 {this.appComponent && this.appComponent}
                             </div>
                             <AppWindowUnfocusedOverlay

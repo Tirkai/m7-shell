@@ -11,6 +11,7 @@ export class Application {
     baseHeight: number;
     minWidth: number;
     minHeight: number;
+    isFullscreen: boolean = false;
 
     isExecuted: boolean = false;
 
@@ -27,6 +28,7 @@ export class Application {
             baseHeight: observable,
             minWidth: observable,
             minHeight: observable,
+            isFullscreen: observable,
             setExecuted: action,
             setAvailable: action,
         });
@@ -41,6 +43,7 @@ export class Application {
         this.minWidth = options.minWidth ?? 400;
         this.minHeight = options.minHeight ?? 300;
         this.isVisibleInStartMenu = options.isVisibleInStartMenu ?? true;
+        this.isFullscreen = options.isFullscreen ?? false;
     }
 
     setExecuted(value: boolean) {

@@ -2,6 +2,7 @@
     height: 30px;
     background: #222;
     /* background: #00519c; */
+    display: none;
     width: 100%;
 }
 .container {
@@ -47,4 +48,8 @@
 }
 .focused {
     background: #0a3965;
+}
+
+.visible {
+    display: flex;
 }

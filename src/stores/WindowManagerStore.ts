@@ -1,4 +1,5 @@
 import { ShellEvents } from "enum/ShellEvents";
+import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { max, min } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/Application";
@@ -31,6 +32,12 @@ export class WindowManagerStore {
 
     get draggedWindow() {
         return this.windows.find((item) => item.isDragging);
+    }
+
+    onChangeDisplayMode(mode: IDisplayMode) {
+        this.windows.forEach((item) => {
+            item.setDispayMode(mode);
+        });
     }
 
     findWindowByApp(app: Application) {

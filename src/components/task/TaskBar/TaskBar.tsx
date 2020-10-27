@@ -1,12 +1,13 @@
 import { SVGIcon } from "@algont/m7-ui";
 import { apps } from "assets/icons";
+import classNames from "classnames";
 import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
 import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
 import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
-import { computed } from "mobx";
+import { computed, reaction } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
@@ -23,6 +24,10 @@ export class TaskBar extends Component<IStore> {
     get store() {
         return this.props.store!;
     }
+
+    state = {
+        isShow: false,
+    };
 
     handleShowAppsMenu = (value: boolean) => {
         if (this.store.applicationManager.applications.length) {
@@ -66,10 +71,29 @@ export class TaskBar extends Component<IStore> {
         this.store.windowManager.closeWindow(appWindow);
     };
 
+    componentDidMount() {
+        this.setState({
+            isShow: this.store.shell.displayMode.taskbarVisible,
+        });
+
+        reaction(
+            () => this.store.shell.displayMode,
+            () => {
+                this.setState({
+                    isShow: this.store.shell.displayMode.taskbarVisible,
+                });
+            },
+        );
+    }
+
     render() {
         return (
             <>
-                <div className={style.taskBar}>
+                <div
+                    className={classNames(style.taskBar, {
+                        [style.show]: this.state.isShow,
+                    })}
+                >
                     <div className={style.container}>
                         <div className={style.tasks}>
                             <TaskBarItem

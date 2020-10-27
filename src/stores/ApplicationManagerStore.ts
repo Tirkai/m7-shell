@@ -111,7 +111,9 @@ export class ApplicationManagerStore {
                             id: v4(),
                             width: appParams.width ?? app.baseWidth,
                             height: appParams.height ?? app.baseHeight,
-                            isFullscreen: appParams.maximize ?? false,
+                            isFullscreen:
+                                appParams.maximize ?? app.isFullscreen ?? false,
+                            dispayMode: this.store.shell.displayMode,
                         }),
                     );
 
@@ -163,6 +165,7 @@ export class ApplicationManagerStore {
                     id: v4(),
                     width: app.baseWidth,
                     height: app.baseHeight,
+                    dispayMode: this.store.shell.displayMode,
                 }),
             );
         } else {

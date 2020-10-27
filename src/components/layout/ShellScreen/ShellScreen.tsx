@@ -31,27 +31,35 @@ export class ShellScreen extends Component<IStore> {
         await this.store.applicationManager.fetchApplications();
 
         const urlParams = new URL(window.location.href).searchParams;
-
+        const enableAutoRun = urlParams.get("enableAutoRun");
         const autoRunApp = urlParams.get("autoRunApp");
-
         const autoRunUrl = urlParams.get("autoRunUrl");
+        const autoRunFullscreen = urlParams.get("autoRunFullscreen");
 
-        if (autoRunApp) {
-            const app = this.store.applicationManager.findByKey(autoRunApp);
+        if (!!parseInt(enableAutoRun ?? "0")) {
+            const isAutorunFullscreen = !!parseInt(autoRunFullscreen ?? "0");
 
-            if (app) {
+            if (autoRunApp) {
+                const app = this.store.applicationManager.findByKey(autoRunApp);
+
+                if (app) {
+                    this.store.applicationManager.executeApplication(app);
+                }
+            }
+
+            if (autoRunUrl) {
+                const app = new ExternalApplication({
+                    id: v4(),
+                    name: autoRunUrl,
+                    url: autoRunUrl,
+                    isFullscreen: isAutorunFullscreen,
+                    isVisibleInStartMenu: false,
+                });
+
+                this.store.applicationManager.addApplication(app);
+
                 this.store.applicationManager.executeApplication(app);
             }
-        }
-
-        if (autoRunUrl) {
-            const app = new ExternalApplication({
-                id: v4(),
-                name: autoRunUrl,
-                url: autoRunUrl,
-            });
-
-            this.store.applicationManager.executeApplication(app);
         }
 
         this.store.notification.connectToNotificationsSocket(

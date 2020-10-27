@@ -8,4 +8,5 @@ export interface IApplicationOptions {
     isVisibleInStartMenu?: boolean;
     minWidth?: number;
     minHeight?: number;
+    isFullscreen?: boolean;
 }
