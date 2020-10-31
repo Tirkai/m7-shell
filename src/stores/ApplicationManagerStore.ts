@@ -8,6 +8,7 @@ import Axios from "axios";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicationResponse";
 import { strings } from "locale";
+import { difference, intersectionWith } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
@@ -213,6 +214,40 @@ export class ApplicationManagerStore {
             } else {
                 this.store.auth.logout();
             }
+        }
+    }
+
+    async fetchUpdateApplications() {
+        const response = await Axios.post<
+            IJsonRpcResponse<IPortalApplicationResponse[]>
+        >(portalEndpoint.url, new JsonRpcPayload("getComponents"));
+
+        if (!response.data.error) {
+            const portalApplications = response.data.result.map(
+                (item) =>
+                    new ExternalApplication({
+                        id: item.id,
+                        name: item.name,
+                        url: item.guiUrl,
+                        icon: item.iconUrl,
+                        key: item.id,
+                    }),
+            );
+
+            const diffIds = difference(
+                portalApplications.map((item) => item.id),
+                this.applications
+                    .filter((item) => item instanceof ExternalApplication)
+                    .map((item) => item.id),
+            );
+
+            this.addApplicationsList(
+                intersectionWith(
+                    portalApplications,
+                    diffIds,
+                    (a, b) => a.id === b,
+                ),
+            );
         }
     }
 

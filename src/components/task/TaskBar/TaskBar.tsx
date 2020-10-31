@@ -34,6 +34,10 @@ export class TaskBar extends Component<IStore> {
             this.store.shell.setActivePanel(
                 value ? ShellPanelType.StartMenu : ShellPanelType.None,
             );
+
+            if (this.store.applicationManager.applications.length > 0) {
+                this.store.applicationManager.fetchUpdateApplications();
+            }
         } else {
             this.store.message.showMessage(
                 strings.error.noAvailableApplications,

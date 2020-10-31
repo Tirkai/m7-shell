@@ -2,9 +2,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(-45deg, #096dd9, #4d98e8);
+    width: 100%;
+    height: 100%;
+    /* background: linear-gradient(-45deg, #096dd9, #4d98e8); */
     border-radius: 50%;
     transition: ease 0.3s;
 }

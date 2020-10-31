@@ -12,6 +12,24 @@ import { v4 } from "uuid";
 export const registeredApps: Application[] = [
     new ExternalApplication({
         id: v4(),
+        name: "Localhost:3000",
+        key: "Localhost:3000",
+        url: `http://localhost:3000`,
+        baseWidth: 800,
+        baseHeight: 650,
+        isVisibleInStartMenu: false,
+    }),
+    new ExternalApplication({
+        id: v4(),
+        name: "Localhost:3001",
+        key: "Localhost:3001",
+        url: `http://localhost:3001`,
+        baseWidth: 800,
+        baseHeight: 650,
+        isVisibleInStartMenu: false,
+    }),
+    new ExternalApplication({
+        id: v4(),
         name: strings.definedApplications.accountsMe,
         key: "AccountsMe",
         url: `http://me.${UPPER_LEVEL_DOMAIN}/#/me`,
