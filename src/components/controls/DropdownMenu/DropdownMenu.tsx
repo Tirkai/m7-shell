@@ -1,5 +1,6 @@
 import { ClickAwayListener } from "@material-ui/core";
 import classNames from "classnames";
+import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import React, { Component } from "react";
 import style from "./style.module.css";
 
@@ -64,9 +65,11 @@ export class DropdownMenu extends Component<IDropdownMenuProps> {
                         )}
                         onClick={() => this.handleShowDropdown(false)}
                     >
-                        <div className={style.container}>
-                            {this.props.render}
-                        </div>
+                        <BackdropWrapper>
+                            <div className={style.container}>
+                                {this.props.render}
+                            </div>
+                        </BackdropWrapper>
                     </div>
                 </div>
             </ClickAwayListener>

@@ -1,4 +1,5 @@
 import { unknownApp } from "assets/icons";
+import { ApplicationPlace } from "enum/ApplicationPlace";
 import { IApplicationOptions } from "interfaces/options/IApplicationOptions";
 import { action, makeObservable, observable } from "mobx";
 
@@ -12,6 +13,7 @@ export class Application {
     minWidth: number;
     minHeight: number;
     isFullscreen: boolean = false;
+    place: ApplicationPlace = ApplicationPlace.Unknown;
 
     isExecuted: boolean = false;
 
@@ -29,6 +31,7 @@ export class Application {
             minWidth: observable,
             minHeight: observable,
             isFullscreen: observable,
+            place: observable,
             setExecuted: action,
             setAvailable: action,
         });
@@ -44,6 +47,7 @@ export class Application {
         this.minHeight = options.minHeight ?? 300;
         this.isVisibleInStartMenu = options.isVisibleInStartMenu ?? true;
         this.isFullscreen = options.isFullscreen ?? false;
+        this.place = options.place ?? ApplicationPlace.Unknown;
     }
 
     setExecuted(value: boolean) {

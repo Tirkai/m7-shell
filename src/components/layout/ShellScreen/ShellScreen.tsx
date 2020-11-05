@@ -174,5 +174,3 @@ export class ShellScreen extends Component<IStore> {
         );
     }
 }
-
-export default ShellScreen;

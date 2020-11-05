@@ -8,8 +8,8 @@
     color: white;
 }
 .taskBarItem svg {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
 }
 .taskBarItem:hover {
     background: rgba(255, 255, 255, 0.2);

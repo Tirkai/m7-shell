@@ -6,7 +6,6 @@
     width: 100%;
     display: flex;
     z-index: 100;
-    background: url("../../../assets/images/wallpaper_blur.jpg");
     background-size: cover;
     background-attachment: fixed;
     transform: translateY(48px);
@@ -17,7 +16,7 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
-    background: #000c;
+    background: #000000cc;
 }
 .tasks {
     display: flex;

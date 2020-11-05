@@ -7,12 +7,17 @@ import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
+import { Application } from "models/Application";
 import React, { Component } from "react";
 import style from "./style.module.css";
 
+interface IAppsProfilePreviewProps extends IStore {
+    apps: Application[];
+}
+
 @inject("store")
 @observer
-export class AppsProfilePreview extends Component<IStore> {
+export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
     @computed
     get store() {
         return this.props.store!;
@@ -39,24 +44,33 @@ export class AppsProfilePreview extends Component<IStore> {
         const userInitials = UtilsFunctions.getInitials(
             this.store.auth.userName,
         );
+
         return (
             <>
                 <div className={style.appsProfilePreview}>
                     <DropdownMenu
                         position="bottomLeft"
                         render={[
-                            <DropdownMenuItem
-                                key="accounts"
-                                onClick={this.handleOpenAccountManager}
-                            >
-                                {strings.startMenu.editAccount}
-                            </DropdownMenuItem>,
-                            <DropdownMenuItem
-                                key="logout"
-                                onClick={this.handleLogout}
-                            >
-                                {strings.startMenu.logout}
-                            </DropdownMenuItem>,
+                            ...this.props.apps.map((app) => (
+                                <DropdownMenuItem
+                                    key={app.id}
+                                    onClick={async () =>
+                                        this.store.applicationManager.executeApplication(
+                                            app,
+                                        )
+                                    }
+                                >
+                                    {app.name}
+                                </DropdownMenuItem>
+                            )),
+                            ...[
+                                <DropdownMenuItem
+                                    key="logout"
+                                    onClick={this.handleLogout}
+                                >
+                                    {strings.startMenu.logout}
+                                </DropdownMenuItem>,
+                            ],
                         ]}
                     >
                         <Avatar

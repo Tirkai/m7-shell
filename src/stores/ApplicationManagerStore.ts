@@ -188,8 +188,13 @@ export class ApplicationManagerStore {
             this.applications = [];
 
             const response = await Axios.post<
-                IJsonRpcResponse<IPortalApplicationResponse[]>
-            >(portalEndpoint.url, new JsonRpcPayload("getComponents"));
+                IJsonRpcResponse<IPortalApplicationResponse<IAppParams>[]>
+            >(
+                portalEndpoint.url,
+                new JsonRpcPayload("getComponents", {
+                    with_shell_params: true,
+                }),
+            );
 
             if (!response.data.error) {
                 const portalApplications = response.data.result.map(
@@ -200,6 +205,7 @@ export class ApplicationManagerStore {
                             url: item.guiUrl,
                             icon: item.iconUrl,
                             key: item.id,
+                            place: item.shellParams?.item_place,
                         }),
                 );
                 this.addApplicationsList(portalApplications);
@@ -219,8 +225,11 @@ export class ApplicationManagerStore {
 
     async fetchUpdateApplications() {
         const response = await Axios.post<
-            IJsonRpcResponse<IPortalApplicationResponse[]>
-        >(portalEndpoint.url, new JsonRpcPayload("getComponents"));
+            IJsonRpcResponse<IPortalApplicationResponse<IAppParams>[]>
+        >(
+            portalEndpoint.url,
+            new JsonRpcPayload("getComponents", { with_shell_params: true }),
+        );
 
         if (!response.data.error) {
             const portalApplications = response.data.result.map(

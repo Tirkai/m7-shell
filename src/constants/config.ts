@@ -1,6 +1,6 @@
 const nodeEnv = process.env.NODE_ENV;
 
-const developmentDomain = "aspk";
+const developmentDomain = "algonttest";
 
 const [, upperLevelDomain] = window.location.hostname.split(".");
 

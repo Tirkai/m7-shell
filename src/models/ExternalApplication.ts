@@ -9,6 +9,7 @@ export class ExternalApplication extends Application {
     customUrl: string = "";
 
     emitter: ShellMessageEmitter;
+
     constructor(options: IExternalApplicationOptions) {
         super(options);
 

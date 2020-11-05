@@ -2,7 +2,7 @@
     display: inline-flex;
     position: absolute;
     flex-direction: column;
-    background: url("../../../assets/images/wallpaper_blur.jpg");
+    /* background: url("../../../assets/images/wallpaper_blur.jpg"); */
     background-attachment: fixed;
     color: white;
     min-width: 200px;
@@ -20,7 +20,7 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: #000000aa;
 }
 .show {
     pointer-events: all;

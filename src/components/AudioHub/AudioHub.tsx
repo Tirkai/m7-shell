@@ -2,6 +2,7 @@ import { SVGIcon } from "@algont/m7-ui";
 import { Slider } from "@material-ui/core";
 import { mute, sound, soundLow, soundMiddle } from "assets/icons";
 import classNames from "classnames";
+import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
@@ -16,6 +17,10 @@ export class AudioHub extends Component<IStore> {
     get store() {
         return this.props.store!;
     }
+
+    state = {
+        isShowBackdrop: false,
+    };
 
     handleChangeVolume = (value: number | number[]) => {
         if (typeof value === "number") {
@@ -44,6 +49,18 @@ export class AudioHub extends Component<IStore> {
         }
     };
 
+    handleAnimationStart = () => {
+        this.setState({
+            isShowBackdrop: false,
+        });
+    };
+
+    handleAnimationEnd = () => {
+        this.setState({
+            isShowBackdrop: true,
+        });
+    };
+
     render() {
         return (
             <div
@@ -52,33 +69,40 @@ export class AudioHub extends Component<IStore> {
                         this.store.shell.activePanel ===
                         ShellPanelType.AudioHub,
                 })}
+                onAnimationStart={this.handleAnimationStart}
+                onAnimationEnd={this.handleAnimationEnd}
             >
-                <div className={style.container}>
-                    <div className={style.content}>
-                        <div className={style.icon} onClick={this.handleMute}>
-                            {!this.store.audio.isMute ? (
-                                this.getIconByVolume()
-                            ) : (
-                                <SVGIcon source={mute} key="soundDisable" />
-                            )}
-                        </div>
-                        <div className={style.volume}>
-                            <Slider
-                                value={this.store.audio.volume}
-                                onChange={(event, value) =>
-                                    this.handleChangeVolume(value)
-                                }
-                                classes={{
-                                    track: style.slider,
-                                    thumb: style.slider,
-                                }}
-                                min={0}
-                                max={1}
-                                step={0.01}
-                            ></Slider>
+                <BackdropWrapper active={this.state.isShowBackdrop}>
+                    <div className={style.container}>
+                        <div className={style.content}>
+                            <div
+                                className={style.icon}
+                                onClick={this.handleMute}
+                            >
+                                {!this.store.audio.isMute ? (
+                                    this.getIconByVolume()
+                                ) : (
+                                    <SVGIcon source={mute} key="soundDisable" />
+                                )}
+                            </div>
+                            <div className={style.volume}>
+                                <Slider
+                                    value={this.store.audio.volume}
+                                    onChange={(event, value) =>
+                                        this.handleChangeVolume(value)
+                                    }
+                                    classes={{
+                                        track: style.slider,
+                                        thumb: style.slider,
+                                    }}
+                                    min={0}
+                                    max={1}
+                                    step={0.01}
+                                ></Slider>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </BackdropWrapper>
             </div>
         );
     }

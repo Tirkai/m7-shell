@@ -9,25 +9,26 @@
     pointer-events: none;
     z-index: 100;
     max-height: calc(100vh - 48px);
-    background: url("../../../assets/images/wallpaper_blur.jpg");
+    /* background: url("../../../assets/images/wallpaper_blur.jpg"); */
     background-size: cover;
     background-attachment: fixed;
     border-top-right-radius: 4px;
     overflow: hidden;
 }
 
-.visible {
+.show {
     opacity: 1;
     transform: translateY(0);
     padding: 0;
     pointer-events: all;
+    animation: show 0.3s;
 }
 .container {
     display: grid;
     grid-template-columns: 48px 1fr;
     box-sizing: border-box;
     height: 100%;
-    background: #222222cc;
+    background: #222222e9;
     border-top-right-radius: 4px;
 }
 
@@ -69,4 +70,16 @@
 .notFoundApps {
     grid-column: span 3;
     color: white;
+}
+@keyframes show {
+    0% {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(50%);
+    }
+    100% {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0);
+    }
 }

@@ -1,3 +1,5 @@
+import { ApplicationPlace } from "enum/ApplicationPlace";
+
 export interface IApplicationOptions {
     id: string;
     name: string;
@@ -9,4 +11,5 @@ export interface IApplicationOptions {
     minWidth?: number;
     minHeight?: number;
     isFullscreen?: boolean;
+    place?: ApplicationPlace;
 }

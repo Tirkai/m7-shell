@@ -1,0 +1,17 @@
+.backdropWrapper {
+    transition: background ease 0.3s;
+    background: #222222;
+    width: 100%;
+    height: inherit;
+}
+
+.active {
+    background: none;
+    backdrop-filter: blur(10px);
+}
+
+@supports not (backdrop-filter: blur(10px)) {
+    .active {
+        background: #222222;
+    }
+}
