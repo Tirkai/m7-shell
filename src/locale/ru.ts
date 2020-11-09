@@ -1,4 +1,7 @@
 export const ru = {
+    global: {
+        systemName: "M7",
+    },
     error: {
         anOccurredError: "Произошла ошибка",
         connectionError: "Не удалось установить соединение с сервером",

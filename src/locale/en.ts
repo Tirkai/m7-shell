@@ -1,4 +1,7 @@
 export const en = {
+    global: {
+        systemName: "M7",
+    },
     error: {
         anOccurredError: "An occurred error",
         connectionError: "Failed to establish a connection to the server",

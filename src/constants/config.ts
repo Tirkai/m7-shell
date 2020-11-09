@@ -10,5 +10,3 @@ export const UPPER_LEVEL_DOMAIN =
     nodeEnv === "development" ? developmentDomain : upperLevelDomain;
 
 export const NOTIFICATIONS_WEBSOCKET_URL = `http://notifications.${UPPER_LEVEL_DOMAIN}/socket.io`;
-
-export const TASKBAR_HEIGHT = 48;

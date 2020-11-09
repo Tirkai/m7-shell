@@ -1,5 +1,5 @@
 import { AudioContainer } from "components/audio/AudioContainer/AudioContainer";
-import { AudioHub } from "components/AudioHub/AudioHub";
+import { AudioHub } from "components/audio/AudioHub/AudioHub";
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";

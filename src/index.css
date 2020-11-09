@@ -9,7 +9,7 @@ body {
     background: #fafafa;
     min-height: 100vh;
     user-select: none;
-    background: url("/wallpapers/woods.jpg");
+    background: url("/wallpapers/wallpaper.jpg");
     background-size: cover;
     background-attachment: fixed;
 }

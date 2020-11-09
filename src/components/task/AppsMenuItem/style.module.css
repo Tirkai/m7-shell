@@ -19,9 +19,9 @@
 }
 
 .appsMenuItem.executed:hover {
-    border: 1px solid transparent;
+    /* border: 1px solid transparent;
     background: #444;
-    cursor: default;
+    cursor: default; */
 }
 
 .title {

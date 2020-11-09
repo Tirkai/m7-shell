@@ -44,7 +44,14 @@ export class AppsMenu extends Component<IStore> {
 
     handleExecuteApp = (app: Application) => {
         if (app.isAvailable) {
-            this.store.applicationManager.executeApplication(app);
+            if (!app.isExecuted) {
+                this.store.applicationManager.executeApplication(app);
+            } else {
+                const appWindow = this.store.windowManager.findWindowByApp(app);
+                if (appWindow) {
+                    this.store.windowManager.focusWindow(appWindow);
+                }
+            }
         }
     };
 
