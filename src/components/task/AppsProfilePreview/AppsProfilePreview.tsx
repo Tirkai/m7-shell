@@ -9,6 +9,7 @@ import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
 import React, { Component } from "react";
+import { AppsMenuSidebarListItem } from "../AppsMenuSidebarListItem/AppsMenuSidebarListItem";
 import style from "./style.module.css";
 
 interface IAppsProfilePreviewProps extends IStore {
@@ -46,33 +47,33 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
         );
 
         return (
-            <>
-                <div className={style.appsProfilePreview}>
-                    <DropdownMenu
-                        position="bottomLeft"
-                        render={[
-                            ...this.props.apps.map((app) => (
-                                <DropdownMenuItem
-                                    key={app.id}
-                                    onClick={async () =>
-                                        this.store.applicationManager.executeApplication(
-                                            app,
-                                        )
-                                    }
-                                >
-                                    {app.name}
-                                </DropdownMenuItem>
-                            )),
-                            ...[
-                                <DropdownMenuItem
-                                    key="logout"
-                                    onClick={this.handleLogout}
-                                >
-                                    {strings.startMenu.logout}
-                                </DropdownMenuItem>,
-                            ],
-                        ]}
-                    >
+            <DropdownMenu
+                position="bottomLeft"
+                render={[
+                    ...this.props.apps.map((app) => (
+                        <DropdownMenuItem
+                            key={app.id}
+                            onClick={async () =>
+                                this.store.applicationManager.executeApplication(
+                                    app,
+                                )
+                            }
+                        >
+                            {app.name}
+                        </DropdownMenuItem>
+                    )),
+                    ...[
+                        <DropdownMenuItem
+                            key="logout"
+                            onClick={this.handleLogout}
+                        >
+                            {strings.startMenu.logout}
+                        </DropdownMenuItem>,
+                    ],
+                ]}
+            >
+                <AppsMenuSidebarListItem>
+                    <div className={style.appsProfilePreview}>
                         <Avatar
                             style={{
                                 background: `linear-gradient(-45deg, ${UtilsFunctions.stringToHslColor(
@@ -89,9 +90,9 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
                         >
                             {userInitials}
                         </Avatar>
-                    </DropdownMenu>
-                </div>
-            </>
+                    </div>
+                </AppsMenuSidebarListItem>
+            </DropdownMenu>
         );
     }
 }

@@ -12,6 +12,7 @@ import React, { Component } from "react";
 import { AppsMenuItem } from "../AppsMenuItem/AppsMenuItem";
 import AppsMenuSearch from "../AppsMenuSearch/AppsMenuSearch";
 import AppsProfilePreview from "../AppsProfilePreview/AppsProfilePreview";
+import { AppsSettings } from "../AppsSettings/AppsSettings";
 import { AppsShellLogo } from "../AppsShellLogo/AppsShellLogo";
 import style from "./style.module.css";
 
@@ -88,6 +89,11 @@ export class AppsMenu extends Component<IStore> {
             ApplicationPlace.UserMenu,
         );
 
+        const settingsMenuApps = this.getFilteredByPlace(
+            this.store.applicationManager.applications,
+            ApplicationPlace.Settings,
+        );
+
         const shellMenuApps = this.getFilteredByPlace(
             this.store.applicationManager.applications,
             ApplicationPlace.M7Menu,
@@ -154,6 +160,7 @@ export class AppsMenu extends Component<IStore> {
                                 </div>
                             </div>
                             <div className={style.sidebarBottom}>
+                                <AppsSettings apps={settingsMenuApps} />
                                 <AppsProfilePreview apps={userMenuApps} />
                             </div>
                         </div>

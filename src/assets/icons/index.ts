@@ -8,6 +8,7 @@ import fullscreen from "./fullscreen.svg";
 import mute from "./mute.svg";
 import notificationsNone from "./notifications-none.svg";
 import notifications from "./notifications.svg";
+import settings from "./settings.svg";
 import soundLow from "./sound-low.svg";
 import soundMiddle from "./sound-middle.svg";
 import sound from "./sound.svg";
@@ -32,4 +33,5 @@ export {
     sound,
     soundMiddle,
     soundLow,
+    settings,
 };

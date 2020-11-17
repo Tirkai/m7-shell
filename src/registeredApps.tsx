@@ -1,6 +1,6 @@
-import { UPPER_LEVEL_DOMAIN } from "constants/config";
+import { ApplicationPlace } from "enum/ApplicationPlace";
 import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
-import { EmitterLogger } from "extensions/EmitterLogger/EmitterLogger";
+import { DevModeView } from "extensions/DevModeView/DevModeView";
 import { LaunchQueryBuilder } from "extensions/LaunchQueryBuilder/LaunchQueryBuilder";
 import { strings } from "locale";
 import { Application } from "models/Application";
@@ -28,24 +28,6 @@ export const registeredApps: Application[] = [
         baseHeight: 650,
         isVisibleInStartMenu: false,
     }),
-    new ExternalApplication({
-        id: v4(),
-        name: strings.definedApplications.accountsMe,
-        key: "AccountsMe",
-        url: `http://me.${UPPER_LEVEL_DOMAIN}/#/me`,
-        baseWidth: 800,
-        baseHeight: 650,
-        isVisibleInStartMenu: false,
-    }),
-    new ExternalApplication({
-        id: v4(),
-        name: strings.definedApplications.license,
-        key: "License",
-        url: `http://license.${UPPER_LEVEL_DOMAIN}`,
-        baseWidth: 800,
-        baseHeight: 650,
-        isVisibleInStartMenu: false,
-    }),
     new ShellApplication({
         id: v4(),
         name: "CustomExecutor",
@@ -57,20 +39,21 @@ export const registeredApps: Application[] = [
     }),
     new ShellApplication({
         id: v4(),
-        name: "EmitterLogger",
-        key: "EmitterLogger",
-        Component: <EmitterLogger />,
-        baseWidth: 700,
-        baseHeight: 600,
+        name: strings.shellApps.launchQueryBuilder.title,
+        key: "LaunchQueryBuilder",
+        Component: <LaunchQueryBuilder />,
+        baseWidth: 600,
+        baseHeight: 700,
         isVisibleInStartMenu: false,
     }),
     new ShellApplication({
         id: v4(),
-        name: "LaunchQueryBuilder",
-        key: "LaunchQueryBuilder",
-        Component: <LaunchQueryBuilder />,
-        baseWidth: 700,
+        name: "DevMode",
+        key: "DevMode",
+        Component: <DevModeView />,
+        baseWidth: 800,
         baseHeight: 600,
         isVisibleInStartMenu: false,
+        place: ApplicationPlace.M7Menu,
     }),
 ];

@@ -51,4 +51,22 @@ export const ru = {
         license: "Лицензионная защита",
         accountsMe: "Профиль",
     },
+
+    shellApps: {
+        launchQueryBuilder: {
+            title: "Параметры запуска",
+            autoRunTitle: "Автозапуск",
+            autoRunType: "Тип автозапуска",
+            autoRunApplication: "Приложение",
+            autoRunApplicationChoose: "Выбрать",
+            autoRunUrl: "URL",
+            autoRunFullscreen: "Полноэкранный",
+            autoLoginTitle: "Автологин",
+            autoLoginFieldLogin: "Логин",
+            autoLoginFieldPassword: "Пароль",
+            displayModeTitle: "Режим отображения",
+            displayModeDefault: "По умолчанию",
+            displayModeEmbed: "Встраиваемый",
+        },
+    },
 };

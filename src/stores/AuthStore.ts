@@ -274,6 +274,8 @@ export class AuthStore {
 
             dispatchEvent(new CustomEvent(ShellEvents.Logout));
 
+            this.store.windowManager.closeAllWindows();
+
             localStorage.removeItem(this.localStorageAccessTokenKey);
             this.accessToken = "";
             this.isAuthorized = false;

@@ -21,6 +21,7 @@ import classNames from "classnames";
 import { FormKeyValueRow } from "components/formLayout/FormKeyValueRow/FormKeyValueRow";
 import { DisplayModeType } from "enum/DisplayModeType";
 import { IStore } from "interfaces/common/IStore";
+import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
@@ -100,10 +101,11 @@ export class LaunchQueryBuilder extends Component<IStore> {
     }
 
     render() {
+        const locale = strings.shellApps.launchQueryBuilder;
         return (
             <>
                 <ContentWithHeaderLayout
-                    header={<PageHeader title={"Launch Query Builder"} />}
+                    header={<PageHeader title={locale.title} />}
                     layoutUnitType="percent"
                     content={
                         <ContentWithFooterLayout
@@ -124,7 +126,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                             }}
                                         >
                                             <FormKeyValueRow>
-                                                <span>Autorun</span>
+                                                <span>
+                                                    {locale.autoRunTitle}
+                                                </span>
                                                 <span>
                                                     <Switch
                                                         color="primary"
@@ -151,7 +155,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                                     <FormItem>
                                                         <FormKeyValueRow>
                                                             <span>
-                                                                Autorun Type
+                                                                {
+                                                                    locale.autoRunType
+                                                                }
                                                             </span>
                                                             <span>
                                                                 <ButtonGroup
@@ -172,7 +178,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                                                             )
                                                                         }
                                                                     >
-                                                                        App
+                                                                        {
+                                                                            locale.autoRunApplication
+                                                                        }
                                                                     </Button>
                                                                     <Button
                                                                         className={classNames(
@@ -188,7 +196,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                                                             )
                                                                         }
                                                                     >
-                                                                        Url
+                                                                        {
+                                                                            locale.autoRunUrl
+                                                                        }
                                                                     </Button>
                                                                 </ButtonGroup>
                                                             </span>
@@ -201,7 +211,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                                             <FormItem>
                                                                 <FormKeyValueRow>
                                                                     <span>
-                                                                        App
+                                                                        {
+                                                                            locale.autoRunApplication
+                                                                        }
                                                                     </span>
                                                                     <span>
                                                                         <Button
@@ -214,11 +226,12 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                                                             }
                                                                         >
                                                                             {store.autoRunApp
-                                                                                ? "App: " +
+                                                                                ? locale.autoRunApplication +
+                                                                                  ": " +
                                                                                   store
                                                                                       .autoRunApp
                                                                                       .name
-                                                                                : "Choose"}
+                                                                                : locale.autoRunApplicationChoose}
                                                                         </Button>
                                                                     </span>
                                                                 </FormKeyValueRow>
@@ -234,7 +247,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                                             <FormItem>
                                                                 <FormKeyValueRow>
                                                                     <span>
-                                                                        URL
+                                                                        {
+                                                                            locale.autoRunUrl
+                                                                        }
                                                                     </span>
                                                                     <span>
                                                                         <TextField
@@ -261,7 +276,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                                     <FormItem>
                                                         <FormKeyValueRow>
                                                             <span>
-                                                                Fullscreen
+                                                                {
+                                                                    locale.autoRunFullscreen
+                                                                }
                                                             </span>
                                                             <span>
                                                                 <Switch
@@ -302,7 +319,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                             }}
                                         >
                                             <FormKeyValueRow>
-                                                <span>Auto login</span>
+                                                <span>
+                                                    {locale.autoLoginTitle}
+                                                </span>
                                                 <span>
                                                     <Switch
                                                         color="primary"
@@ -326,7 +345,11 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                         >
                                             <FormItem>
                                                 <FormKeyValueRow>
-                                                    <span>Login</span>
+                                                    <span>
+                                                        {
+                                                            locale.autoLoginFieldLogin
+                                                        }
+                                                    </span>
                                                     <span>
                                                         <TextField
                                                             value={store.login}
@@ -342,7 +365,11 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                             </FormItem>
                                             <FormItem>
                                                 <FormKeyValueRow>
-                                                    <span>Password</span>
+                                                    <span>
+                                                        {
+                                                            locale.autoLoginFieldPassword
+                                                        }
+                                                    </span>
                                                     <span>
                                                         <TextField
                                                             value={
@@ -374,7 +401,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                             }}
                                         >
                                             <FormKeyValueRow>
-                                                <span>Display Mode</span>
+                                                <span>
+                                                    {locale.displayModeTitle}
+                                                </span>
                                                 <span>
                                                     <ButtonGroup
                                                         color="primary"
@@ -397,7 +426,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                                                 store.displayMode
                                                             }
                                                         >
-                                                            Default
+                                                            {
+                                                                locale.displayModeDefault
+                                                            }
                                                         </Button>
                                                         <Button
                                                             onClick={() =>
@@ -416,7 +447,9 @@ export class LaunchQueryBuilder extends Component<IStore> {
                                                                 store.displayMode
                                                             }
                                                         >
-                                                            Embed
+                                                            {
+                                                                locale.displayModeEmbed
+                                                            }
                                                         </Button>
                                                     </ButtonGroup>
                                                 </span>
