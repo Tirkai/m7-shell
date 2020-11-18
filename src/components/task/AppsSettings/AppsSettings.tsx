@@ -31,7 +31,6 @@ export class AppsSettings extends Component<IAppsSettingsProps> {
     handleShowDropdown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         const x = e.pageX;
         const y = e.pageY;
-        console.log(x, y);
 
         this.store.contextMenu.showContextMenu(
             new Point2D(x, y),

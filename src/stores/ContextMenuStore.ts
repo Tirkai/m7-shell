@@ -26,8 +26,6 @@ export class ContextMenuStore {
 
         const resultPoint = new Point2D(point.x, point.y);
 
-        console.log(point.y + items.length * ITEM_HEIGHT, windowHeight);
-
         if (point.y + items.length * ITEM_HEIGHT > windowHeight - OFFSET) {
             resultPoint.setY(
                 windowHeight - items.length * ITEM_HEIGHT - OFFSET,
@@ -37,7 +35,6 @@ export class ContextMenuStore {
         this.items = items;
         this.isShow = true;
 
-        console.log({ resultPoint });
         this.point = resultPoint;
     }
 
