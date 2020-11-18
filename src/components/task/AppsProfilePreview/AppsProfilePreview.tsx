@@ -1,13 +1,14 @@
 import { UtilsFunctions } from "@algont/m7-utils";
 import { Avatar } from "@material-ui/core";
-import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
-import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
+import { exit } from "assets/icons";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
+import { ContextMenuItemModel } from "models/ContextMenuItemModel";
+import { Point2D } from "models/Point2D";
 import React, { Component } from "react";
 import { AppsMenuSidebarListItem } from "../AppsMenuSidebarListItem/AppsMenuSidebarListItem";
 import style from "./style.module.css";
@@ -23,6 +24,28 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
     get store() {
         return this.props.store!;
     }
+
+    handleExecuteApp = (app: Application) => {
+        this.store.applicationManager.executeApplication(app);
+    };
+
+    handleShowDropdown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        this.store.contextMenu.showContextMenu(new Point2D(e.pageX, e.pageY), [
+            ...this.props.apps.map(
+                (app) =>
+                    new ContextMenuItemModel({
+                        icon: app.icon,
+                        content: app.name,
+                        onClick: () => this.handleExecuteApp(app),
+                    }),
+            ),
+            new ContextMenuItemModel({
+                icon: exit,
+                content: strings.startMenu.logout,
+                onClick: this.handleLogout,
+            }),
+        ]);
+    };
 
     handleLogout = async () => {
         await this.store.auth.logout();
@@ -47,52 +70,26 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
         );
 
         return (
-            <DropdownMenu
-                position="bottomLeft"
-                render={[
-                    ...this.props.apps.map((app) => (
-                        <DropdownMenuItem
-                            key={app.id}
-                            onClick={async () =>
-                                this.store.applicationManager.executeApplication(
-                                    app,
-                                )
-                            }
-                        >
-                            {app.name}
-                        </DropdownMenuItem>
-                    )),
-                    ...[
-                        <DropdownMenuItem
-                            key="logout"
-                            onClick={this.handleLogout}
-                        >
-                            {strings.startMenu.logout}
-                        </DropdownMenuItem>,
-                    ],
-                ]}
-            >
-                <AppsMenuSidebarListItem>
-                    <div className={style.appsProfilePreview}>
-                        <Avatar
-                            style={{
-                                background: `linear-gradient(-45deg, ${UtilsFunctions.stringToHslColor(
-                                    userInitials,
-                                    75,
-                                    60,
-                                )}, ${UtilsFunctions.stringToHslColor(
-                                    userInitials,
-                                    75,
-                                    75,
-                                )})`,
-                            }}
-                            className={style.avatar}
-                        >
-                            {userInitials}
-                        </Avatar>
-                    </div>
-                </AppsMenuSidebarListItem>
-            </DropdownMenu>
+            <AppsMenuSidebarListItem onClick={this.handleShowDropdown}>
+                <div className={style.appsProfilePreview}>
+                    <Avatar
+                        style={{
+                            background: `linear-gradient(-45deg, ${UtilsFunctions.stringToHslColor(
+                                userInitials,
+                                75,
+                                60,
+                            )}, ${UtilsFunctions.stringToHslColor(
+                                userInitials,
+                                75,
+                                75,
+                            )})`,
+                        }}
+                        className={style.avatar}
+                    >
+                        {userInitials}
+                    </Avatar>
+                </div>
+            </AppsMenuSidebarListItem>
         );
     }
 }

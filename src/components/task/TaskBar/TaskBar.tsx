@@ -1,7 +1,6 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { apps } from "assets/icons";
+import { apps, cross } from "assets/icons";
 import classNames from "classnames";
-import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
 import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
@@ -12,6 +11,7 @@ import { computed, reaction } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
+import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import React, { Component } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
@@ -91,6 +91,13 @@ export class TaskBar extends Component<IStore> {
         );
     }
 
+    createCloseApplicationContextMenuItem = (appWindow: ApplicationWindow) =>
+        new ContextMenuItemModel({
+            icon: cross,
+            content: strings.application.actions.close,
+            onClick: () => this.handleCloseWindow(appWindow),
+        });
+
     render() {
         return (
             <>
@@ -124,16 +131,9 @@ export class TaskBar extends Component<IStore> {
                                                 )
                                             }
                                             menu={[
-                                                <DropdownMenuItem
-                                                    key="close"
-                                                    onClick={() =>
-                                                        this.handleCloseWindow(
-                                                            appWindow,
-                                                        )
-                                                    }
-                                                >
-                                                    Закрыть
-                                                </DropdownMenuItem>,
+                                                this.createCloseApplicationContextMenuItem(
+                                                    appWindow,
+                                                ),
                                             ]}
                                         >
                                             <SVGIcon

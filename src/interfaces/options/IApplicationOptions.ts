@@ -12,4 +12,5 @@ export interface IApplicationOptions {
     minHeight?: number;
     isFullscreen?: boolean;
     place?: ApplicationPlace;
+    isOnlyAdmin?: boolean;
 }

@@ -4,10 +4,18 @@ import style from "./style.module.css";
 
 const className = style.appsMenuSidebarListItem;
 
-export class AppsMenuSidebarListItem extends Component {
+interface IAppsMenuSidebarListItemProps {
+    onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+}
+
+export class AppsMenuSidebarListItem extends Component<
+    IAppsMenuSidebarListItemProps
+> {
     render() {
         return (
-            <div className={classNames(className)}>{this.props.children}</div>
+            <div onClick={this.props.onClick} className={classNames(className)}>
+                {this.props.children}
+            </div>
         );
     }
 }

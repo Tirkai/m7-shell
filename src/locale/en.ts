@@ -47,6 +47,11 @@ export const en = {
         title: "Notifications",
         noMoreNotifications: "No more notifications",
     },
+    application: {
+        actions: {
+            close: "Close",
+        },
+    },
     definedApplications: {
         license: "License",
         accountsMe: "Profile",

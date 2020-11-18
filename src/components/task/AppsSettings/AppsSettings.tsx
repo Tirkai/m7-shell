@@ -1,11 +1,11 @@
 import { SVGIcon } from "@algont/m7-ui";
 import { settings } from "assets/icons";
-import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
-import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
+import { ContextMenuItemModel } from "models/ContextMenuItemModel";
+import { Point2D } from "models/Point2D";
 import React, { Component } from "react";
 import { AppsMenuSidebarListItem } from "../AppsMenuSidebarListItem/AppsMenuSidebarListItem";
 import style from "./style.module.css";
@@ -23,37 +23,44 @@ export class AppsSettings extends Component<IAppsSettingsProps> {
     get store() {
         return this.props.store!;
     }
+
+    handleExecuteApp = (app: Application) => {
+        this.store.applicationManager.executeApplication(app);
+    };
+
+    handleShowDropdown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const x = e.pageX;
+        const y = e.pageY;
+        console.log(x, y);
+
+        this.store.contextMenu.showContextMenu(
+            new Point2D(x, y),
+            this.props.apps.map(
+                (app) =>
+                    new ContextMenuItemModel({
+                        icon: app.icon,
+                        content: app.name,
+                        onClick: () => this.handleExecuteApp(app),
+                    }),
+            ),
+        );
+    };
+
     render() {
         if (this.props.apps.length) {
             return (
-                <DropdownMenu
-                    position="bottomLeft"
-                    render={[
-                        ...this.props.apps.map((app) => (
-                            <DropdownMenuItem
-                                key={app.id}
-                                onClick={async () =>
-                                    this.store.applicationManager.executeApplication(
-                                        app,
-                                    )
-                                }
-                            >
-                                {app.name}
-                            </DropdownMenuItem>
-                        )),
-                    ]}
+                <AppsMenuSidebarListItem
+                    onClick={(e) => this.handleShowDropdown(e)}
                 >
-                    <AppsMenuSidebarListItem>
-                        <SVGIcon
-                            source={settings}
-                            size={{
-                                width: "24px",
-                                height: "24px",
-                            }}
-                            color="white"
-                        />
-                    </AppsMenuSidebarListItem>
-                </DropdownMenu>
+                    <SVGIcon
+                        source={settings}
+                        size={{
+                            width: "24px",
+                            height: "24px",
+                        }}
+                        color="white"
+                    />
+                </AppsMenuSidebarListItem>
             );
         } else {
             return "";

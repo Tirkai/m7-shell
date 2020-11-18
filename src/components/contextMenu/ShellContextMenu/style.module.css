@@ -1,0 +1,59 @@
+.contextMenu {
+    position: fixed;
+    flex-direction: column;
+
+    min-width: 200px;
+    max-width: 600px;
+
+    overflow: hidden;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    max-height: 400px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    border: 1px solid #444;
+    /* pointer-events: none; */
+    padding: 6px 0;
+
+    transition: ease 0.1s;
+    /* opacity: 0; */
+    background: #000;
+    border-radius: 4px;
+
+    min-width: 200px;
+    max-width: 600px;
+    overflow: auto;
+}
+
+.show {
+    opacity: 1;
+    pointer-events: all;
+}
+.show .container {
+    animation: fadeInTop ease 0.2s;
+}
+@keyframes fadeInTop {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInBottom {
+    0% {
+        transform: translateY(100%);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}

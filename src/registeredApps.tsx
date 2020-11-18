@@ -55,5 +55,6 @@ export const registeredApps: Application[] = [
         baseHeight: 600,
         isVisibleInStartMenu: false,
         place: ApplicationPlace.M7Menu,
+        isOnlyAdmin: true,
     }),
 ];

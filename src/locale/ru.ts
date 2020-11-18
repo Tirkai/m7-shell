@@ -47,6 +47,11 @@ export const ru = {
         title: "Уведомления",
         noMoreNotifications: "Нет уведомлений",
     },
+    application: {
+        actions: {
+            close: "Закрыть",
+        },
+    },
     definedApplications: {
         license: "Лицензионная защита",
         accountsMe: "Профиль",

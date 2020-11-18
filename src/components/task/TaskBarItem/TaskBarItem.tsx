@@ -1,18 +1,40 @@
 import classNames from "classnames";
-import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
+import { IStore } from "interfaces/common/IStore";
+import { computed } from "mobx";
+import { inject, observer } from "mobx-react";
+import { ContextMenuItemModel } from "models/ContextMenuItemModel";
+import { Point2D } from "models/Point2D";
 import React, { Component } from "react";
 import style from "./style.module.css";
 
-interface ITaskBarItemProps {
+interface ITaskBarItemProps extends IStore {
     onClick: () => void;
     autoWidth?: boolean;
     executed?: boolean;
     focused?: boolean;
     badge?: string | number;
-    menu?: JSX.Element[];
+    menu?: ContextMenuItemModel[];
 }
 
+@inject("store")
+@observer
 export class TaskBarItem extends Component<ITaskBarItemProps> {
+    @computed
+    get store() {
+        return this.props.store!;
+    }
+
+    handleShowContextMenu = (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    ) => {
+        if (this.props.menu?.length) {
+            this.store.contextMenu.showContextMenu(
+                new Point2D(e.pageX, e.pageY),
+                this.props.menu,
+            );
+        }
+    };
+
     render() {
         const isBigNumber = +(this.props.badge ?? 0) >= 100;
 
@@ -36,13 +58,12 @@ export class TaskBarItem extends Component<ITaskBarItemProps> {
                 ) : (
                     ""
                 )}
-                <DropdownMenu
-                    trigger="context"
-                    position="topEdge"
-                    render={this.props.menu ?? []}
+                <div
+                    onContextMenu={this.handleShowContextMenu}
+                    className={style.content}
                 >
-                    <div className={style.content}>{this.props.children}</div>
-                </DropdownMenu>
+                    {this.props.children}
+                </div>
             </div>
         );
     }

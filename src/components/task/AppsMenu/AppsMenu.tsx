@@ -1,6 +1,4 @@
 import classNames from "classnames";
-import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
-import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { ApplicationPlace } from "enum/ApplicationPlace";
 import { IStore } from "interfaces/common/IStore";
@@ -98,6 +96,7 @@ export class AppsMenu extends Component<IStore> {
             this.store.applicationManager.applications,
             ApplicationPlace.M7Menu,
         );
+
         // TODO: Refactor
         return (
             <div
@@ -111,53 +110,7 @@ export class AppsMenu extends Component<IStore> {
                     <div className={style.container}>
                         <div className={style.sidebar}>
                             <div className={style.sidebarTop}>
-                                <div className={style.logo}>
-                                    {this.store.auth.isAdmin ||
-                                    this.store.auth.isSysadmin ? (
-                                        <DropdownMenu
-                                            render={[
-                                                ...shellMenuApps.map((app) => (
-                                                    <DropdownMenuItem
-                                                        key={app.id}
-                                                        onClick={async () =>
-                                                            this.store.applicationManager.executeApplication(
-                                                                app,
-                                                            )
-                                                        }
-                                                    >
-                                                        {app.name}
-                                                    </DropdownMenuItem>
-                                                )),
-                                                ...[
-                                                    this.store.auth.isAdmin ? (
-                                                        <DropdownMenuItem
-                                                            key={"devmode"}
-                                                            onClick={() =>
-                                                                this.handleEnableDevMode(
-                                                                    !this.store
-                                                                        .shell
-                                                                        .enabledDevMode,
-                                                                )
-                                                            }
-                                                        >
-                                                            {
-                                                                strings
-                                                                    .startMenu
-                                                                    .devMode
-                                                            }
-                                                        </DropdownMenuItem>
-                                                    ) : (
-                                                        <></>
-                                                    ),
-                                                ],
-                                            ]}
-                                        >
-                                            <AppsShellLogo />
-                                        </DropdownMenu>
-                                    ) : (
-                                        <AppsShellLogo />
-                                    )}
-                                </div>
+                                <AppsShellLogo apps={shellMenuApps} />
                             </div>
                             <div className={style.sidebarBottom}>
                                 <AppsSettings apps={settingsMenuApps} />

@@ -14,6 +14,7 @@ export class Application {
     minHeight: number;
     isFullscreen: boolean = false;
     place: ApplicationPlace = ApplicationPlace.Unknown;
+    isOnlyAdmin: boolean = false;
 
     isExecuted: boolean = false;
 
@@ -32,6 +33,7 @@ export class Application {
             minHeight: observable,
             isFullscreen: observable,
             place: observable,
+            isOnlyAdmin: observable,
             setExecuted: action,
             setAvailable: action,
         });
@@ -48,6 +50,7 @@ export class Application {
         this.isVisibleInStartMenu = options.isVisibleInStartMenu ?? true;
         this.isFullscreen = options.isFullscreen ?? false;
         this.place = options.place ?? ApplicationPlace.Unknown;
+        this.isOnlyAdmin = options.isOnlyAdmin ?? false;
     }
 
     setExecuted(value: boolean) {

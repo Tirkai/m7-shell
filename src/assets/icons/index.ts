@@ -4,6 +4,7 @@ import collapse from "./collapse.svg";
 import cross from "./cross.svg";
 import empty from "./empty.svg";
 import error from "./error.svg";
+import exit from "./exit.svg";
 import fullscreen from "./fullscreen.svg";
 import mute from "./mute.svg";
 import notificationsNone from "./notifications-none.svg";
@@ -34,4 +35,5 @@ export {
     soundMiddle,
     soundLow,
     settings,
+    exit,
 };
