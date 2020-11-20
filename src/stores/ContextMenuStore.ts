@@ -22,20 +22,24 @@ export class ContextMenuStore {
     items: ContextMenuItemModel[] = [];
 
     showContextMenu(point: Point2D, items: ContextMenuItemModel[]) {
-        const windowHeight = window.innerHeight;
+        try {
+            const windowHeight = window.innerHeight;
 
-        const resultPoint = new Point2D(point.x, point.y);
+            const resultPoint = new Point2D(point.x, point.y);
 
-        if (point.y + items.length * ITEM_HEIGHT > windowHeight - OFFSET) {
-            resultPoint.setY(
-                windowHeight - items.length * ITEM_HEIGHT - OFFSET,
-            );
+            if (point.y + items.length * ITEM_HEIGHT > windowHeight - OFFSET) {
+                resultPoint.setY(
+                    windowHeight - items.length * ITEM_HEIGHT - OFFSET,
+                );
+            }
+
+            this.items = items;
+            this.isShow = true;
+
+            this.point = resultPoint;
+        } catch (e) {
+            console.error(e);
         }
-
-        this.items = items;
-        this.isShow = true;
-
-        this.point = resultPoint;
     }
 
     hideContextmenu() {

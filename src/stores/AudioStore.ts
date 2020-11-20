@@ -25,27 +25,31 @@ export class AudioStore {
     }
 
     setAudio(audio: HTMLAudioElement) {
-        if (audio) {
-            this.audioPlayer = audio;
-            this.audioPlayer.onended = () => this.rewindQueue();
+        try {
+            if (audio) {
+                this.audioPlayer = audio;
+                this.audioPlayer.onended = () => this.rewindQueue();
 
-            const volume = parseFloat(
-                localStorage.getItem(this.localStorageVolumeKey) ?? "1",
-            );
+                const volume = parseFloat(
+                    localStorage.getItem(this.localStorageVolumeKey) ?? "1",
+                );
 
-            const mute = parseInt(
-                localStorage.getItem(this.localStorageMuteKey) ?? "0",
-            );
+                const mute = parseInt(
+                    localStorage.getItem(this.localStorageMuteKey) ?? "0",
+                );
 
-            if (!isNaN(volume)) {
-                this.setVolume(volume);
+                if (!isNaN(volume)) {
+                    this.setVolume(volume);
+                }
+
+                if (!isNaN(mute)) {
+                    this.setMute(!!mute);
+                }
+            } else {
+                this.audioPlayer = null;
             }
-
-            if (!isNaN(mute)) {
-                this.setMute(!!mute);
-            }
-        } else {
-            this.audioPlayer = null;
+        } catch (e) {
+            console.error(e);
         }
     }
 
@@ -57,51 +61,75 @@ export class AudioStore {
     }
 
     rewindQueue() {
-        const soundsInQueue = this.queue.filter((item) => item.awaitQueue);
+        try {
+            const soundsInQueue = this.queue.filter((item) => item.awaitQueue);
 
-        const [sound] = soundsInQueue;
-        if (sound) {
-            this.queue.shift();
-            if (sound.awaitQueue) {
-                this.playAudio(sound);
-            } else this.rewindQueue();
+            const [sound] = soundsInQueue;
+            if (sound) {
+                this.queue.shift();
+                if (sound.awaitQueue) {
+                    this.playAudio(sound);
+                } else this.rewindQueue();
+            }
+        } catch (e) {
+            console.error(e);
         }
     }
 
     playAudio(audio: AudioModel) {
-        if (this.audioPlayer && !this.isSoundDisable) {
-            if (!this.isPlaying) {
-                this.audioPlayer.src = audio.source;
-                this.audioPlayer.play();
-            } else {
-                this.queue.push(audio);
+        try {
+            if (this.audioPlayer && !this.isSoundDisable) {
+                if (!this.isPlaying) {
+                    this.audioPlayer.src = audio.source;
+                    this.audioPlayer.play();
+                } else {
+                    this.queue.push(audio);
+                }
             }
+        } catch (e) {
+            console.error(e);
+            // TOdo
+            // this.store.message.showMessage(
+            //     strings.error.anOccurredError,
+            //     serviceErrorText,
+            // );
         }
     }
 
     setVolume(value: number) {
-        this.volume = value;
-        if (this.audioPlayer) {
-            this.audioPlayer.volume = this.volume;
+        try {
+            this.volume = value;
+            if (this.audioPlayer) {
+                this.audioPlayer.volume = this.volume;
+            }
+
+            this.setMute(this.volume <= 0);
+
+            localStorage.setItem(
+                this.localStorageVolumeKey,
+                this.volume.toString(),
+            );
+        } catch (e) {
+            console.error(e);
         }
-
-        this.setMute(this.volume <= 0);
-
-        localStorage.setItem(
-            this.localStorageVolumeKey,
-            this.volume.toString(),
-        );
     }
 
     setMute(value: boolean) {
-        this.isMute = value;
+        try {
+            this.isMute = value;
 
-        if (this.volume <= 0) {
-            this.volume = 0.01;
+            if (this.volume <= 0) {
+                this.volume = 0.01;
+            }
+
+            const localStorageSavedValue = (this.isMute ? 1 : 0).toString();
+
+            localStorage.setItem(
+                this.localStorageMuteKey,
+                localStorageSavedValue,
+            );
+        } catch (e) {
+            console.error(e);
         }
-
-        const localStorageSavedValue = (this.isMute ? 1 : 0).toString();
-
-        localStorage.setItem(this.localStorageMuteKey, localStorageSavedValue);
     }
 }

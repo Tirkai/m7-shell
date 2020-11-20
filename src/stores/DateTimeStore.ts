@@ -28,11 +28,15 @@ export class DateTimeStore {
     }
 
     init() {
-        const timeout = 1000;
-        setInterval(() => {
-            this.setDate(moment().format(this.dateFormat));
-            this.setTime(moment().format(this.timeFormat));
-        }, timeout);
+        try {
+            const timeout = 1000;
+            setInterval(() => {
+                this.setDate(moment().format(this.dateFormat));
+                this.setTime(moment().format(this.timeFormat));
+            }, timeout);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     setDate(value: string) {

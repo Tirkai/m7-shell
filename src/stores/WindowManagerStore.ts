@@ -35,9 +35,13 @@ export class WindowManagerStore {
     }
 
     onChangeDisplayMode(mode: IDisplayMode) {
-        this.windows.forEach((item) => {
-            item.setDispayMode(mode);
-        });
+        try {
+            this.windows.forEach((item) => {
+                item.setDispayMode(mode);
+            });
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     findWindowByApp(app: Application) {
@@ -50,48 +54,60 @@ export class WindowManagerStore {
     }
 
     focusWindow(appWindow: ApplicationWindow) {
-        window.dispatchEvent(new CustomEvent(ShellEvents.FocusAnyWindow));
+        try {
+            window.dispatchEvent(new CustomEvent(ShellEvents.FocusAnyWindow));
 
-        if (appWindow.isFocused) return;
+            if (appWindow.isFocused) return;
 
-        if (appWindow.isCollapsed) this.expandWindow(appWindow);
+            if (appWindow.isCollapsed) this.expandWindow(appWindow);
 
-        const indexes = [...this.windows.map((item) => item.depthIndex)];
+            const indexes = [...this.windows.map((item) => item.depthIndex)];
 
-        const minIndex = min(indexes);
+            const minIndex = min(indexes);
 
-        const maxIndex = max(indexes);
+            const maxIndex = max(indexes);
 
-        if (minIndex && maxIndex) {
-            this.windows.forEach((item) => {
-                let index = 0;
-                if (item.id === appWindow.id) {
-                    index = maxIndex - minIndex + 2;
-                    appWindow.setFocused(true);
-                } else {
-                    index = item.depthIndex - minIndex + 1;
-                    item.setFocused(false);
-                }
-                item.setDepthIndex(index);
-            });
+            if (minIndex && maxIndex) {
+                this.windows.forEach((item) => {
+                    let index = 0;
+                    if (item.id === appWindow.id) {
+                        index = maxIndex - minIndex + 2;
+                        appWindow.setFocused(true);
+                    } else {
+                        index = item.depthIndex - minIndex + 1;
+                        item.setFocused(false);
+                    }
+                    item.setDepthIndex(index);
+                });
+            }
+            this.focusedWindow = appWindow;
+        } catch (e) {
+            console.error(e);
         }
-        this.focusedWindow = appWindow;
     }
 
     expandWindow(appWindow: ApplicationWindow) {
-        appWindow.setCollapsed(false);
-        appWindow.setFocused(true);
+        try {
+            appWindow.setCollapsed(false);
+            appWindow.setFocused(true);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     closeWindow(appWindow: ApplicationWindow) {
-        const app = this.store.applicationManager.findById(
-            appWindow.application.id,
-        );
-        if (app) {
-            app.setExecuted(false);
-        }
+        try {
+            const app = this.store.applicationManager.findById(
+                appWindow.application.id,
+            );
+            if (app) {
+                app.setExecuted(false);
+            }
 
-        this.windows.splice(this.windows.indexOf(appWindow), 1);
+            this.windows.splice(this.windows.indexOf(appWindow), 1);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     closeAllWindows() {
@@ -99,7 +115,11 @@ export class WindowManagerStore {
     }
 
     clearFocus() {
-        this.focusedWindow?.setFocused(false);
-        this.focusedWindow = null;
+        try {
+            this.focusedWindow?.setFocused(false);
+            this.focusedWindow = null;
+        } catch (e) {
+            console.error(e);
+        }
     }
 }

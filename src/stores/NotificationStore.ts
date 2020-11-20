@@ -139,10 +139,15 @@ export class NotificationStore {
     }
 
     async disconnectFromNotificationsSocket() {
-        return new Promise((resolve) => {
-            this.socket?.close();
-            this.socket = null;
-            resolve();
+        return new Promise((resolve, reject) => {
+            try {
+                this.socket?.close();
+                this.socket = null;
+                resolve();
+            } catch (e) {
+                console.error(e);
+                reject();
+            }
         });
     }
 
@@ -219,14 +224,18 @@ export class NotificationStore {
     }
 
     addNotification(notification: NotificationModel) {
-        this.toasts.unshift(new ToastNotification(notification));
-        this.notifications.unshift(notification);
-        this.store.audio.playAudio(
-            new AudioModel({
-                source: AudioSource.Notification,
-                awaitQueue: false,
-            }),
-        );
+        try {
+            this.toasts.unshift(new ToastNotification(notification));
+            this.notifications.unshift(notification);
+            this.store.audio.playAudio(
+                new AudioModel({
+                    source: AudioSource.Notification,
+                    awaitQueue: false,
+                }),
+            );
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     updateNotificationCount(count: number) {
@@ -237,15 +246,19 @@ export class NotificationStore {
         notifications: NotificationModel[],
         login: string,
     ) {
-        await Axios.post<IJsonRpcResponse>(
-            notificationsEndpoint.url,
-            new JsonRpcPayload("drop_user_notifications", {
-                user_notifications: notifications.map((item) => ({
-                    ntf_id: item.id,
-                    login,
-                })),
-            }),
-        );
-        this.fetchNotifications(this.store.auth.userLogin);
+        try {
+            await Axios.post<IJsonRpcResponse>(
+                notificationsEndpoint.url,
+                new JsonRpcPayload("drop_user_notifications", {
+                    user_notifications: notifications.map((item) => ({
+                        ntf_id: item.id,
+                        login,
+                    })),
+                }),
+            );
+            this.fetchNotifications(this.store.auth.userLogin);
+        } catch (e) {
+            console.error(e);
+        }
     }
 }
