@@ -50,6 +50,10 @@ export const en = {
     application: {
         actions: {
             close: "Close",
+            hardReset: "Reset",
+            refresh: "Refresh",
+            fullScreen: "Fullscreen",
+            collapse: "Collapse",
         },
     },
     definedApplications: {

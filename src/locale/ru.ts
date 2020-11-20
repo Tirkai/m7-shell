@@ -50,6 +50,10 @@ export const ru = {
     application: {
         actions: {
             close: "Закрыть",
+            hardReset: "Перезагрузить",
+            refresh: "Обновить",
+            fullScreen: "Полноэкранный",
+            collapse: "Свернуть",
         },
     },
     definedApplications: {

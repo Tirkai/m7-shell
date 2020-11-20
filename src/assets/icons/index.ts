@@ -2,13 +2,16 @@ import apps from "./apps.svg";
 import backward from "./backward.svg";
 import collapse from "./collapse.svg";
 import cross from "./cross.svg";
+import dotsMenu from "./dots-menu.svg";
 import empty from "./empty.svg";
 import error from "./error.svg";
 import exit from "./exit.svg";
 import fullscreen from "./fullscreen.svg";
+import listMenu from "./list-menu.svg";
 import mute from "./mute.svg";
 import notificationsNone from "./notifications-none.svg";
 import notifications from "./notifications.svg";
+import refresh from "./refresh.svg";
 import settings from "./settings.svg";
 import soundLow from "./sound-low.svg";
 import soundMiddle from "./sound-middle.svg";
@@ -36,4 +39,7 @@ export {
     soundLow,
     settings,
     exit,
+    refresh,
+    dotsMenu,
+    listMenu,
 };

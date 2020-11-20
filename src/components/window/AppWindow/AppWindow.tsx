@@ -15,7 +15,7 @@ import {
     ResizeHandle,
 } from "react-resizable";
 import AppLoader from "../AppLoader/AppLoader";
-import AppWindowHeader from "../AppWindowHeader/AppWindowHeader";
+import { AppWindowHeader } from "../AppWindowHeader/AppWindowHeader";
 import { AppWindowUnfocusedOverlay } from "../AppWindowUnfocusedOverlay/AppWindowUnfocusedOverlay";
 import style from "./style.module.css";
 
@@ -43,6 +43,7 @@ interface IAppWindowState {
     hasBackward: boolean;
     hasReload: boolean;
     customUrl: string;
+    frame: HTMLIFrameElement | null;
 }
 
 @inject("store")
@@ -53,6 +54,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
         hasBackward: false,
         hasReload: false,
         customUrl: "",
+        frame: null,
     };
 
     @computed
@@ -75,6 +77,11 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
         const context = frameRef?.contentWindow;
         if (context) {
             const app = this.props.application;
+
+            this.setState({
+                frame: frameRef,
+            });
+
             if (app instanceof ExternalApplication) {
                 app.setEmitterContext(context);
                 this.handleBindingEmitterEvents(app);
@@ -131,6 +138,15 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
     handleHeaderDoubleClick = () => {
         const appWindow = this.props.window;
         appWindow.setFullScreen(!appWindow.isFullScreen);
+    };
+
+    handleReload = () => {
+        const frame = (this.state.frame as unknown) as HTMLIFrameElement;
+        if (frame) {
+            frame.setAttribute("src", frame.getAttribute("src") ?? "");
+
+            // frame.contentWindow?.location.reload();
+        }
     };
 
     componentDidMount() {
@@ -229,9 +245,9 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                                 onClose={this.props.onClose}
                                 onDoubleClick={this.handleHeaderDoubleClick}
                                 hasBackward={this.state.hasBackward}
-                                hasReload={this.state.hasReload}
+                                hasReload={true}
                                 onBackward={() => true}
-                                onReload={() => true}
+                                onReload={this.handleReload}
                                 onCollapse={() => this.handleCollapse()}
                                 onFullscreen={() => this.handleFullScreen()}
                                 visible={
