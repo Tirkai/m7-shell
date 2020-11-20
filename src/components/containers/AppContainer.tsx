@@ -21,9 +21,11 @@ export class AppContainer extends Component<IStore> {
         window.addEventListener("contextmenu", (event) =>
             event.preventDefault(),
         );
-        window.onbeforeunload = function() {
-            return true;
-        };
+
+        const getCloseBrowserWindowDenied = () =>
+            this.store.applicationManager.executedApplications.length > 0;
+
+        window.onbeforeunload = () => getCloseBrowserWindowDenied();
 
         window.addEventListener("click", (event: MouseEvent) => {
             if (this.store.contextMenu.isShow) {
