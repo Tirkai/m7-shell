@@ -20,6 +20,9 @@ export const ru = {
             authenticateUnknownNode: "Неизвестный узел",
         },
         description: "Единая служба авторизации",
+        action: {
+            logout: "Выход",
+        },
     },
     actions: {
         login: "Вход",

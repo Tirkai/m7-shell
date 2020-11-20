@@ -34,6 +34,14 @@ export class WindowManagerStore {
         return this.windows.find((item) => item.isDragging);
     }
 
+    get hasDraggedWindow() {
+        return !!this.draggedWindow;
+    }
+
+    get activeElement(): Element | null {
+        return document.activeElement;
+    }
+
     onChangeDisplayMode(mode: IDisplayMode) {
         try {
             this.windows.forEach((item) => {

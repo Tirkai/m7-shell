@@ -20,6 +20,9 @@ export const en = {
             authenticateUnknownNode: "Unknown node",
         },
         description: "Unified Authorization Service",
+        action: {
+            logout: "Logout",
+        },
     },
     actions: {
         login: "Login",

@@ -75,6 +75,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
 
     handleFrameLoaded = (frameRef: HTMLIFrameElement) => {
         const context = frameRef?.contentWindow;
+
         if (context) {
             const app = this.props.application;
 
@@ -265,10 +266,13 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                                         .displayMode.showAppWindowHeader,
                                 })}
                             >
-                                {this.appComponent && this.appComponent}
+                                {this.appComponent}
                             </div>
                             <AppWindowUnfocusedOverlay
-                                visible={!this.props.isFocused}
+                                visible={
+                                    this.store.windowManager.hasDraggedWindow ||
+                                    !this.props.isFocused
+                                }
                             />
                         </div>
                     </ResizableBox>
