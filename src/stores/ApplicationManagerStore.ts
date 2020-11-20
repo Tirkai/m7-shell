@@ -126,10 +126,18 @@ export class ApplicationManagerStore {
                                 const { url } = payload;
 
                                 const findedApp = this.findByUrlPart(url);
+                                // TODO: Execute application with hash in function
+                                // #region
+                                const hashParams = new URLSearchParams();
+                                hashParams.append("hash", v4());
+
+                                const urlWithHash =
+                                    url + "?" + hashParams.toString();
+                                // #endregion
                                 if (findedApp instanceof ExternalApplication) {
                                     this.executeApplicationWithUrl(
                                         findedApp,
-                                        url,
+                                        urlWithHash,
                                     );
                                 } else {
                                     const instance = new ExternalApplication({

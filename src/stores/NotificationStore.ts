@@ -208,7 +208,7 @@ export class NotificationStore {
             }
         } catch (e) {
             console.error(e);
-            this.status = NotificationServiceConnectStatus.Disconnected;
+            this.setStatus(NotificationServiceConnectStatus.Disconnected);
             if (this.store.auth.isAuthorized) {
                 setTimeout(
                     async () => this.reconnectToNotificationSocket(),

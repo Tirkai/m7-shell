@@ -259,7 +259,7 @@ export class AuthStore {
         >(meEndpoint.url, new JsonRpcPayload("get_me"));
         if (!userNameResponse.data.error) {
             const user = userNameResponse.data.result;
-            this.userName = user.name;
+            this.setUserName(user.name);
         }
     }
 
@@ -306,5 +306,9 @@ export class AuthStore {
 
     setUserLogin(value: string) {
         this.userLogin = value;
+    }
+
+    setUserName(value: string) {
+        this.userName = value;
     }
 }

@@ -11,6 +11,7 @@ import { Application } from "models/Application";
 import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationModel } from "models/NotificationModel";
 import React, { Component } from "react";
+import { v4 } from "uuid";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
 import style from "./style.module.css";
@@ -68,9 +69,16 @@ export class NotificationHub extends Component<IStore> {
         const app = this.store.applicationManager.findById(appId);
 
         if (app instanceof ExternalApplication) {
+            // TODO: Execute application with hash in function
+            // #region
+            const hashParams = new URLSearchParams();
+            hashParams.append("hash", v4());
+
+            const urlWithHash = url + "?" + hashParams.toString();
+            // #endregion
             shell.setActivePanel(ShellPanelType.None);
 
-            applicationManager.executeApplicationWithUrl(app, url);
+            applicationManager.executeApplicationWithUrl(app, urlWithHash);
 
             const appWindow = windowManager.findWindowByApp(app);
 

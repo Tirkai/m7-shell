@@ -1,7 +1,6 @@
 import { ShellMessageEmitter } from "@algont/m7-shell-emitter";
 import { IExternalApplicationOptions } from "interfaces/options/IExternalApplicationOptions";
 import { action, computed, makeObservable, observable } from "mobx";
-import { v4 } from "uuid";
 import { Application } from "./Application";
 export class ExternalApplication extends Application {
     url: string;
@@ -59,6 +58,6 @@ export class ExternalApplication extends Application {
     }
 
     setCustomUrl(url: string) {
-        this.customUrl = url + "?hash=" + v4();
+        this.customUrl = url;
     }
 }
