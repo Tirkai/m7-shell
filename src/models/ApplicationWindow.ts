@@ -1,3 +1,4 @@
+import { TASKBAR_HEIGHT } from "constants/config";
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { IPinArea } from "interfaces/window/IPinArea";
@@ -59,15 +60,25 @@ export class ApplicationWindow {
 
         this.application = app;
         this.id = options.id;
-        this.width =
-            typeof options.width === "number" ? options.width : app.baseWidth;
-        this.height =
-            typeof options.height === "number"
-                ? options.height
-                : app.baseHeight;
+
+        const [width, height] = this.getSizeWithBounds(
+            options.width,
+            options.height,
+        );
+
+        this.width = width;
+        this.height = height;
+        // this.width =
+        //     typeof options.width === "number" ? options.width : app.baseWidth;
+        // this.height =
+        //     typeof options.height === "number"
+        //         ? options.height
+        //         : app.baseHeight;
 
         this.x = Math.floor(window.innerWidth / 2 - this.width / 2);
-        this.y = Math.floor(window.innerHeight / 2 - this.height / 2);
+        this.y = Math.floor(
+            window.innerHeight / 2 - this.height / 2 - TASKBAR_HEIGHT / 2,
+        );
         this.isFullScreen = options.isFullscreen ?? false;
         this.lockedWidth = this.width;
         this.lockedHeight = this.height;
@@ -100,8 +111,9 @@ export class ApplicationWindow {
     }
 
     setSize(width: number, height: number) {
-        this.width = Math.floor(width);
-        this.height = Math.floor(height);
+        const [w, h] = this.getSizeWithBounds(width, height);
+        this.width = Math.floor(w);
+        this.height = Math.floor(h);
     }
 
     setResizeOriginPoint(x: number, y: number) {
@@ -179,5 +191,15 @@ export class ApplicationWindow {
     recalculateFullScreenSize() {
         this.isFullScreen = false;
         this.isFullScreen = true;
+    }
+
+    private getSizeWithBounds(width: number, height: number) {
+        const resultWidth =
+            width < window.innerWidth ? width : window.innerWidth;
+        const resultHeight =
+            height < window.innerHeight - TASKBAR_HEIGHT
+                ? height
+                : window.innerHeight - TASKBAR_HEIGHT;
+        return [resultWidth, resultHeight];
     }
 }

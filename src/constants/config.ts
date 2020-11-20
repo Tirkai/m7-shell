@@ -6,6 +6,8 @@ const [, upperLevelDomain] = window.location.hostname.split(".");
 
 export const AUTH_TOKEN_HEADER = "X-M7-Authorization-Token";
 
+export const TASKBAR_HEIGHT = 48;
+
 export const UPPER_LEVEL_DOMAIN =
     nodeEnv === "development" ? developmentDomain : upperLevelDomain;
 
