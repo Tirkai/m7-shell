@@ -1,6 +1,4 @@
-import { ApplicationPlace } from "enum/ApplicationPlace";
 import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
-import { DevModeView } from "extensions/DevModeView/DevModeView";
 import { LaunchQueryBuilder } from "extensions/LaunchQueryBuilder/LaunchQueryBuilder";
 import { strings } from "locale";
 import { Application } from "models/Application";
@@ -45,16 +43,5 @@ export const registeredApps: Application[] = [
         baseWidth: 600,
         baseHeight: 700,
         isVisibleInStartMenu: false,
-    }),
-    new ShellApplication({
-        id: v4(),
-        name: "DevMode",
-        key: "DevMode",
-        Component: <DevModeView />,
-        baseWidth: 800,
-        baseHeight: 600,
-        isVisibleInStartMenu: false,
-        place: ApplicationPlace.M7Menu,
-        isOnlyAdmin: true,
     }),
 ];

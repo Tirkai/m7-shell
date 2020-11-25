@@ -23,12 +23,15 @@ export class ExternalApplication extends Application {
 
         this.emitter = new ShellMessageEmitter(this.id);
         try {
-            const [url, params] = options.url.split("?");
-
-            const urlParams = new URLSearchParams(params);
+            const url = new URL(options.url);
+            const urlParams = new URLSearchParams(url.search);
             urlParams.set("appId", this.id);
 
-            this.url = url + "?" + urlParams.toString();
+            const resultUrl = `${url.protocol}//${url.host}${
+                url.pathname
+            }?${urlParams.toString()}${url.hash}`;
+
+            this.url = resultUrl;
         } catch (e) {
             this.url = "";
             this.setAvailable(false);
