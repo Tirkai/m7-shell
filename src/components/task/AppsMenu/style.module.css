@@ -9,7 +9,6 @@
     pointer-events: none;
     z-index: 100;
     max-height: calc(100vh - 48px);
-    /* background: url("../../../assets/images/wallpaper_blur.jpg"); */
     background-size: cover;
     background-attachment: fixed;
     border-top-right-radius: 4px;
@@ -34,7 +33,6 @@
 
 .content {
     display: block;
-    /* padding: 24px 24px 0 24px; */
 }
 
 .search {

@@ -2,7 +2,6 @@
     display: inline-flex;
     position: absolute;
     flex-direction: column;
-    /* background: url("../../../assets/images/wallpaper_blur.jpg"); */
     background-attachment: fixed;
     color: white;
     min-width: 200px;

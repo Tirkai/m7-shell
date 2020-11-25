@@ -18,12 +18,6 @@
     cursor: pointer;
 }
 
-.appsMenuItem.executed:hover {
-    /* border: 1px solid transparent;
-    background: #444;
-    cursor: default; */
-}
-
 .title {
     display: flex;
     align-items: center;
