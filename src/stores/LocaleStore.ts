@@ -16,7 +16,11 @@ export class LocaleStore {
     language: string = window.navigator.language;
 
     setLocale(locale: string) {
-        strings.setLanguage(locale);
-        moment.locale(locale);
+        try {
+            strings.setLanguage(locale);
+            moment.locale(locale);
+        } catch (e) {
+            console.error(e);
+        }
     }
 }

@@ -1,11 +1,14 @@
 import { CircularProgress } from "@material-ui/core";
 import classNames from "classnames";
 import { strings } from "locale";
+import { inject, observer } from "mobx-react";
 import React, { Component } from "react";
 import style from "./style.module.css";
 
 const className = style.awaitVerifyScreen;
 
+@inject("store")
+@observer
 export class AwaitVerifyScreen extends Component {
     render() {
         return (

@@ -8,6 +8,7 @@ import Axios from "axios";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicationResponse";
 import { strings } from "locale";
+import { difference, intersectionWith } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
@@ -111,7 +112,9 @@ export class ApplicationManagerStore {
                             id: v4(),
                             width: appParams.width ?? app.baseWidth,
                             height: appParams.height ?? app.baseHeight,
-                            isFullscreen: appParams.maximize ?? false,
+                            isFullscreen:
+                                appParams.maximize ?? app.isFullscreen ?? false,
+                            dispayMode: this.store.shell.displayMode,
                         }),
                     );
 
@@ -123,10 +126,18 @@ export class ApplicationManagerStore {
                                 const { url } = payload;
 
                                 const findedApp = this.findByUrlPart(url);
+                                // TODO: Execute application with hash in function
+                                // #region
+                                const hashParams = new URLSearchParams();
+                                hashParams.append("hash", v4());
+
+                                const urlWithHash =
+                                    url + "?" + hashParams.toString();
+                                // #endregion
                                 if (findedApp instanceof ExternalApplication) {
                                     this.executeApplicationWithUrl(
                                         findedApp,
-                                        url,
+                                        urlWithHash,
                                     );
                                 } else {
                                     const instance = new ExternalApplication({
@@ -156,22 +167,27 @@ export class ApplicationManagerStore {
     }
 
     executeApplicationWithUrl(app: ExternalApplication, url: string) {
-        if (!app.isExecuted) {
-            app.setExecuted(true).setCustomUrl(url);
-            this.store.windowManager.addWindow(
-                new ApplicationWindow(app, {
-                    id: v4(),
-                    width: app.baseWidth,
-                    height: app.baseHeight,
-                }),
-            );
-        } else {
-            app.setCustomUrl(url);
+        try {
+            if (!app.isExecuted) {
+                app.setExecuted(true).setCustomUrl(url);
+                this.store.windowManager.addWindow(
+                    new ApplicationWindow(app, {
+                        id: v4(),
+                        width: app.baseWidth,
+                        height: app.baseHeight,
+                        dispayMode: this.store.shell.displayMode,
+                    }),
+                );
+            } else {
+                app.setCustomUrl(url);
 
-            const appWindow = this.store.windowManager.findWindowByApp(app);
-            if (appWindow) {
-                this.store.windowManager.focusWindow(appWindow);
+                const appWindow = this.store.windowManager.findWindowByApp(app);
+                if (appWindow) {
+                    this.store.windowManager.focusWindow(appWindow);
+                }
             }
+        } catch (e) {
+            console.error(e);
         }
     }
 
@@ -184,8 +200,13 @@ export class ApplicationManagerStore {
             this.applications = [];
 
             const response = await Axios.post<
-                IJsonRpcResponse<IPortalApplicationResponse[]>
-            >(portalEndpoint.url, new JsonRpcPayload("getComponents"));
+                IJsonRpcResponse<IPortalApplicationResponse<IAppParams>[]>
+            >(
+                portalEndpoint.url,
+                new JsonRpcPayload("getComponents", {
+                    with_shell_params: true,
+                }),
+            );
 
             if (!response.data.error) {
                 const portalApplications = response.data.result.map(
@@ -196,6 +217,7 @@ export class ApplicationManagerStore {
                             url: item.guiUrl,
                             icon: item.iconUrl,
                             key: item.id,
+                            place: item.shellParams?.item_place,
                         }),
                 );
                 this.addApplicationsList(portalApplications);
@@ -213,6 +235,49 @@ export class ApplicationManagerStore {
         }
     }
 
+    async fetchUpdateApplications() {
+        try {
+            const response = await Axios.post<
+                IJsonRpcResponse<IPortalApplicationResponse<IAppParams>[]>
+            >(
+                portalEndpoint.url,
+                new JsonRpcPayload("getComponents", {
+                    with_shell_params: true,
+                }),
+            );
+
+            if (!response.data.error) {
+                const portalApplications = response.data.result.map(
+                    (item) =>
+                        new ExternalApplication({
+                            id: item.id,
+                            name: item.name,
+                            url: item.guiUrl,
+                            icon: item.iconUrl,
+                            key: item.id,
+                        }),
+                );
+
+                const diffIds = difference(
+                    portalApplications.map((item) => item.id),
+                    this.applications
+                        .filter((item) => item instanceof ExternalApplication)
+                        .map((item) => item.id),
+                );
+
+                this.addApplicationsList(
+                    intersectionWith(
+                        portalApplications,
+                        diffIds,
+                        (a, b) => a.id === b,
+                    ),
+                );
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     findByKey(key: string) {
         return this.applications.find((app) => app.key === key);
     }
@@ -222,11 +287,15 @@ export class ApplicationManagerStore {
     }
 
     findByUrlPart(url: string) {
-        const hostname = new URL(url).hostname;
-        return this.applications.find((app) =>
-            app instanceof ExternalApplication
-                ? app.url.indexOf(hostname) > -1 && app.url.length > 0
-                : false,
-        );
+        try {
+            const hostname = new URL(url).hostname;
+            return this.applications.find((app) =>
+                app instanceof ExternalApplication
+                    ? app.url.indexOf(hostname) > -1 && app.url.length > 0
+                    : false,
+            );
+        } catch (e) {
+            console.error(e);
+        }
     }
 }

@@ -2,8 +2,9 @@
     position: absolute;
     right: 5px;
     bottom: 53px;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.65);
     z-index: 200;
     pointer-events: none;
     text-shadow: 0 0 0 black;
+    text-align: right;
 }

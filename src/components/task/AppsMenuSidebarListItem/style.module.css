@@ -1,0 +1,14 @@
+.appsMenuSidebarListItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 48px;
+}
+.appsMenuSidebarListItem:last-child {
+    margin-bottom: 0;
+}
+
+.appsMenuSidebarListItem:hover {
+    background: #444;
+}

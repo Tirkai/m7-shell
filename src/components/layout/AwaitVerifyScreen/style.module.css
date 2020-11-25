@@ -21,6 +21,14 @@
 
 .text {
     color: white;
+    margin-bottom: 20px;
+}
+.action {
+    display: flex;
+    justify-content: stretch;
+}
+.action button {
+    width: 100%;
 }
 
 @keyframes fadeIn {

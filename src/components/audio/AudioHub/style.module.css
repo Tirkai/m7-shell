@@ -2,7 +2,6 @@
     position: absolute;
     bottom: 48px;
     right: 0;
-    background: url("/wallpapers/wallpaper_blur.jpg");
     width: 300px;
     background-attachment: fixed;
     background-position: right;
@@ -15,7 +14,7 @@
 }
 
 .container {
-    background: #222222cc;
+    background: #222222e9;
     padding: 16px;
     height: 100%;
 }
@@ -31,6 +30,7 @@
     opacity: 1;
     pointer-events: all;
     transform: translateY(0);
+    animation: show 0.3s;
 }
 
 .icon {
@@ -45,4 +45,17 @@
 
 .slider {
     background: #096dd9;
+}
+
+@keyframes show {
+    0% {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(50%);
+    }
+    100% {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0);
+    }
 }

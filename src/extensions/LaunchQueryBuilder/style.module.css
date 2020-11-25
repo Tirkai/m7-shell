@@ -1,0 +1,44 @@
+.launchQueryBuilder {
+    display: block;
+}
+
+.accordion {
+    box-shadow: none;
+    cursor: default;
+    background: none;
+}
+
+.accordionExpanded {
+    margin: 0 !important;
+    border-bottom: 1px solid #e2e2e2;
+}
+
+.summaryExpanded {
+    background: #bedaf3;
+}
+
+.details {
+    display: block;
+    margin: 0 16px;
+    padding: 0 12px 12px 12px;
+}
+
+.details > div {
+    width: 100%;
+}
+
+.summary {
+    padding: 0 12px;
+}
+
+.summary > div {
+    width: 100%;
+}
+
+.activeButton {
+    background: #00519c;
+    color: white;
+}
+.activeButton:hover {
+    background: #00519c;
+}

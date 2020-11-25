@@ -1,4 +1,7 @@
 export const ru = {
+    global: {
+        systemName: "M7",
+    },
     error: {
         anOccurredError: "Произошла ошибка",
         connectionError: "Не удалось установить соединение с сервером",
@@ -17,6 +20,9 @@ export const ru = {
             authenticateUnknownNode: "Неизвестный узел",
         },
         description: "Единая служба авторизации",
+        action: {
+            logout: "Выход",
+        },
     },
     actions: {
         login: "Вход",
@@ -44,8 +50,35 @@ export const ru = {
         title: "Уведомления",
         noMoreNotifications: "Нет уведомлений",
     },
+    application: {
+        actions: {
+            close: "Закрыть",
+            hardReset: "Перезагрузить",
+            refresh: "Обновить",
+            fullScreen: "Полноэкранный",
+            collapse: "Свернуть",
+        },
+    },
     definedApplications: {
         license: "Лицензионная защита",
         accountsMe: "Профиль",
+    },
+
+    shellApps: {
+        launchQueryBuilder: {
+            title: "Параметры запуска",
+            autoRunTitle: "Автозапуск",
+            autoRunType: "Тип автозапуска",
+            autoRunApplication: "Приложение",
+            autoRunApplicationChoose: "Выбрать",
+            autoRunUrl: "URL",
+            autoRunFullscreen: "Полноэкранный",
+            autoLoginTitle: "Автологин",
+            autoLoginFieldLogin: "Логин",
+            autoLoginFieldPassword: "Пароль",
+            displayModeTitle: "Режим отображения",
+            displayModeDefault: "По умолчанию",
+            displayModeEmbed: "Встраиваемый",
+        },
     },
 };
