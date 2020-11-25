@@ -68,12 +68,6 @@ export class ApplicationWindow {
 
         this.width = width;
         this.height = height;
-        // this.width =
-        //     typeof options.width === "number" ? options.width : app.baseWidth;
-        // this.height =
-        //     typeof options.height === "number"
-        //         ? options.height
-        //         : app.baseHeight;
 
         this.x = Math.floor(window.innerWidth / 2 - this.width / 2);
         this.y = Math.floor(

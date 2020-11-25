@@ -145,8 +145,6 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
         const frame = (this.state.frame as unknown) as HTMLIFrameElement;
         if (frame) {
             frame.setAttribute("src", frame.getAttribute("src") ?? "");
-
-            // frame.contentWindow?.location.reload();
         }
     };
 
