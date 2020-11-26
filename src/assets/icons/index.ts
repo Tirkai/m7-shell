@@ -12,10 +12,12 @@ import mute from "./mute.svg";
 import notificationsNone from "./notifications-none.svg";
 import notifications from "./notifications.svg";
 import refresh from "./refresh.svg";
+import rocket from "./rocket.svg";
 import settings from "./settings.svg";
 import soundLow from "./sound-low.svg";
 import soundMiddle from "./sound-middle.svg";
 import sound from "./sound.svg";
+import terminal from "./terminal.svg";
 import unknownApp from "./unknown.svg";
 import videocam from "./video.svg";
 import warning from "./warning.svg";
@@ -42,4 +44,6 @@ export {
     refresh,
     dotsMenu,
     listMenu,
+    terminal,
+    rocket,
 };

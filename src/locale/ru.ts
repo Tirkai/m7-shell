@@ -80,5 +80,9 @@ export const ru = {
             displayModeDefault: "По умолчанию",
             displayModeEmbed: "Встраиваемый",
         },
+        customExecutor: {
+            title: "Выполнить",
+            execute: "Выполнить",
+        },
     },
 };
