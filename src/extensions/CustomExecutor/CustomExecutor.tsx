@@ -1,5 +1,6 @@
 import { Button, TextField } from "@material-ui/core";
 import { IStore } from "interfaces/common/IStore";
+import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ExternalApplication } from "models/ExternalApplication";
@@ -59,7 +60,7 @@ export class CustomExecutor extends Component<IStore> {
                             color="primary"
                             variant="contained"
                         >
-                            Run
+                            {strings.shellApps.customExecutor.execute}
                         </Button>
                     </div>
                 </form>

@@ -80,5 +80,9 @@ export const en = {
             displayModeDefault: "По умолчанию",
             displayModeEmbed: "Встраиваемый",
         },
+        customExecutor: {
+            title: "Custom Executor",
+            execute: "Execute",
+        },
     },
 };
