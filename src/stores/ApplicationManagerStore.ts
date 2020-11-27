@@ -142,10 +142,24 @@ export class ApplicationManagerStore {
                                 } else {
                                     const instance = new ExternalApplication({
                                         id: v4(),
+
                                         name: app.name,
                                         url,
                                         icon: app.icon,
+                                        isExistedAppInstance: true,
                                     });
+
+                                    // TODO: Hotfix for cert
+                                    // #region
+                                    this.store.applicationManager.addApplication(
+                                        instance,
+                                    );
+
+                                    this.store.auth.injectAuthTokenInExternalApplication(
+                                        instance,
+                                    );
+                                    // #endregion
+
                                     this.executeApplicationWithUrl(
                                         instance,
                                         url,

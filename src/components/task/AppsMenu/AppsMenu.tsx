@@ -125,6 +125,7 @@ export class AppsMenu extends Component<IStore> {
                                 />
                             </div>
                             <div className={style.appsListWrapper}>
+                                {/* TODO: Refactor apps filter */}
                                 <div className={style.appsList}>
                                     {this.store.applicationManager.isSearching
                                         ? this.getFilteredByPlace(
@@ -132,34 +133,56 @@ export class AppsMenu extends Component<IStore> {
                                                   .findedApplicatons,
                                               ApplicationPlace.MainMenu,
                                               true,
-                                          ).map((app) => (
-                                              <AppsMenuItem
-                                                  key={app.id}
-                                                  icon={app.icon}
-                                                  title={app.name}
-                                                  isExecuted={app.isExecuted}
-                                                  isAvailable={app.isAvailable}
-                                                  onClick={() =>
-                                                      this.handleExecuteApp(app)
-                                                  }
-                                              />
-                                          ))
+                                          )
+                                              .filter(
+                                                  (item) =>
+                                                      !item.isExistedAppInstance,
+                                              )
+                                              .map((app) => (
+                                                  <AppsMenuItem
+                                                      key={app.id}
+                                                      icon={app.icon}
+                                                      title={app.name}
+                                                      isExecuted={
+                                                          app.isExecuted
+                                                      }
+                                                      isAvailable={
+                                                          app.isAvailable
+                                                      }
+                                                      onClick={() =>
+                                                          this.handleExecuteApp(
+                                                              app,
+                                                          )
+                                                      }
+                                                  />
+                                              ))
                                         : this.getFilteredByPlace(
                                               applicationsList,
                                               ApplicationPlace.MainMenu,
                                               true,
-                                          ).map((app) => (
-                                              <AppsMenuItem
-                                                  key={app.id}
-                                                  icon={app.icon}
-                                                  title={app.name}
-                                                  isExecuted={app.isExecuted}
-                                                  isAvailable={app.isAvailable}
-                                                  onClick={() =>
-                                                      this.handleExecuteApp(app)
-                                                  }
-                                              />
-                                          ))}
+                                          )
+                                              .filter(
+                                                  (item) =>
+                                                      !item.isExistedAppInstance,
+                                              )
+                                              .map((app) => (
+                                                  <AppsMenuItem
+                                                      key={app.id}
+                                                      icon={app.icon}
+                                                      title={app.name}
+                                                      isExecuted={
+                                                          app.isExecuted
+                                                      }
+                                                      isAvailable={
+                                                          app.isAvailable
+                                                      }
+                                                      onClick={() =>
+                                                          this.handleExecuteApp(
+                                                              app,
+                                                          )
+                                                      }
+                                                  />
+                                              ))}
                                     {this.store.applicationManager
                                         .isSearching &&
                                     this.store.applicationManager
