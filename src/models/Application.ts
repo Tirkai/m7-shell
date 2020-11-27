@@ -20,6 +20,8 @@ export class Application {
 
     isVisibleInStartMenu: boolean = true;
 
+    isExistedAppInstance: boolean = false;
+
     isAvailable: boolean = true;
 
     constructor(options: IApplicationOptions) {
@@ -34,6 +36,7 @@ export class Application {
             isFullscreen: observable,
             place: observable,
             isOnlyAdmin: observable,
+            isExistedAppInstance: observable,
             setExecuted: action,
             setAvailable: action,
         });
@@ -51,6 +54,7 @@ export class Application {
         this.isFullscreen = options.isFullscreen ?? false;
         this.place = options.place ?? ApplicationPlace.Unknown;
         this.isOnlyAdmin = options.isOnlyAdmin ?? false;
+        this.isExistedAppInstance = options.isExistedAppInstance ?? false;
     }
 
     setExecuted(value: boolean) {

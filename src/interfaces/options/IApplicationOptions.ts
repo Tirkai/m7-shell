@@ -13,4 +13,5 @@ export interface IApplicationOptions {
     isFullscreen?: boolean;
     place?: ApplicationPlace;
     isOnlyAdmin?: boolean;
+    isExistedAppInstance?: boolean;
 }
