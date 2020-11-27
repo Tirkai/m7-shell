@@ -45,14 +45,10 @@ export class NotificationHub extends Component<IStore> {
     };
 
     handleCloseNotification = (notification: NotificationModel) => {
-        notification.setDisplayed(false);
-
-        setTimeout(() => {
-            this.store.notification.removeNotifications(
-                [notification],
-                this.store.auth.userLogin,
-            );
-        }, 300);
+        this.store.notification.removeNotifications(
+            [notification],
+            this.store.auth.userLogin,
+        );
     };
 
     handleScroll = (event: React.UIEvent<HTMLDivElement>) => {

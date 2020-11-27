@@ -188,12 +188,22 @@ export class NotificationStore {
                             this.updateNotificationCount(response.total),
                     );
 
+                    this.socket.on(
+                        "delete_notification",
+                        (response: INotificationResponse) => {
+                            const notification = this.notifications.find(
+                                (item) => item.id === response.ntf_id,
+                            );
+                            notification?.setDisplayed(false);
+
+                            this.fetchNotifications(this.store.auth.userLogin);
+                        },
+                    );
+
                     this.socket.on("disconnect", () => {
                         this.setStatus(
                             NotificationServiceConnectStatus.Disconnected,
                         );
-
-                        // this.reconnectToNotificationSocket();
                     });
 
                     window.addEventListener(
