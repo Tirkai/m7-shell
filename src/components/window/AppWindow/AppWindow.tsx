@@ -75,7 +75,6 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
 
     handleFrameLoaded = (frameRef: HTMLIFrameElement) => {
         const context = frameRef?.contentWindow;
-
         if (context) {
             const app = this.props.application;
 
@@ -87,12 +86,12 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                 app.setEmitterContext(context);
                 this.handleBindingEmitterEvents(app);
             }
-            this.handleAppReady();
         }
     };
 
     handleBindingEmitterEvents = (app: ExternalApplication) => {
         app.emitter.on(AppMessageType.Connected, () => {
+            this.handleAppReady();
             this.store.auth.injectAuthTokenInExternalApplication(app);
         });
 
@@ -157,24 +156,26 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
 
     appComponent: JSX.Element | null = null;
     render() {
-        if (this.props.application instanceof ExternalApplication) {
-            this.appComponent = (
-                <iframe
-                    onLoad={this.handleAppReady}
-                    src={this.props.application.applicationUrl}
-                    ref={this.handleFrameLoaded}
-                    title={this.props.application.name}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        pointerEvents:
-                            this.props.isResizing || this.props.isDragging
-                                ? "none"
-                                : "all",
-                    }}
-                    frameBorder={0}
-                ></iframe>
-            );
+        if (!this.state.isAppReady) {
+            if (this.props.application instanceof ExternalApplication) {
+                this.appComponent = (
+                    <iframe
+                        onLoad={this.handleAppReady}
+                        src={this.props.application.applicationUrl}
+                        ref={this.handleFrameLoaded}
+                        title={this.props.application.name}
+                        style={{
+                            width: "100%",
+                            height: "100%",
+                            pointerEvents:
+                                this.props.isResizing || this.props.isDragging
+                                    ? "none"
+                                    : "all",
+                        }}
+                        frameBorder={0}
+                    ></iframe>
+                );
+            }
         }
         if (this.props.application instanceof ShellApplication) {
             this.appComponent = this.props.application.Component;

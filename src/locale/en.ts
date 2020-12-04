@@ -37,7 +37,11 @@ export const en = {
         off: "off",
         on: "on",
         notFound: "Not found",
-        sessionRecovery: "Session recovery",
+        sessionRecovery: {
+            title: "Session recovery",
+            content:
+                "Session recovery took a little longer than usual. Check your network connection or login again",
+        },
     },
     startMenu: {
         search: "Search",
