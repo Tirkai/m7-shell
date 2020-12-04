@@ -24,6 +24,9 @@ export const en = {
             logout: "Logout",
         },
     },
+    search: {
+        notFound: "Not found",
+    },
     actions: {
         login: "Login",
     },

@@ -223,6 +223,8 @@ export class NotificationStore {
             }
         } catch (e) {
             console.error(e);
+            /* TODO: Check unauthorize exception */
+
             this.setStatus(NotificationServiceConnectStatus.Disconnected);
             if (this.store.auth.isAuthorized) {
                 setTimeout(
@@ -266,6 +268,20 @@ export class NotificationStore {
                     })),
                 }),
             );
+            // TODO: Think about it
+
+            // notifications.forEach(
+            //     action((notification) => {
+            //         const notify = this.notifications.find(
+            //             (item) => item.id === notification.id,
+            //         );
+            //         if (notify) {
+            //             this.notifications.splice(
+            //                 this.notifications.indexOf(notify, 1),
+            //             );
+            //         }
+            //     }),
+            // );
             this.fetchNotifications(this.store.auth.userLogin);
         } catch (e) {
             console.error(e);

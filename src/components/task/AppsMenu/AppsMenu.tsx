@@ -1,12 +1,15 @@
+import { SVGIcon } from "@algont/m7-ui";
+import { search as searchIcon } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
+import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
+import { PerformanceContext } from "contexts/PerformanceContext";
 import { ApplicationPlace } from "enum/ApplicationPlace";
-import { IStore } from "interfaces/common/IStore";
+import { useStore } from "hooks/useStore";
 import { strings } from "locale";
-import { computed } from "mobx";
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import { Application } from "models/Application";
-import React, { Component } from "react";
+import React, { useContext, useState } from "react";
 import { AppsMenuItem } from "../AppsMenuItem/AppsMenuItem";
 import AppsMenuSearch from "../AppsMenuSearch/AppsMenuSearch";
 import AppsProfilePreview from "../AppsProfilePreview/AppsProfilePreview";
@@ -14,47 +17,32 @@ import { AppsSettings } from "../AppsSettings/AppsSettings";
 import { AppsShellLogo } from "../AppsShellLogo/AppsShellLogo";
 import style from "./style.module.css";
 
-@inject("store")
-@observer
-export class AppsMenu extends Component<IStore> {
-    @computed
-    get store() {
-        return this.props.store!;
-    }
+export const AppsMenu: React.FC = observer(() => {
+    const store = useStore();
+    const performanceMode = useContext(PerformanceContext);
+    const [isShowBackdrop, setShowBackdrop] = useState(false);
+    const [search, setSearch] = useState("");
+    const [isSearching, setSearching] = useState(false);
 
-    state = {
-        isShowBackdrop: false,
+    const handleSearch = (value: string) => {
+        setSearch(value);
+        setSearching(value.length > 0);
     };
 
-    handleSearch = (value: string) => {
-        this.store.applicationManager.setSearch(value);
-    };
-
-    handleExecuteLicenseApp = () => {
-        const app = this.store.applicationManager.findByKey("License");
-        if (app) {
-            this.store.applicationManager.executeApplication(app);
-        }
-    };
-
-    handleEnableDevMode = (value: boolean) => {
-        this.store.shell.setDevMode(value);
-    };
-
-    handleExecuteApp = (app: Application) => {
+    const handleExecuteApp = (app: Application) => {
         if (app.isAvailable) {
             if (!app.isExecuted) {
-                this.store.applicationManager.executeApplication(app);
+                store.applicationManager.executeApplication(app);
             } else {
-                const appWindow = this.store.windowManager.findWindowByApp(app);
+                const appWindow = store.windowManager.findWindowByApp(app);
                 if (appWindow) {
-                    this.store.windowManager.focusWindow(appWindow);
+                    store.windowManager.focusWindow(appWindow);
                 }
             }
         }
     };
 
-    getFilteredByPlace = (
+    const getFilteredByPlace = (
         apps: Application[],
         place: ApplicationPlace,
         showDefault: boolean = false,
@@ -65,140 +53,98 @@ export class AppsMenu extends Component<IStore> {
                 (showDefault ? item.place === ApplicationPlace.Unknown : false),
         );
 
-    handleAnimationStart = () => {
-        this.setState({
-            isShowBackdrop: false,
-        });
-    };
+    const applicationsList = getFilteredByPlace(
+        !store.shell.enabledDevMode
+            ? store.applicationManager.displayedApplications
+            : store.applicationManager.applications,
+        ApplicationPlace.MainMenu,
+        true,
+    );
 
-    handleAnimationEnd = () => {
-        this.setState({
-            isShowBackdrop: true,
-        });
-    };
+    const userMenuApps = getFilteredByPlace(
+        store.applicationManager.applications,
+        ApplicationPlace.UserMenu,
+    );
 
-    render() {
-        const applicationsList = !this.store.shell.enabledDevMode
-            ? this.store.applicationManager.displayedApplications
-            : this.store.applicationManager.applications;
+    const settingsMenuApps = getFilteredByPlace(
+        store.applicationManager.applications,
+        ApplicationPlace.Settings,
+    );
 
-        const userMenuApps = this.getFilteredByPlace(
-            this.store.applicationManager.applications,
-            ApplicationPlace.UserMenu,
-        );
+    const shellMenuApps = getFilteredByPlace(
+        store.applicationManager.applications,
+        ApplicationPlace.M7Menu,
+    );
 
-        const settingsMenuApps = this.getFilteredByPlace(
-            this.store.applicationManager.applications,
-            ApplicationPlace.Settings,
-        );
+    const displayedApps = !isSearching
+        ? applicationsList
+        : applicationsList.filter(
+              (app) =>
+                  app.name.toLowerCase().indexOf(search.toLowerCase()) > -1,
+          );
 
-        const shellMenuApps = this.getFilteredByPlace(
-            this.store.applicationManager.applications,
-            ApplicationPlace.M7Menu,
-        );
-
-        // TODO: Refactor
-        return (
-            <div
-                className={classNames(style.appsMenu, {
-                    [style.show]: this.store.shell.appMenuShow,
-                })}
-                onAnimationStart={this.handleAnimationStart}
-                onAnimationEnd={this.handleAnimationEnd}
-            >
-                <BackdropWrapper active={this.state.isShowBackdrop}>
-                    <div className={style.container}>
-                        <div className={style.sidebar}>
-                            <div className={style.sidebarTop}>
-                                <AppsShellLogo apps={shellMenuApps} />
-                            </div>
-                            <div className={style.sidebarBottom}>
-                                <AppsSettings apps={settingsMenuApps} />
-                                <AppsProfilePreview apps={userMenuApps} />
-                            </div>
+    return (
+        <div
+            className={classNames(style.appsMenu, {
+                [style.show]: store.shell.appMenuShow,
+                "no-animate": !performanceMode.mode.enableAnimation,
+            })}
+            onAnimationStart={() => setShowBackdrop(false)}
+            onAnimationEnd={() => setShowBackdrop(false)}
+        >
+            <BackdropWrapper active={isShowBackdrop}>
+                <div className={style.container}>
+                    <div className={style.sidebar}>
+                        <div className={style.sidebarTop}>
+                            <AppsShellLogo apps={shellMenuApps} />
                         </div>
-                        <div className={style.content}>
-                            <div className={style.search}>
-                                <AppsMenuSearch
-                                    value={this.store.applicationManager.search}
-                                    onChange={this.handleSearch}
-                                />
-                            </div>
-                            <div className={style.appsListWrapper}>
-                                {/* TODO: Refactor apps filter */}
-                                <div className={style.appsList}>
-                                    {this.store.applicationManager.isSearching
-                                        ? this.getFilteredByPlace(
-                                              this.store.applicationManager
-                                                  .findedApplicatons,
-                                              ApplicationPlace.MainMenu,
-                                              true,
-                                          )
-                                              .filter(
-                                                  (item) =>
-                                                      !item.isExistedAppInstance,
-                                              )
-                                              .map((app) => (
-                                                  <AppsMenuItem
-                                                      key={app.id}
-                                                      icon={app.icon}
-                                                      title={app.name}
-                                                      isExecuted={
-                                                          app.isExecuted
-                                                      }
-                                                      isAvailable={
-                                                          app.isAvailable
-                                                      }
-                                                      onClick={() =>
-                                                          this.handleExecuteApp(
-                                                              app,
-                                                          )
-                                                      }
-                                                  />
-                                              ))
-                                        : this.getFilteredByPlace(
-                                              applicationsList,
-                                              ApplicationPlace.MainMenu,
-                                              true,
-                                          )
-                                              .filter(
-                                                  (item) =>
-                                                      !item.isExistedAppInstance,
-                                              )
-                                              .map((app) => (
-                                                  <AppsMenuItem
-                                                      key={app.id}
-                                                      icon={app.icon}
-                                                      title={app.name}
-                                                      isExecuted={
-                                                          app.isExecuted
-                                                      }
-                                                      isAvailable={
-                                                          app.isAvailable
-                                                      }
-                                                      onClick={() =>
-                                                          this.handleExecuteApp(
-                                                              app,
-                                                          )
-                                                      }
-                                                  />
-                                              ))}
-                                    {this.store.applicationManager
-                                        .isSearching &&
-                                    this.store.applicationManager
-                                        .findedApplicatons.length <= 0 ? (
-                                        <div className={style.notFoundApps}>
-                                            {strings.state.notFound}
-                                        </div>
-                                    ) : (
-                                        ""
-                                    )}
-                                </div>
+                        <div className={style.sidebarBottom}>
+                            <AppsSettings apps={settingsMenuApps} />
+                            <AppsProfilePreview apps={userMenuApps} />
+                        </div>
+                    </div>
+                    <div className={style.content}>
+                        <div className={style.search}>
+                            <AppsMenuSearch
+                                value={search}
+                                onChange={handleSearch}
+                            />
+                        </div>
+
+                        <div className={style.appsListWrapper}>
+                            <div className={style.appsContainer}>
+                                {displayedApps.length > 0 && (
+                                    <div className={style.appsList}>
+                                        {displayedApps.map((app) => (
+                                            <AppsMenuItem
+                                                key={app.id}
+                                                icon={app.icon}
+                                                title={app.name}
+                                                isExecuted={app.isExecuted}
+                                                isAvailable={app.isAvailable}
+                                                onClick={() =>
+                                                    handleExecuteApp(app)
+                                                }
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                                {isSearching && displayedApps.length <= 0 && (
+                                    <PlaceholderWithIcon
+                                        icon={
+                                            <SVGIcon
+                                                source={searchIcon}
+                                                color="white"
+                                            />
+                                        }
+                                        content={strings.search.notFound}
+                                    />
+                                )}
                             </div>
                         </div>
                     </div>
-                </BackdropWrapper>
-            </div>
-        );
-    }
-}
+                </div>
+            </BackdropWrapper>
+        </div>
+    );
+});

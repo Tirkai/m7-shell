@@ -1,6 +1,6 @@
 {
     "name": "m7-shell",
-    "version": "0.21.2",
+    "version": "0.22.0-alpha",
     "private": true,
     "dependencies": {
         "@algont/m7-shell-emitter": "^0.7.0",
@@ -108,7 +108,8 @@
         "storybook-readme": "^5.0.8",
         "ts-node": "^9.0.0",
         "tslint": "^5.20.0",
-        "tslint-config-prettier": "^1.18.0"
+        "tslint-config-prettier": "^1.18.0",
+        "typedoc": "^0.19.2"
     },
     "homepage": "./"
 }

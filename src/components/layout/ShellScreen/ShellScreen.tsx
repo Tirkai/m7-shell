@@ -1,6 +1,7 @@
 import { AudioContainer } from "components/audio/AudioContainer/AudioContainer";
 import { AudioHub } from "components/audio/AudioHub/AudioHub";
 import { ShellContextMenu } from "components/contextMenu/ShellContextMenu/ShellContextMenu";
+import { ShellContextMenuOverlay } from "components/contextMenu/ShellContextMenuOverlay/ShellContextMenuOverlay";
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
@@ -171,6 +172,8 @@ export class ShellScreen extends Component<IStore> {
                 <AppWindowPinContainer />
                 <AudioContainer />
                 <AudioHub />
+                <ShellContextMenuOverlay />
+
                 <ShellContextMenu />
             </div>
         );

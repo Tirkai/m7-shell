@@ -1,68 +1,61 @@
+import { SVGIcon } from "@algont/m7-ui";
 import { empty } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
+import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
+import { PerformanceContext } from "contexts/PerformanceContext";
 import { ShellPanelType } from "enum/ShellPanelType";
-import { IStore } from "interfaces/common/IStore";
+import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { uniq } from "lodash";
-import { computed } from "mobx";
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import { Application } from "models/Application";
 import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationModel } from "models/NotificationModel";
-import React, { Component } from "react";
+import React, { useContext, useState } from "react";
 import { v4 } from "uuid";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
 import style from "./style.module.css";
 
-@inject("store")
-@observer
-export class NotificationHub extends Component<IStore> {
-    @computed
-    get store() {
-        return this.props.store!;
-    }
+export const NotificationHub = observer(() => {
+    const store = useStore();
+    const performanceMode = useContext(PerformanceContext);
+    const [isScrolled, setScrolled] = useState(false);
+    const [isShowBackdrop, setShowBackdrop] = useState(false);
 
-    state = {
-        isScrolled: false,
-        isShowBackdrop: false,
-    };
-
-    handleClearGroup = (id: string) => {
-        const notifications = this.store.notification.notifications.filter(
+    const handleClearGroup = (id: string) => {
+        const notifications = store.notification.notifications.filter(
             (item) => item.applicationId === id,
         );
 
         notifications.forEach((item) => item.setDisplayed(false));
 
         setTimeout(() => {
-            this.store.notification.removeNotifications(
+            store.notification.removeNotifications(
                 notifications,
-                this.store.auth.userLogin,
+                store.auth.userLogin,
             );
         }, 300);
     };
 
-    handleCloseNotification = (notification: NotificationModel) => {
-        this.store.notification.removeNotifications(
-            [notification],
-            this.store.auth.userLogin,
-        );
+    const handleCloseNotification = (notification: NotificationModel) => {
+        notification.setDisplayed(false);
+        setTimeout(() => {
+            store.notification.removeNotifications(
+                [notification],
+                store.auth.userLogin,
+            );
+        }, 300);
     };
 
-    handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-        if (this.state.isScrolled && event.currentTarget.scrollTop <= 0) {
-            this.setState({ isScrolled: false });
-        }
-        if (!this.state.isScrolled && event.currentTarget.scrollTop > 0) {
-            this.setState({ isScrolled: true });
-        }
+    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+        setScrolled(!isScrolled && event.currentTarget.scrollTop > 0);
     };
 
-    handleRunApplication = (appId: string, url: string) => {
-        const { shell, applicationManager, windowManager } = this.store;
-        const app = this.store.applicationManager.findById(appId);
+    const handleRunApplication = (appId: string, url: string) => {
+        const { shell, applicationManager, windowManager } = store;
+        const app = store.applicationManager.findById(appId);
 
         if (app instanceof ExternalApplication) {
             // TODO: Execute application with hash in function
@@ -84,106 +77,85 @@ export class NotificationHub extends Component<IStore> {
         }
     };
 
-    handleAnimationEnd = () => {
-        this.setState({
-            isShowBackdrop: true,
-        });
-    };
+    const apps = new Map<string, Application | undefined>();
+    const uniqueIds = uniq(
+        store.notification.notifications.map((item) => item.applicationId),
+    );
+    uniqueIds.forEach((item) =>
+        apps.set(item, store.applicationManager.findById(item)),
+    );
 
-    handleAnimationStart = () => {
-        this.setState({
-            isShowBackdrop: false,
-        });
-    };
-
-    render() {
-        const apps = new Map<string, Application | undefined>();
-        const uniqueIds = uniq(
-            this.store.notification.notifications.map(
-                (item) => item.applicationId,
-            ),
-        );
-        uniqueIds.forEach((item) =>
-            apps.set(item, this.store.applicationManager.findById(item)),
-        );
-
-        return (
-            <div
-                className={classNames(style.notificationHub, {
-                    [style.show]: this.store.shell.notificationHubShow,
-                })}
-                onAnimationStart={this.handleAnimationStart}
-                onAnimationEnd={this.handleAnimationEnd}
-            >
-                <BackdropWrapper active={this.state.isShowBackdrop}>
-                    <div className={style.container}>
-                        <div className={style.content}>
-                            <div
-                                className={classNames(style.title, {
-                                    [style.titleAfterScroll]: this.state
-                                        .isScrolled,
-                                })}
-                            >
-                                {strings.notification.title}
-                            </div>
-                            <div
-                                className={style.notificationsList}
-                                onScroll={this.handleScroll}
-                            >
-                                {uniqueIds.length ? (
-                                    uniqueIds.map((appId) => (
-                                        <NotificationGroup
-                                            key={appId}
-                                            onClear={() =>
-                                                this.handleClearGroup(appId)
-                                            }
-                                            icon={apps.get(appId)?.icon ?? ""}
-                                            title={apps.get(appId)?.name ?? ""}
-                                        >
-                                            {this.store.notification.notifications
-                                                .filter(
-                                                    (item) =>
-                                                        item.applicationId ===
-                                                        appId,
-                                                )
-                                                .slice(0, 5)
-                                                .map((notification) => (
-                                                    <NotificationCard
-                                                        key={notification.id}
-                                                        {...notification}
-                                                        onClick={() =>
-                                                            this.handleRunApplication(
-                                                                notification.applicationId,
-                                                                notification.url,
-                                                            )
-                                                        }
-                                                        onClose={() =>
-                                                            this.handleCloseNotification(
-                                                                notification,
-                                                            )
-                                                        }
-                                                    />
-                                                ))}
-                                        </NotificationGroup>
-                                    ))
-                                ) : (
-                                    <div className={style.noMoreNotifications}>
-                                        <div className={style.emptyIcon}>
-                                            <img src={empty} alt="Empty" />
-                                        </div>
-                                        <div className={style.emptyText}>
-                                            {
-                                                strings.notification
-                                                    .noMoreNotifications
-                                            }
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+    return (
+        <div
+            className={classNames(style.notificationHub, {
+                [style.show]: store.shell.notificationHubShow,
+                "no-animate": !performanceMode.mode.enableAnimation,
+            })}
+            onAnimationStart={() => setShowBackdrop(false)}
+            onAnimationEnd={() => setShowBackdrop(true)}
+        >
+            <BackdropWrapper active={isShowBackdrop}>
+                <div className={style.container}>
+                    <div className={style.content}>
+                        <div
+                            className={classNames(style.title, {
+                                [style.titleAfterScroll]: isScrolled,
+                            })}
+                        >
+                            {strings.notification.title}
+                        </div>
+                        <div
+                            className={style.notificationsList}
+                            onScroll={handleScroll}
+                        >
+                            {uniqueIds.length ? (
+                                uniqueIds.map((appId) => (
+                                    <NotificationGroup
+                                        key={appId}
+                                        onClear={() => handleClearGroup(appId)}
+                                        icon={apps.get(appId)?.icon ?? ""}
+                                        title={apps.get(appId)?.name ?? ""}
+                                    >
+                                        {store.notification.notifications
+                                            .filter(
+                                                (item) =>
+                                                    item.applicationId ===
+                                                    appId,
+                                            )
+                                            .slice(0, 5)
+                                            .map((notification) => (
+                                                <NotificationCard
+                                                    key={notification.id}
+                                                    {...notification}
+                                                    onClick={() =>
+                                                        handleRunApplication(
+                                                            notification.applicationId,
+                                                            notification.url,
+                                                        )
+                                                    }
+                                                    onClose={() =>
+                                                        handleCloseNotification(
+                                                            notification,
+                                                        )
+                                                    }
+                                                />
+                                            ))}
+                                    </NotificationGroup>
+                                ))
+                            ) : (
+                                <PlaceholderWithIcon
+                                    icon={
+                                        <SVGIcon source={empty} color="white" />
+                                    }
+                                    content={
+                                        strings.notification.noMoreNotifications
+                                    }
+                                />
+                            )}
                         </div>
                     </div>
-                </BackdropWrapper>
-            </div>
-        );
-    }
-}
+                </div>
+            </BackdropWrapper>
+        </div>
+    );
+});
