@@ -1,27 +1,52 @@
-import { CircularProgress } from "@material-ui/core";
-import classNames from "classnames";
+import {
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+} from "@material-ui/core";
+import { useStore } from "hooks/useStore";
 import { strings } from "locale";
-import { inject, observer } from "mobx-react";
-import React, { Component } from "react";
+import { observer } from "mobx-react";
+import React, { useEffect, useState } from "react";
 import style from "./style.module.css";
 
-const className = style.awaitVerifyScreen;
+export const AwaitVerifyScreen: React.FC = observer(() => {
+    const store = useStore();
+    const [isShow, setShow] = useState(false);
 
-@inject("store")
-@observer
-export class AwaitVerifyScreen extends Component {
-    render() {
-        return (
-            <div className={classNames(className)}>
-                <div className={style.container}>
-                    <div className={style.loader}>
-                        <CircularProgress color="secondary" />
+    const handleLogout = async () => store.auth.logout();
+
+    useEffect(() => {
+        const timeout = setTimeout(() => setShow(true), 3000);
+        return () => clearTimeout(timeout);
+    }, []);
+
+    return (
+        <Dialog open={isShow} onClose={() => setShow(false)} fullWidth>
+            <DialogTitle>
+                <div className={style.header}>
+                    <div className={style.preloader}>
+                        <CircularProgress size={20} />
                     </div>
-                    <div className={style.text}>
-                        {strings.state.sessionRecovery}
+                    <div className={style.title}>
+                        {strings.state.sessionRecovery.title}
                     </div>
                 </div>
-            </div>
-        );
-    }
-}
+            </DialogTitle>
+            <DialogContent>
+                {strings.state.sessionRecovery.content}
+            </DialogContent>
+            <DialogActions>
+                <Button
+                    color="primary"
+                    variant="contained"
+                    onClick={handleLogout}
+                >
+                    {strings.auth.action.logout}
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+});
