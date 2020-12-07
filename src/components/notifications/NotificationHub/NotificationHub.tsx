@@ -66,7 +66,12 @@ export const NotificationHub = observer(() => {
     };
 
     const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-        setScrolled(!isScrolled && event.currentTarget.scrollTop > 0);
+        if (isScrolled && event.currentTarget.scrollTop <= 0) {
+            setScrolled(false);
+        }
+        if (!isScrolled && event.currentTarget.scrollTop > 0) {
+            setScrolled(true);
+        }
     };
 
     const handleRunApplication = (appId: string, url: string) => {
