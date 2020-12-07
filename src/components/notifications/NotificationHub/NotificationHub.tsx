@@ -12,7 +12,7 @@ import { observer } from "mobx-react";
 import { Application } from "models/Application";
 import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationModel } from "models/NotificationModel";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { v4 } from "uuid";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
@@ -23,6 +23,22 @@ export const NotificationHub = observer(() => {
     const performanceMode = useContext(PerformanceContext);
     const [isScrolled, setScrolled] = useState(false);
     const [isShowBackdrop, setShowBackdrop] = useState(false);
+
+    const connectNotifications = async () => {
+        await store.notification.fetchApps(store.auth.userLogin);
+        await store.notification.fetchNotifications(store.auth.userLogin);
+
+        store.notification.connectToNotificationsSocket(store.auth.accessToken);
+    };
+
+    const disconnectNotifications = () => {
+        store.notification.disconnectFromNotificationsSocket();
+    };
+
+    useEffect(() => {
+        connectNotifications();
+        return () => disconnectNotifications();
+    }, []);
 
     const handleClearGroup = (id: string) => {
         const notifications = store.notification.notifications.filter(
@@ -82,7 +98,10 @@ export const NotificationHub = observer(() => {
         store.notification.notifications.map((item) => item.applicationId),
     );
     uniqueIds.forEach((item) =>
-        apps.set(item, store.applicationManager.findById(item)),
+        apps.set(
+            item,
+            store.notification.applications.find((app) => app.id === item),
+        ),
     );
 
     return (

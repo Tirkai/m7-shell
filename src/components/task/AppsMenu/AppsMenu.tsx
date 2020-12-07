@@ -12,7 +12,7 @@ import { Application } from "models/Application";
 import React, { useContext, useState } from "react";
 import { AppsMenuItem } from "../AppsMenuItem/AppsMenuItem";
 import AppsMenuSearch from "../AppsMenuSearch/AppsMenuSearch";
-import AppsProfilePreview from "../AppsProfilePreview/AppsProfilePreview";
+import { AppsProfilePreview } from "../AppsProfilePreview/AppsProfilePreview";
 import { AppsSettings } from "../AppsSettings/AppsSettings";
 import { AppsShellLogo } from "../AppsShellLogo/AppsShellLogo";
 import style from "./style.module.css";
@@ -90,7 +90,7 @@ export const AppsMenu: React.FC = observer(() => {
                 "no-animate": !performanceMode.mode.enableAnimation,
             })}
             onAnimationStart={() => setShowBackdrop(false)}
-            onAnimationEnd={() => setShowBackdrop(false)}
+            onAnimationEnd={() => setShowBackdrop(true)}
         >
             <BackdropWrapper active={isShowBackdrop}>
                 <div className={style.container}>

@@ -7,18 +7,21 @@ import {
 } from "constants/config";
 import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellEvents } from "enum/ShellEvents";
+import { ApplicationFactory } from "factories/ApplicationFactory";
 import { NotificationFactory } from "factories/NotificationFactory";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
+import { INotificationAppRelationResponse } from "interfaces/response/INotificationAppRelationResponse";
 import { INotificationCountResponse } from "interfaces/response/INotificationCountResponse";
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
 import { flatten } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { AudioModel } from "models/AudioModel";
+import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationModel } from "models/NotificationModel";
 import { ToastNotification } from "models/ToastNotification";
 import io from "socket.io-client";
 import {
-    legacyNotificationEndpoint,
+    notificationsAppsEndpoint,
     notificationsEndpoint,
 } from "utils/endpoints";
 import { AppStore } from "./AppStore";
@@ -31,6 +34,8 @@ export class NotificationStore {
     notifications: NotificationModel[] = [];
 
     count = 0;
+
+    applications: ExternalApplication[] = [];
 
     status: NotificationServiceConnectStatus =
         NotificationServiceConnectStatus.Default;
@@ -61,14 +66,7 @@ export class NotificationStore {
     async fetchNotifications(login: string) {
         return new Promise(async (resolve, reject) => {
             try {
-                const appsResponse = await Axios.post<
-                    IJsonRpcResponse<string[]>
-                >(
-                    legacyNotificationEndpoint.url,
-                    new JsonRpcPayload("getAppIds"),
-                );
-
-                const countResponse = await Axios.post<
+                const notificationsCountResponse = await Axios.post<
                     IJsonRpcResponse<number>
                 >(
                     notificationsEndpoint.url,
@@ -79,35 +77,29 @@ export class NotificationStore {
                     }),
                 );
 
-                this.setCount(countResponse.data.result);
+                this.setCount(notificationsCountResponse.data.result);
 
-                const servicedApplicationsIds = appsResponse.data.result;
-
-                const notifications = servicedApplicationsIds.map(
-                    async (id) => {
-                        const response = await Axios.post<
-                            IJsonRpcResponse<INotificationResponse[]>
-                        >(
-                            notificationsEndpoint.url,
-                            new JsonRpcPayload("get_list_by_filter", {
-                                filter: {
-                                    app_id: {
-                                        values: [id],
-                                    },
-                                    login: { values: [login] },
+                const notifications = this.applications.map(async (app) => {
+                    const response = await Axios.post<
+                        IJsonRpcResponse<INotificationResponse[]>
+                    >(
+                        notificationsEndpoint.url,
+                        new JsonRpcPayload("get_list_by_filter", {
+                            filter: {
+                                app_id: {
+                                    values: [app.id],
                                 },
-                                limit: 5,
-                                offset: 0,
-                                order: [
-                                    { field: "ntf_date", direction: "desc" },
-                                ],
-                            }),
-                        );
-                        return response.data.result.map((item) =>
-                            NotificationFactory.createNotification(item),
-                        );
-                    },
-                );
+                                login: { values: [login] },
+                            },
+                            limit: 5,
+                            offset: 0,
+                            order: [{ field: "ntf_date", direction: "desc" }],
+                        }),
+                    );
+                    return response.data.result.map((item) =>
+                        NotificationFactory.createNotification(item),
+                    );
+                });
 
                 Promise.all(notifications)
                     .then((values) => {
@@ -123,6 +115,46 @@ export class NotificationStore {
                 reject();
             }
         });
+    }
+
+    async fetchApps(login: string) {
+        try {
+            const appsCountResponse = await Axios.post<
+                IJsonRpcResponse<number>
+            >(
+                notificationsAppsEndpoint.url,
+                new JsonRpcPayload("get_count_by_filter", {
+                    filter: {
+                        login: { values: [login] },
+                    },
+                }),
+            );
+
+            const appsListResponse = await Axios.post<
+                IJsonRpcResponse<INotificationAppRelationResponse[]>
+            >(
+                notificationsAppsEndpoint.url,
+                new JsonRpcPayload("get_list_by_filter", {
+                    filter: {},
+                    order: [
+                        {
+                            field: "app_name",
+                            direction: "asc",
+                        },
+                    ],
+                    limit: appsCountResponse.data.result,
+                    offset: 0,
+                }),
+            );
+
+            this.setApplications(
+                appsListResponse.data.result.map((item) =>
+                    ApplicationFactory.createNotificationAppRelation(item),
+                ),
+            );
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     removeToast(toast: ToastNotification) {
@@ -151,10 +183,10 @@ export class NotificationStore {
         });
     }
 
-    async connectToNotificationsSocket(token: string) {
+    connectToNotificationsSocket(token: string) {
         try {
             if (token.length > 0) {
-                await this.fetchNotifications(this.store.auth.userLogin);
+                // await this.fetchNotifications(this.store.auth.userLogin);
                 if (this.socket === null) {
                     this.socket = io.connect(NOTIFICATIONS_WEBSOCKET_URL, {
                         transportOptions: {
@@ -252,6 +284,10 @@ export class NotificationStore {
 
     updateNotificationCount(count: number) {
         this.count = count;
+    }
+
+    setApplications(apps: ExternalApplication[]) {
+        this.applications = apps;
     }
 
     async removeNotifications(

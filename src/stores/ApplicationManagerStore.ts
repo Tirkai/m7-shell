@@ -5,6 +5,7 @@ import {
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
+import { ApplicationFactory } from "factories/ApplicationFactory";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicationResponse";
 import { strings } from "locale";
@@ -188,7 +189,7 @@ export class ApplicationManagerStore {
     }
 
     destroyUserSession() {
-        this.applications.forEach((app) => app.setExecuted(false));
+        this.applications = [];
     }
 
     async fetchApplications() {
@@ -205,16 +206,8 @@ export class ApplicationManagerStore {
             );
 
             if (!response.data.error) {
-                const portalApplications = response.data.result.map(
-                    (item) =>
-                        new ExternalApplication({
-                            id: item.id,
-                            name: item.name,
-                            url: item.guiUrl,
-                            icon: item.iconUrl,
-                            key: item.id,
-                            place: item.shellParams?.item_place,
-                        }),
+                const portalApplications = response.data.result.map((item) =>
+                    ApplicationFactory.createExternalApplication(item),
                 );
                 this.addApplicationsList(portalApplications);
             }
