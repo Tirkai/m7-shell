@@ -1,6 +1,7 @@
 .notificationGroup {
     display: block;
     position: relative;
+    margin-bottom: 10px;
 }
 .notificationGroup:hover .actions {
     display: flex;

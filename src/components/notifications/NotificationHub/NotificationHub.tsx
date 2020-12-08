@@ -3,6 +3,7 @@ import { empty } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
+import { NOTIFICATION_APP_GUID } from "constants/config";
 import { PerformanceContext } from "contexts/PerformanceContext";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
@@ -109,12 +110,30 @@ export const NotificationHub = observer(() => {
     };
 
     const handleOpenNotificationGroup = (group: NotificationGroupModel) => {
-        store.message.showMessage(
-            "Упс...",
-            `Вы думали, что-то произойдет, но не произошло.
-            Мир по своей природе жесток и не обязан соответствовать вашим ожиданиям.
-            Но справедливость ради, когда нибудь тут появятся уведомления для ${group.name}`,
+        const notificationApp = store.applicationManager.findById(
+            NOTIFICATION_APP_GUID,
         );
+
+        if (notificationApp instanceof ExternalApplication) {
+            const url = new URL(notificationApp.url);
+            const params = new URLSearchParams();
+            params.set("filterByAppId", group.id);
+            params.set("appId", NOTIFICATION_APP_GUID);
+
+            url.search = params.toString();
+
+            store.applicationManager.executeApplicationWithUrl(
+                notificationApp,
+                url.toString(),
+            );
+        }
+
+        // store.message.showMessage(
+        //     "Упс...",
+        //     `Вы думали, что-то произойдет, но не произошло.
+        //     Мир по своей природе жесток и не обязан соответствовать вашим ожиданиям.
+        //     Но справедливость ради, когда нибудь тут появятся уведомления для ${group.name}`,
+        // );
     };
 
     return (
