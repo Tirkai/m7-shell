@@ -7,10 +7,9 @@ import { PerformanceContext } from "contexts/PerformanceContext";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
-import { uniq } from "lodash";
 import { observer } from "mobx-react";
-import { Application } from "models/Application";
 import { ExternalApplication } from "models/ExternalApplication";
+import { NotificationGroupModel } from "models/NotificationGroupModel";
 import { NotificationModel } from "models/NotificationModel";
 import React, { useContext, useEffect, useState } from "react";
 import { v4 } from "uuid";
@@ -26,7 +25,8 @@ export const NotificationHub = observer(() => {
 
     const connectNotifications = async () => {
         await store.notification.fetchApps(store.auth.userLogin);
-        await store.notification.fetchNotifications(store.auth.userLogin);
+        await store.notification.fetchTotalCount(store.auth.userLogin);
+        store.notification.fetchNotifications(store.auth.userLogin);
 
         store.notification.connectToNotificationsSocket(store.auth.accessToken);
     };
@@ -40,19 +40,29 @@ export const NotificationHub = observer(() => {
         return () => disconnectNotifications();
     }, []);
 
-    const handleClearGroup = (id: string) => {
-        const notifications = store.notification.notifications.filter(
-            (item) => item.applicationId === id,
-        );
+    const handleClearGroup = (group: NotificationGroupModel) => {
+        group.setFetching(true);
+        group.notifications.forEach((notify) => notify.setDisplayed(false));
+        setTimeout(async () => {
+            try {
+                await store.notification.removeNotifications(
+                    group.notifications,
+                    store.auth.userLogin,
+                );
 
-        notifications.forEach((item) => item.setDisplayed(false));
+                group.clearNotifications();
 
-        setTimeout(() => {
-            store.notification.removeNotifications(
-                notifications,
-                store.auth.userLogin,
-            );
-        }, 300);
+                await store.notification.fetchGroup(
+                    group,
+                    store.auth.userLogin,
+                );
+                group.setFetching(false);
+            } catch (e) {
+                group.setFetching(false);
+
+                console.error(e);
+            }
+        }, 500);
     };
 
     const handleCloseNotification = (notification: NotificationModel) => {
@@ -98,16 +108,14 @@ export const NotificationHub = observer(() => {
         }
     };
 
-    const apps = new Map<string, Application | undefined>();
-    const uniqueIds = uniq(
-        store.notification.notifications.map((item) => item.applicationId),
-    );
-    uniqueIds.forEach((item) =>
-        apps.set(
-            item,
-            store.notification.applications.find((app) => app.id === item),
-        ),
-    );
+    const handleOpenNotificationGroup = (group: NotificationGroupModel) => {
+        store.message.showMessage(
+            "Упс...",
+            `Вы думали, что-то произойдет, но не произошло.
+            Мир по своей природе жесток и не обязан соответствовать вашим ожиданиям.
+            Но справедливость ради, когда нибудь тут появятся уведомления для ${group.name}`,
+        );
+    };
 
     return (
         <div
@@ -132,22 +140,26 @@ export const NotificationHub = observer(() => {
                             className={style.notificationsList}
                             onScroll={handleScroll}
                         >
-                            {uniqueIds.length ? (
-                                uniqueIds.map((appId) => (
+                            {store.notification.groups
+                                .filter(
+                                    (group) =>
+                                        group.hasNotifications ||
+                                        group.isFetching,
+                                )
+                                .map((group) => (
                                     <NotificationGroup
-                                        key={appId}
-                                        onClear={() => handleClearGroup(appId)}
-                                        icon={apps.get(appId)?.icon ?? ""}
-                                        title={apps.get(appId)?.name ?? ""}
+                                        key={group.id}
+                                        onClear={() => handleClearGroup(group)}
+                                        onTitleClick={() =>
+                                            handleOpenNotificationGroup(group)
+                                        }
+                                        icon={group.icon}
+                                        title={group.name}
+                                        count={group.count}
+                                        isFetching={group.isFetching}
                                     >
-                                        {store.notification.notifications
-                                            .filter(
-                                                (item) =>
-                                                    item.applicationId ===
-                                                    appId,
-                                            )
-                                            .slice(0, 5)
-                                            .map((notification) => (
+                                        {group.notifications.map(
+                                            (notification) => (
                                                 <NotificationCard
                                                     key={notification.id}
                                                     {...notification}
@@ -163,19 +175,29 @@ export const NotificationHub = observer(() => {
                                                         )
                                                     }
                                                 />
-                                            ))}
+                                            ),
+                                        )}
                                     </NotificationGroup>
-                                ))
-                            ) : (
-                                <PlaceholderWithIcon
-                                    icon={
-                                        <SVGIcon source={empty} color="white" />
-                                    }
-                                    content={
-                                        strings.notification.noMoreNotifications
-                                    }
-                                />
-                            )}
+                                ))}
+                            {store.notification.groups.every(
+                                (group) => !group.hasNotifications,
+                            ) &&
+                                store.notification.groups.every(
+                                    (group) => !group.isFetching,
+                                ) && (
+                                    <PlaceholderWithIcon
+                                        icon={
+                                            <SVGIcon
+                                                source={empty}
+                                                color="white"
+                                            />
+                                        }
+                                        content={
+                                            strings.notification
+                                                .noMoreNotifications
+                                        }
+                                    />
+                                )}
                         </div>
                     </div>
                 </div>

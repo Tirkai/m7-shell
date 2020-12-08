@@ -1,39 +1,48 @@
 import { SVGIcon } from "@algont/m7-ui";
+import { CircularProgress } from "@material-ui/core";
 import { cross } from "assets/icons";
-import React, { Component } from "react";
+import React from "react";
 import style from "./style.module.css";
-interface INotificationGroup {
+interface INotificationGroupProps {
     icon: string;
     title: string;
+    count?: number;
+    children: JSX.Element | JSX.Element[];
+    isFetching?: boolean;
     onClear: () => void;
+    onTitleClick: () => void;
 }
 
-export class NotificationGroup extends Component<INotificationGroup> {
-    handleClearGroup = () => this.props.onClear();
+export const NotificationGroup = (props: INotificationGroupProps) => {
+    const handleClearGroup = () => props.onClear();
 
-    render() {
-        return (
-            <div className={style.notificationGroup}>
-                <div className={style.header}>
-                    <div className={style.title}>
-                        <div className={style.icon}>
-                            <SVGIcon source={this.props.icon} color="white" />
-                        </div>
-                        <div className={style.titleText}>
-                            {this.props.title}
-                        </div>
+    return (
+        <div className={style.notificationGroup}>
+            <div className={style.header}>
+                <div className={style.title} onClick={props.onTitleClick}>
+                    <div className={style.icon}>
+                        <SVGIcon source={props.icon} color="white" />
                     </div>
-                    <div className={style.actions}>
-                        <div
-                            className={style.actionItem}
-                            onClick={this.handleClearGroup}
-                        >
-                            <SVGIcon source={cross} color="white" />
-                        </div>
+                    <div className={style.titleText}>{props.title}</div>
+                    <div className={style.count}>{props.count}</div>
+                </div>
+                <div className={style.actions}>
+                    <div
+                        className={style.actionItem}
+                        onClick={handleClearGroup}
+                    >
+                        <SVGIcon source={cross} color="white" />
                     </div>
                 </div>
-                <div className={style.content}>{this.props.children}</div>
             </div>
-        );
-    }
-}
+            <div className={style.content}>
+                {props.children}
+                {props.isFetching && (
+                    <div className={style.overlay}>
+                        <CircularProgress color="secondary" />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};

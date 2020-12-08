@@ -42,7 +42,8 @@
 .notificationsList {
     height: 100%;
     align-items: flex-start;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 0 12px;
 }
 .notificationItem {
