@@ -1,6 +1,6 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { CircularProgress } from "@material-ui/core";
 import { cross } from "assets/icons";
+import classNames from "classnames";
 import React from "react";
 import style from "./style.module.css";
 interface INotificationGroupProps {
@@ -37,11 +37,12 @@ export const NotificationGroup = (props: INotificationGroupProps) => {
             </div>
             <div className={style.content}>
                 {props.children}
-                {props.isFetching && (
-                    <div className={style.overlay}>
-                        <CircularProgress color="secondary" />
-                    </div>
-                )}
+
+                <div
+                    className={classNames(style.overlay, {
+                        [style.show]: props.isFetching,
+                    })}
+                ></div>
             </div>
         </div>
     );
