@@ -217,7 +217,6 @@ export class NotificationStore {
     connectToNotificationsSocket(token: string) {
         try {
             if (token.length > 0) {
-                // await this.fetchNotifications(this.store.auth.userLogin);
                 if (this.socket === null) {
                     this.socket = io.connect(NOTIFICATIONS_WEBSOCKET_URL, {
                         transportOptions: {
@@ -310,7 +309,6 @@ export class NotificationStore {
     addNotification(notification: NotificationModel) {
         try {
             this.toasts.unshift(new ToastNotification(notification));
-            // this.notifications.unshift(notification);
 
             const group = this.groups.find(
                 (item) => item.id === notification.applicationId,
@@ -318,8 +316,6 @@ export class NotificationStore {
             if (group) {
                 this.fetchGroup(group, this.store.auth.userLogin);
             }
-
-            // group?.setNotifications([...group.notifications, notification]);
 
             this.store.audio.playAudio(
                 new AudioModel({

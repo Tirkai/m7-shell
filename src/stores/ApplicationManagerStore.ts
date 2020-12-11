@@ -224,48 +224,6 @@ export class ApplicationManagerStore {
         }
     }
 
-    async fetchUpdateApplications() {
-        try {
-            // Placeholder
-            await new Promise((resolve) => resolve());
-            // const response = await Axios.post<
-            //     IJsonRpcResponse<IPortalApplicationResponse<IAppParams>[]>
-            // >(
-            //     portalEndpoint.url,
-            //     new JsonRpcPayload("getComponents", {
-            //         with_shell_params: true,
-            //     }),
-            // );
-            // if (!response.data.error) {
-            //     const portalApplications = response.data.result.map(
-            //         (item) =>
-            //             new ExternalApplication({
-            //                 id: item.id,
-            //                 name: item.name,
-            //                 url: item.guiUrl,
-            //                 icon: item.iconUrl,
-            //                 key: item.id,
-            //             }),
-            //     );
-            //     const diffIds = difference(
-            //         portalApplications.map((item) => item.id),
-            //         this.applications
-            //             .filter((item) => item instanceof ExternalApplication)
-            //             .map((item) => item.id),
-            //     );
-            //     this.addApplicationsList(
-            //         intersectionWith(
-            //             portalApplications,
-            //             diffIds,
-            //             (a, b) => a.id === b,
-            //         ),
-            //     );
-            // }
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
     findByKey(key: string) {
         return this.applications.find((app) => app.key === key);
     }
