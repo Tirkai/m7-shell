@@ -1,8 +1,14 @@
 export const ru = {
+    global: {
+        systemName: "M7",
+    },
     error: {
         anOccurredError: "Произошла ошибка",
         connectionError: "Не удалось установить соединение с сервером",
         applicationService: "Сервис приложений недоступен",
+        noAvailableApplications: "Нет доступных приложений",
+        failedGetAvailableApplications:
+            "Не удалось получить список доступных приложения для данного пользователя",
     },
     auth: {
         error: {
@@ -14,6 +20,9 @@ export const ru = {
             authenticateUnknownNode: "Неизвестный узел",
         },
         description: "Единая служба авторизации",
+        action: {
+            logout: "Выход",
+        },
     },
     actions: {
         login: "Вход",
@@ -28,6 +37,11 @@ export const ru = {
         off: "выключено",
         on: "включено",
         notFound: "Ничего не найдено",
+        sessionRecovery: {
+            title: "Восстановление сессии",
+            content:
+                "Восстановление сессии заняло чуть больше времени чем обычно. Проверьте ваше сетевое подключение или авторизуйтесь повторно.",
+        },
     },
     startMenu: {
         search: "Поиск",
@@ -40,8 +54,39 @@ export const ru = {
         title: "Уведомления",
         noMoreNotifications: "Нет уведомлений",
     },
+    application: {
+        actions: {
+            close: "Закрыть",
+            hardReset: "Перезагрузить",
+            refresh: "Обновить",
+            fullScreen: "Полноэкранный",
+            collapse: "Свернуть",
+        },
+    },
     definedApplications: {
         license: "Лицензионная защита",
         accountsMe: "Профиль",
+    },
+
+    shellApps: {
+        launchQueryBuilder: {
+            title: "Параметры запуска",
+            autoRunTitle: "Автозапуск",
+            autoRunType: "Тип автозапуска",
+            autoRunApplication: "Приложение",
+            autoRunApplicationChoose: "Выбрать",
+            autoRunUrl: "URL",
+            autoRunFullscreen: "Полноэкранный",
+            autoLoginTitle: "Автологин",
+            autoLoginFieldLogin: "Логин",
+            autoLoginFieldPassword: "Пароль",
+            displayModeTitle: "Режим отображения",
+            displayModeDefault: "По умолчанию",
+            displayModeEmbed: "Встраиваемый",
+        },
+        customExecutor: {
+            title: "Выполнить",
+            execute: "Выполнить",
+        },
     },
 };

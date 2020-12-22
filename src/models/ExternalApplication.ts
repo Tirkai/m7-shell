@@ -1,20 +1,45 @@
 import { ShellMessageEmitter } from "@algont/m7-shell-emitter";
 import { IExternalApplicationOptions } from "interfaces/options/IExternalApplicationOptions";
-import { action, computed, observable } from "mobx";
-import { v4 } from "uuid";
+import { action, computed, makeObservable, observable } from "mobx";
 import { Application } from "./Application";
-export class ExternalApllication extends Application {
-    @observable
+export class ExternalApplication extends Application {
     url: string;
 
-    @observable
     customUrl: string = "";
 
     emitter: ShellMessageEmitter;
+
     constructor(options: IExternalApplicationOptions) {
         super(options);
-        this.url = options.url;
-        this.emitter = new ShellMessageEmitter();
+
+        makeObservable(this, {
+            url: observable,
+            customUrl: observable,
+            applicationUrl: computed,
+            setEmitterContext: action,
+            setExecuted: action,
+            setCustomUrl: action,
+        });
+
+        this.emitter = new ShellMessageEmitter(this.id);
+        try {
+            const url = new URL(options.url);
+            const urlParams = new URLSearchParams(url.search);
+            urlParams.set("appId", this.id);
+
+            const resultUrl = `${url.protocol}//${url.host}${
+                url.pathname
+            }?${urlParams.toString()}${url.hash}`;
+
+            this.url = resultUrl;
+        } catch (e) {
+            this.url = "";
+            this.setAvailable(false);
+        }
+    }
+
+    get applicationUrl() {
+        return this.customUrl.length ? this.customUrl : this.url;
     }
 
     setEmitterContext(context: Window) {
@@ -22,12 +47,6 @@ export class ExternalApllication extends Application {
         return this;
     }
 
-    @computed
-    get applicationUrl() {
-        return this.customUrl.length ? this.customUrl : this.url;
-    }
-
-    @action
     setExecuted(value: boolean) {
         try {
             this.emitter?.clear();
@@ -41,9 +60,7 @@ export class ExternalApllication extends Application {
         return this;
     }
 
-    @action
     setCustomUrl(url: string) {
-        this.customUrl = url + "?hash=" + v4();
-        console.log({ custom: this.customUrl, app: this.applicationUrl });
+        this.customUrl = url;
     }
 }

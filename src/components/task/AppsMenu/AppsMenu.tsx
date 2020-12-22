@@ -1,6 +1,6 @@
 import classNames from "classnames";
-import { DropdownMenu } from "components/controls/DropdownMenu/DropdownMenu";
-import { DropdownMenuItem } from "components/controls/DropdownMenuItem/DropdownMenuItem";
+import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
+import { ApplicationPlace } from "enum/ApplicationPlace";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { computed } from "mobx";
@@ -10,6 +10,7 @@ import React, { Component } from "react";
 import { AppsMenuItem } from "../AppsMenuItem/AppsMenuItem";
 import AppsMenuSearch from "../AppsMenuSearch/AppsMenuSearch";
 import AppsProfilePreview from "../AppsProfilePreview/AppsProfilePreview";
+import { AppsSettings } from "../AppsSettings/AppsSettings";
 import { AppsShellLogo } from "../AppsShellLogo/AppsShellLogo";
 import style from "./style.module.css";
 
@@ -20,6 +21,10 @@ export class AppsMenu extends Component<IStore> {
     get store() {
         return this.props.store!;
     }
+
+    state = {
+        isShowBackdrop: false,
+    };
 
     handleSearch = (value: string) => {
         this.store.applicationManager.setSearch(value);
@@ -37,7 +42,39 @@ export class AppsMenu extends Component<IStore> {
     };
 
     handleExecuteApp = (app: Application) => {
-        this.store.applicationManager.executeApplication(app);
+        if (app.isAvailable) {
+            if (!app.isExecuted) {
+                this.store.applicationManager.executeApplication(app);
+            } else {
+                const appWindow = this.store.windowManager.findWindowByApp(app);
+                if (appWindow) {
+                    this.store.windowManager.focusWindow(appWindow);
+                }
+            }
+        }
+    };
+
+    getFilteredByPlace = (
+        apps: Application[],
+        place: ApplicationPlace,
+        showDefault: boolean = false,
+    ) =>
+        apps.filter(
+            (item) =>
+                item.place === place ||
+                (showDefault ? item.place === ApplicationPlace.Unknown : false),
+        );
+
+    handleAnimationStart = () => {
+        this.setState({
+            isShowBackdrop: false,
+        });
+    };
+
+    handleAnimationEnd = () => {
+        this.setState({
+            isShowBackdrop: true,
+        });
     };
 
     render() {
@@ -45,97 +82,122 @@ export class AppsMenu extends Component<IStore> {
             ? this.store.applicationManager.displayedApplications
             : this.store.applicationManager.applications;
 
+        const userMenuApps = this.getFilteredByPlace(
+            this.store.applicationManager.applications,
+            ApplicationPlace.UserMenu,
+        );
+
+        const settingsMenuApps = this.getFilteredByPlace(
+            this.store.applicationManager.applications,
+            ApplicationPlace.Settings,
+        );
+
+        const shellMenuApps = this.getFilteredByPlace(
+            this.store.applicationManager.applications,
+            ApplicationPlace.M7Menu,
+        );
+
+        // TODO: Refactor
         return (
             <div
                 className={classNames(style.appsMenu, {
-                    [style.visible]: this.store.shell.appMenuShow,
+                    [style.show]: this.store.shell.appMenuShow,
                 })}
+                onAnimationStart={this.handleAnimationStart}
+                onAnimationEnd={this.handleAnimationEnd}
             >
-                <div className={style.container}>
-                    <div className={style.sidebar}>
-                        <div className={style.sidebarTop}>
-                            <div className={style.logo}>
-                                <DropdownMenu
-                                    render={[
-                                        <DropdownMenuItem
-                                            key={"licence"}
-                                            onClick={
-                                                this.handleExecuteLicenseApp
-                                            }
-                                        >
-                                            {
-                                                strings.definedApplications
-                                                    .license
-                                            }
-                                        </DropdownMenuItem>,
-                                        <DropdownMenuItem
-                                            key={"devmode"}
-                                            onClick={() =>
-                                                this.handleEnableDevMode(
-                                                    !this.store.shell
-                                                        .enabledDevMode,
-                                                )
-                                            }
-                                        >
-                                            {strings.startMenu.devMode}
-                                        </DropdownMenuItem>,
-                                    ]}
-                                >
-                                    <AppsShellLogo />
-                                </DropdownMenu>
+                <BackdropWrapper active={this.state.isShowBackdrop}>
+                    <div className={style.container}>
+                        <div className={style.sidebar}>
+                            <div className={style.sidebarTop}>
+                                <AppsShellLogo apps={shellMenuApps} />
+                            </div>
+                            <div className={style.sidebarBottom}>
+                                <AppsSettings apps={settingsMenuApps} />
+                                <AppsProfilePreview apps={userMenuApps} />
                             </div>
                         </div>
-                        <div className={style.sidebarBottom}>
-                            <AppsProfilePreview />
-                        </div>
-                    </div>
-                    <div className={style.content}>
-                        <div className={style.search}>
-                            <AppsMenuSearch
-                                value={this.store.applicationManager.search}
-                                onChange={this.handleSearch}
-                            />
-                        </div>
-                        <div className={style.appsListWrapper}>
-                            <div className={style.appsList}>
-                                {this.store.applicationManager.isSearching
-                                    ? this.store.applicationManager.findedApplicatons.map(
-                                          (app) => (
-                                              <AppsMenuItem
-                                                  key={app.id}
-                                                  icon={app.icon}
-                                                  title={app.name}
-                                                  isExecuted={app.isExecuted}
-                                                  onClick={() =>
-                                                      this.handleExecuteApp(app)
-                                                  }
-                                              />
-                                          ),
-                                      )
-                                    : applicationsList.map((app) => (
-                                          <AppsMenuItem
-                                              key={app.id}
-                                              icon={app.icon}
-                                              title={app.name}
-                                              isExecuted={app.isExecuted}
-                                              onClick={() =>
-                                                  this.handleExecuteApp(app)
-                                              }
-                                          />
-                                      ))}
-                                {this.store.applicationManager.isSearching &&
-                                this.store.applicationManager.findedApplicatons
-                                    .length <= 0 ? (
-                                    <div className={style.notFoundApps}>
-                                        {strings.state.notFound}
-                                    </div>
-                                ) : (
-                                    ""
-                                )}
+                        <div className={style.content}>
+                            <div className={style.search}>
+                                <AppsMenuSearch
+                                    value={this.store.applicationManager.search}
+                                    onChange={this.handleSearch}
+                                />
+                            </div>
+                            <div className={style.appsListWrapper}>
+                                {/* TODO: Refactor apps filter */}
+                                <div className={style.appsList}>
+                                    {this.store.applicationManager.isSearching
+                                        ? this.getFilteredByPlace(
+                                              this.store.applicationManager
+                                                  .findedApplicatons,
+                                              ApplicationPlace.MainMenu,
+                                              true,
+                                          )
+                                              .filter(
+                                                  (item) =>
+                                                      !item.isExistedAppInstance,
+                                              )
+                                              .map((app) => (
+                                                  <AppsMenuItem
+                                                      key={app.id}
+                                                      icon={app.icon}
+                                                      title={app.name}
+                                                      isExecuted={
+                                                          app.isExecuted
+                                                      }
+                                                      isAvailable={
+                                                          app.isAvailable
+                                                      }
+                                                      onClick={() =>
+                                                          this.handleExecuteApp(
+                                                              app,
+                                                          )
+                                                      }
+                                                  />
+                                              ))
+                                        : this.getFilteredByPlace(
+                                              applicationsList,
+                                              ApplicationPlace.MainMenu,
+                                              true,
+                                          )
+                                              .filter(
+                                                  (item) =>
+                                                      !item.isExistedAppInstance,
+                                              )
+                                              .map((app) => (
+                                                  <AppsMenuItem
+                                                      key={app.id}
+                                                      icon={app.icon}
+                                                      title={app.name}
+                                                      isExecuted={
+                                                          app.isExecuted
+                                                      }
+                                                      isAvailable={
+                                                          app.isAvailable
+                                                      }
+                                                      onClick={() =>
+                                                          this.handleExecuteApp(
+                                                              app,
+                                                          )
+                                                      }
+                                                  />
+                                              ))}
+                                    {this.store.applicationManager
+                                        .isSearching &&
+                                    this.store.applicationManager
+                                        .findedApplicatons.length <= 0 ? (
+                                        <div className={style.notFoundApps}>
+                                            {strings.state.notFound}
+                                        </div>
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </BackdropWrapper>
             </div>
         );
     }

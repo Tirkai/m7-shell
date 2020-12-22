@@ -1,0 +1,28 @@
+.shellContextMenuItem {
+    display: inline-flex;
+    padding: 8px 16px 8px 12px;
+    box-sizing: border-box;
+    color: white;
+    cursor: pointer;
+    white-space: nowrap;
+    background: black;
+}
+
+.shellContextMenuItem:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    margin-right: 6px;
+}
+
+.icon svg {
+    color: white;
+    width: 16px;
+    height: 16px;
+}

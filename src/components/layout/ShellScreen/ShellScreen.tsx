@@ -1,3 +1,6 @@
+import { AudioContainer } from "components/audio/AudioContainer/AudioContainer";
+import { AudioHub } from "components/audio/AudioHub/AudioHub";
+import { ShellContextMenu } from "components/contextMenu/ShellContextMenu/ShellContextMenu";
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
@@ -11,7 +14,7 @@ import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationWindow } from "models/ApplicationWindow";
-import { ExternalApllication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/ExternalApplication";
 import React, { Component } from "react";
 import { DraggableData, DraggableEvent } from "react-draggable";
 import { ResizeCallbackData } from "react-resizable";
@@ -29,27 +32,35 @@ export class ShellScreen extends Component<IStore> {
         await this.store.applicationManager.fetchApplications();
 
         const urlParams = new URL(window.location.href).searchParams;
-
+        const enableAutoRun = urlParams.get("enableAutoRun");
         const autoRunApp = urlParams.get("autoRunApp");
-
         const autoRunUrl = urlParams.get("autoRunUrl");
+        const autoRunFullscreen = urlParams.get("autoRunFullscreen");
 
-        if (autoRunApp) {
-            const app = this.store.applicationManager.findByKey(autoRunApp);
+        if (!!parseInt(enableAutoRun ?? "0")) {
+            const isAutorunFullscreen = !!parseInt(autoRunFullscreen ?? "0");
 
-            if (app) {
+            if (autoRunApp) {
+                const app = this.store.applicationManager.findByKey(autoRunApp);
+
+                if (app) {
+                    this.store.applicationManager.executeApplication(app);
+                }
+            }
+
+            if (autoRunUrl) {
+                const app = new ExternalApplication({
+                    id: v4(),
+                    name: autoRunUrl,
+                    url: autoRunUrl,
+                    isFullscreen: isAutorunFullscreen,
+                    isVisibleInStartMenu: false,
+                });
+
+                this.store.applicationManager.addApplication(app);
+
                 this.store.applicationManager.executeApplication(app);
             }
-        }
-
-        if (autoRunUrl) {
-            const app = new ExternalApllication({
-                id: v4(),
-                name: autoRunUrl,
-                url: autoRunUrl,
-            });
-
-            this.store.applicationManager.executeApplication(app);
         }
 
         this.store.notification.connectToNotificationsSocket(
@@ -158,9 +169,10 @@ export class ShellScreen extends Component<IStore> {
                 <TaskBar />
                 <BuildVersion />
                 <AppWindowPinContainer />
+                <AudioContainer />
+                <AudioHub />
+                <ShellContextMenu />
             </div>
         );
     }
 }
-
-export default ShellScreen;

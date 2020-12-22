@@ -5,7 +5,7 @@ import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
-import { ExternalApllication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
 import React, { Component } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
@@ -15,7 +15,7 @@ import {
     ResizeHandle,
 } from "react-resizable";
 import AppLoader from "../AppLoader/AppLoader";
-import AppWindowHeader from "../AppWindowHeader/AppWindowHeader";
+import { AppWindowHeader } from "../AppWindowHeader/AppWindowHeader";
 import { AppWindowUnfocusedOverlay } from "../AppWindowUnfocusedOverlay/AppWindowUnfocusedOverlay";
 import style from "./style.module.css";
 
@@ -43,6 +43,7 @@ interface IAppWindowState {
     hasBackward: boolean;
     hasReload: boolean;
     customUrl: string;
+    frame: HTMLIFrameElement | null;
 }
 
 @inject("store")
@@ -53,6 +54,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
         hasBackward: false,
         hasReload: false,
         customUrl: "",
+        frame: null,
     };
 
     @computed
@@ -75,18 +77,23 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
         const context = frameRef?.contentWindow;
         if (context) {
             const app = this.props.application;
-            if (app instanceof ExternalApllication && context) {
+
+            this.setState({
+                frame: frameRef,
+            });
+
+            if (app instanceof ExternalApplication) {
                 app.setEmitterContext(context);
                 this.handleBindingEmitterEvents(app);
             }
-            this.handleAppReady();
         }
     };
 
-    handleBindingEmitterEvents = (app: ExternalApllication) => {
-        app.emitter.on(AppMessageType.Connected, () =>
-            this.store.auth.injectAuthTokenInExternalApplication(app),
-        );
+    handleBindingEmitterEvents = (app: ExternalApplication) => {
+        app.emitter.on(AppMessageType.Connected, () => {
+            this.handleAppReady();
+            this.store.auth.injectAuthTokenInExternalApplication(app);
+        });
 
         app.emitter.on(AppMessageType.ForceRecieveToken, () =>
             this.store.auth.injectAuthTokenInExternalApplication(app),
@@ -133,6 +140,13 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
         appWindow.setFullScreen(!appWindow.isFullScreen);
     };
 
+    handleReload = () => {
+        const frame = (this.state.frame as unknown) as HTMLIFrameElement;
+        if (frame) {
+            frame.setAttribute("src", frame.getAttribute("src") ?? "");
+        }
+    };
+
     componentDidMount() {
         const app = this.props.application;
         if (app instanceof ShellApplication) {
@@ -142,31 +156,32 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
 
     appComponent: JSX.Element | null = null;
     render() {
-        if (this.props.application instanceof ExternalApllication) {
-            this.appComponent = (
-                <iframe
-                    onLoad={this.handleAppReady}
-                    src={this.props.application.applicationUrl}
-                    ref={this.handleFrameLoaded}
-                    title={this.props.application.name}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        pointerEvents:
-                            this.props.isResizing || this.props.isDragging
-                                ? "none"
-                                : "all",
-                    }}
-                    frameBorder={0}
-                ></iframe>
-            );
+        if (!this.state.isAppReady) {
+            if (this.props.application instanceof ExternalApplication) {
+                this.appComponent = (
+                    <iframe
+                        onLoad={this.handleAppReady}
+                        src={this.props.application.applicationUrl}
+                        ref={this.handleFrameLoaded}
+                        title={this.props.application.name}
+                        style={{
+                            width: "100%",
+                            height: "100%",
+                            pointerEvents:
+                                this.props.isResizing || this.props.isDragging
+                                    ? "none"
+                                    : "all",
+                        }}
+                        frameBorder={0}
+                    ></iframe>
+                );
+            }
         }
         if (this.props.application instanceof ShellApplication) {
             this.appComponent = this.props.application.Component;
         }
 
         const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
-        const taskBarWidth = 48;
 
         const boundsVisibilityPercentModifier = 0.25;
         const boundsInvisibilityPercentModifier = 0.75;
@@ -230,21 +245,33 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                                 onClose={this.props.onClose}
                                 onDoubleClick={this.handleHeaderDoubleClick}
                                 hasBackward={this.state.hasBackward}
-                                hasReload={this.state.hasReload}
+                                hasReload={true}
                                 onBackward={() => true}
-                                onReload={() => true}
+                                onReload={this.handleReload}
                                 onCollapse={() => this.handleCollapse()}
                                 onFullscreen={() => this.handleFullScreen()}
+                                visible={
+                                    this.store.shell.displayMode
+                                        .showAppWindowHeader
+                                }
                             />
                             <AppLoader
                                 icon={this.props.application.icon}
                                 disabled={this.state.isAppReady}
                             />
-                            <div className={classNames(style.content)}>
-                                {this.appComponent && this.appComponent}
+                            <div
+                                className={classNames(style.content, {
+                                    [style.withHeader]: this.store.shell
+                                        .displayMode.showAppWindowHeader,
+                                })}
+                            >
+                                {this.appComponent}
                             </div>
                             <AppWindowUnfocusedOverlay
-                                visible={!this.props.isFocused}
+                                visible={
+                                    this.store.windowManager.hasDraggedWindow ||
+                                    !this.props.isFocused
+                                }
                             />
                         </div>
                     </ResizableBox>

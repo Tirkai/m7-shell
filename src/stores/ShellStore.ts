@@ -1,48 +1,93 @@
+import { DisplayModeType } from "enum/DisplayModeType";
 import { ShellEvents } from "enum/ShellEvents";
 import { ShellPanelType } from "enum/ShellPanelType";
-import { action, computed, observable } from "mobx";
+import { IDisplayMode } from "interfaces/display/IDisplayMode";
+import { action, makeAutoObservable, reaction } from "mobx";
+import { DefaultDisplayMode } from "models/DefaultDisplayMode";
+import { DevModeModel } from "models/DevModeModel";
+import { EmbedDisplayMode } from "models/EmbedDisplayMode";
+import moment from "moment";
 import { AppStore } from "./AppStore";
 
 export class ShellStore {
-    @computed
+    localStorageDevModeKey = "DEV_MODE";
+
     get appMenuShow() {
         return this.activePanel === ShellPanelType.StartMenu;
     }
 
-    @computed
     get notificationHubShow() {
         return this.activePanel === ShellPanelType.NotificationHub;
     }
 
-    @observable
+    get audioHubShow() {
+        return this.activePanel === ShellPanelType.AudioHub;
+    }
+
     enabledDevMode: boolean = process.env.NODE_ENV === "development";
 
-    @observable
     activePanel: ShellPanelType = ShellPanelType.None;
+
+    displayMode: IDisplayMode = new DefaultDisplayMode();
 
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
 
-        window.addEventListener(ShellEvents.DesktopClick, () => {
-            this.activePanel = ShellPanelType.None;
-            this.store.windowManager.clearFocus();
-        });
+        makeAutoObservable(this);
 
-        window.addEventListener(ShellEvents.FocusAnyWindow, () => {
-            this.activePanel = ShellPanelType.None;
-        });
+        window.addEventListener(
+            ShellEvents.DesktopClick,
+            action(() => {
+                this.activePanel = ShellPanelType.None;
+                this.store.windowManager.clearFocus();
+            }),
+        );
 
-        window.addEventListener(ShellEvents.StartMenuOpen, () => {
-            this.store.windowManager.clearFocus();
-        });
+        window.addEventListener(
+            ShellEvents.FocusAnyWindow,
+            action(() => {
+                this.activePanel = ShellPanelType.None;
+            }),
+        );
 
-        window.addEventListener(ShellEvents.NotificationHubOpen, () => {
-            this.store.windowManager.clearFocus();
-        });
+        window.addEventListener(
+            ShellEvents.StartMenuOpen,
+            action(() => {
+                this.store.windowManager.clearFocus();
+            }),
+        );
+
+        window.addEventListener(
+            ShellEvents.NotificationHubOpen,
+            action(() => {
+                this.store.windowManager.clearFocus();
+            }),
+        );
+
+        window.addEventListener(
+            ShellEvents.AudioHubOpen,
+            action(() => {
+                this.store.windowManager.clearFocus();
+            }),
+        );
+
+        const storagedDevMode = JSON.parse(
+            localStorage.getItem(this.localStorageDevModeKey) ?? "{}",
+        ) as DevModeModel;
+
+        if (storagedDevMode) {
+            if (moment(storagedDevMode.expire).diff(moment()) > 0) {
+                this.setDevMode(storagedDevMode.enabled);
+            }
+        }
+
+        reaction(
+            () => this.displayMode,
+            (mode) => this.store.windowManager.onChangeDisplayMode(mode),
+        );
     }
 
-    @action
     setActivePanel(panel: ShellPanelType) {
         this.activePanel = panel;
 
@@ -59,13 +104,32 @@ export class ShellStore {
                 );
                 break;
             }
+            case ShellPanelType.AudioHub: {
+                window.dispatchEvent(new CustomEvent(ShellEvents.AudioHubOpen));
+                break;
+            }
             default:
                 break;
         }
     }
 
-    @action
     setDevMode(value: boolean) {
         this.enabledDevMode = value;
+
+        localStorage.setItem(
+            this.localStorageDevModeKey,
+            JSON.stringify(new DevModeModel(value, moment().add(1, "hour"))),
+        );
+    }
+
+    setDisplayMode(value: DisplayModeType) {
+        switch (value) {
+            case DisplayModeType.Default:
+                return (this.displayMode = new DefaultDisplayMode());
+            case DisplayModeType.Embed:
+                return (this.displayMode = new EmbedDisplayMode());
+            default:
+                break;
+        }
     }
 }

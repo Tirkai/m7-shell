@@ -1,60 +1,49 @@
 import { TASKBAR_HEIGHT } from "constants/config";
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
+import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { IPinArea } from "interfaces/window/IPinArea";
-import { action, computed, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { ResizeHandle } from "react-resizable";
 import { Application } from "./Application";
+import { DefaultDisplayMode } from "./DefaultDisplayMode";
 
 interface IApplicationWindowOptions {
     id: string;
     width: number;
     height: number;
     isFullscreen?: boolean;
+    dispayMode?: IDisplayMode;
 }
 
 export class ApplicationWindow {
     id: string;
-
     application: Application;
-
-    @observable
     depthIndex: number = 1;
-
-    @observable
     isFocused: boolean = false;
-
-    @observable
     isFullScreen: boolean = false;
-
-    @observable
     isCollapsed: boolean = false;
-
-    @observable
-    width: number;
-
-    @observable
-    height: number;
-
-    @observable
+    width: number = 800;
+    height: number = 600;
     x: number;
-
-    @observable
     y: number;
-
-    @observable
     pinArea: IPinArea | null = null;
+    displayMode: IDisplayMode;
+    resizeOriginPoint: { x: number; y: number } = { x: 0, y: 0 };
+    lockedWidth: number;
+    lockedHeight: number;
+    lockedX: number;
+    lockedY: number;
+    isDragging: boolean = false;
+    isResizing: boolean = false;
 
-    @computed
     get minYPosition() {
         return this.y + this.height - this.application.minHeight;
     }
 
-    @computed
     get minXPosition() {
         return this.x + this.width - this.application.minWidth;
     }
 
-    @computed
     get bounds() {
         return {
             x: !this.isFullScreen ? this.x : 0,
@@ -62,47 +51,40 @@ export class ApplicationWindow {
             width: !this.isFullScreen ? this.width : window.innerWidth,
             height: !this.isFullScreen
                 ? this.height
-                : window.innerHeight - TASKBAR_HEIGHT + 1,
+                : window.innerHeight - this.displayMode.taskbarOffset + 1,
         };
     }
 
-    @observable
-    resizeOriginPoint: { x: number; y: number } = { x: 0, y: 0 };
-
-    @observable
-    lockedWidth: number = this.width;
-
-    @observable
-    lockedHeight: number = this.height;
-
-    @observable
-    lockedX: number = this.x;
-
-    @observable
-    lockedY: number = this.y;
-
-    @observable
-    isDragging: boolean = false;
-
-    @observable
-    isResizing: boolean = false;
-
     constructor(app: Application, options: IApplicationWindowOptions) {
+        makeAutoObservable(this);
+
         this.application = app;
         this.id = options.id;
-        this.width = options.width;
-        this.height = options.height;
+
+        const [width, height] = this.getSizeWithBounds(
+            options.width,
+            options.height,
+        );
+
+        this.width = width;
+        this.height = height;
+
         this.x = Math.floor(window.innerWidth / 2 - this.width / 2);
-        this.y = Math.floor(window.innerHeight / 2 - this.height / 2);
+        this.y = Math.floor(
+            window.innerHeight / 2 - this.height / 2 - TASKBAR_HEIGHT / 2,
+        );
         this.isFullScreen = options.isFullscreen ?? false;
+        this.lockedWidth = this.width;
+        this.lockedHeight = this.height;
+        this.lockedX = this.x;
+        this.lockedY = this.y;
+        this.displayMode = options.dispayMode ?? new DefaultDisplayMode();
     }
 
-    @action
     setResizing(value: boolean) {
         this.isResizing = value;
     }
 
-    @action
     setDragging(value: boolean) {
         this.isDragging = value;
 
@@ -117,19 +99,17 @@ export class ApplicationWindow {
         }
     }
 
-    @action
     setPosition(x: number, y: number) {
         this.x = Math.floor(x);
         this.y = Math.floor(y);
     }
 
-    @action
     setSize(width: number, height: number) {
-        this.width = Math.floor(width);
-        this.height = Math.floor(height);
+        const [w, h] = this.getSizeWithBounds(width, height);
+        this.width = Math.floor(w);
+        this.height = Math.floor(h);
     }
 
-    @action
     setResizeOriginPoint(x: number, y: number) {
         this.resizeOriginPoint = { x, y };
         this.lockedWidth = this.width;
@@ -138,13 +118,11 @@ export class ApplicationWindow {
         this.lockedY = this.y;
     }
 
-    @action
     resize(
         handle: ResizeHandle,
         position: { x: number; y: number },
         size: { width: number; height: number },
     ) {
-        // const handle = data.handle;
         const dir = ResizeHandleDirection;
         const deltaX = this.resizeOriginPoint.x - position.x;
         const deltaY = this.resizeOriginPoint.y - position.y;
@@ -179,29 +157,43 @@ export class ApplicationWindow {
         }
     }
 
-    @action
     setDepthIndex(value: number) {
         this.depthIndex = value;
     }
 
-    @action
     setFocused(value: boolean) {
         this.isFocused = value;
     }
 
-    @action
     setFullScreen(value: boolean) {
         this.isFullScreen = value;
     }
 
-    @action
     setCollapsed(value: boolean) {
         this.isFocused = false;
         this.isCollapsed = value;
     }
 
-    @action
     setPinArea(area: IPinArea | null) {
         this.pinArea = area;
+    }
+
+    setDispayMode(mode: IDisplayMode) {
+        this.displayMode = mode;
+    }
+
+    recalculateFullScreenSize() {
+        this.isFullScreen = false;
+        this.isFullScreen = true;
+    }
+
+    private getSizeWithBounds(width: number, height: number) {
+        const resultWidth =
+            width < window.innerWidth ? width : window.innerWidth;
+        const resultHeight =
+            height < window.innerHeight - TASKBAR_HEIGHT
+                ? height
+                : window.innerHeight - TASKBAR_HEIGHT;
+        return [resultWidth, resultHeight];
     }
 }

@@ -3,14 +3,16 @@ import { JsonRpcPayload, JsonRpcResult } from "@algont/m7-utils";
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
 import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
+import { RoleType } from "enum/RoleType";
 import { ShellEvents } from "enum/ShellEvents";
-import { IRefrashTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
+import { IAccessTokenMetadata } from "interfaces/auth/IAccessTokenMetadata";
+import { IRefreshTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { Base64 } from "js-base64";
 import { strings } from "locale";
-import { action, computed, observable } from "mobx";
-import { ExternalApllication } from "models/ExternalApplication";
+import { makeAutoObservable } from "mobx";
+import { ExternalApplication } from "models/ExternalApplication";
 import moment, { Moment } from "moment";
 import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
@@ -23,42 +25,45 @@ export class AuthStore {
     private readonly localStorageUserLogin: string = "USER_LOGIN";
     private readonly localStorageDelta: string =
         "DELTA_" + process.env.REACT_APP_BUILD;
-    @observable
+
     accessToken: string = "";
 
-    @observable
     refreshToken: string = "";
 
-    @observable
     userLogin: string = "";
 
-    @observable
     userName: string = "";
 
-    @observable
+    roles: RoleType[] = [];
+
     isAuthorized: boolean = false;
 
-    @observable
     deltaTime: number = 0;
 
-    @observable
     renewTime: Moment = moment();
 
-    @observable
     createTime: Moment = moment();
 
-    @observable
     currentTime: Moment = moment();
 
-    @observable
     timeOffset: number = 30000;
 
-    decodeToken<T>(token: string) {
-        const [, expireSection] = token.split(".");
+    checkedAfterStart: boolean = false;
 
-        if (expireSection) {
+    get isAdmin() {
+        return this.roles.some((item) => item === RoleType.Admin);
+    }
+
+    get isSysadmin() {
+        return this.roles.some((item) => item === RoleType.Sysadmin);
+    }
+
+    decodeToken<T>(token: string) {
+        const [, tokenPayload] = token.split(".");
+
+        if (tokenPayload) {
             const decodedData = (JSON.parse(
-                Base64.decode(expireSection),
+                Base64.decode(tokenPayload),
             ) as unknown) as T;
             return decodedData;
         } else {
@@ -66,18 +71,15 @@ export class AuthStore {
         }
     }
 
-    @computed
     get remainingTokenTime() {
         const time = -this.currentTime.diff(this.renewTime) + this.deltaTime;
         return !isNaN(time) ? time : 0;
     }
 
-    @computed
     get remainingTokenTimeInSeconds() {
         return Math.floor((this.remainingTokenTime + this.timeOffset) / 1000);
     }
 
-    @computed
     get isTokenExpired() {
         return this.remainingTokenTime <= 0;
     }
@@ -85,6 +87,8 @@ export class AuthStore {
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
+
+        makeAutoObservable(this);
 
         const authToken = localStorage.getItem(this.localStorageAccessTokenKey);
         const refreshToken = localStorage.getItem(
@@ -110,7 +114,7 @@ export class AuthStore {
         window.addEventListener("focus", () => checkoutRemainingTime());
 
         setInterval(() => {
-            this.currentTime = moment();
+            this.setCurrentTime(moment());
             if (this.isAuthorized) {
                 const hasRemainedTime = checkoutRemainingTime();
                 if (!hasRemainedTime) {
@@ -118,6 +122,8 @@ export class AuthStore {
                 }
             }
         }, 1000);
+
+        this.verifyToken();
     }
 
     async verifyToken() {
@@ -130,81 +136,107 @@ export class AuthStore {
             }),
         );
 
+        if (!response.data.error) {
+            this.setCheckedAfterStart(true);
+        }
+
         return new JsonRpcResult({
             status: !response.data.error,
             result: response.data.result === AccessTokenVerifyStatus.Ok,
         });
     }
 
-    @action
     setToken(accessToken: string, refreshToken: string) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
+        try {
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
 
-        const refreshTokenData = this.decodeToken<IRefrashTokenMetadata>(
-            refreshToken,
-        );
-
-        this.createTime = moment.utc(refreshTokenData?.created);
-        this.renewTime = moment.utc(refreshTokenData?.renew);
-
-        const localStorageDelta = localStorage.getItem(this.localStorageDelta);
-
-        if (!localStorageDelta) {
-            this.deltaTime = this.currentTime.diff(this.createTime);
-            localStorage.setItem(
-                this.localStorageDelta,
-                this.deltaTime.toString(),
+            const refreshTokenData = this.decodeToken<IRefreshTokenMetadata>(
+                refreshToken,
             );
-        } else {
-            this.deltaTime = parseInt(localStorageDelta);
+
+            const accessTokenData = this.decodeToken<IAccessTokenMetadata>(
+                accessToken,
+            );
+
+            this.roles = accessTokenData?.roles ?? [];
+
+            this.createTime = moment.utc(refreshTokenData?.created);
+            this.renewTime = moment.utc(refreshTokenData?.renew);
+
+            const localStorageDelta = localStorage.getItem(
+                this.localStorageDelta,
+            );
+
+            if (!localStorageDelta) {
+                this.deltaTime = this.currentTime.diff(this.createTime);
+                localStorage.setItem(
+                    this.localStorageDelta,
+                    this.deltaTime.toString(),
+                );
+            } else {
+                this.deltaTime = parseInt(localStorageDelta);
+            }
+
+            localStorage.setItem(
+                this.localStorageAccessTokenKey,
+                this.accessToken,
+            );
+
+            localStorage.setItem(
+                this.localStorageRefreshTokenKey,
+                this.refreshToken,
+            );
+            Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
+        } catch (e) {
+            console.error(e);
         }
-
-        const delay = this.remainingTokenTime + this.timeOffset;
-        localStorage.setItem(this.localStorageAccessTokenKey, this.accessToken);
-
-        localStorage.setItem(
-            this.localStorageRefreshTokenKey,
-            this.refreshToken,
-        );
-        Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
     }
 
-    @action
-    injectAuthTokenInExternalApplication(app: ExternalApllication) {
-        app.emitter.emit(ShellMessageType.UpdateAuthToken, {
-            token: this.accessToken,
-            login: this.userLogin,
-        });
+    injectAuthTokenInExternalApplication(app: ExternalApplication) {
+        try {
+            app.emitter.emit(ShellMessageType.UpdateAuthToken, {
+                token: this.accessToken,
+                login: this.userLogin,
+            });
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     async renewToken() {
-        const response = await Axios.post<IJsonRpcResponse<IAuthResponse>>(
-            authEndpoint.url,
-            new JsonRpcPayload("renew", {
-                token: this.refreshToken,
-            }),
-        );
-        localStorage.removeItem(this.localStorageDelta);
-        if (!response.data.error) {
-            const result = response.data.result;
-            this.setToken(result.access_token, result.refresh_token);
-            this.store.applicationManager.executedApplications.forEach(
-                (item) => {
-                    if (item instanceof ExternalApllication) {
-                        item.emitter.emit(ShellMessageType.UpdateAuthToken, {
-                            token: this.accessToken,
-                            login: this.userLogin,
-                        });
-                    }
-                },
+        try {
+            const response = await Axios.post<IJsonRpcResponse<IAuthResponse>>(
+                authEndpoint.url,
+                new JsonRpcPayload("renew", {
+                    token: this.refreshToken,
+                }),
             );
-        } else {
-            this.logout();
+            localStorage.removeItem(this.localStorageDelta);
+            if (!response.data.error) {
+                const result = response.data.result;
+                this.setToken(result.access_token, result.refresh_token);
+                this.store.applicationManager.executedApplications.forEach(
+                    (item) => {
+                        if (item instanceof ExternalApplication) {
+                            item.emitter.emit(
+                                ShellMessageType.UpdateAuthToken,
+                                {
+                                    token: this.accessToken,
+                                    login: this.userLogin,
+                                },
+                            );
+                        }
+                    },
+                );
+            } else {
+                this.logout();
+            }
+        } catch (e) {
+            console.error(e);
         }
     }
 
-    @action
     async login(login: string, password: string) {
         try {
             const response = await Axios.post<IJsonRpcResponse<IAuthResponse>>(
@@ -221,8 +253,9 @@ export class AuthStore {
                     response.data.result.refresh_token,
                 );
 
-                this.isAuthorized = true;
-                this.userLogin = login;
+                this.setUserLogin(login);
+                this.setAuthorized(true);
+                this.setCheckedAfterStart(true);
 
                 localStorage.setItem(
                     this.localStorageUserLogin,
@@ -240,18 +273,20 @@ export class AuthStore {
         }
     }
 
-    @action
     async fetchUsername() {
-        const userNameResponse = await Axios.post<
-            IJsonRpcResponse<{ name: string }>
-        >(meEndpoint.url, new JsonRpcPayload("get_me"));
-        if (!userNameResponse.data.error) {
-            const user = userNameResponse.data.result;
-            this.userName = user.name;
+        try {
+            const userNameResponse = await Axios.post<
+                IJsonRpcResponse<{ name: string }>
+            >(meEndpoint.url, new JsonRpcPayload("get_me"));
+            if (!userNameResponse.data.error) {
+                const user = userNameResponse.data.result;
+                this.setUserName(user.name);
+            }
+        } catch (e) {
+            console.error(e);
         }
     }
 
-    @action
     async logout() {
         try {
             const response = await Axios.post<IJsonRpcResponse<unknown>>(
@@ -262,6 +297,8 @@ export class AuthStore {
             );
 
             dispatchEvent(new CustomEvent(ShellEvents.Logout));
+
+            this.store.windowManager.closeAllWindows();
 
             localStorage.removeItem(this.localStorageAccessTokenKey);
             this.accessToken = "";
@@ -277,5 +314,25 @@ export class AuthStore {
                 strings.error.connectionError,
             );
         }
+    }
+
+    setCurrentTime(time: Moment) {
+        this.currentTime = time;
+    }
+
+    setAuthorized(value: boolean) {
+        this.isAuthorized = value;
+    }
+
+    setCheckedAfterStart(value: boolean) {
+        this.checkedAfterStart = value;
+    }
+
+    setUserLogin(value: string) {
+        this.userLogin = value;
+    }
+
+    setUserName(value: string) {
+        this.userName = value;
     }
 }

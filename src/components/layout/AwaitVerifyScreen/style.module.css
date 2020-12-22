@@ -1,0 +1,12 @@
+.header {
+    display: flex;
+    align-items: center;
+}
+.preloader {
+    display: flex;
+    align-items: center;
+    margin-right: 12px;
+}
+.title {
+    display: block;
+}

@@ -1,3 +1,5 @@
+import { ApplicationPlace } from "enum/ApplicationPlace";
+
 export interface IApplicationOptions {
     id: string;
     name: string;
@@ -8,4 +10,8 @@ export interface IApplicationOptions {
     isVisibleInStartMenu?: boolean;
     minWidth?: number;
     minHeight?: number;
+    isFullscreen?: boolean;
+    place?: ApplicationPlace;
+    isOnlyAdmin?: boolean;
+    isExistedAppInstance?: boolean;
 }

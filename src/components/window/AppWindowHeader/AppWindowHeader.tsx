@@ -1,11 +1,17 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { backward, collapse, cross, fullscreen } from "assets/icons";
+import { collapse, cross, fullscreen, refresh } from "assets/icons";
 import classNames from "classnames";
+import { IStore } from "interfaces/common/IStore";
+import { strings } from "locale";
+import { computed } from "mobx";
+import { inject, observer } from "mobx-react";
+import { ContextMenuItemModel } from "models/ContextMenuItemModel";
+import { Point2D } from "models/Point2D";
 import React, { Component } from "react";
 import { AppWindowHeaderAction } from "../AppWindowHeaderAction/AppWindowHeaderAction";
 import style from "./style.module.css";
 
-interface IAppWindowHeaderProps {
+interface IAppWindowHeaderProps extends IStore {
     icon: string;
     title: string;
     hasBackward?: boolean;
@@ -17,9 +23,27 @@ interface IAppWindowHeaderProps {
     onCollapse: () => void;
     onBackward: () => void;
     onReload: () => void;
+    visible: boolean;
 }
 
+@inject("store")
+@observer
 export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
+    @computed
+    get store() {
+        return this.props.store!;
+    }
+
+    handleShowContextMenu = (e: React.MouseEvent) => {
+        this.store.contextMenu.showContextMenu(new Point2D(e.pageX, e.pageY), [
+            new ContextMenuItemModel({
+                icon: refresh,
+                content: strings.application.actions.hardReset,
+                onClick: this.props.onReload,
+            }),
+        ]);
+    };
+
     render() {
         return (
             <div
@@ -27,30 +51,16 @@ export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
                     "appWindowHeader",
                     style.appWindowHeader,
                     { [style.focused]: this.props.isFocused },
+                    { [style.visible]: this.props.visible },
                 )}
                 onDoubleClick={this.props.onDoubleClick}
             >
                 <div className={style.container}>
-                    <div className={style.actions}>
-                        {this.props.hasBackward ? (
-                            <AppWindowHeaderAction
-                                icon={backward}
-                                onClick={this.props.onBackward}
-                            />
-                        ) : (
-                            ""
-                        )}
-                        {this.props.hasReload ? (
-                            <AppWindowHeaderAction
-                                icon={backward}
-                                onClick={this.props.onReload}
-                            />
-                        ) : (
-                            ""
-                        )}
-                    </div>
                     <div className={classNames("appHeaderInfoBar", style.info)}>
-                        <div className={style.icon}>
+                        <div
+                            className={style.icon}
+                            onClick={this.handleShowContextMenu}
+                        >
                             <SVGIcon
                                 source={this.props.icon}
                                 size={{ width: "16px", height: "16px" }}
@@ -78,5 +88,3 @@ export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
         );
     }
 }
-
-export default AppWindowHeader;

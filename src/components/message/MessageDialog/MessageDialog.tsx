@@ -33,6 +33,7 @@ export class MessageDialog extends Component<IStore> {
                 <DialogContent>{this.store.message.message}</DialogContent>
                 <DialogActions>
                     <Button
+                        autoFocus
                         color="primary"
                         variant="contained"
                         onClick={() => this.handleCloseMessage()}

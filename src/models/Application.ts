@@ -1,6 +1,7 @@
 import { unknownApp } from "assets/icons";
+import { ApplicationPlace } from "enum/ApplicationPlace";
 import { IApplicationOptions } from "interfaces/options/IApplicationOptions";
-import { action } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 
 export class Application {
     id: string;
@@ -11,10 +12,35 @@ export class Application {
     baseHeight: number;
     minWidth: number;
     minHeight: number;
+    isFullscreen: boolean = false;
+    place: ApplicationPlace = ApplicationPlace.Unknown;
+    isOnlyAdmin: boolean = false;
+
     isExecuted: boolean = false;
+
     isVisibleInStartMenu: boolean = true;
 
+    isExistedAppInstance: boolean = false;
+
+    isAvailable: boolean = true;
+
     constructor(options: IApplicationOptions) {
+        makeObservable(this, {
+            key: observable,
+            name: observable,
+            icon: observable,
+            baseWidth: observable,
+            baseHeight: observable,
+            minWidth: observable,
+            minHeight: observable,
+            isFullscreen: observable,
+            place: observable,
+            isOnlyAdmin: observable,
+            isExistedAppInstance: observable,
+            setExecuted: action,
+            setAvailable: action,
+        });
+
         this.id = options.id;
         this.name = options.name;
         this.key = options.key ?? options.id;
@@ -25,11 +51,18 @@ export class Application {
         this.minWidth = options.minWidth ?? 400;
         this.minHeight = options.minHeight ?? 300;
         this.isVisibleInStartMenu = options.isVisibleInStartMenu ?? true;
+        this.isFullscreen = options.isFullscreen ?? false;
+        this.place = options.place ?? ApplicationPlace.Unknown;
+        this.isOnlyAdmin = options.isOnlyAdmin ?? false;
+        this.isExistedAppInstance = options.isExistedAppInstance ?? false;
     }
 
-    @action
     setExecuted(value: boolean) {
         this.isExecuted = value;
         return this;
+    }
+
+    setAvailable(value: boolean) {
+        this.isAvailable = value;
     }
 }

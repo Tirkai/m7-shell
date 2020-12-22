@@ -7,6 +7,7 @@ interface IAppsMenuItemProps {
     icon: string;
     title: string;
     isExecuted: boolean;
+    isAvailable: boolean;
     onClick: () => void;
 }
 
@@ -16,23 +17,23 @@ export class AppsMenuItem extends Component<IAppsMenuItemProps> {
             <div
                 className={classNames(style.appsMenuItem, {
                     [style.executed]: this.props.isExecuted,
+                    [style.unavailable]: !this.props.isAvailable,
                 })}
                 onClick={this.props.onClick}
             >
                 <StartMenuApplicationIcon>
                     <SVGIcon
                         source={this.props.icon}
-                        size={{ width: "16px", height: "16px" }}
+                        size={{ width: "32px", height: "32px" }}
                         color="white"
                     />
                 </StartMenuApplicationIcon>
-
+                {this.props.isExecuted ? (
+                    <div className={style.executeStatus} />
+                ) : (
+                    ""
+                )}
                 <div className={style.title}>
-                    {this.props.isExecuted ? (
-                        <div className={style.executeStatus} />
-                    ) : (
-                        ""
-                    )}
                     <span>{this.props.title}</span>
                 </div>
             </div>

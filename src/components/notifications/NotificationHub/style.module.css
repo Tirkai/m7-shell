@@ -5,7 +5,6 @@
     right: 0px;
     color: white;
     z-index: 100;
-    background: url("../../../assets/images/wallpaper_blur.jpg");
     background-attachment: fixed;
     background-position: right;
     background-size: cover;
@@ -21,9 +20,10 @@
     opacity: 1;
     pointer-events: all;
     transform: translateX(0);
+    animation: show 0.3s;
 }
 .container {
-    background: #222222cc;
+    background: #222222e9;
     height: 100%;
 }
 
@@ -71,4 +71,17 @@
 }
 .emptyText {
     padding: 12px;
+}
+
+@keyframes show {
+    0% {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(50%);
+    }
+    100% {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateX(0);
+    }
 }
