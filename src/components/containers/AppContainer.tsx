@@ -27,17 +27,6 @@ export class AppContainer extends Component<IStore> {
 
         window.onbeforeunload = () => getCloseBrowserWindowDenied();
 
-        window.addEventListener("click", (event: MouseEvent) => {
-            if (this.store.contextMenu.isShow) {
-                const target = event.target as HTMLDivElement;
-                if (!target.closest("#context-menu")) {
-                    if (this.store.contextMenu.isReady) {
-                        this.store.contextMenu.hideContextmenu();
-                    }
-                }
-            }
-        });
-
         const urlParams = new URL(window.location.href).searchParams;
         const enableAutoRun = urlParams.get("enableAutoLogin");
         const autoLogin = urlParams.get("login");

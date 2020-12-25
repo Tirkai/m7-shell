@@ -88,11 +88,6 @@ export class AudioStore {
             }
         } catch (e) {
             console.error(e);
-            // TOdo
-            // this.store.message.showMessage(
-            //     strings.error.anOccurredError,
-            //     serviceErrorText,
-            // );
         }
     }
 

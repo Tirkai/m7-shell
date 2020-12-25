@@ -5,10 +5,10 @@ import {
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
+import { ApplicationFactory } from "factories/ApplicationFactory";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicationResponse";
 import { strings } from "locale";
-import { difference, intersectionWith } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
@@ -21,25 +21,8 @@ import { AppStore } from "./AppStore";
 export class ApplicationManagerStore {
     applications: Application[] = [];
 
-    search: string = "";
-
-    setSearch(value: string) {
-        this.search = value;
-    }
-
-    get findedApplicatons() {
-        return this.displayedApplications.filter(
-            (app) =>
-                app.name.toLowerCase().indexOf(this.search.toLowerCase()) > -1,
-        );
-    }
-
     get displayedApplications() {
         return this.applications.filter((item) => item.isVisibleInStartMenu);
-    }
-
-    get isSearching() {
-        return this.search.length > 0;
     }
 
     get executedApplications() {
@@ -206,7 +189,7 @@ export class ApplicationManagerStore {
     }
 
     destroyUserSession() {
-        this.applications.forEach((app) => app.setExecuted(false));
+        this.applications = [];
     }
 
     async fetchApplications() {
@@ -223,16 +206,8 @@ export class ApplicationManagerStore {
             );
 
             if (!response.data.error) {
-                const portalApplications = response.data.result.map(
-                    (item) =>
-                        new ExternalApplication({
-                            id: item.id,
-                            name: item.name,
-                            url: item.guiUrl,
-                            icon: item.iconUrl,
-                            key: item.id,
-                            place: item.shellParams?.item_place,
-                        }),
+                const portalApplications = response.data.result.map((item) =>
+                    ApplicationFactory.createExternalApplication(item),
                 );
                 this.addApplicationsList(portalApplications);
             }
@@ -246,49 +221,6 @@ export class ApplicationManagerStore {
             } else {
                 this.store.auth.logout();
             }
-        }
-    }
-
-    async fetchUpdateApplications() {
-        try {
-            const response = await Axios.post<
-                IJsonRpcResponse<IPortalApplicationResponse<IAppParams>[]>
-            >(
-                portalEndpoint.url,
-                new JsonRpcPayload("getComponents", {
-                    with_shell_params: true,
-                }),
-            );
-
-            if (!response.data.error) {
-                const portalApplications = response.data.result.map(
-                    (item) =>
-                        new ExternalApplication({
-                            id: item.id,
-                            name: item.name,
-                            url: item.guiUrl,
-                            icon: item.iconUrl,
-                            key: item.id,
-                        }),
-                );
-
-                const diffIds = difference(
-                    portalApplications.map((item) => item.id),
-                    this.applications
-                        .filter((item) => item instanceof ExternalApplication)
-                        .map((item) => item.id),
-                );
-
-                this.addApplicationsList(
-                    intersectionWith(
-                        portalApplications,
-                        diffIds,
-                        (a, b) => a.id === b,
-                    ),
-                );
-            }
-        } catch (e) {
-            console.error(e);
         }
     }
 

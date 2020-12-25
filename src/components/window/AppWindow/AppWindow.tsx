@@ -85,6 +85,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
             if (app instanceof ExternalApplication) {
                 app.setEmitterContext(context);
                 this.handleBindingEmitterEvents(app);
+                this.handleAppReady();
             }
         }
     };

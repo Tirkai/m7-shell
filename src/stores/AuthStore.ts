@@ -302,13 +302,14 @@ export class AuthStore {
 
             localStorage.removeItem(this.localStorageAccessTokenKey);
             this.accessToken = "";
-            this.isAuthorized = false;
+            this.setAuthorized(false);
 
             return new JsonRpcResult({
                 status: !response.data.error,
             });
         } catch (e) {
-            this.isAuthorized = false;
+            this.setAuthorized(false);
+
             this.store.message.showMessage(
                 strings.error.anOccurredError,
                 strings.error.connectionError,

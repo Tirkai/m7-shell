@@ -8,12 +8,6 @@ import style from "./style.module.css";
 interface IAppWindowPinAreaProps extends IStore {
     pinArea: IPinArea;
     windowArea: IPinArea;
-    // areaWidth: number;
-    // areaHeight: number;
-    // windowWidth: number;
-    // windowHeight: number;
-    // top: number;
-    // left: number;
 }
 
 @inject("store")

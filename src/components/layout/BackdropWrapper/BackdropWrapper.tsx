@@ -1,32 +1,24 @@
 import classNames from "classnames";
+import { PerformanceContext } from "contexts/PerformanceContext";
 import { IStore } from "interfaces/common/IStore";
-import { computed } from "mobx";
-import { inject, observer } from "mobx-react";
-import React, { Component } from "react";
+import React, { useContext } from "react";
 import style from "./style.module.css";
 const className = style.backdropWrapper;
 
 interface IBackdropWrapperProps extends IStore {
     active?: boolean;
+    children: JSX.Element | JSX.Element[];
 }
 
-@inject("store")
-@observer
-export class BackdropWrapper extends Component<IBackdropWrapperProps> {
-    @computed
-    get store() {
-        return this.props.store!;
-    }
-
-    render() {
-        return (
-            <div
-                className={classNames(className, {
-                    [style.active]: this.props.active,
-                })}
-            >
-                {this.props.children}
-            </div>
-        );
-    }
-}
+export const BackdropWrapper = (props: IBackdropWrapperProps) => {
+    const { mode } = useContext(PerformanceContext);
+    return (
+        <div
+            className={classNames(className, {
+                [style.active]: props.active && mode.enableBackdrop,
+            })}
+        >
+            {props.children}
+        </div>
+    );
+};

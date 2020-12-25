@@ -7,18 +7,21 @@ import {
 } from "constants/config";
 import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellEvents } from "enum/ShellEvents";
+import { ApplicationFactory } from "factories/ApplicationFactory";
 import { NotificationFactory } from "factories/NotificationFactory";
 import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
+import { INotificationAppRelationResponse } from "interfaces/response/INotificationAppRelationResponse";
 import { INotificationCountResponse } from "interfaces/response/INotificationCountResponse";
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
-import { flatten } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { AudioModel } from "models/AudioModel";
+import { ExternalApplication } from "models/ExternalApplication";
+import { NotificationGroupModel } from "models/NotificationGroupModel";
 import { NotificationModel } from "models/NotificationModel";
 import { ToastNotification } from "models/ToastNotification";
 import io from "socket.io-client";
 import {
-    legacyNotificationEndpoint,
+    notificationsAppsEndpoint,
     notificationsEndpoint,
 } from "utils/endpoints";
 import { AppStore } from "./AppStore";
@@ -30,7 +33,15 @@ export class NotificationStore {
 
     notifications: NotificationModel[] = [];
 
-    count = 0;
+    groups: NotificationGroupModel[] = [];
+
+    totalCount = 0;
+
+    applications: ExternalApplication[] = [];
+
+    get isExistNotifications() {
+        return this.groups.some((group) => group.hasNotifications);
+    }
 
     status: NotificationServiceConnectStatus =
         NotificationServiceConnectStatus.Default;
@@ -50,79 +61,131 @@ export class NotificationStore {
         this.notifications = notifications;
     }
 
-    setCount(count: number) {
-        this.count = count;
+    setTotalCount(count: number) {
+        this.totalCount = count;
     }
 
     setToasts(toasts: ToastNotification[]) {
         this.toasts = toasts;
     }
 
-    async fetchNotifications(login: string) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const appsResponse = await Axios.post<
-                    IJsonRpcResponse<string[]>
-                >(
-                    legacyNotificationEndpoint.url,
-                    new JsonRpcPayload("getAppIds"),
-                );
+    async fetchGroup(group: NotificationGroupModel, login: string) {
+        group.setFetching(true);
 
-                const countResponse = await Axios.post<
-                    IJsonRpcResponse<number>
-                >(
-                    notificationsEndpoint.url,
-                    new JsonRpcPayload("get_count_by_filter", {
-                        filter: {
-                            login: { values: [login] },
-                        },
-                    }),
-                );
+        const countResponse = await Axios.post<IJsonRpcResponse<number>>(
+            notificationsEndpoint.url,
+            new JsonRpcPayload("get_count_by_filter", {
+                filter: {
+                    login: { values: [login] },
+                    app_id: { values: [group.id] },
+                },
+            }),
+        );
 
-                this.setCount(countResponse.data.result);
+        group.setCount(countResponse.data.result);
 
-                const servicedApplicationsIds = appsResponse.data.result;
-
-                const notifications = servicedApplicationsIds.map(
-                    async (id) => {
-                        const response = await Axios.post<
-                            IJsonRpcResponse<INotificationResponse[]>
-                        >(
-                            notificationsEndpoint.url,
-                            new JsonRpcPayload("get_list_by_filter", {
-                                filter: {
-                                    app_id: {
-                                        values: [id],
-                                    },
-                                    login: { values: [login] },
-                                },
-                                limit: 5,
-                                offset: 0,
-                                order: [
-                                    { field: "ntf_date", direction: "desc" },
-                                ],
-                            }),
-                        );
-                        return response.data.result.map((item) =>
-                            NotificationFactory.createNotification(item),
-                        );
+        const notificationsResponse = await Axios.post<
+            IJsonRpcResponse<INotificationResponse[]>
+        >(
+            notificationsEndpoint.url,
+            new JsonRpcPayload("get_list_by_filter", {
+                filter: {
+                    app_id: {
+                        values: [group.id],
                     },
-                );
+                    login: { values: [login] },
+                },
+                limit: 5,
+                offset: 0,
+                order: [{ field: "ntf_date", direction: "desc" }],
+            }),
+        );
 
-                Promise.all(notifications)
-                    .then((values) => {
-                        const notificationsList = values.filter(
-                            (item) => item?.length,
-                        );
-                        this.setNotifications(flatten(notificationsList ?? []));
-                    })
-                    .catch((e) => console.error(e));
+        const notifications = notificationsResponse.data.result.map((item) =>
+            NotificationFactory.createNotification(item),
+        );
 
-                resolve();
-            } catch (e) {
-                reject();
-            }
-        });
+        group.setNotifications(notifications);
+
+        group.setFetching(false);
+    }
+
+    async fetchTotalCount(login: string) {
+        const notificationsCountResponse = await Axios.post<
+            IJsonRpcResponse<number>
+        >(
+            notificationsEndpoint.url,
+            new JsonRpcPayload("get_count_by_filter", {
+                filter: {
+                    login: { values: [login] },
+                },
+            }),
+        );
+
+        this.setTotalCount(notificationsCountResponse.data.result);
+    }
+
+    fetchNotifications(login: string) {
+        try {
+            this.groups.forEach((group) => {
+                this.fetchGroup(group, login);
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async fetchApps(login: string) {
+        try {
+            const appsCountResponse = await Axios.post<
+                IJsonRpcResponse<number>
+            >(
+                notificationsAppsEndpoint.url,
+                new JsonRpcPayload("get_count_by_filter", {
+                    filter: {
+                        login: { values: [login] },
+                    },
+                }),
+            );
+
+            const appsListResponse = await Axios.post<
+                IJsonRpcResponse<INotificationAppRelationResponse[]>
+            >(
+                notificationsAppsEndpoint.url,
+                new JsonRpcPayload("get_list_by_filter", {
+                    filter: {},
+                    order: [
+                        {
+                            field: "app_name",
+                            direction: "asc",
+                        },
+                    ],
+                    limit: appsCountResponse.data.result,
+                    offset: 0,
+                }),
+            );
+
+            this.setApplications(
+                appsListResponse.data.result.map((item) =>
+                    ApplicationFactory.createNotificationAppRelation(item),
+                ),
+            );
+
+            this.setGroups(
+                this.applications.map(
+                    (app) =>
+                        new NotificationGroupModel({
+                            id: app.id,
+                            name: app.name,
+                            icon: app.icon,
+                            count: 0,
+                            notifications: [],
+                        }),
+                ),
+            );
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     removeToast(toast: ToastNotification) {
@@ -151,10 +214,9 @@ export class NotificationStore {
         });
     }
 
-    async connectToNotificationsSocket(token: string) {
+    connectToNotificationsSocket(token: string) {
         try {
             if (token.length > 0) {
-                await this.fetchNotifications(this.store.auth.userLogin);
                 if (this.socket === null) {
                     this.socket = io.connect(NOTIFICATIONS_WEBSOCKET_URL, {
                         transportOptions: {
@@ -191,12 +253,21 @@ export class NotificationStore {
                     this.socket.on(
                         "delete_notification",
                         (response: INotificationResponse) => {
-                            const notification = this.notifications.find(
-                                (item) => item.id === response.ntf_id,
-                            );
-                            notification?.setDisplayed(false);
+                            const notificationId = response.ntf_id;
 
-                            this.fetchNotifications(this.store.auth.userLogin);
+                            const group = this.groups.find((groupItem) =>
+                                groupItem.notifications.find(
+                                    (notifyItem) =>
+                                        notifyItem.id === notificationId,
+                                ),
+                            );
+
+                            if (group) {
+                                this.fetchGroup(
+                                    group,
+                                    this.store.auth.userLogin,
+                                );
+                            }
                         },
                     );
 
@@ -223,6 +294,8 @@ export class NotificationStore {
             }
         } catch (e) {
             console.error(e);
+            /* TODO: Check unauthorize exception */
+
             this.setStatus(NotificationServiceConnectStatus.Disconnected);
             if (this.store.auth.isAuthorized) {
                 setTimeout(
@@ -236,7 +309,14 @@ export class NotificationStore {
     addNotification(notification: NotificationModel) {
         try {
             this.toasts.unshift(new ToastNotification(notification));
-            this.notifications.unshift(notification);
+
+            const group = this.groups.find(
+                (item) => item.id === notification.applicationId,
+            );
+            if (group) {
+                this.fetchGroup(group, this.store.auth.userLogin);
+            }
+
             this.store.audio.playAudio(
                 new AudioModel({
                     source: AudioSource.Notification,
@@ -249,7 +329,15 @@ export class NotificationStore {
     }
 
     updateNotificationCount(count: number) {
-        this.count = count;
+        this.totalCount = count;
+    }
+
+    setApplications(apps: ExternalApplication[]) {
+        this.applications = apps;
+    }
+
+    setGroups(groups: NotificationGroupModel[]) {
+        this.groups = groups;
     }
 
     async removeNotifications(
@@ -266,7 +354,6 @@ export class NotificationStore {
                     })),
                 }),
             );
-            this.fetchNotifications(this.store.auth.userLogin);
         } catch (e) {
             console.error(e);
         }

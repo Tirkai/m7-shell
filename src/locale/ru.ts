@@ -24,6 +24,9 @@ export const ru = {
             logout: "Выход",
         },
     },
+    search: {
+        notFound: "Ничего не найдено",
+    },
     actions: {
         login: "Вход",
     },
