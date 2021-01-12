@@ -233,10 +233,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                         ]}
                     >
                         <div
-                            className={classNames(style.windowContainer, {
-                                [style.fullScreen]: this.props.window
-                                    .isFullScreen,
-                            })}
+                            className={classNames(style.windowContainer)}
                             onMouseDown={this.handleFocus}
                         >
                             <AppWindowHeader
