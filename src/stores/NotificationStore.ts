@@ -206,7 +206,7 @@ export class NotificationStore {
             try {
                 this.socket?.close();
                 this.socket = null;
-                resolve();
+                resolve(true);
             } catch (e) {
                 console.error(e);
                 reject();
@@ -277,6 +277,10 @@ export class NotificationStore {
                         );
                     });
 
+                    this.socket.on("reconnect_error", () => {
+                        this.reconnectToNotificationSocket();
+                    });
+
                     window.addEventListener(
                         ShellEvents.Logout,
                         () => {
@@ -297,6 +301,7 @@ export class NotificationStore {
             /* TODO: Check unauthorize exception */
 
             this.setStatus(NotificationServiceConnectStatus.Disconnected);
+
             if (this.store.auth.isAuthorized) {
                 setTimeout(
                     async () => this.reconnectToNotificationSocket(),
