@@ -268,6 +268,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                             <AppWindowUnfocusedOverlay
                                 visible={
                                     this.store.windowManager.hasDraggedWindow ||
+                                    this.store.windowManager.hasResizedWindow ||
                                     !this.props.isFocused
                                 }
                             />
