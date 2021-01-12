@@ -57,7 +57,7 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
 
     render() {
         const userInitials = UtilsFunctions.getInitials(
-            this.store.auth.userName,
+            this.store.user.userName,
         );
 
         return (

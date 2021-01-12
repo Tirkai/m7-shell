@@ -30,6 +30,7 @@ export class ShellScreen extends Component<IStore> {
     }
 
     async componentDidMount() {
+        await this.store.user.fetchUsername();
         await this.store.applicationManager.fetchApplications();
 
         const urlParams = new URL(window.location.href).searchParams;
