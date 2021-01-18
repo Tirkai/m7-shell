@@ -125,7 +125,6 @@ export class ApplicationManagerStore {
                                 } else {
                                     const instance = new ExternalApplication({
                                         id: v4(),
-
                                         name: app.name,
                                         url,
                                         icon: app.icon,
@@ -149,6 +148,12 @@ export class ApplicationManagerStore {
                                     );
                                 }
                             },
+                        );
+                        Axios.post<IJsonRpcResponse>(
+                            portalEndpoint.url,
+                            new JsonRpcPayload("menuClick", {
+                                component_id: app.id,
+                            }),
                         );
                     }
                 } else {
