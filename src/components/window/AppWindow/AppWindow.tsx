@@ -233,10 +233,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                         ]}
                     >
                         <div
-                            className={classNames(style.windowContainer, {
-                                [style.fullScreen]: this.props.window
-                                    .isFullScreen,
-                            })}
+                            className={classNames(style.windowContainer)}
                             onMouseDown={this.handleFocus}
                         >
                             <AppWindowHeader
@@ -271,6 +268,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                             <AppWindowUnfocusedOverlay
                                 visible={
                                     this.store.windowManager.hasDraggedWindow ||
+                                    this.store.windowManager.hasResizedWindow ||
                                     !this.props.isFocused
                                 }
                             />

@@ -38,6 +38,14 @@ export class WindowManagerStore {
         return !!this.draggedWindow;
     }
 
+    get resizedWindow() {
+        return this.windows.find((item) => item.isResizing);
+    }
+
+    get hasResizedWindow() {
+        return !!this.resizedWindow;
+    }
+
     get activeElement(): Element | null {
         return document.activeElement;
     }
