@@ -13,6 +13,7 @@ import notificationsNone from "./notifications-none.svg";
 import notifications from "./notifications.svg";
 import refresh from "./refresh.svg";
 import rocket from "./rocket.svg";
+import search from "./search.svg";
 import settings from "./settings.svg";
 import soundLow from "./sound-low.svg";
 import soundMiddle from "./sound-middle.svg";
@@ -46,4 +47,5 @@ export {
     listMenu,
     terminal,
     rocket,
+    search,
 };

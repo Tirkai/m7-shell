@@ -35,10 +35,6 @@ export class TaskBar extends Component<IStore> {
             this.store.shell.setActivePanel(
                 value ? ShellPanelType.StartMenu : ShellPanelType.None,
             );
-
-            if (this.store.applicationManager.applications.length > 0) {
-                this.store.applicationManager.fetchUpdateApplications();
-            }
         } else {
             this.store.message.showMessage(
                 strings.error.noAvailableApplications,
@@ -166,8 +162,9 @@ export class TaskBar extends Component<IStore> {
                                     badge={
                                         this.store.notification.status ===
                                         NotificationServiceConnectStatus.Connected
-                                            ? this.store.notification.count > 0
-                                                ? this.store.notification.count.toString()
+                                            ? this.store.notification
+                                                  .totalCount > 0
+                                                ? this.store.notification.totalCount.toString()
                                                 : undefined
                                             : undefined
                                     }
@@ -184,7 +181,7 @@ export class TaskBar extends Component<IStore> {
                                             this.store.notification.status ===
                                             NotificationServiceConnectStatus.Connected
                                                 ? this.store.notification
-                                                      .notifications.length > 0
+                                                      .isExistNotifications
                                                 : false
                                         }
                                     />

@@ -3,107 +3,84 @@ import { Slider } from "@material-ui/core";
 import { mute, sound, soundLow, soundMiddle } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
+import { PerformanceContext } from "contexts/PerformanceContext";
 import { ShellPanelType } from "enum/ShellPanelType";
-import { IStore } from "interfaces/common/IStore";
-import { computed } from "mobx";
-import { inject, observer } from "mobx-react";
-import React, { Component } from "react";
+import { useStore } from "hooks/useStore";
+import { observer } from "mobx-react";
+import React, { useContext, useState } from "react";
 import style from "./style.module.css";
 const className = style.audioHub;
-@inject("store")
-@observer
-export class AudioHub extends Component<IStore> {
-    @computed
-    get store() {
-        return this.props.store!;
-    }
 
-    state = {
-        isShowBackdrop: false,
-    };
+export const AudioHub = observer(() => {
+    const store = useStore();
+    const [isShowBackdrop, setShowBackdrop] = useState(false);
+    const performanceMode = useContext(PerformanceContext);
 
-    handleChangeVolume = (value: number | number[]) => {
+    const handleChangeVolume = (value: number | number[]) => {
         if (typeof value === "number") {
-            this.store.audio.setVolume(value);
+            store.audio.setVolume(value);
         }
     };
 
-    handleMute = () => {
-        this.store.audio.setMute(!this.store.audio.isMute);
+    const handleMute = () => {
+        store.audio.setMute(!store.audio.isMute);
     };
 
-    getIconByVolume = () => {
-        if (this.store.audio.volume > 0.66) {
+    const getIconByVolume = () => {
+        if (store.audio.volume > 0.66) {
             return <SVGIcon source={sound} key="sound" color="white" />;
         }
-        if (this.store.audio.volume > 0.33 && this.store.audio.volume <= 0.66) {
+        if (store.audio.volume > 0.33 && store.audio.volume <= 0.66) {
             return (
                 <SVGIcon source={soundMiddle} key="soundMiddle" color="white" />
             );
         }
-        if (this.store.audio.volume > 0 && this.store.audio.volume <= 0.33) {
+        if (store.audio.volume > 0 && store.audio.volume <= 0.33) {
             return <SVGIcon source={soundLow} key="soundLow" color="white" />;
         }
-        if (this.store.audio.volume <= 0) {
+        if (store.audio.volume <= 0) {
             return <SVGIcon source={mute} key="soundLow" color="white" />;
         }
     };
 
-    handleAnimationStart = () => {
-        this.setState({
-            isShowBackdrop: false,
-        });
-    };
-
-    handleAnimationEnd = () => {
-        this.setState({
-            isShowBackdrop: true,
-        });
-    };
-
-    render() {
-        return (
-            <div
-                className={classNames(className, {
-                    [style.show]:
-                        this.store.shell.activePanel ===
-                        ShellPanelType.AudioHub,
-                })}
-                onAnimationStart={this.handleAnimationStart}
-                onAnimationEnd={this.handleAnimationEnd}
-            >
-                <BackdropWrapper active={this.state.isShowBackdrop}>
-                    <div className={style.container}>
-                        <div className={style.content}>
-                            <div
-                                className={style.icon}
-                                onClick={this.handleMute}
-                            >
-                                {!this.store.audio.isMute ? (
-                                    this.getIconByVolume()
-                                ) : (
-                                    <SVGIcon source={mute} key="soundDisable" />
-                                )}
-                            </div>
-                            <div className={style.volume}>
-                                <Slider
-                                    value={this.store.audio.volume}
-                                    onChange={(event, value) =>
-                                        this.handleChangeVolume(value)
-                                    }
-                                    classes={{
-                                        track: style.slider,
-                                        thumb: style.slider,
-                                    }}
-                                    min={0}
-                                    max={1}
-                                    step={0.01}
-                                ></Slider>
-                            </div>
+    return (
+        <div
+            className={classNames(className, {
+                [style.show]:
+                    store.shell.activePanel === ShellPanelType.AudioHub,
+                "no-animate": !performanceMode.mode.enableAnimation,
+            })}
+            onAnimationStart={() => setShowBackdrop(false)}
+            onAnimationEnd={() => setShowBackdrop(true)}
+        >
+            <BackdropWrapper active={isShowBackdrop}>
+                <div className={style.container}>
+                    <div className={style.content}>
+                        <div className={style.icon} onClick={handleMute}>
+                            {!store.audio.isMute ? (
+                                getIconByVolume()
+                            ) : (
+                                <SVGIcon source={mute} key="soundDisable" />
+                            )}
+                        </div>
+                        <div className={style.volume}>
+                            <Slider
+                                value={store.audio.volume}
+                                onChange={(event, value) =>
+                                    handleChangeVolume(value)
+                                }
+                                classes={{
+                                    track: style.slider,
+                                    thumb: style.slider,
+                                }}
+                                min={0}
+                                max={1}
+                                step={0.01}
+                            ></Slider>
                         </div>
                     </div>
-                </BackdropWrapper>
-            </div>
-        );
-    }
-}
+                </div>
+            </BackdropWrapper>
+        </div>
+    );
+});

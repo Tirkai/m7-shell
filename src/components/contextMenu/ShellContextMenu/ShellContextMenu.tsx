@@ -1,54 +1,47 @@
 import classNames from "classnames";
-import { IStore } from "interfaces/common/IStore";
-import { computed } from "mobx";
-import { inject, observer } from "mobx-react";
+import { PerformanceContext } from "contexts/PerformanceContext";
+import { useStore } from "hooks/useStore";
+import { observer } from "mobx-react";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
-import React, { Component } from "react";
+import React, { useContext } from "react";
 import { ShellContextMenuItem } from "../ShellContextMenuItem/ShellContextMenuItem";
 import style from "./style.module.css";
 const className = style.contextMenu;
-@inject("store")
-@observer
-export class ShellContextMenu extends Component<IStore> {
-    @computed
-    get store() {
-        return this.props.store!;
-    }
 
-    handleClick = (item: ContextMenuItemModel) => {
-        this.store.contextMenu.hideContextmenu();
+export const ShellContextMenu: React.FC = observer(() => {
+    const store = useStore();
+    const performanceMode = useContext(PerformanceContext);
+    const handleClick = (item: ContextMenuItemModel) => {
+        store.contextMenu.hideContextMenu();
 
         item.onClick();
     };
 
-    handleReady = () => {
-        this.store.contextMenu.setReady(true);
-    };
-
-    render() {
-        return (
+    return (
+        <div
+            className={classNames(className, {
+                [style.show]: store.contextMenu.isShow,
+            })}
+            style={{
+                top: store.contextMenu.point.y + "px",
+                left: store.contextMenu.point.x + "px",
+            }}
+            id="context-menu"
+        >
             <div
-                className={classNames(className, {
-                    [style.show]: this.store.contextMenu.isShow,
+                className={classNames(style.container, {
+                    "no-animate": !performanceMode.mode.enableAnimation,
                 })}
-                style={{
-                    top: this.store.contextMenu.point.y + "px",
-                    left: this.store.contextMenu.point.x + "px",
-                }}
-                id="context-menu"
-                onAnimationEnd={() => this.handleReady()}
             >
-                <div className={style.container}>
-                    {this.store.contextMenu.items.map((item) => (
-                        <ShellContextMenuItem
-                            key={item.id}
-                            icon={item.icon}
-                            content={item.content}
-                            onClick={() => this.handleClick(item)}
-                        />
-                    ))}
-                </div>
+                {store.contextMenu.items.map((item) => (
+                    <ShellContextMenuItem
+                        key={item.id}
+                        icon={item.icon}
+                        content={item.content}
+                        onClick={() => handleClick(item)}
+                    />
+                ))}
             </div>
-        );
-    }
-}
+        </div>
+    );
+});

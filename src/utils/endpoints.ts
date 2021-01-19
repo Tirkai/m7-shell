@@ -20,3 +20,7 @@ export const legacyNotificationEndpoint = new JsonRpcEndpoint(
 export const notificationsEndpoint = new JsonRpcEndpoint(
     `http://notifications.${UPPER_LEVEL_DOMAIN}/jsonrpc/notify/v2`,
 );
+
+export const notificationsAppsEndpoint = new JsonRpcEndpoint(
+    `http://notifications.${UPPER_LEVEL_DOMAIN}/jsonrpc/apps/v1`,
+);

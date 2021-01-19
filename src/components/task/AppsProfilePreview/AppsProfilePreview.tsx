@@ -47,26 +47,17 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
         ]);
     };
 
-    handleLogout = async () => {
-        await this.store.auth.logout();
+    handleLogout = () => {
         this.store.applicationManager.destroyUserSession();
         this.store.windowManager.closeAllWindows();
-        this.store.shell.setActivePanel(ShellPanelType.StartMenu);
+        this.store.shell.setActivePanel(ShellPanelType.None);
         this.setState({ showMenu: false });
-    };
-
-    handleOpenAccountManager = () => {
-        const app = this.store.applicationManager.findByKey("AccountsMe");
-        if (app) {
-            this.store.applicationManager.executeApplication(app);
-            this.store.shell.setActivePanel(ShellPanelType.None);
-        }
-        this.setState({ showMenu: false });
+        this.store.auth.logout();
     };
 
     render() {
         const userInitials = UtilsFunctions.getInitials(
-            this.store.auth.userName,
+            this.store.user.userName,
         );
 
         return (
@@ -93,5 +84,3 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
         );
     }
 }
-
-export default AppsProfilePreview;

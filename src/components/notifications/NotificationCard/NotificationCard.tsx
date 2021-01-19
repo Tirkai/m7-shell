@@ -1,7 +1,9 @@
 import { cross } from "assets/icons";
 import classNames from "classnames";
+import { PerformanceContext } from "contexts/PerformanceContext";
+import { observer } from "mobx-react";
 import moment from "moment";
-import React, { Component } from "react";
+import React, { useContext } from "react";
 import style from "./style.module.css";
 
 interface INotificationCardProps {
@@ -13,54 +15,52 @@ interface INotificationCardProps {
     onClick: () => void;
 }
 
-export class NotificationCard extends Component<INotificationCardProps> {
+export const NotificationCard = observer((props: INotificationCardProps) => {
+    const performanceMode = useContext(PerformanceContext);
 
-    handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        this.props.onClick();
-        this.props.onClose();
+    const handleClick = (
+        event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    ) => {
+        props.onClick();
+        props.onClose();
     };
 
-    handleClose = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const handleClose = (
+        event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    ) => {
         event.stopPropagation();
-        this.props.onClose();
+        props.onClose();
     };
-    render() {
-        const localizedDate = moment(this.props.date).fromNow();
-        return (
-            <div
-                className={classNames(style.notificationCard, {
-                    [style.isRemoving]: !this.props.isDisplayed,
-                })}
-                onClick={this.handleClick}
-            >
-                <div className={style.container}>
-                    <div className={style.header}>
-                        <div className={style.actions}>
-                            <div
-                                className={style.actionItem}
-                                onClick={this.handleClose}
-                            >
-                                <img src={cross} alt="Close" />
-                            </div>
+
+    const localizedDate = moment(props.date).fromNow();
+    return (
+        <div
+            className={classNames(style.notificationCard, {
+                [style.isRemoving]: !props.isDisplayed,
+                "no-animate": !performanceMode.mode.enableAnimation,
+            })}
+            onClick={handleClick}
+        >
+            <div className={style.container}>
+                <div className={style.header}>
+                    <div className={style.actions}>
+                        <div className={style.actionItem} onClick={handleClose}>
+                            <img src={cross} alt="Close" />
                         </div>
-                    </div>
-                    {this.props.title.length ? (
-                        <div className={style.title}>{this.props.title}</div>
-                    ) : (
-                        ""
-                    )}
-                    {this.props.text ? (
-                        <div className={style.content}>
-                            <div className={style.text}>{this.props.text}</div>
-                        </div>
-                    ) : (
-                        ""
-                    )}
-                    <div className={style.date}>
-                        <div className={style.text}>{localizedDate}</div>
                     </div>
                 </div>
+                {props.title.length && (
+                    <div className={style.title}>{props.title}</div>
+                )}
+                {props.text && (
+                    <div className={style.content}>
+                        <div className={style.text}>{props.text}</div>
+                    </div>
+                )}
+                <div className={style.date}>
+                    <div className={style.text}>{localizedDate}</div>
+                </div>
             </div>
-        );
-    }
-}
+        </div>
+    );
+});

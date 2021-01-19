@@ -17,8 +17,6 @@ export class ContextMenuStore {
 
     isShow: boolean = false;
 
-    isReady: boolean = false;
-
     items: ContextMenuItemModel[] = [];
 
     showContextMenu(point: Point2D, items: ContextMenuItemModel[]) {
@@ -34,6 +32,7 @@ export class ContextMenuStore {
             }
 
             this.items = items;
+
             this.isShow = true;
 
             this.point = resultPoint;
@@ -42,12 +41,7 @@ export class ContextMenuStore {
         }
     }
 
-    hideContextmenu() {
+    hideContextMenu() {
         this.isShow = false;
-        this.isReady = false;
-    }
-
-    setReady(value: boolean) {
-        this.isReady = value;
     }
 }

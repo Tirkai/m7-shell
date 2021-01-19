@@ -6,7 +6,7 @@
     max-width: 600px;
 
     overflow: hidden;
-    z-index: 100;
+    z-index: 200;
     top: 0;
     left: 0;
     overflow: hidden;
@@ -38,6 +38,11 @@
 .show .container {
     animation: fadeInTop ease 0.2s;
 }
+
+.zeroDurationAnimate {
+    animation: fadeInTop ease 0s;
+}
+
 @keyframes fadeInTop {
     0% {
         transform: translateY(-100%);
