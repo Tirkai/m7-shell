@@ -76,12 +76,13 @@ export const AppsMenu: React.FC = observer(() => {
         ApplicationPlace.M7Menu,
     );
 
-    const displayedApps = !isSearching
+    const displayedApps = (!isSearching
         ? applicationsList
         : applicationsList.filter(
               (app) =>
                   app.name.toLowerCase().indexOf(search.toLowerCase()) > -1,
-          );
+          )
+    ).filter((app) => !app.isExistedAppInstance);
 
     return (
         <div
