@@ -32,22 +32,19 @@ export const AppsMenu: React.FC = observer(() => {
     };
 
     const handleExecuteApp = (app: Application) => {
-        const appProccess = new ApplicationProcess({
-            app,
-            window: new ApplicationWindow(),
-        });
+        if (!app.isExecuted) {
+            const appProccess = new ApplicationProcess({
+                app,
+                window: new ApplicationWindow(),
+            });
 
-        store.applicationManager.execute(appProccess);
-        // if (app.isAvailable) {
-        //     if (!app.isExecuted) {
-        //         store.applicationManager.executeApplication(app);
-        //     } else {
-        //         const appWindow = store.windowManager.findWindowByApp(app);
-        //         if (appWindow) {
-        //             store.windowManager.focusWindow(appWindow);
-        //         }
-        //     }
-        // }
+            store.processManager.execute(appProccess);
+        } else {
+            const activeProcess = store.processManager.findProcessByApp(app);
+            if (activeProcess) {
+                store.windowManager.focusWindow(activeProcess.window);
+            }
+        }
     };
 
     const getFilteredByPlace = (

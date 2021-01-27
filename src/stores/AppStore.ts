@@ -6,6 +6,7 @@ import { DateTimeStore } from "./DateTimeStore";
 import { LocaleStore } from "./LocaleStore";
 import { MessageStore } from "./MessageStore";
 import { NotificationStore } from "./NotificationStore";
+import { ProcessManagerStore } from "./ProcessManagerStore";
 import { ShellStore } from "./ShellStore";
 import { UserStore } from "./UserStore";
 import { WindowManagerStore } from "./WindowManagerStore";
@@ -13,6 +14,7 @@ import { WindowManagerStore } from "./WindowManagerStore";
 export class AppStore {
     auth: AuthStore;
     dateTime: DateTimeStore;
+    processManager: ProcessManagerStore;
     applicationManager: ApplicationManagerStore;
     windowManager: WindowManagerStore;
     shell: ShellStore;
@@ -25,6 +27,7 @@ export class AppStore {
     constructor() {
         this.auth = new AuthStore(this);
         this.dateTime = new DateTimeStore(this);
+        this.processManager = new ProcessManagerStore(this);
         this.applicationManager = new ApplicationManagerStore(this);
         this.windowManager = new WindowManagerStore(this);
         this.shell = new ShellStore(this);

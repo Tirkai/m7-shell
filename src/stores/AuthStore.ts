@@ -217,7 +217,7 @@ export class AuthStore {
                 const result = response.data.result;
                 this.setToken(result.access_token, result.refresh_token);
 
-                this.store.applicationManager.processes.forEach((appProcess) =>
+                this.store.processManager.processes.forEach((appProcess) =>
                     this.injectAuthTokenInProcess(appProcess),
                 );
                 // this.store.applicationManager.executedApplications.forEach(
@@ -303,6 +303,8 @@ export class AuthStore {
             dispatchEvent(new CustomEvent(ShellEvents.Logout));
 
             this.store.windowManager.closeAllWindows();
+
+            this.store.processManager.killAllProcesses();
 
             localStorage.removeItem(this.localStorageAccessTokenKey);
             this.accessToken = "";

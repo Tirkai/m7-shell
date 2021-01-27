@@ -92,13 +92,22 @@ export const NotificationHub = observer(() => {
         if (app instanceof ExternalApplication) {
             store.shell.setActivePanel(ShellPanelType.None);
 
-            const appProcess = new ApplicationProcess({
-                app,
-                window: new ApplicationWindow(),
-                url,
-            });
-
-            store.applicationManager.execute(appProcess);
+            if (!app.isExecuted) {
+                const appProcess = new ApplicationProcess({
+                    app,
+                    window: new ApplicationWindow(),
+                    url,
+                });
+                store.processManager.execute(appProcess);
+            } else {
+                const activeProcess = store.processManager.findProcessByApp(
+                    app,
+                );
+                if (activeProcess) {
+                    activeProcess.setUrl(url);
+                    store.windowManager.focusWindow(activeProcess.window);
+                }
+            }
         }
     };
 
@@ -107,14 +116,34 @@ export const NotificationHub = observer(() => {
             NOTIFICATION_APP_GUID,
         );
         if (notificationApp) {
-            const appProcess = new ApplicationProcess({
-                app: notificationApp,
-                window: new ApplicationWindow(),
-                params: new Map([["filterByAppId", group.id]]),
-            });
-
-            store.applicationManager.execute(appProcess);
+            if (!notificationApp.isExecuted) {
+                const appProcess = new ApplicationProcess({
+                    app: notificationApp,
+                    window: new ApplicationWindow(),
+                    params: new Map([["filterByAppId", group.id]]),
+                });
+                store.processManager.execute(appProcess);
+            } else {
+                const activeProcess = store.processManager.findProcessByApp(
+                    notificationApp,
+                );
+                if (activeProcess) {
+                    activeProcess.setParams(
+                        new Map([["filterByAppId", group.id]]),
+                    );
+                    store.windowManager.focusWindow(activeProcess.window);
+                }
+            }
         }
+
+        // const appProcess = new ApplicationProcess({
+        //     app: notificationApp,
+        //     window: new ApplicationWindow(),
+        //     params: new Map([["filterByAppId", group.id]]),
+        // });
+
+        // store.processManager.execute(appProcess);
+        // }
     };
 
     return (

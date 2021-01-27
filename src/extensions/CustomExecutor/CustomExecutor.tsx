@@ -31,7 +31,7 @@ export const CustomExecutor = () => {
             window: new ApplicationWindow(),
         });
 
-        store.applicationManager.execute(appProccess);
+        store.processManager.execute(appProccess);
     };
 
     return (

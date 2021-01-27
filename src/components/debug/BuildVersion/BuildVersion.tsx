@@ -24,6 +24,15 @@ export class BuildVersion extends Component<IStore> {
         if (this.store.shell.enabledDevMode) {
             return (
                 <div className={style.container}>
+                    <div>
+                        {this.store.processManager.processes.map(
+                            (appProcess) => (
+                                <div>
+                                    {appProcess.modifiedUrl} ({appProcess.url})
+                                </div>
+                            ),
+                        )}
+                    </div>
                     <div>{`🔑${moment
                         .utc(this.store.auth.remainingTokenTimeInSeconds * 1000)
                         .format("HH:mm:ss")}`}</div>

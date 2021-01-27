@@ -28,7 +28,7 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
     }
 
     handleExecuteApp = (app: Application) => {
-        this.store.applicationManager.execute(
+        this.store.processManager.execute(
             new ApplicationProcess({
                 app,
                 window: new ApplicationWindow(),

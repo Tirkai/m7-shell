@@ -1,4 +1,3 @@
-import { EmitterMessage, invokeListeners } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
 import { ApplicationFactory } from "factories/ApplicationFactory";
@@ -32,30 +31,30 @@ export class ApplicationManagerStore {
 
         makeAutoObservable(this);
 
-        window.onmessage = (event: MessageEvent) => {
-            const message: EmitterMessage<unknown> = event.data;
-            let apps = [];
+        // window.onmessage = (event: MessageEvent) => {
+        //     const message: EmitterMessage<unknown> = event.data;
+        //     let apps = [];
 
-            apps = this.applications.filter(
-                (item) => item.id === message.appId,
-            );
+        //     apps = this.applications.filter(
+        //         (item) => item.id === message.appId,
+        //     );
 
-            // #region Backward compatibility m7-shell-emitter@0.6
-            // Todo: Remove after update all projects
-            if (!message.appId && message.source) {
-                apps = this.applications.filter((item) =>
-                    item instanceof ExternalApplication && message.source
-                        ? item.url.indexOf(message.source) > -1
-                        : false,
-                );
-            }
-            // #endregion
+        //     // #region Backward compatibility m7-shell-emitter@0.6
+        //     // Todo: Remove after update all projects
+        //     if (!message.appId && message.source) {
+        //         apps = this.applications.filter((item) =>
+        //             item instanceof ExternalApplication && message.source
+        //                 ? item.url.indexOf(message.source) > -1
+        //                 : false,
+        //         );
+        //     }
+        //     // #endregion
 
-            this.processes.forEach((appProccess) => {
-                invokeListeners(message, appProccess.emitter.listeners);
-                return;
-            });
-        };
+        //     this.processes.forEach((appProccess) => {
+        //         invokeListeners(message, appProccess.emitter.listeners);
+        //         return;
+        //     });
+        // };
     }
 
     addApplication(app: Application) {
@@ -67,7 +66,7 @@ export class ApplicationManagerStore {
         return this;
     }
 
-    async execute(appProcess: ApplicationProcess) {
+    async execute1(appProcess: ApplicationProcess) {
         const applicationParamsResponse = await Axios.post<
             IJsonRpcResponse<IAppParams>
         >(

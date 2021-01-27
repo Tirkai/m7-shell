@@ -10,6 +10,7 @@ import { strings } from "locale";
 import { computed, reaction } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
+import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import React, { Component } from "react";
@@ -70,8 +71,8 @@ export class TaskBar extends Component<IStore> {
         );
     };
 
-    handleCloseWindow = (appWindow: ApplicationWindow) => {
-        this.store.windowManager.closeWindow(appWindow);
+    handleKillProcess = (appProcess: ApplicationProcess) => {
+        this.store.processManager.killProcess(appProcess);
     };
 
     componentDidMount() {
@@ -89,11 +90,11 @@ export class TaskBar extends Component<IStore> {
         );
     }
 
-    createCloseApplicationContextMenuItem = (appWindow: ApplicationWindow) =>
+    createCloseApplicationContextMenuItem = (appProcess: ApplicationProcess) =>
         new ContextMenuItemModel({
             icon: cross,
             content: strings.application.actions.close,
-            onClick: () => this.handleCloseWindow(appWindow),
+            onClick: () => this.handleKillProcess(appProcess),
         });
 
     render() {
@@ -117,7 +118,7 @@ export class TaskBar extends Component<IStore> {
                                 >
                                     <SVGIcon source={apps} color="white" />
                                 </TaskBarItem>
-                                {this.store.applicationManager.processes.map(
+                                {this.store.processManager.processes.map(
                                     (appProcess) => (
                                         <TaskBarItem
                                             key={appProcess.id}
@@ -132,7 +133,7 @@ export class TaskBar extends Component<IStore> {
                                             }
                                             menu={[
                                                 this.createCloseApplicationContextMenuItem(
-                                                    appProcess.window,
+                                                    appProcess,
                                                 ),
                                             ]}
                                         >

@@ -54,7 +54,7 @@ export class ShellScreen extends Component<IStore> {
                     });
 
                     // this.store.applicationManager.executeApplication(app);
-                    this.store.applicationManager.execute(appProcess);
+                    this.store.processManager.execute(appProcess);
                 }
             }
 
@@ -76,7 +76,7 @@ export class ShellScreen extends Component<IStore> {
 
                 // this.store.applicationManager.executeApplication(app);
 
-                this.store.applicationManager.execute(appProcess);
+                this.store.processManager.execute(appProcess);
             }
         }
     }
@@ -134,7 +134,7 @@ export class ShellScreen extends Component<IStore> {
 
     handleCloseWindow = (appProcess: ApplicationProcess) => {
         // this.store.windowManager.closeWindow(appWindow);
-        this.store.applicationManager.killProcess(appProcess);
+        this.store.processManager.killProcess(appProcess);
     };
 
     handleDrag = (
@@ -157,10 +157,11 @@ export class ShellScreen extends Component<IStore> {
                     onClick={this.handleClickDesktop}
                 ></div>
 
-                {this.store.applicationManager.processes.map((process) => (
+                {this.store.processManager.processes.map((process) => (
                     <AppWindow
                         key={process.window.id}
                         process={process}
+                        url={process.modifiedUrl}
                         {...process.window}
                         window={process.window}
                         onResizeStart={(event, data) =>

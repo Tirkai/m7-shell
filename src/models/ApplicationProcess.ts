@@ -1,4 +1,5 @@
 import { ShellMessageEmitter } from "@algont/m7-shell-emitter";
+import { makeAutoObservable } from "mobx";
 import { v4 } from "uuid";
 import { Application } from "./Application";
 import { ApplicationWindow } from "./ApplicationWindow";
@@ -23,6 +24,8 @@ export class ApplicationProcess {
     hash: string;
 
     constructor(options: IApplicationProcessOptions) {
+        makeAutoObservable(this);
+
         this.id = v4();
         this.hash = v4();
         this.app = options.app;
@@ -45,6 +48,14 @@ export class ApplicationProcess {
 
     setName(value: string) {
         this.name = value;
+    }
+
+    setUrl(value: string) {
+        this.url = value;
+    }
+
+    setParams(value: Map<string, string>) {
+        this.params = value;
     }
 
     get modifiedUrl() {

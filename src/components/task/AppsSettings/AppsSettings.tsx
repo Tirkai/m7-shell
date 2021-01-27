@@ -32,7 +32,7 @@ export class AppsSettings extends Component<IAppsSettingsProps> {
             window: new ApplicationWindow(),
         });
         // this.store.applicationManager.executeApplication(app);
-        this.store.applicationManager.execute(appProcess);
+        this.store.processManager.execute(appProcess);
     };
 
     handleShowDropdown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
