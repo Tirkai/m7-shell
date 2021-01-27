@@ -7,6 +7,8 @@ import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
+import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationWindow } from "models/ApplicationWindow";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { Point2D } from "models/Point2D";
 import React, { Component } from "react";
@@ -26,7 +28,12 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
     }
 
     handleExecuteApp = (app: Application) => {
-        this.store.applicationManager.executeApplication(app);
+        this.store.applicationManager.execute(
+            new ApplicationProcess({
+                app,
+                window: new ApplicationWindow(),
+            }),
+        );
     };
 
     handleShowDropdown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {

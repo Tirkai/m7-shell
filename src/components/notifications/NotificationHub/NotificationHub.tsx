@@ -9,11 +9,12 @@ import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { observer } from "mobx-react";
+import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationGroupModel } from "models/NotificationGroupModel";
 import { NotificationModel } from "models/NotificationModel";
 import React, { useContext, useEffect, useState } from "react";
-import { v4 } from "uuid";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
 import style from "./style.module.css";
@@ -86,26 +87,18 @@ export const NotificationHub = observer(() => {
     };
 
     const handleRunApplication = (appId: string, url: string) => {
-        const { shell, applicationManager, windowManager } = store;
         const app = store.applicationManager.findById(appId);
 
         if (app instanceof ExternalApplication) {
-            // TODO: Execute application with hash in function
-            // #region
-            const hashParams = new URLSearchParams();
-            hashParams.append("hash", v4());
+            store.shell.setActivePanel(ShellPanelType.None);
 
-            const urlWithHash = url + "?" + hashParams.toString();
-            // #endregion
-            shell.setActivePanel(ShellPanelType.None);
+            const appProcess = new ApplicationProcess({
+                app,
+                window: new ApplicationWindow(),
+                url,
+            });
 
-            applicationManager.executeApplicationWithUrl(app, urlWithHash);
-
-            const appWindow = windowManager.findWindowByApp(app);
-
-            if (appWindow) {
-                windowManager.focusWindow(appWindow);
-            }
+            store.applicationManager.execute(appProcess);
         }
     };
 
@@ -113,19 +106,14 @@ export const NotificationHub = observer(() => {
         const notificationApp = store.applicationManager.findById(
             NOTIFICATION_APP_GUID,
         );
+        if (notificationApp) {
+            const appProcess = new ApplicationProcess({
+                app: notificationApp,
+                window: new ApplicationWindow(),
+                params: new Map([["filterByAppId", group.id]]),
+            });
 
-        if (notificationApp instanceof ExternalApplication) {
-            const url = new URL(notificationApp.url);
-            const params = new URLSearchParams();
-            params.set("filterByAppId", group.id);
-            params.set("appId", NOTIFICATION_APP_GUID);
-
-            url.search = params.toString();
-
-            store.applicationManager.executeApplicationWithUrl(
-                notificationApp,
-                url.toString(),
-            );
+            store.applicationManager.execute(appProcess);
         }
     };
 

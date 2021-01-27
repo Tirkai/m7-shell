@@ -1,4 +1,3 @@
-import { ShellMessageEmitter } from "@algont/m7-shell-emitter";
 import { IExternalApplicationOptions } from "interfaces/options/IExternalApplicationOptions";
 import { action, computed, makeObservable, observable } from "mobx";
 import { Application } from "./Application";
@@ -7,7 +6,7 @@ export class ExternalApplication extends Application {
 
     customUrl: string = "";
 
-    emitter: ShellMessageEmitter;
+    // emitter: ShellMessageEmitter;
 
     constructor(options: IExternalApplicationOptions) {
         super(options);
@@ -16,16 +15,16 @@ export class ExternalApplication extends Application {
             url: observable,
             customUrl: observable,
             applicationUrl: computed,
-            setEmitterContext: action,
-            setExecuted: action,
+            // setEmitterContext: action,
+            // setExecuted: action,
             setCustomUrl: action,
         });
 
-        this.emitter = new ShellMessageEmitter(this.id);
+        // this.emitter = new ShellMessageEmitter(this.id);
         try {
             const url = new URL(options.url);
             const urlParams = new URLSearchParams(url.search);
-            urlParams.set("appId", this.id);
+            // urlParams.set("appId", this.id);
 
             const resultUrl = `${url.protocol}//${url.host}${
                 url.pathname
@@ -42,23 +41,23 @@ export class ExternalApplication extends Application {
         return this.customUrl.length ? this.customUrl : this.url;
     }
 
-    setEmitterContext(context: Window) {
-        this.emitter.setContext(context);
-        return this;
-    }
+    // setEmitterContext(context: Window) {
+    //     this.emitter.setContext(context);
+    //     return this;
+    // }
 
-    setExecuted(value: boolean) {
-        try {
-            this.emitter?.clear();
-            this.isExecuted = value;
-            if (!value) {
-                this.customUrl = "";
-            }
-        } catch (e) {
-            console.error(e);
-        }
-        return this;
-    }
+    // setExecuted(value: boolean) {
+    //     try {
+    //         this.emitter?.clear();
+    //         this.isExecuted = value;
+    //         if (!value) {
+    //             this.customUrl = "";
+    //         }
+    //     } catch (e) {
+    //         console.error(e);
+    //     }
+    //     return this;
+    // }
 
     setCustomUrl(url: string) {
         this.customUrl = url;

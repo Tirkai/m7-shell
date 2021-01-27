@@ -46,7 +46,9 @@ export class TaskBar extends Component<IStore> {
     handleExecuteApp = (app: Application) => {
         this.store.shell.setActivePanel(ShellPanelType.None);
 
-        this.store.applicationManager.executeApplication(app);
+        alert(`Taskbar.handleExecuteApp`);
+
+        // this.store.applicationManager.executeApplication(app);
     };
 
     handleFocusAppWindow = (appWindow: ApplicationWindow) => {
@@ -115,27 +117,27 @@ export class TaskBar extends Component<IStore> {
                                 >
                                     <SVGIcon source={apps} color="white" />
                                 </TaskBarItem>
-                                {this.store.windowManager.windows.map(
-                                    (appWindow) => (
+                                {this.store.applicationManager.processes.map(
+                                    (appProcess) => (
                                         <TaskBarItem
-                                            key={appWindow.id}
+                                            key={appProcess.id}
                                             executed
-                                            focused={appWindow.isFocused}
+                                            focused={
+                                                appProcess.window.isFocused
+                                            }
                                             onClick={() =>
                                                 this.handleFocusAppWindow(
-                                                    appWindow,
+                                                    appProcess.window,
                                                 )
                                             }
                                             menu={[
                                                 this.createCloseApplicationContextMenuItem(
-                                                    appWindow,
+                                                    appProcess.window,
                                                 ),
                                             ]}
                                         >
                                             <SVGIcon
-                                                source={
-                                                    appWindow.application.icon
-                                                }
+                                                source={appProcess.app.icon}
                                                 color="white"
                                             />
                                         </TaskBarItem>

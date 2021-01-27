@@ -2,7 +2,6 @@ import { ShellEvents } from "enum/ShellEvents";
 import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { max, min } from "lodash";
 import { makeAutoObservable } from "mobx";
-import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { AppStore } from "./AppStore";
 
@@ -60,9 +59,9 @@ export class WindowManagerStore {
         }
     }
 
-    findWindowByApp(app: Application) {
-        return this.windows.find((item) => item.application.id === app.id);
-    }
+    // findWindowByApp(app: Application) {
+    //     return this.windows.find((item) => item.application.id === app.id);
+    // }
 
     addWindow(appWindow: ApplicationWindow) {
         this.windows.push(appWindow);
@@ -113,12 +112,12 @@ export class WindowManagerStore {
 
     closeWindow(appWindow: ApplicationWindow) {
         try {
-            const app = this.store.applicationManager.findById(
-                appWindow.application.id,
-            );
-            if (app) {
-                app.setExecuted(false);
-            }
+            // const app = this.store.applicationManager.findById(
+            //     appWindow.application.id,
+            // );
+            // if (app) {
+            //     // app.setExecuted(false);
+            // }
 
             this.windows.splice(this.windows.indexOf(appWindow), 1);
         } catch (e) {

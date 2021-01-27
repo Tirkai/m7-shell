@@ -9,11 +9,13 @@ import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { AppWindow } from "components/window/AppWindow/AppWindow";
 import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/AppWindowPinContainer";
+import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { ShellEvents } from "enum/ShellEvents";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
+import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
 import React, { Component } from "react";
@@ -46,7 +48,13 @@ export class ShellScreen extends Component<IStore> {
                 const app = this.store.applicationManager.findByKey(autoRunApp);
 
                 if (app) {
-                    this.store.applicationManager.executeApplication(app);
+                    const appProcess = new ApplicationProcess({
+                        app,
+                        window: new ApplicationWindow(),
+                    });
+
+                    // this.store.applicationManager.executeApplication(app);
+                    this.store.applicationManager.execute(appProcess);
                 }
             }
 
@@ -59,9 +67,16 @@ export class ShellScreen extends Component<IStore> {
                     isVisibleInStartMenu: false,
                 });
 
-                this.store.applicationManager.addApplication(app);
+                const appProcess = new ApplicationProcess({
+                    app,
+                    window: new ApplicationWindow(),
+                });
 
-                this.store.applicationManager.executeApplication(app);
+                // this.store.applicationManager.addApplication(app);
+
+                // this.store.applicationManager.executeApplication(app);
+
+                this.store.applicationManager.execute(appProcess);
             }
         }
     }
@@ -90,8 +105,8 @@ export class ShellScreen extends Component<IStore> {
             data.handle === ResizeHandleDirection.SouthWest
         ) {
             if (
-                appWindow.width < appWindow.application.minWidth ||
-                appWindow.height < appWindow.application.minHeight
+                appWindow.width < MIN_WINDOW_WIDTH ||
+                appWindow.height < MIN_WINDOW_HEIGHT
             ) {
                 position = {
                     x: appWindow.minXPosition,
@@ -100,13 +115,13 @@ export class ShellScreen extends Component<IStore> {
                 event.preventDefault();
             }
         } else {
-            if (appWindow.width < appWindow.application.minWidth) {
+            if (appWindow.width < MIN_WINDOW_WIDTH) {
                 position = {
                     x: appWindow.minXPosition,
                     y: event.clientY,
                 };
             }
-            if (appWindow.height < appWindow.application.minHeight) {
+            if (appWindow.height < MIN_WINDOW_HEIGHT) {
                 position = {
                     x: event.clientX,
                     y: appWindow.minYPosition,
@@ -117,8 +132,9 @@ export class ShellScreen extends Component<IStore> {
         appWindow.resize(data.handle, position, size);
     };
 
-    handleCloseWindow = (appWindow: ApplicationWindow) => {
-        this.store.windowManager.closeWindow(appWindow);
+    handleCloseWindow = (appProcess: ApplicationProcess) => {
+        // this.store.windowManager.closeWindow(appWindow);
+        this.store.applicationManager.killProcess(appProcess);
     };
 
     handleDrag = (
@@ -140,7 +156,34 @@ export class ShellScreen extends Component<IStore> {
                     className={style.desktop}
                     onClick={this.handleClickDesktop}
                 ></div>
-                {this.store.windowManager.windows.map((appWindow) => (
+
+                {this.store.applicationManager.processes.map((process) => (
+                    <AppWindow
+                        key={process.window.id}
+                        process={process}
+                        {...process.window}
+                        window={process.window}
+                        onResizeStart={(event, data) =>
+                            this.handleWindowResizeStart(
+                                process.window,
+                                event,
+                                data,
+                            )
+                        }
+                        onResizeStop={() => process.window.setResizing(false)}
+                        onResize={(event, data) =>
+                            this.handleWindowResize(process.window, event, data)
+                        }
+                        onDragStart={() => process.window.setDragging(true)}
+                        onDragStop={() => process.window.setDragging(false)}
+                        onDrag={(event, data) =>
+                            this.handleDrag(process.window, event, data)
+                        }
+                        onClose={() => this.handleCloseWindow(process)}
+                    />
+                ))}
+
+                {/* {this.store.windowManager.windows.map((appWindow) => (
                     <AppWindow
                         key={appWindow.id}
                         {...appWindow}
@@ -159,7 +202,7 @@ export class ShellScreen extends Component<IStore> {
                         }
                         onClose={() => this.handleCloseWindow(appWindow)}
                     />
-                ))}
+                ))} */}
 
                 <AppsMenu />
                 <NotificationToasts />

@@ -24,16 +24,15 @@ export class NotificationToasts extends Component<IStore> {
             toast.notification.applicationId,
         );
         if (app instanceof ExternalApplication) {
-            applicationManager.executeApplicationWithUrl(
-                app,
-                toast.notification.url,
-            );
-
-            const appWindow = windowManager.findWindowByApp(app);
-
-            if (appWindow) {
-                windowManager.focusWindow(appWindow);
-            }
+            // TODO: Todoooo
+            // applicationManager.executeApplicationWithUrl(
+            //     app,
+            //     toast.notification.url,
+            // );
+            // const appWindow = windowManager.findWindowByApp(app);
+            // if (appWindow) {
+            //     windowManager.focusWindow(appWindow);
+            // }
         }
 
         toast.setShow(false);

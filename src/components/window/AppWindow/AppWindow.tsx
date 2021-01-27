@@ -1,9 +1,10 @@
 import { AppMessageType } from "@algont/m7-shell-emitter";
 import classNames from "classnames";
+import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
-import { Application } from "models/Application";
+import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
@@ -20,7 +21,7 @@ import { AppWindowUnfocusedOverlay } from "../AppWindowUnfocusedOverlay/AppWindo
 import style from "./style.module.css";
 
 interface IAppWindowProps extends IStore {
-    application: Application;
+    process: ApplicationProcess;
     window: ApplicationWindow;
     width: number;
     height: number;
@@ -76,34 +77,32 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
     handleFrameLoaded = (frameRef: HTMLIFrameElement) => {
         const context = frameRef?.contentWindow;
         if (context) {
-            const app = this.props.application;
-
             this.setState({
                 frame: frameRef,
             });
 
-            if (app instanceof ExternalApplication) {
-                app.setEmitterContext(context);
-                this.handleBindingEmitterEvents(app);
-                this.handleAppReady();
-            }
+            this.handleBindingEmitterEvents(this.props.process);
+
+            this.props.process.setEmitterContext(context);
+            this.handleAppReady();
         }
     };
 
-    handleBindingEmitterEvents = (app: ExternalApplication) => {
-        app.emitter.on(AppMessageType.Connected, () => {
+    handleBindingEmitterEvents = (appProcess: ApplicationProcess) => {
+        appProcess.emitter.on(AppMessageType.Connected, () => {
             this.handleAppReady();
-            this.store.auth.injectAuthTokenInExternalApplication(app);
+
+            this.store.auth.injectAuthTokenInProcess(appProcess);
         });
 
-        app.emitter.on(AppMessageType.ForceRecieveToken, () =>
-            this.store.auth.injectAuthTokenInExternalApplication(app),
+        appProcess.emitter.on(AppMessageType.ForceRecieveToken, () =>
+            this.store.auth.injectAuthTokenInProcess(appProcess),
         );
 
-        app.emitter.on(AppMessageType.EnableBackwardButton, (payload) =>
+        appProcess.emitter.on(AppMessageType.EnableBackwardButton, (payload) =>
             this.handleShowBackward(payload),
         );
-        app.emitter.on(AppMessageType.EnableReloadButton, (payload) =>
+        appProcess.emitter.on(AppMessageType.EnableReloadButton, (payload) =>
             this.handleShowReload(payload),
         );
     };
@@ -149,22 +148,23 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
     };
 
     componentDidMount() {
-        const app = this.props.application;
-        if (app instanceof ShellApplication) {
-            this.setState({ isAppReady: true });
-        }
+        // const app = this.props.application;
+        // if (app instanceof ShellApplication) {
+        //     this.setState({ isAppReady: true });
+        // }
     }
 
     appComponent: JSX.Element | null = null;
+
     render() {
         if (!this.state.isAppReady) {
-            if (this.props.application instanceof ExternalApplication) {
+            if (this.props.process.app instanceof ExternalApplication) {
                 this.appComponent = (
                     <iframe
                         onLoad={this.handleAppReady}
-                        src={this.props.application.applicationUrl}
+                        src={this.props.process.modifiedUrl}
                         ref={this.handleFrameLoaded}
-                        title={this.props.application.name}
+                        title={this.props.process.name}
                         style={{
                             width: "100%",
                             height: "100%",
@@ -178,8 +178,8 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                 );
             }
         }
-        if (this.props.application instanceof ShellApplication) {
-            this.appComponent = this.props.application.Component;
+        if (this.props.process.app instanceof ShellApplication) {
+            this.appComponent = this.props.process.app.Component;
         }
 
         const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
@@ -227,18 +227,15 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                         onResize={this.handleResize}
                         axis={this.props.window.isFullScreen ? "none" : "both"}
                         resizeHandles={resizeDirections as ResizeHandle[]}
-                        minConstraints={[
-                            this.props.application.minWidth,
-                            this.props.application.minHeight,
-                        ]}
+                        minConstraints={[MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT]}
                     >
                         <div
                             className={classNames(style.windowContainer)}
                             onMouseDown={this.handleFocus}
                         >
                             <AppWindowHeader
-                                icon={this.props.application.icon}
-                                title={this.props.application.name}
+                                icon={this.props.process.app.icon}
+                                title={this.props.process.name}
                                 isFocused={this.props.isFocused}
                                 onClose={this.props.onClose}
                                 onDoubleClick={this.handleHeaderDoubleClick}
@@ -254,7 +251,7 @@ export class AppWindow extends Component<IAppWindowProps, IAppWindowState> {
                                 }
                             />
                             <AppLoader
-                                icon={this.props.application.icon}
+                                icon={this.props.process.app.icon}
                                 disabled={this.state.isAppReady}
                             />
                             <div

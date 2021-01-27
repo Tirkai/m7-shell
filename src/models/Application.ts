@@ -8,10 +8,10 @@ export class Application {
     key: string;
     name: string;
     icon: string;
-    baseWidth: number;
-    baseHeight: number;
-    minWidth: number;
-    minHeight: number;
+    // baseWidth: number;
+    // baseHeight: number;
+    // minWidth: number;
+    // minHeight: number;
     isFullscreen: boolean = false;
     place: ApplicationPlace = ApplicationPlace.Unknown;
     isOnlyAdmin: boolean = false;
@@ -29,15 +29,14 @@ export class Application {
             key: observable,
             name: observable,
             icon: observable,
-            baseWidth: observable,
-            baseHeight: observable,
-            minWidth: observable,
-            minHeight: observable,
+            // baseWidth: observable,
+            // baseHeight: observable,
+            // minWidth: observable,
+            // minHeight: observable,
             isFullscreen: observable,
             place: observable,
             isOnlyAdmin: observable,
             isExistedAppInstance: observable,
-            setExecuted: action,
             setAvailable: action,
         });
 
@@ -46,20 +45,15 @@ export class Application {
         this.key = options.key ?? options.id;
         this.icon =
             options.icon || options.icon?.length ? options.icon : unknownApp;
-        this.baseWidth = options.baseWidth ?? 1000;
-        this.baseHeight = options.baseHeight ?? 700;
-        this.minWidth = options.minWidth ?? 400;
-        this.minHeight = options.minHeight ?? 300;
+        // this.baseWidth = options.baseWidth ?? 1000;
+        // this.baseHeight = options.baseHeight ?? 700;
+        // this.minWidth = options.minWidth ?? 400;
+        // this.minHeight = options.minHeight ?? 300;
         this.isVisibleInStartMenu = options.isVisibleInStartMenu ?? true;
         this.isFullscreen = options.isFullscreen ?? false;
         this.place = options.place ?? ApplicationPlace.Unknown;
         this.isOnlyAdmin = options.isOnlyAdmin ?? false;
         this.isExistedAppInstance = options.isExistedAppInstance ?? false;
-    }
-
-    setExecuted(value: boolean) {
-        this.isExecuted = value;
-        return this;
     }
 
     setAvailable(value: boolean) {

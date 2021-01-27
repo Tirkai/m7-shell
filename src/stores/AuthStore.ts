@@ -12,7 +12,7 @@ import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { Base64 } from "js-base64";
 import { strings } from "locale";
 import { makeAutoObservable } from "mobx";
-import { ExternalApplication } from "models/ExternalApplication";
+import { ApplicationProcess } from "models/ApplicationProcess";
 import moment, { Moment } from "moment";
 import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
@@ -193,9 +193,9 @@ export class AuthStore {
         }
     }
 
-    injectAuthTokenInExternalApplication(app: ExternalApplication) {
+    injectAuthTokenInProcess(appProccess: ApplicationProcess) {
         try {
-            app.emitter.emit(ShellMessageType.UpdateAuthToken, {
+            appProccess.emitter.emit(ShellMessageType.UpdateAuthToken, {
                 token: this.accessToken,
                 login: this.userLogin,
             });
@@ -216,19 +216,23 @@ export class AuthStore {
             if (!response.data.error) {
                 const result = response.data.result;
                 this.setToken(result.access_token, result.refresh_token);
-                this.store.applicationManager.executedApplications.forEach(
-                    (item) => {
-                        if (item instanceof ExternalApplication) {
-                            item.emitter.emit(
-                                ShellMessageType.UpdateAuthToken,
-                                {
-                                    token: this.accessToken,
-                                    login: this.userLogin,
-                                },
-                            );
-                        }
-                    },
+
+                this.store.applicationManager.processes.forEach((appProcess) =>
+                    this.injectAuthTokenInProcess(appProcess),
                 );
+                // this.store.applicationManager.executedApplications.forEach(
+                //     (item) => {
+                //         if (item instanceof ExternalApplication) {
+                //             item.emitter.emit(
+                //                 ShellMessageType.UpdateAuthToken,
+                //                 {
+                //                     token: this.accessToken,
+                //                     login: this.userLogin,
+                //                 },
+                //             );
+                //         }
+                //     },
+                // );
             } else {
                 this.logout();
             }

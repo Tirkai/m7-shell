@@ -4,6 +4,8 @@ import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/Application";
+import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationWindow } from "models/ApplicationWindow";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { Point2D } from "models/Point2D";
 import React, { Component } from "react";
@@ -25,7 +27,12 @@ export class AppsSettings extends Component<IAppsSettingsProps> {
     }
 
     handleExecuteApp = (app: Application) => {
-        this.store.applicationManager.executeApplication(app);
+        const appProcess = new ApplicationProcess({
+            app,
+            window: new ApplicationWindow(),
+        });
+        // this.store.applicationManager.executeApplication(app);
+        this.store.applicationManager.execute(appProcess);
     };
 
     handleShowDropdown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
