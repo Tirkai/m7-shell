@@ -8,7 +8,7 @@ import React, { Component } from "react";
 import style from "./style.module.css";
 
 interface ITaskBarItemProps extends IStore {
-    onClick: () => void;
+    onClick?: () => void;
     autoWidth?: boolean;
     executed?: boolean;
     focused?: boolean;

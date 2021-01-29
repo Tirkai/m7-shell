@@ -1,5 +1,9 @@
 import { ShellMessageType } from "@algont/m7-shell-emitter";
-import { JsonRpcPayload, JsonRpcResult } from "@algont/m7-utils";
+import {
+    IJsonRpcResponse,
+    JsonRpcPayload,
+    JsonRpcResult,
+} from "@algont/m7-utils";
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
 import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
@@ -9,7 +13,6 @@ import { ShellEvents } from "enum/ShellEvents";
 import { IAccessTokenMetadata } from "interfaces/auth/IAccessTokenMetadata";
 import { IRefreshTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
-import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { Base64 } from "js-base64";
 import { strings } from "locale";
 import { makeAutoObservable } from "mobx";
@@ -152,6 +155,10 @@ export class AuthStore {
 
             if (!response.data.error) {
                 this.setCheckedAfterStart(true);
+
+                this.eventBus.dispatchEvent(
+                    new CustomEvent(AuthEventType.SuccessVerifyToken),
+                );
             } else {
                 this.eventBus.dispatchEvent(
                     new CustomEvent(AuthEventType.FailedVerifyToken),
@@ -206,6 +213,12 @@ export class AuthStore {
                 this.localStorageDelta,
             );
 
+            this.eventBus.dispatchEvent(
+                new CustomEvent(AuthEventType.UpdateToken, {
+                    detail: this.accessToken,
+                }),
+            );
+
             if (!localStorageDelta) {
                 this.deltaTime = this.currentTime.diff(this.createTime);
                 localStorage.setItem(
@@ -255,29 +268,10 @@ export class AuthStore {
                 const result = response.data.result;
                 this.setToken(result.access_token, result.refresh_token);
 
-                this.eventBus.dispatchEvent(
-                    new CustomEvent(AuthEventType.UpdateToken, {
-                        detail: this.accessToken,
-                    }),
-                );
-
                 // TODO: Move to Process Store
                 this.store.processManager.processes.forEach((appProcess) =>
                     this.injectAuthTokenInProcess(appProcess),
                 );
-                // this.store.applicationManager.executedApplications.forEach(
-                //     (item) => {
-                //         if (item instanceof ExternalApplication) {
-                //             item.emitter.emit(
-                //                 ShellMessageType.UpdateAuthToken,
-                //                 {
-                //                     token: this.accessToken,
-                //                     login: this.userLogin,
-                //                 },
-                //             );
-                //         }
-                //     },
-                // );
             } else {
                 this.eventBus.dispatchEvent(
                     new CustomEvent(AuthEventType.FailedRenewToken, {
@@ -354,10 +348,6 @@ export class AuthStore {
             dispatchEvent(new CustomEvent(ShellEvents.Logout));
 
             this.eventBus.dispatchEvent(new CustomEvent(AuthEventType.Logout));
-
-            // this.store.windowManager.closeAllWindows();
-
-            // this.store.processManager.killAllProcesses();
 
             localStorage.removeItem(this.localStorageAccessTokenKey);
             this.accessToken = "";

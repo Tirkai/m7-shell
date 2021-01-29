@@ -2,6 +2,7 @@ import apps from "./apps.svg";
 import backward from "./backward.svg";
 import collapse from "./collapse.svg";
 import cross from "./cross.svg";
+import disconnect from "./disconnect.svg";
 import dotsMenu from "./dots-menu.svg";
 import empty from "./empty.svg";
 import error from "./error.svg";
@@ -48,4 +49,5 @@ export {
     terminal,
     rocket,
     search,
+    disconnect,
 };

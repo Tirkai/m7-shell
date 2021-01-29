@@ -6,7 +6,6 @@ import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicati
 import { strings } from "locale";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/Application";
-import { ApplicationProcess } from "models/ApplicationProcess";
 import { ExternalApplication } from "models/ExternalApplication";
 import { registeredApps } from "registeredApps";
 import { portalEndpoint } from "utils/endpoints";
@@ -14,8 +13,6 @@ import { AppStore } from "./AppStore";
 
 export class ApplicationManagerStore {
     applications: Application[] = [];
-
-    processes: ApplicationProcess[] = [];
 
     get displayedApplications() {
         return this.applications.filter((item) => item.isVisibleInStartMenu);
@@ -30,31 +27,6 @@ export class ApplicationManagerStore {
         this.store = store;
 
         makeAutoObservable(this);
-
-        // window.onmessage = (event: MessageEvent) => {
-        //     const message: EmitterMessage<unknown> = event.data;
-        //     let apps = [];
-
-        //     apps = this.applications.filter(
-        //         (item) => item.id === message.appId,
-        //     );
-
-        //     // #region Backward compatibility m7-shell-emitter@0.6
-        //     // Todo: Remove after update all projects
-        //     if (!message.appId && message.source) {
-        //         apps = this.applications.filter((item) =>
-        //             item instanceof ExternalApplication && message.source
-        //                 ? item.url.indexOf(message.source) > -1
-        //                 : false,
-        //         );
-        //     }
-        //     // #endregion
-
-        //     this.processes.forEach((appProccess) => {
-        //         invokeListeners(message, appProccess.emitter.listeners);
-        //         return;
-        //     });
-        // };
     }
 
     addApplication(app: Application) {
@@ -65,122 +37,6 @@ export class ApplicationManagerStore {
         this.applications = [...this.applications, ...apps];
         return this;
     }
-
-    async execute1(appProcess: ApplicationProcess) {
-        const applicationParamsResponse = await Axios.post<
-            IJsonRpcResponse<IAppParams>
-        >(
-            portalEndpoint.url,
-            new JsonRpcPayload("getComponentShellParams", {
-                component_id: appProcess.app.id,
-            }),
-        );
-
-        if (!applicationParamsResponse.data.error) {
-            appProcess.window.setParams(applicationParamsResponse.data.result);
-        }
-
-        this.startProcess(appProcess);
-    }
-
-    // async executeApplication(app: Application) {
-    //     alert("STOP USE DEPRECATED EXECUTOR");
-    //     // const errorTitle = strings.error.anOccurredError;
-    //     // const serviceErrorText = strings.error.applicationService;
-    //     // try {
-    //     //     if (!app.isExecuted) {
-    //     //         const applicationParamsResponse = await Axios.post<
-    //     //             IJsonRpcResponse<IAppParams>
-    //     //         >(
-    //     //             portalEndpoint.url,
-    //     //             new JsonRpcPayload("getComponentShellParams", {
-    //     //                 component_id: app.id,
-    //     //             }),
-    //     //         );
-
-    //     //         if (!applicationParamsResponse.data.error) {
-    //     //             const appParams = applicationParamsResponse.data.result;
-
-    //     //             // app.setExecuted(true);
-    //     //             this.store.windowManager.addWindow(
-    //     //                 new ApplicationWindow(app, {
-    //     //                     id: v4(),
-    //     //                     width: appParams.width ?? app.baseWidth,
-    //     //                     height: appParams.height ?? app.baseHeight,
-    //     //                     isFullscreen:
-    //     //                         appParams.maximize ?? app.isFullscreen ?? false,
-    //     //                     displayMode: this.store.shell.displayMode,
-    //     //                 }),
-    //     //             );
-
-    //     //             // Bindings
-    //     //             // if (app instanceof ExternalApplication) {
-    //     //             //     app.emitter.on(
-    //     //             //         AppMessageType.CreateWindowInstance,
-    //     //             //         (payload: { url: string }) => {
-    //     //             //             const { url } = payload;
-
-    //     //             //             const findedApp = this.findByUrlPart(url);
-
-    //     //             //             // TODO: Execute application with hash in function
-    //     //             //             // #region
-    //     //             //             const hashParams = new URLSearchParams();
-    //     //             //             hashParams.append("hash", v4());
-
-    //     //             //             const urlWithHash =
-    //     //             //                 url + "?" + hashParams.toString();
-    //     //             //             // #endregion
-
-    //     //             //             if (findedApp instanceof ExternalApplication) {
-    //     //             //                 this.executeApplicationWithUrl(
-    //     //             //                     findedApp,
-    //     //             //                     urlWithHash,
-    //     //             //                 );
-    //     //             //             } else {
-    //     //             //                 const instance = new ExternalApplication({
-    //     //             //                     id: v4(),
-    //     //             //                     name: app.name,
-    //     //             //                     url,
-    //     //             //                     icon: app.icon,
-    //     //             //                     isExistedAppInstance: true,
-    //     //             //                 });
-
-    //     //             //                 // TODO: Hotfix for cert
-    //     //             //                 // #region
-    //     //             //                 this.store.applicationManager.addApplication(
-    //     //             //                     instance,
-    //     //             //                 );
-
-    //     //             //                 this.store.auth.injectAuthTokenInExternalApplication(
-    //     //             //                     instance,
-    //     //             //                 );
-    //     //             //                 // #endregion
-
-    //     //             //                 this.executeApplicationWithUrl(
-    //     //             //                     instance,
-    //     //             //                     url,
-    //     //             //                 );
-    //     //             //             }
-    //     //             //         },
-    //     //             //     );
-    //     //             //     Axios.post<IJsonRpcResponse>(
-    //     //             //         portalEndpoint.url,
-    //     //             //         new JsonRpcPayload("menuClick", {
-    //     //             //             component_id: app.id,
-    //     //             //         }),
-    //     //             //     );
-    //     //             // }
-    //     //         } else {
-    //     //             this.store.message.showMessage(
-    //     //                 errorTitle,
-    //     //                 serviceErrorText,
-    //     //             );
-    //     //         }
-    //     //     }
-    //     // } catch (e) {
-    //     //     this.store.message.showMessage(errorTitle, serviceErrorText);
-    //     // }
-    // }
 
     destroyUserSession() {
         this.applications = [];
@@ -237,19 +93,5 @@ export class ApplicationManagerStore {
         } catch (e) {
             console.error(e);
         }
-    }
-
-    startProcess(executor: ApplicationProcess) {
-        this.processes.push(executor);
-
-        this.store.windowManager.addWindow(executor.window);
-    }
-
-    killProcess(appProcess: ApplicationProcess) {
-        const index = this.processes.indexOf(appProcess);
-
-        this.store.windowManager.closeWindow(appProcess.window);
-
-        this.processes.splice(index, 1);
     }
 }

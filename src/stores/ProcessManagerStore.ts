@@ -56,72 +56,82 @@ export class ProcessManagerStore {
     }
 
     async execute(appProcess: ApplicationProcess) {
-        appProcess.app.setExecuted(true);
+        try {
+            appProcess.app.setExecuted(true);
+            const applicationParamsResponse = await Axios.post<
+                IJsonRpcResponse<IAppParams>
+            >(
+                portalEndpoint.url,
+                new JsonRpcPayload("getComponentShellParams", {
+                    component_id: appProcess.app.id,
+                }),
+            );
 
-        const applicationParamsResponse = await Axios.post<
-            IJsonRpcResponse<IAppParams>
-        >(
-            portalEndpoint.url,
-            new JsonRpcPayload("getComponentShellParams", {
-                component_id: appProcess.app.id,
-            }),
-        );
-
-        if (!applicationParamsResponse.data.error) {
-            appProcess.window.setParams(applicationParamsResponse.data.result);
-        }
-
-        // Bindings
-        appProcess.emitter.on(
-            AppMessageType.CreateWindowInstance,
-            (payload: { url: string }) => {
-                const { url } = payload;
-
-                console.log({ payload });
-
-                const findedApp = this.store.applicationManager.findByUrlPart(
-                    url,
+            if (!applicationParamsResponse.data.error) {
+                appProcess.window.setParams(
+                    applicationParamsResponse.data.result,
                 );
+            }
 
-                if (findedApp) {
-                    if (!findedApp.isExecuted) {
+            // Bindings
+            appProcess.emitter.on(
+                AppMessageType.CreateWindowInstance,
+                (payload: { url: string }) => {
+                    const { url } = payload;
+
+                    console.log({ payload });
+
+                    const findedApp = this.store.applicationManager.findByUrlPart(
+                        url,
+                    );
+
+                    if (findedApp) {
+                        if (!findedApp.isExecuted) {
+                            const createdAppProcessInstance = new ApplicationProcess(
+                                {
+                                    app: findedApp,
+                                    window: new ApplicationWindow(),
+                                    url,
+                                },
+                            );
+                            this.execute(createdAppProcessInstance);
+                        } else {
+                            const activeProcess = this.findProcessByApp(
+                                findedApp,
+                            );
+                            if (activeProcess) {
+                                activeProcess.setUrl(url);
+                                this.store.windowManager.focusWindow(
+                                    activeProcess.window,
+                                );
+                            }
+                        }
+                    } else {
                         const createdAppProcessInstance = new ApplicationProcess(
                             {
-                                app: findedApp,
+                                app: new ExternalApplication({
+                                    name: url,
+                                    url,
+                                }),
                                 window: new ApplicationWindow(),
-                                url,
                             },
                         );
                         this.execute(createdAppProcessInstance);
-                    } else {
-                        const activeProcess = this.findProcessByApp(findedApp);
-                        if (activeProcess) {
-                            activeProcess.setUrl(url);
-                            this.store.windowManager.focusWindow(
-                                activeProcess.window,
-                            );
-                        }
                     }
-                } else {
-                    const createdAppProcessInstance = new ApplicationProcess({
-                        app: new ExternalApplication({
-                            name: url,
-                            url,
-                        }),
-                        window: new ApplicationWindow(),
-                    });
-                    this.execute(createdAppProcessInstance);
-                }
-            },
-        );
-        Axios.post<IJsonRpcResponse>(
-            portalEndpoint.url,
-            new JsonRpcPayload("menuClick", {
-                component_id: appProcess.app.id,
-            }),
-        );
+                },
+            );
+            Axios.post<IJsonRpcResponse>(
+                portalEndpoint.url,
+                new JsonRpcPayload("menuClick", {
+                    component_id: appProcess.app.id,
+                }),
+            );
 
-        this.startProcess(appProcess);
+            this.startProcess(appProcess);
+        } catch (e) {
+            this.store.message.showMessage("[ph] Execute failed", "[ph]");
+            appProcess.app.setExecuted(false);
+        }
     }
 
     startProcess(appProcess: ApplicationProcess) {

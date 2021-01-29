@@ -48,12 +48,14 @@ export class ShellScreen extends Component<IStore> {
                 const app = this.store.applicationManager.findByKey(autoRunApp);
 
                 if (app) {
+                    alert(isAutorunFullscreen);
                     const appProcess = new ApplicationProcess({
                         app,
-                        window: new ApplicationWindow(),
+                        window: new ApplicationWindow({
+                            isFullscreen: isAutorunFullscreen,
+                        }),
                     });
 
-                    // this.store.applicationManager.executeApplication(app);
                     this.store.processManager.execute(appProcess);
                 }
             }
@@ -69,12 +71,10 @@ export class ShellScreen extends Component<IStore> {
 
                 const appProcess = new ApplicationProcess({
                     app,
-                    window: new ApplicationWindow(),
+                    window: new ApplicationWindow({
+                        isFullscreen: isAutorunFullscreen,
+                    }),
                 });
-
-                // this.store.applicationManager.addApplication(app);
-
-                // this.store.applicationManager.executeApplication(app);
 
                 this.store.processManager.execute(appProcess);
             }
@@ -133,7 +133,6 @@ export class ShellScreen extends Component<IStore> {
     };
 
     handleCloseWindow = (appProcess: ApplicationProcess) => {
-        // this.store.windowManager.closeWindow(appWindow);
         this.store.processManager.killProcess(appProcess);
     };
 
@@ -183,28 +182,6 @@ export class ShellScreen extends Component<IStore> {
                         onClose={() => this.handleCloseWindow(process)}
                     />
                 ))}
-
-                {/* {this.store.windowManager.windows.map((appWindow) => (
-                    <AppWindow
-                        key={appWindow.id}
-                        {...appWindow}
-                        window={appWindow}
-                        onResizeStart={(event, data) =>
-                            this.handleWindowResizeStart(appWindow, event, data)
-                        }
-                        onResizeStop={() => appWindow.setResizing(false)}
-                        onResize={(event, data) =>
-                            this.handleWindowResize(appWindow, event, data)
-                        }
-                        onDragStart={() => appWindow.setDragging(true)}
-                        onDragStop={() => appWindow.setDragging(false)}
-                        onDrag={(event, data) =>
-                            this.handleDrag(appWindow, event, data)
-                        }
-                        onClose={() => this.handleCloseWindow(appWindow)}
-                    />
-                ))} */}
-
                 <AppsMenu />
                 <NotificationToasts />
                 <NotificationHub />

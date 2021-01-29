@@ -1,4 +1,4 @@
-import { JsonRpcPayload } from "@algont/m7-utils";
+import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
 import { AudioSource } from "constants/audio";
 import {
@@ -9,7 +9,6 @@ import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnec
 import { ShellEvents } from "enum/ShellEvents";
 import { ApplicationFactory } from "factories/ApplicationFactory";
 import { NotificationFactory } from "factories/NotificationFactory";
-import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { INotificationAppRelationResponse } from "interfaces/response/INotificationAppRelationResponse";
 import { INotificationCountResponse } from "interfaces/response/INotificationCountResponse";
 import { INotificationResponse } from "interfaces/response/INotificationResponse";

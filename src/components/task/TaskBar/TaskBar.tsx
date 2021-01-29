@@ -3,18 +3,19 @@ import { apps, cross } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
+import { NetworkStatusType } from "enum/NetworkStatusType";
 import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { computed, reaction } from "mobx";
 import { inject, observer } from "mobx-react";
-import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import React, { Component } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
+import { TaskbarDisconnectedStatus } from "../TaskbarDisconnectedStatus/TaskbarDisconnectedStatus";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
 import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
 import style from "./style.module.css";
@@ -44,14 +45,6 @@ export class TaskBar extends Component<IStore> {
         }
     };
 
-    handleExecuteApp = (app: Application) => {
-        this.store.shell.setActivePanel(ShellPanelType.None);
-
-        alert(`Taskbar.handleExecuteApp`);
-
-        // this.store.applicationManager.executeApplication(app);
-    };
-
     handleFocusAppWindow = (appWindow: ApplicationWindow) => {
         this.store.windowManager.focusWindow(appWindow);
         if (appWindow.isCollapsed) {
@@ -73,6 +66,10 @@ export class TaskBar extends Component<IStore> {
 
     handleKillProcess = (appProcess: ApplicationProcess) => {
         this.store.processManager.killProcess(appProcess);
+    };
+
+    handleShowNetworkTroubleMessage = () => {
+        this.store.message.showMessage("[ph] Network trouble", "[ph]");
     };
 
     componentDidMount() {
@@ -145,7 +142,19 @@ export class TaskBar extends Component<IStore> {
                                     ),
                                 )}
                             </div>
+
                             <div className={style.actions}>
+                                {this.store.network.networkStatus ===
+                                    NetworkStatusType.Trouble && (
+                                    <TaskBarItem
+                                        onClick={
+                                            this.handleShowNetworkTroubleMessage
+                                        }
+                                    >
+                                        <TaskbarDisconnectedStatus />
+                                    </TaskBarItem>
+                                )}
+
                                 <TaskBarItem
                                     onClick={() =>
                                         this.handleShowAudioHub(
@@ -158,9 +167,10 @@ export class TaskBar extends Component<IStore> {
                                         isMuted={this.store.audio.isMute}
                                     />
                                 </TaskBarItem>
-                                <TaskBarItem onClick={() => true} autoWidth>
+                                <TaskBarItem autoWidth>
                                     <TaskBarDateTime />
                                 </TaskBarItem>
+
                                 <TaskBarItem
                                     badge={
                                         this.store.notification.status ===

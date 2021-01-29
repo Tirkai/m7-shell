@@ -64,10 +64,6 @@ export class WindowManagerStore {
         }
     }
 
-    // findWindowByApp(app: Application) {
-    //     return this.windows.find((item) => item.application.id === app.id);
-    // }
-
     addWindow(appWindow: ApplicationWindow) {
         this.windows.push(appWindow);
         this.focusWindow(appWindow);
@@ -117,13 +113,6 @@ export class WindowManagerStore {
 
     closeWindow(appWindow: ApplicationWindow) {
         try {
-            // const app = this.store.applicationManager.findById(
-            //     appWindow.application.id,
-            // );
-            // if (app) {
-            //     // app.setExecuted(false);
-            // }
-
             this.windows.splice(this.windows.indexOf(appWindow), 1);
         } catch (e) {
             console.error(e);

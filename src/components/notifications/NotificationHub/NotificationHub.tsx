@@ -135,15 +135,6 @@ export const NotificationHub = observer(() => {
                 }
             }
         }
-
-        // const appProcess = new ApplicationProcess({
-        //     app: notificationApp,
-        //     window: new ApplicationWindow(),
-        //     params: new Map([["filterByAppId", group.id]]),
-        // });
-
-        // store.processManager.execute(appProcess);
-        // }
     };
 
     return (

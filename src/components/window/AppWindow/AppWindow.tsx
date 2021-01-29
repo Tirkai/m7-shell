@@ -80,13 +80,6 @@ export const AppWindow = (props: IAppWindowProps) => {
         appProcess.emitter.on(AppMessageType.ForceRecieveToken, () =>
             store.auth.injectAuthTokenInProcess(appProcess),
         );
-
-        // appProcess.emitter.on(AppMessageType.EnableBackwardButton, (payload) =>
-        //     handleShowBackward(payload),
-        // );
-        // appProcess.emitter.on(AppMessageType.EnableReloadButton, (payload) =>
-        //     handleShowReload(payload),
-        // );
     };
 
     const handleAppReady = () => {
@@ -103,14 +96,6 @@ export const AppWindow = (props: IAppWindowProps) => {
     const handleFocus = () => {
         store.windowManager.focusWindow(props.window);
     };
-
-    // const handleShowBackward = (value: boolean) => {
-    //     setState({ hasBackward: value });
-    // };
-
-    // const handleShowReload = (value: boolean) => {
-    //     this.setState({ hasReload: value });
-    // };
 
     const handleFullScreen = () => {
         props.window.setFullScreen(!props.window.isFullScreen);

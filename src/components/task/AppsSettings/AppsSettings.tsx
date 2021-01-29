@@ -31,7 +31,6 @@ export class AppsSettings extends Component<IAppsSettingsProps> {
             app,
             window: new ApplicationWindow(),
         });
-        // this.store.applicationManager.executeApplication(app);
         this.store.processManager.execute(appProcess);
     };
 
