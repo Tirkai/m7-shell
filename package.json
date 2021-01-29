@@ -48,6 +48,7 @@
         "stage": "npm version patch --git-tag-version=false",
         "build": "react-scripts build",
         "build:env": "cd ./scripts && npx ts-node ./build.ts",
+        "build:night": "cross-env REACT_APP_NIGHT=true react-scripts build",
         "deploy": "ts-node ./scripts/deploy.ts",
         "prettier": "prettier --write \"./**/*.{ts,tsx,css}\"",
         "prettier-watch": "onchange 'src/**/*.{ts,tsx,css}' -- prettier --write {{changed}}",

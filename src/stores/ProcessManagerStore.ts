@@ -5,6 +5,7 @@ import {
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
+import { AuthEventType } from "enum/AuthEventType";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/Application";
@@ -22,6 +23,10 @@ export class ProcessManagerStore {
         this.store = store;
 
         makeAutoObservable(this);
+
+        this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
+            this.killAllProcesses(),
+        );
 
         window.onmessage = (event: MessageEvent) => {
             const message: EmitterMessage<unknown> = event.data;
@@ -107,46 +112,6 @@ export class ProcessManagerStore {
                     });
                     this.execute(createdAppProcessInstance);
                 }
-
-                // // TODO: Execute application with hash in function
-                // // #region
-                // const hashParams = new URLSearchParams();
-                // hashParams.append("hash", v4());
-
-                // const urlWithHash =
-                //     url + "?" + hashParams.toString();
-                // // #endregion
-
-                // if (findedApp instanceof ExternalApplication) {
-                //     this.executeApplicationWithUrl(
-                //         findedApp,
-                //         urlWithHash,
-                //     );
-                // } else {
-                //     const instance = new ExternalApplication({
-                //         id: v4(),
-                //         name: app.name,
-                //         url,
-                //         icon: app.icon,
-                //         isExistedAppInstance: true,
-                //     });
-
-                //     // TODO: Hotfix for cert
-                //     // #region
-                //     this.store.applicationManager.addApplication(
-                //         instance,
-                //     );
-
-                //     this.store.auth.injectAuthTokenInExternalApplication(
-                //         instance,
-                //     );
-                //     // #endregion
-
-                //     this.executeApplicationWithUrl(
-                //         instance,
-                //         url,
-                //     );
-                // }
             },
         );
         Axios.post<IJsonRpcResponse>(

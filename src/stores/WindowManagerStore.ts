@@ -1,3 +1,4 @@
+import { AuthEventType } from "enum/AuthEventType";
 import { ShellEvents } from "enum/ShellEvents";
 import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { max, min } from "lodash";
@@ -13,6 +14,10 @@ export class WindowManagerStore {
         this.store = store;
 
         makeAutoObservable(this);
+
+        this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
+            this.closeAllWindows(),
+        );
 
         window.addEventListener(ShellEvents.FocusShellControls, () =>
             this.clearFocus(),

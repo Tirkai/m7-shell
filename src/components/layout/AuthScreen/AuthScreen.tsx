@@ -10,6 +10,8 @@ import { observer } from "mobx-react";
 import React, { useContext, useEffect, useState } from "react";
 import style from "./style.module.css";
 
+const isNight = process.env.REACT_APP_NIGHT;
+
 export const AuthScreen: React.FC = observer(() => {
     const store = useStore();
     const performanceMode = useContext(PerformanceContext);
@@ -62,6 +64,11 @@ export const AuthScreen: React.FC = observer(() => {
                         )}
                     </div>
                 </div>
+                {isNight && (
+                    <Alert variant="filled" severity="info">
+                        Experemental Build
+                    </Alert>
+                )}
             </div>
         </div>
     );

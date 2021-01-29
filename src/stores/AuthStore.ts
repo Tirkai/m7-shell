@@ -3,6 +3,7 @@ import { JsonRpcPayload, JsonRpcResult } from "@algont/m7-utils";
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
 import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
+import { AuthEventType } from "enum/AuthEventType";
 import { RoleType } from "enum/RoleType";
 import { ShellEvents } from "enum/ShellEvents";
 import { IAccessTokenMetadata } from "interfaces/auth/IAccessTokenMetadata";
@@ -50,6 +51,8 @@ export class AuthStore {
 
     checkedAfterStart: boolean = false;
 
+    eventBus: EventTarget = new EventTarget();
+
     get isAdmin() {
         return this.roles.some((item) => item === RoleType.Admin);
     }
@@ -84,6 +87,8 @@ export class AuthStore {
         return this.remainingTokenTime <= 0;
     }
 
+    interval: NodeJS.Timeout | null = null;
+
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
@@ -113,7 +118,7 @@ export class AuthStore {
 
         window.addEventListener("focus", () => checkoutRemainingTime());
 
-        setInterval(() => {
+        this.interval = setInterval(() => {
             this.setCurrentTime(moment());
             if (this.isAuthorized) {
                 const hasRemainedTime = checkoutRemainingTime();
@@ -123,27 +128,60 @@ export class AuthStore {
             }
         }, 1000);
 
-        this.verifyToken();
+        setInterval(() => {
+            if (this.isAuthorized) {
+                this.verifyToken();
+            }
+        }, 30000);
+
+        if (this.isAuthorized) {
+            this.verifyToken();
+        }
     }
 
     async verifyToken() {
-        const response = await Axios.post<
-            IJsonRpcResponse<AccessTokenVerifyStatus>
-        >(
-            authEndpoint.url,
-            new JsonRpcPayload("verify", {
-                token: this.accessToken,
-            }),
-        );
+        try {
+            const response = await Axios.post<
+                IJsonRpcResponse<AccessTokenVerifyStatus>
+            >(
+                authEndpoint.url,
+                new JsonRpcPayload("verify", {
+                    token: this.accessToken,
+                }),
+            );
 
-        if (!response.data.error) {
-            this.setCheckedAfterStart(true);
+            if (!response.data.error) {
+                this.setCheckedAfterStart(true);
+            } else {
+                this.eventBus.dispatchEvent(
+                    new CustomEvent(AuthEventType.FailedVerifyToken),
+                );
+            }
+
+            if (response.data.result === AccessTokenVerifyStatus.Expired) {
+                this.renewToken();
+            }
+            if (response.data.result === AccessTokenVerifyStatus.NotFound) {
+                this.eventBus.dispatchEvent(
+                    new CustomEvent(AuthEventType.TokenNotFound),
+                );
+
+                this.logout();
+            }
+
+            return new JsonRpcResult({
+                status: !response.data.error,
+                result: response.data.result === AccessTokenVerifyStatus.Ok,
+            });
+        } catch (e) {
+            this.eventBus.dispatchEvent(
+                new CustomEvent(AuthEventType.FailedVerifyToken),
+            );
+
+            return new JsonRpcResult({
+                status: false,
+            });
         }
-
-        return new JsonRpcResult({
-            status: !response.data.error,
-            result: response.data.result === AccessTokenVerifyStatus.Ok,
-        });
     }
 
     setToken(accessToken: string, refreshToken: string) {
@@ -217,6 +255,13 @@ export class AuthStore {
                 const result = response.data.result;
                 this.setToken(result.access_token, result.refresh_token);
 
+                this.eventBus.dispatchEvent(
+                    new CustomEvent(AuthEventType.UpdateToken, {
+                        detail: this.accessToken,
+                    }),
+                );
+
+                // TODO: Move to Process Store
                 this.store.processManager.processes.forEach((appProcess) =>
                     this.injectAuthTokenInProcess(appProcess),
                 );
@@ -234,6 +279,12 @@ export class AuthStore {
                 //     },
                 // );
             } else {
+                this.eventBus.dispatchEvent(
+                    new CustomEvent(AuthEventType.FailedRenewToken, {
+                        detail: response.data.error,
+                    }),
+                );
+
                 this.logout();
             }
         } catch (e) {
@@ -302,13 +353,19 @@ export class AuthStore {
 
             dispatchEvent(new CustomEvent(ShellEvents.Logout));
 
-            this.store.windowManager.closeAllWindows();
+            this.eventBus.dispatchEvent(new CustomEvent(AuthEventType.Logout));
 
-            this.store.processManager.killAllProcesses();
+            // this.store.windowManager.closeAllWindows();
+
+            // this.store.processManager.killAllProcesses();
 
             localStorage.removeItem(this.localStorageAccessTokenKey);
             this.accessToken = "";
             this.setAuthorized(false);
+
+            if (this.interval) {
+                clearInterval(this.interval);
+            }
 
             return new JsonRpcResult({
                 status: !response.data.error,
