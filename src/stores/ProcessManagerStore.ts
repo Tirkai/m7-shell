@@ -74,16 +74,15 @@ export class ProcessManagerStore {
             }
 
             // Bindings
+
             appProcess.emitter.on(
                 AppMessageType.CreateWindowInstance,
-                (payload: { url: string }) => {
-                    const { url } = payload;
+                (payload: { url: string; appId: string }) => {
+                    const { url, appId } = payload;
 
-                    console.log({ payload });
-
-                    const findedApp = this.store.applicationManager.findByUrlPart(
-                        url,
-                    );
+                    const findedApp = appId
+                        ? this.store.applicationManager.findById(appId)
+                        : this.store.applicationManager.findByUrlPart(url);
 
                     if (findedApp) {
                         if (!findedApp.isExecuted) {
@@ -158,5 +157,10 @@ export class ProcessManagerStore {
 
     killAllProcesses() {
         this.processes.forEach((appProcess) => this.killProcess(appProcess));
+    }
+
+    // TODO: Implement checkout exist process method
+    checkoutExsistProcessMethod() {
+        //
     }
 }

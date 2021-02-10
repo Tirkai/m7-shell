@@ -22,13 +22,10 @@ import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
 export class AuthStore {
-    private readonly localStorageAccessTokenKey: string =
-        "ACCESS_TOKEN_" + process.env.REACT_APP_BUILD;
-    private readonly localStorageRefreshTokenKey: string =
-        "REFRESH_TOKEN_" + process.env.REACT_APP_BUILD;
+    private readonly localStorageAccessTokenKey: string = "ACCESS_TOKEN";
+    private readonly localStorageRefreshTokenKey: string = "REFRESH_TOKEN";
     private readonly localStorageUserLogin: string = "USER_LOGIN";
-    private readonly localStorageDelta: string =
-        "DELTA_" + process.env.REACT_APP_BUILD;
+    private readonly localStorageDelta: string = "DELTA";
 
     accessToken: string = "";
 
@@ -90,6 +87,8 @@ export class AuthStore {
         return this.remainingTokenTime <= 0;
     }
 
+    isUpdateTokenProcessActive: boolean = false;
+
     interval: NodeJS.Timeout | null = null;
 
     private store: AppStore;
@@ -109,37 +108,46 @@ export class AuthStore {
             this.userLogin = userLogin;
             this.isAuthorized = true;
             this.fetchUsername();
+            this.init();
         }
 
-        const checkoutRemainingTime = () => {
-            const diff =
-                this.renewTime.diff(this.currentTime) +
-                this.deltaTime +
-                this.timeOffset;
-            return diff >= 0;
-        };
-
-        window.addEventListener("focus", () => checkoutRemainingTime());
-
-        this.interval = setInterval(() => {
-            this.setCurrentTime(moment());
-            if (this.isAuthorized) {
-                const hasRemainedTime = checkoutRemainingTime();
-                if (!hasRemainedTime) {
-                    this.renewToken();
-                }
-            }
-        }, 1000);
-
-        setInterval(() => {
+        window.addEventListener("focus", () => {
             if (this.isAuthorized) {
                 this.verifyToken();
             }
-        }, 30000);
+        });
+
+        // setInterval(() => {
+        //     if (this.isAuthorized) {
+        //         this.verifyToken();
+        //     }
+        // }, 30000);
 
         if (this.isAuthorized) {
             this.verifyToken();
         }
+    }
+
+    checkoutRemainingTime() {
+        const diff =
+            this.renewTime.diff(this.currentTime) +
+            this.deltaTime +
+            this.timeOffset;
+        return diff >= 0;
+    }
+
+    init() {
+        this.interval = setInterval(() => {
+            this.setCurrentTime(moment());
+            if (this.isAuthorized) {
+                const hasRemainedTime = this.checkoutRemainingTime();
+                if (!hasRemainedTime) {
+                    if (!this.isUpdateTokenProcessActive) {
+                        this.renewToken();
+                    }
+                }
+            }
+        }, 1000);
     }
 
     async verifyToken() {
@@ -257,6 +265,8 @@ export class AuthStore {
 
     async renewToken() {
         try {
+            this.isUpdateTokenProcessActive = true;
+
             const response = await Axios.post<IJsonRpcResponse<IAuthResponse>>(
                 authEndpoint.url,
                 new JsonRpcPayload("renew", {
@@ -283,6 +293,8 @@ export class AuthStore {
             }
         } catch (e) {
             console.error(e);
+        } finally {
+            this.isUpdateTokenProcessActive = false;
         }
     }
 
@@ -313,6 +325,8 @@ export class AuthStore {
 
                 this.fetchUsername();
             }
+            this.init();
+
             return response.data;
         } catch (e) {
             this.store.message.showMessage(

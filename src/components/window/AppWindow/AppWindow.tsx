@@ -1,4 +1,4 @@
-import { AppMessageType } from "@algont/m7-shell-emitter";
+import { AppMessageType, ShellMessageType } from "@algont/m7-shell-emitter";
 import classNames from "classnames";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { useStore } from "hooks/useStore";
@@ -111,10 +111,12 @@ export const AppWindow = (props: IAppWindowProps) => {
     };
 
     const handleReload = () => {
-        const iFrame = (frame as unknown) as HTMLIFrameElement;
-        if (iFrame) {
-            iFrame.setAttribute("src", iFrame.getAttribute("src") ?? "");
-        }
+        props.process.emitter.emit(ShellMessageType.ReloadPage, {});
+
+        // const iFrame = (frame as unknown) as HTMLIFrameElement;
+        // if (iFrame) {
+        //     iFrame.setAttribute("src", iFrame.getAttribute("src") ?? "");
+        // }
     };
 
     useEffect(() => {
