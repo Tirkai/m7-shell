@@ -11,6 +11,7 @@ interface IApplicationProcessOptions {
     url?: string;
     name?: string;
     params?: Map<string, string>;
+    disableParams?: boolean;
 }
 
 export class ApplicationProcess {
@@ -22,6 +23,7 @@ export class ApplicationProcess {
     params: Map<string, string>;
     emitter: ShellMessageEmitter;
     hash: string;
+    disableParams: boolean;
 
     constructor(options: IApplicationProcessOptions) {
         makeAutoObservable(this);
@@ -33,6 +35,7 @@ export class ApplicationProcess {
         this.params = options.params ?? new Map();
         this.emitter = new ShellMessageEmitter(this.app.id);
         this.name = options.name ?? this.app.name;
+        this.disableParams = options.disableParams ?? false;
 
         if (this.app instanceof ExternalApplication) {
             this.url = options.url ?? this.app.url;
@@ -62,12 +65,14 @@ export class ApplicationProcess {
         if (this.app instanceof ExternalApplication) {
             const url = new URL(this.url);
 
-            url.searchParams.set("hash", this.hash);
-            url.searchParams.set("appId", this.app.id);
+            if (!this.disableParams) {
+                url.searchParams.set("hash", this.hash);
+                url.searchParams.set("appId", this.app.id);
 
-            this.params.forEach((value, key) =>
-                url.searchParams.set(key, value),
-            );
+                this.params.forEach((value, key) =>
+                    url.searchParams.set(key, value),
+                );
+            }
 
             return url.toString();
         }

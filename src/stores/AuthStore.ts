@@ -22,10 +22,10 @@ import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
 export class AuthStore {
-    private readonly localStorageAccessTokenKey: string = "ACCESS_TOKEN";
-    private readonly localStorageRefreshTokenKey: string = "REFRESH_TOKEN";
-    private readonly localStorageUserLogin: string = "USER_LOGIN";
-    private readonly localStorageDelta: string = "DELTA";
+    private readonly sessionStorageAccessTokenKey: string = "ACCESS_TOKEN";
+    private readonly sessionStorageRefreshTokenKey: string = "REFRESH_TOKEN";
+    private readonly sessionStorageUserLogin: string = "USER_LOGIN";
+    private readonly sessionStorageDelta: string = "DELTA";
 
     accessToken: string = "";
 
@@ -97,11 +97,13 @@ export class AuthStore {
 
         makeAutoObservable(this);
 
-        const authToken = localStorage.getItem(this.localStorageAccessTokenKey);
-        const refreshToken = localStorage.getItem(
-            this.localStorageRefreshTokenKey,
+        const authToken = sessionStorage.getItem(
+            this.sessionStorageAccessTokenKey,
         );
-        const userLogin = localStorage.getItem(this.localStorageUserLogin);
+        const refreshToken = sessionStorage.getItem(
+            this.sessionStorageRefreshTokenKey,
+        );
+        const userLogin = sessionStorage.getItem(this.sessionStorageUserLogin);
 
         if (authToken && refreshToken && userLogin) {
             this.setToken(authToken, refreshToken);
@@ -217,8 +219,8 @@ export class AuthStore {
             this.createTime = moment.utc(refreshTokenData?.created);
             this.renewTime = moment.utc(refreshTokenData?.renew);
 
-            const localStorageDelta = localStorage.getItem(
-                this.localStorageDelta,
+            const sessionStorageDelta = sessionStorage.getItem(
+                this.sessionStorageDelta,
             );
 
             this.eventBus.dispatchEvent(
@@ -227,23 +229,23 @@ export class AuthStore {
                 }),
             );
 
-            if (!localStorageDelta) {
+            if (!sessionStorageDelta) {
                 this.deltaTime = this.currentTime.diff(this.createTime);
-                localStorage.setItem(
-                    this.localStorageDelta,
+                sessionStorage.setItem(
+                    this.sessionStorageDelta,
                     this.deltaTime.toString(),
                 );
             } else {
-                this.deltaTime = parseInt(localStorageDelta);
+                this.deltaTime = parseInt(sessionStorageDelta);
             }
 
-            localStorage.setItem(
-                this.localStorageAccessTokenKey,
+            sessionStorage.setItem(
+                this.sessionStorageAccessTokenKey,
                 this.accessToken,
             );
 
-            localStorage.setItem(
-                this.localStorageRefreshTokenKey,
+            sessionStorage.setItem(
+                this.sessionStorageRefreshTokenKey,
                 this.refreshToken,
             );
             Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
@@ -273,7 +275,7 @@ export class AuthStore {
                     token: this.refreshToken,
                 }),
             );
-            localStorage.removeItem(this.localStorageDelta);
+            sessionStorage.removeItem(this.sessionStorageDelta);
             if (!response.data.error) {
                 const result = response.data.result;
                 this.setToken(result.access_token, result.refresh_token);
@@ -318,8 +320,8 @@ export class AuthStore {
                 this.setAuthorized(true);
                 this.setCheckedAfterStart(true);
 
-                localStorage.setItem(
-                    this.localStorageUserLogin,
+                sessionStorage.setItem(
+                    this.sessionStorageUserLogin,
                     this.userLogin,
                 );
 
@@ -363,7 +365,7 @@ export class AuthStore {
 
             this.eventBus.dispatchEvent(new CustomEvent(AuthEventType.Logout));
 
-            localStorage.removeItem(this.localStorageAccessTokenKey);
+            sessionStorage.removeItem(this.sessionStorageAccessTokenKey);
             this.accessToken = "";
             this.setAuthorized(false);
 
