@@ -18,6 +18,7 @@ import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskbarDisconnectedStatus } from "../TaskbarDisconnectedStatus/TaskbarDisconnectedStatus";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
 import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
+import { TaskHint } from "../TaskHint/TaskHint";
 import style from "./style.module.css";
 
 @inject("store")
@@ -120,6 +121,11 @@ export class TaskBar extends Component<IStore> {
                                         <TaskBarItem
                                             key={appProcess.id}
                                             executed
+                                            hint={
+                                                <TaskHint
+                                                    title={appProcess.name}
+                                                />
+                                            }
                                             focused={
                                                 appProcess.window.isFocused
                                             }
