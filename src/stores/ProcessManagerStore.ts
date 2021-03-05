@@ -106,10 +106,11 @@ export class ProcessManagerStore {
                             }
                         }
                     } else {
+                        const processUrl = new URL(url);
                         const createdAppProcessInstance = new ApplicationProcess(
                             {
                                 app: new ExternalApplication({
-                                    name: url,
+                                    name: processUrl.host,
                                     url,
                                 }),
                                 window: new ApplicationWindow(),
