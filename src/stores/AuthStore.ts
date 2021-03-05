@@ -119,12 +119,6 @@ export class AuthStore {
             }
         });
 
-        // setInterval(() => {
-        //     if (this.isAuthorized) {
-        //         this.verifyToken();
-        //     }
-        // }, 30000);
-
         if (this.isAuthorized) {
             this.verifyToken();
         }
@@ -366,7 +360,10 @@ export class AuthStore {
             this.eventBus.dispatchEvent(new CustomEvent(AuthEventType.Logout));
 
             sessionStorage.removeItem(this.sessionStorageAccessTokenKey);
+            sessionStorage.removeItem(this.sessionStorageRefreshTokenKey);
+
             this.accessToken = "";
+            this.refreshToken = "";
             this.setAuthorized(false);
 
             if (this.interval) {
