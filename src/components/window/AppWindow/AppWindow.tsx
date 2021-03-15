@@ -146,7 +146,7 @@ export const AppWindow = (props: IAppWindowProps) => {
         if (props.process.app instanceof ShellApplication) {
             return props.process.app.Component;
         }
-        return <div>Sorry Link</div>;
+        return <div>Unknown component</div>;
     }, [props.process.modifiedUrl]);
 
     const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];

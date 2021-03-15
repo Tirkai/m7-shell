@@ -3,6 +3,7 @@ import { AudioStore } from "./AudioStore";
 import { AuthStore } from "./AuthStore";
 import { ContextMenuStore } from "./ContextMenuStore";
 import { DateTimeStore } from "./DateTimeStore";
+import { DesktopStore } from "./DesktopStore";
 import { LocaleStore } from "./LocaleStore";
 import { MessageStore } from "./MessageStore";
 import { NetworkStore } from "./NetworkStore";
@@ -26,6 +27,7 @@ export class AppStore {
     contextMenu: ContextMenuStore;
     user: UserStore;
     network: NetworkStore;
+    desktop: DesktopStore;
     constructor() {
         this.auth = new AuthStore(this);
         this.dateTime = new DateTimeStore(this);
@@ -40,6 +42,7 @@ export class AppStore {
         this.contextMenu = new ContextMenuStore(this);
         this.user = new UserStore(this);
         this.network = new NetworkStore(this);
+        this.desktop = new DesktopStore(this);
         console.warn("STORE", this);
     }
 }

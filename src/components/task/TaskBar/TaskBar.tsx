@@ -1,9 +1,8 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { apps, cross } from "assets/icons";
+import { apps, cross, layout } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
-import { NetworkStatusType } from "enum/NetworkStatusType";
 import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
@@ -15,7 +14,6 @@ import { ApplicationWindow } from "models/ApplicationWindow";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import React, { Component } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
-import { TaskbarDisconnectedStatus } from "../TaskbarDisconnectedStatus/TaskbarDisconnectedStatus";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
 import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
 import { TaskHint } from "../TaskHint/TaskHint";
@@ -71,6 +69,10 @@ export class TaskBar extends Component<IStore> {
 
     handleShowNetworkTroubleMessage = () => {
         this.store.message.showMessage("[ph] Network trouble", "[ph]");
+    };
+
+    handleShowDesktopLayoutConfig = () => {
+        this.store.desktop.setEditMode(!this.store.desktop.isEditMode);
     };
 
     componentDidMount() {
@@ -150,17 +152,14 @@ export class TaskBar extends Component<IStore> {
                             </div>
 
                             <div className={style.actions}>
-                                {this.store.network.networkStatus ===
-                                    NetworkStatusType.Trouble && (
-                                    <TaskBarItem
-                                        onClick={
-                                            this.handleShowNetworkTroubleMessage
-                                        }
-                                    >
-                                        <TaskbarDisconnectedStatus />
-                                    </TaskBarItem>
-                                )}
-
+                                {/* TODO: Locale */}
+                                <TaskBarItem
+                                    onClick={() =>
+                                        this.handleShowDesktopLayoutConfig()
+                                    }
+                                >
+                                    <SVGIcon source={layout} color="white" />
+                                </TaskBarItem>
                                 <TaskBarItem
                                     onClick={() =>
                                         this.handleShowAudioHub(

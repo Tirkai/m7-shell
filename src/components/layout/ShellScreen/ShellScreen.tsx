@@ -3,6 +3,8 @@ import { AudioHub } from "components/audio/AudioHub/AudioHub";
 import { ShellContextMenu } from "components/contextMenu/ShellContextMenu/ShellContextMenu";
 import { ShellContextMenuOverlay } from "components/contextMenu/ShellContextMenuOverlay/ShellContextMenuOverlay";
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
+import { DesktopConfigHub } from "components/desktop/DesktopConfigHub/DesktopConfigHub";
+import { DesktopGridArea } from "components/desktop/DesktopGridArea/DesktopGridArea";
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
@@ -48,7 +50,6 @@ export class ShellScreen extends Component<IStore> {
                 const app = this.store.applicationManager.findByKey(autoRunApp);
 
                 if (app) {
-                    alert(isAutorunFullscreen);
                     const appProcess = new ApplicationProcess({
                         app,
                         window: new ApplicationWindow({
@@ -154,7 +155,9 @@ export class ShellScreen extends Component<IStore> {
                 <div
                     className={style.desktop}
                     onClick={this.handleClickDesktop}
-                ></div>
+                >
+                    <DesktopGridArea />
+                </div>
 
                 {this.store.processManager.processes.map((process) => (
                     <AppWindow
@@ -190,8 +193,8 @@ export class ShellScreen extends Component<IStore> {
                 <AppWindowPinContainer />
                 <AudioContainer />
                 <AudioHub />
+                <DesktopConfigHub />
                 <ShellContextMenuOverlay />
-
                 <ShellContextMenu />
             </div>
         );

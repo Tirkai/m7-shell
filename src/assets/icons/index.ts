@@ -8,6 +8,7 @@ import empty from "./empty.svg";
 import error from "./error.svg";
 import exit from "./exit.svg";
 import fullscreen from "./fullscreen.svg";
+import layout from "./layout.svg";
 import listMenu from "./list-menu.svg";
 import mute from "./mute.svg";
 import notificationsNone from "./notifications-none.svg";
@@ -50,4 +51,5 @@ export {
     rocket,
     search,
     disconnect,
+    layout,
 };
