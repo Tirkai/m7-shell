@@ -133,6 +133,7 @@ export class ApplicationWindow {
         const dir = ResizeHandleDirection;
         const deltaX = this.resizeOriginPoint.x - position.x;
         const deltaY = this.resizeOriginPoint.y - position.y;
+
         if (
             handle === dir.East ||
             handle === dir.SouthEast ||
@@ -148,6 +149,7 @@ export class ApplicationWindow {
         }
         if (handle === dir.North) {
             this.setPosition(this.x, position.y);
+            // this.setSize
             this.setSize(this.width, this.lockedHeight + deltaY);
         }
         if (handle === dir.SouthWest) {

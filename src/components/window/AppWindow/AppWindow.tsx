@@ -9,11 +9,7 @@ import { ExternalApplication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
 import React, { useEffect, useMemo, useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
-import {
-    ResizableBox,
-    ResizeCallbackData,
-    ResizeHandle,
-} from "react-resizable";
+import { Resizable, ResizeCallbackData, ResizeHandle } from "react-resizable";
 import AppLoader from "../AppLoader/AppLoader";
 import { AppWindowHeader } from "../AppWindowHeader/AppWindowHeader";
 import { AppWindowUnfocusedOverlay } from "../AppWindowUnfocusedOverlay/AppWindowUnfocusedOverlay";
@@ -90,6 +86,12 @@ export const AppWindow = (props: IAppWindowProps) => {
         event: React.SyntheticEvent,
         data: ResizeCallbackData,
     ) => {
+        const nativeEvent = (event as unknown) as MouseEvent;
+
+        if (nativeEvent.clientY < 0) {
+            return;
+        }
+
         props.onResize((event as unknown) as MouseEvent, data);
     };
 
@@ -183,14 +185,22 @@ export const AppWindow = (props: IAppWindowProps) => {
                 className={classNames(style.appWindow, {
                     [style.collapsed]: props.window.isCollapsed,
                 })}
-                style={{ zIndex: props.window.depthIndex }}
+                style={{
+                    zIndex: props.window.depthIndex,
+                    width: !props.window.isFullScreen
+                        ? props.window.width
+                        : "100%",
+                    height: !props.window.isFullScreen
+                        ? props.window.height
+                        : "100%",
+                }}
             >
-                <ResizableBox
-                    width={props.window.bounds.width}
-                    height={props.window.bounds.height}
+                <Resizable
+                    width={props.window.width}
+                    height={props.window.height}
+                    onResize={handleResize}
                     onResizeStart={handleResizeStart}
                     onResizeStop={handleResizeEnd}
-                    onResize={handleResize}
                     axis={props.window.isFullScreen ? "none" : "both"}
                     resizeHandles={resizeDirections as ResizeHandle[]}
                     minConstraints={[MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT]}
@@ -198,6 +208,14 @@ export const AppWindow = (props: IAppWindowProps) => {
                     <div
                         className={classNames(style.windowContainer)}
                         onMouseDown={handleFocus}
+                        // style={{
+                        //     width: !props.window.isFullScreen
+                        //         ? props.window.width
+                        //         : "100%",
+                        //     height: !props.window.isFullScreen
+                        //         ? props.window.height
+                        //         : "100%",
+                        // }}
                     >
                         <AppWindowHeader
                             icon={props.process.app.icon}
@@ -235,7 +253,7 @@ export const AppWindow = (props: IAppWindowProps) => {
                             }
                         />
                     </div>
-                </ResizableBox>
+                </Resizable>
             </div>
         </Draggable>
     );
