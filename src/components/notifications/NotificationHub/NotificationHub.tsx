@@ -89,7 +89,7 @@ export const NotificationHub = observer(() => {
     const handleRunApplication = (appId: string, url: string) => {
         const app = store.applicationManager.findById(appId);
 
-        if (app instanceof ExternalApplication) {
+        if (app instanceof ExternalApplication && url.length) {
             store.shell.setActivePanel(ShellPanelType.None);
 
             if (!app.isExecuted) {
@@ -108,6 +108,8 @@ export const NotificationHub = observer(() => {
                     store.windowManager.focusWindow(activeProcess.window);
                 }
             }
+        } else {
+            console.warn("Try run application with empty URL");
         }
     };
 
