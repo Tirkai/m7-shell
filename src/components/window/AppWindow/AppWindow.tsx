@@ -146,6 +146,7 @@ export const AppWindow = (props: IAppWindowProps) => {
             );
         }
         if (props.process.app instanceof ShellApplication) {
+            handleAppReady();
             return props.process.app.Component;
         }
         return <div>Unknown component</div>;
