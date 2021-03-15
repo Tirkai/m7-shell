@@ -9,10 +9,8 @@ import { NotificationHub } from "components/notifications/NotificationHub/Notifi
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
-import { AppWindow } from "components/window/AppWindow/AppWindow";
+import { AppWindowArea } from "components/window/AppWindowArea/AppWindowArea";
 import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/AppWindowPinContainer";
-import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
-import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { ShellEvents } from "enum/ShellEvents";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
@@ -21,10 +19,9 @@ import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
 import React, { Component } from "react";
-import { DraggableData, DraggableEvent } from "react-draggable";
-import { ResizeCallbackData } from "react-resizable";
 import { v4 } from "uuid";
 import style from "./style.module.css";
+
 @inject("store")
 @observer
 export class ShellScreen extends Component<IStore> {
@@ -82,69 +79,6 @@ export class ShellScreen extends Component<IStore> {
         }
     }
 
-    handleWindowResizeStart = (
-        appWindow: ApplicationWindow,
-        event: MouseEvent,
-        data: ResizeCallbackData,
-    ) => {
-        appWindow.setResizing(true);
-        appWindow.setResizeOriginPoint(event.clientX, event.clientY);
-    };
-
-    handleWindowResize = (
-        appWindow: ApplicationWindow,
-        event: MouseEvent,
-        data: ResizeCallbackData,
-    ) => {
-        const size = data.size;
-        let position = { x: event.clientX, y: event.clientY };
-
-        if (
-            data.handle === ResizeHandleDirection.NorthEast ||
-            data.handle === ResizeHandleDirection.NorthWest ||
-            data.handle === ResizeHandleDirection.SouthEast ||
-            data.handle === ResizeHandleDirection.SouthWest
-        ) {
-            if (
-                appWindow.width < MIN_WINDOW_WIDTH ||
-                appWindow.height < MIN_WINDOW_HEIGHT
-            ) {
-                position = {
-                    x: appWindow.minXPosition,
-                    y: appWindow.minYPosition,
-                };
-                event.preventDefault();
-            }
-        } else {
-            if (appWindow.width < MIN_WINDOW_WIDTH) {
-                position = {
-                    x: appWindow.minXPosition,
-                    y: event.clientY,
-                };
-            }
-            if (appWindow.height < MIN_WINDOW_HEIGHT) {
-                position = {
-                    x: event.clientX,
-                    y: appWindow.minYPosition,
-                };
-            }
-        }
-
-        appWindow.resize(data.handle, position, size);
-    };
-
-    handleCloseWindow = (appProcess: ApplicationProcess) => {
-        this.store.processManager.killProcess(appProcess);
-    };
-
-    handleDrag = (
-        appWindow: ApplicationWindow,
-        event: DraggableEvent,
-        data: DraggableData,
-    ) => {
-        appWindow.setPosition(data.x, data.y);
-    };
-
     handleClickDesktop = () => {
         window.dispatchEvent(new CustomEvent(ShellEvents.DesktopClick));
     };
@@ -159,32 +93,7 @@ export class ShellScreen extends Component<IStore> {
                     <DesktopGridArea />
                 </div>
 
-                {this.store.processManager.processes.map((process) => (
-                    <AppWindow
-                        key={process.window.id}
-                        process={process}
-                        url={process.modifiedUrl}
-                        {...process.window}
-                        window={process.window}
-                        onResizeStart={(event, data) =>
-                            this.handleWindowResizeStart(
-                                process.window,
-                                event,
-                                data,
-                            )
-                        }
-                        onResizeStop={() => process.window.setResizing(false)}
-                        onResize={(event, data) =>
-                            this.handleWindowResize(process.window, event, data)
-                        }
-                        onDragStart={() => process.window.setDragging(true)}
-                        onDragStop={() => process.window.setDragging(false)}
-                        onDrag={(event, data) =>
-                            this.handleDrag(process.window, event, data)
-                        }
-                        onClose={() => this.handleCloseWindow(process)}
-                    />
-                ))}
+                <AppWindowArea disabled={this.store.desktop.isEditMode} />
                 <AppsMenu />
                 <NotificationToasts />
                 <NotificationHub />

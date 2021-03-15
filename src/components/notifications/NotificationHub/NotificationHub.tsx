@@ -143,7 +143,6 @@ export const NotificationHub = observer(() => {
         <div
             className={classNames(style.notificationHub, {
                 [style.show]: store.shell.notificationHubShow,
-                "no-animate": !performanceMode.mode.enableAnimation,
             })}
             onAnimationStart={() => setShowBackdrop(false)}
             onAnimationEnd={() => setShowBackdrop(true)}

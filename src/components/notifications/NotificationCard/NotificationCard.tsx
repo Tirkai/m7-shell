@@ -37,7 +37,6 @@ export const NotificationCard = observer((props: INotificationCardProps) => {
         <div
             className={classNames(style.notificationCard, {
                 [style.isRemoving]: !props.isDisplayed,
-                "no-animate": !performanceMode.mode.enableAnimation,
             })}
             onClick={handleClick}
         >
