@@ -148,9 +148,16 @@ export class ApplicationWindow {
             this.setSize(this.lockedWidth + deltaX, this.height);
         }
         if (handle === dir.North) {
-            this.setPosition(this.x, position.y);
-            // this.setSize
-            this.setSize(this.width, this.lockedHeight + deltaY);
+            if (position.y > 0) {
+                this.setPosition(this.x, position.y);
+                this.setSize(this.width, this.lockedHeight + deltaY);
+            } else {
+                this.setPosition(this.x, 0);
+                this.setSize(
+                    this.width,
+                    this.lockedHeight + deltaY - Math.abs(position.y),
+                );
+            }
         }
         if (handle === dir.SouthWest) {
             this.setPosition(position.x, this.lockedY);

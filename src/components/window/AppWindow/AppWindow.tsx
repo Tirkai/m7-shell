@@ -84,13 +84,16 @@ export const AppWindow = (props: IAppWindowProps) => {
 
     const handleResize = (
         event: React.SyntheticEvent,
-        data: ResizeCallbackData,
+        eventData: ResizeCallbackData,
     ) => {
+        const data = eventData;
         const nativeEvent = (event as unknown) as MouseEvent;
 
-        if (nativeEvent.clientY < 0) {
-            return;
-        }
+        // console.log({ data: data.size });
+
+        // if (nativeEvent.clientY < 0) {
+        //     return;
+        // }
 
         props.onResize((event as unknown) as MouseEvent, data);
     };
