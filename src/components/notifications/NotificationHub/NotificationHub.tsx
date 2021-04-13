@@ -1,7 +1,13 @@
 import { SVGIcon } from "@algont/m7-ui";
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+} from "@material-ui/core";
 import { empty } from "assets/icons";
 import classNames from "classnames";
-import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
 import { NOTIFICATION_APP_GUID } from "constants/config";
 import { PerformanceContext } from "contexts/PerformanceContext";
@@ -23,7 +29,11 @@ export const NotificationHub = observer(() => {
     const store = useStore();
     const performanceMode = useContext(PerformanceContext);
     const [isScrolled, setScrolled] = useState(false);
-    const [isShowBackdrop, setShowBackdrop] = useState(false);
+
+    const [showClearGroupDialog, setShowClearGroupDialog] = useState<{
+        isShow: boolean;
+        group: NotificationGroupModel | null;
+    }>({ isShow: false, group: null });
 
     const connectNotifications = async () => {
         await store.notification.fetchApps(store.auth.userLogin);
@@ -42,17 +52,15 @@ export const NotificationHub = observer(() => {
         return () => disconnectNotifications();
     }, []);
 
-    const handleClearGroup = (group: NotificationGroupModel) => {
-        group.setFetching(true);
-        group.notifications.forEach((notify) => notify.setDisplayed(false));
-        setTimeout(async () => {
+    const handleClearGroup = async (group: NotificationGroupModel | null) => {
+        setShowClearGroupDialog({ isShow: false, group: null });
+        if (group) {
+            group.setFetching(true);
             try {
-                await store.notification.removeNotifications(
-                    group.notifications,
+                await store.notification.removeNotificationsByGroup(
+                    group,
                     store.auth.userLogin,
                 );
-
-                group.clearNotifications();
 
                 await store.notification.fetchGroup(
                     group,
@@ -64,14 +72,14 @@ export const NotificationHub = observer(() => {
 
                 console.error(e);
             }
-        }, 500);
+        }
     };
 
     const handleCloseNotification = (notification: NotificationModel) => {
         notification.setDisplayed(false);
         setTimeout(() => {
             store.notification.removeNotifications(
-                [notification],
+                [notification.id],
                 store.auth.userLogin,
             );
         }, 300);
@@ -144,85 +152,112 @@ export const NotificationHub = observer(() => {
             className={classNames(style.notificationHub, {
                 [style.show]: store.shell.notificationHubShow,
             })}
-            onAnimationStart={() => setShowBackdrop(false)}
-            onAnimationEnd={() => setShowBackdrop(true)}
         >
-            <BackdropWrapper active={isShowBackdrop}>
-                <div className={style.container}>
-                    <div className={style.content}>
-                        <div
-                            className={classNames(style.title, {
-                                [style.titleAfterScroll]: isScrolled,
-                            })}
-                        >
-                            {strings.notification.title}
-                        </div>
-                        <div
-                            className={style.notificationsList}
-                            onScroll={handleScroll}
-                        >
-                            {store.notification.groups
-                                .filter(
-                                    (group) =>
-                                        group.hasNotifications ||
-                                        group.isFetching,
-                                )
-                                .map((group) => (
-                                    <NotificationGroup
-                                        key={group.id}
-                                        onClear={() => handleClearGroup(group)}
-                                        onTitleClick={() =>
-                                            handleOpenNotificationGroup(group)
-                                        }
-                                        icon={group.icon}
-                                        title={group.name}
-                                        count={group.count}
-                                        isFetching={group.isFetching}
-                                    >
-                                        {group.notifications.map(
-                                            (notification) => (
-                                                <NotificationCard
-                                                    key={notification.id}
-                                                    {...notification}
-                                                    onClick={() =>
-                                                        handleRunApplication(
-                                                            notification.applicationId,
-                                                            notification.url,
-                                                        )
-                                                    }
-                                                    onClose={() =>
-                                                        handleCloseNotification(
-                                                            notification,
-                                                        )
-                                                    }
-                                                />
-                                            ),
-                                        )}
-                                    </NotificationGroup>
-                                ))}
-                            {store.notification.groups.every(
-                                (group) => !group.hasNotifications,
-                            ) &&
-                                store.notification.groups.every(
-                                    (group) => !group.isFetching,
-                                ) && (
-                                    <PlaceholderWithIcon
-                                        icon={
-                                            <SVGIcon
-                                                source={empty}
-                                                color="white"
-                                            />
-                                        }
-                                        content={
-                                            strings.notification
-                                                .noMoreNotifications
-                                        }
-                                    />
-                                )}
-                        </div>
+            <div className={style.container}>
+                <div className={style.content}>
+                    <div
+                        className={classNames(style.title, {
+                            [style.titleAfterScroll]: isScrolled,
+                        })}
+                    >
+                        {strings.notification.title}
+                    </div>
+                    <div
+                        className={style.notificationsList}
+                        onScroll={handleScroll}
+                    >
+                        {store.notification.groups
+                            .filter((group) => group.hasNotifications)
+                            .map((group) => (
+                                <NotificationGroup
+                                    key={group.id}
+                                    onClear={() =>
+                                        setShowClearGroupDialog({
+                                            isShow: true,
+                                            group,
+                                        })
+                                    }
+                                    onTitleClick={() =>
+                                        handleOpenNotificationGroup(group)
+                                    }
+                                    icon={group.icon}
+                                    title={group.name}
+                                    count={group.count}
+                                    isFetching={
+                                        group.isFetching || group.isLocked
+                                    }
+                                >
+                                    {group.notifications.map((notification) => (
+                                        <NotificationCard
+                                            key={notification.id}
+                                            {...notification}
+                                            onClick={() =>
+                                                handleRunApplication(
+                                                    notification.applicationId,
+                                                    notification.url,
+                                                )
+                                            }
+                                            onClose={() =>
+                                                handleCloseNotification(
+                                                    notification,
+                                                )
+                                            }
+                                        />
+                                    ))}
+                                </NotificationGroup>
+                            ))}
+                        {store.notification.groups.every(
+                            (group) => !group.hasNotifications,
+                        ) &&
+                            store.notification.groups.every(
+                                (group) => !group.isFetching,
+                            ) && (
+                                <PlaceholderWithIcon
+                                    icon={
+                                        <SVGIcon source={empty} color="white" />
+                                    }
+                                    content={
+                                        strings.notification.noMoreNotifications
+                                    }
+                                />
+                            )}
                     </div>
                 </div>
-            </BackdropWrapper>
+            </div>
+            {/* TODO: locale */}
+            <Dialog
+                fullWidth
+                open={showClearGroupDialog.isShow}
+                onClose={() =>
+                    setShowClearGroupDialog({ isShow: false, group: null })
+                }
+            >
+                <DialogTitle>Удалить все уведомления в группе?</DialogTitle>
+                <DialogContent>
+                    Данное действие невозможно отменить
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => {
+                            handleClearGroup(showClearGroupDialog.group);
+                        }}
+                    >
+                        Удалить
+                    </Button>
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={() =>
+                            setShowClearGroupDialog({
+                                isShow: false,
+                                group: null,
+                            })
+                        }
+                    >
+                        Отмена
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 });

@@ -1,4 +1,10 @@
-import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
+import {
+    IJsonRpcResponse,
+    JsonRpcFailure,
+    JsonRpcPayload,
+    JsonRpcResult,
+    RequestListPayload,
+} from "@algont/m7-utils";
 import Axios from "axios";
 import { AudioSource } from "constants/audio";
 import {
@@ -68,44 +74,82 @@ export class NotificationStore {
         this.toasts = toasts;
     }
 
+    async loadCountByFilter(payload: object) {
+        try {
+            const response = await Axios.post<IJsonRpcResponse<number>>(
+                notificationsEndpoint.url,
+                new JsonRpcPayload("get_count_by_filter", payload),
+            );
+
+            return new JsonRpcResult({
+                status: !response.data.error,
+                result: response.data.result,
+            });
+        } catch (e) {
+            console.error(e);
+            return new JsonRpcFailure();
+        }
+    }
+
+    async loadNotificationsByFilter(payload: RequestListPayload) {
+        try {
+            const response = await Axios.post<
+                IJsonRpcResponse<INotificationResponse[]>
+            >(
+                notificationsEndpoint.url,
+                new JsonRpcPayload("get_list_by_filter", payload),
+            );
+
+            return new JsonRpcResult({
+                status: !response.data.error,
+                result: response.data.result,
+            });
+        } catch (e) {
+            console.error(e);
+            return new JsonRpcFailure();
+        }
+    }
+
     async fetchGroup(group: NotificationGroupModel, login: string) {
         group.setFetching(true);
 
-        const countResponse = await Axios.post<IJsonRpcResponse<number>>(
-            notificationsEndpoint.url,
-            new JsonRpcPayload("get_count_by_filter", {
-                filter: {
-                    login: { values: [login] },
-                    app_id: { values: [group.id] },
-                },
-            }),
-        );
+        const countResponse = await this.loadCountByFilter({
+            filter: {
+                login: { values: [login] },
+                app_id: { values: [group.id] },
+            },
+        });
 
-        group.setCount(countResponse.data.result);
+        if (countResponse.status) {
+            const count = countResponse.result!;
+            group.setCount(count);
 
-        const notificationsResponse = await Axios.post<
-            IJsonRpcResponse<INotificationResponse[]>
-        >(
-            notificationsEndpoint.url,
-            new JsonRpcPayload("get_list_by_filter", {
-                filter: {
-                    app_id: {
-                        values: [group.id],
+            const notificationsResponse = await this.loadNotificationsByFilter(
+                new RequestListPayload({
+                    filter: {
+                        app_id: {
+                            values: [group.id],
+                        },
+                        login: { values: [login] },
                     },
-                    login: { values: [login] },
-                },
-                limit: 5,
-                offset: 0,
-                order: [{ field: "ntf_date", direction: "desc" }],
-            }),
-        );
+                    limit: 5,
+                    offset: 0,
+                    order: [{ field: "ntf_date", direction: "desc" }],
+                }),
+            );
 
-        const notifications = notificationsResponse.data.result.map((item) =>
-            NotificationFactory.createNotification(item),
-        );
+            if (notificationsResponse.result) {
+                const notifications = notificationsResponse.result.map((item) =>
+                    NotificationFactory.createNotification(item),
+                );
 
-        group.setNotifications(notifications);
-
+                group.setNotifications(notifications);
+            } else {
+                console.warn("No notifications list result");
+            }
+        } else {
+            console.warn("No count notification result");
+        }
         group.setFetching(false);
     }
 
@@ -344,22 +388,78 @@ export class NotificationStore {
         this.groups = groups;
     }
 
-    async removeNotifications(
-        notifications: NotificationModel[],
+    async removeNotificationsByGroup(
+        group: NotificationGroupModel,
         login: string,
     ) {
+        group.setLocked(true);
+
+        const loop = async () => {
+            const deleteCount = 100;
+            const countResponse = await this.loadCountByFilter({
+                filter: {
+                    login: { values: [login] },
+                    app_id: { values: [group.id] },
+                },
+            });
+            if (countResponse.status) {
+                const count = countResponse.result!;
+
+                if (count > 0) {
+                    const notificationsResponse = await this.loadNotificationsByFilter(
+                        new RequestListPayload({
+                            filter: {
+                                app_id: {
+                                    values: [group.id],
+                                },
+                                login: { values: [login] },
+                            },
+                            limit: deleteCount,
+                            order: [{ field: "ntf_date", direction: "desc" }],
+                        }),
+                    );
+
+                    if (notificationsResponse.result) {
+                        const removeResponse = await this.removeNotifications(
+                            notificationsResponse.result.map(
+                                (item) => item.ntf_id,
+                            ),
+                            login,
+                        );
+
+                        if (removeResponse.status) {
+                            loop();
+                        }
+                    }
+                } else {
+                    group.setLocked(false);
+                    this.fetchGroup(group, login);
+                }
+            }
+        };
+
+        await loop();
+    }
+
+    async removeNotifications(ids: string[], login: string) {
         try {
-            await Axios.post<IJsonRpcResponse>(
+            const response = await Axios.post<IJsonRpcResponse>(
                 notificationsEndpoint.url,
                 new JsonRpcPayload("drop_user_notifications", {
-                    user_notifications: notifications.map((item) => ({
-                        ntf_id: item.id,
+                    user_notifications: ids.map((item) => ({
+                        ntf_id: item,
                         login,
                     })),
                 }),
             );
+
+            return new JsonRpcResult({
+                status: !response.data.error,
+                result: response.data.result,
+            });
         } catch (e) {
             console.error(e);
+            return new JsonRpcFailure();
         }
     }
 }

@@ -1,5 +1,5 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { apps, cross, layout } from "assets/icons";
+import { apps, cross } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
@@ -152,14 +152,14 @@ export class TaskBar extends Component<IStore> {
                             </div>
 
                             <div className={style.actions}>
-                                {/* TODO: Locale */}
+                                {/* TODO: Secret feature
                                 <TaskBarItem
                                     onClick={() =>
                                         this.handleShowDesktopLayoutConfig()
                                     }
                                 >
                                     <SVGIcon source={layout} color="white" />
-                                </TaskBarItem>
+                                </TaskBarItem> */}
                                 <TaskBarItem
                                     onClick={() =>
                                         this.handleShowAudioHub(

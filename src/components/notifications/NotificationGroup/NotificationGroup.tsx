@@ -1,4 +1,5 @@
 import { SVGIcon } from "@algont/m7-ui";
+import { CircularProgress } from "@material-ui/core";
 import { cross } from "assets/icons";
 import classNames from "classnames";
 import React from "react";
@@ -9,6 +10,7 @@ interface INotificationGroupProps {
     count?: number;
     children: JSX.Element | JSX.Element[];
     isFetching?: boolean;
+    isLocked?: boolean;
     onClear: () => void;
     onTitleClick: () => void;
 }
@@ -26,7 +28,11 @@ export const NotificationGroup = (props: INotificationGroupProps) => {
                     <div className={style.titleText}>{props.title}</div>
                     <div className={style.count}>{props.count}</div>
                 </div>
-                <div className={style.actions}>
+                <div
+                    className={classNames(style.actions, {
+                        [style.disabledActions]: props.isFetching,
+                    })}
+                >
                     <div
                         className={style.actionItem}
                         onClick={handleClearGroup}
@@ -42,7 +48,9 @@ export const NotificationGroup = (props: INotificationGroupProps) => {
                     className={classNames(style.overlay, {
                         [style.show]: props.isFetching,
                     })}
-                ></div>
+                >
+                    <CircularProgress color="secondary" />
+                </div>
             </div>
         </div>
     );

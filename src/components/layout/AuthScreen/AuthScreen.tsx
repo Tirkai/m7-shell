@@ -23,7 +23,6 @@ export const AuthScreen: React.FC = observer(() => {
 
     const handleLogin = async (form: { login: string; password: string }) => {
         const data = await store.auth.login(form.login, form.password);
-
         if (data?.error) {
             const errorKey = authErrorCodes.get(data.error.code.toString());
             const errorLocaleStrings = strings.auth.error as any;
@@ -58,6 +57,7 @@ export const AuthScreen: React.FC = observer(() => {
                         )}
                     </div>
                 </div>
+
                 {isNight && (
                     <Alert variant="filled" severity="info">
                         Experemental Build

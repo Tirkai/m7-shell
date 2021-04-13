@@ -45,6 +45,7 @@
 .actions {
     display: flex;
     align-items: center;
+    transition: ease 0.3s;
 }
 
 .actionItem {
@@ -71,6 +72,11 @@
     text-align: center;
     margin-left: 6px;
     font-size: 12px;
+}
+
+.disabledActions {
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 .overlay {

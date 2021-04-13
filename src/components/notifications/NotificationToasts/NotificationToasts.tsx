@@ -58,7 +58,7 @@ export const NotificationToasts = observer(() => {
 
     const handleRemoveNotification = (notification: NotificationModel) => {
         store.notification.removeNotifications(
-            [notification],
+            [notification.id],
             store.auth.userLogin,
         );
     };
