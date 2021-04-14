@@ -5,7 +5,6 @@ export class MessageStore {
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
-
         makeAutoObservable(this);
     }
 

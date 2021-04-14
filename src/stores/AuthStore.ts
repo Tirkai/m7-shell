@@ -1,30 +1,31 @@
 import { ShellMessageType } from "@algont/m7-shell-emitter";
-import { JsonRpcPayload, JsonRpcResult } from "@algont/m7-utils";
+import {
+    IJsonRpcResponse,
+    JsonRpcPayload,
+    JsonRpcResult,
+} from "@algont/m7-utils";
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
 import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
+import { AuthEventType } from "enum/AuthEventType";
 import { RoleType } from "enum/RoleType";
 import { ShellEvents } from "enum/ShellEvents";
 import { IAccessTokenMetadata } from "interfaces/auth/IAccessTokenMetadata";
 import { IRefreshTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
-import { IJsonRpcResponse } from "interfaces/response/IJsonRpcResponse";
 import { Base64 } from "js-base64";
 import { strings } from "locale";
 import { makeAutoObservable } from "mobx";
-import { ExternalApplication } from "models/ExternalApplication";
+import { ApplicationProcess } from "models/ApplicationProcess";
 import moment, { Moment } from "moment";
 import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
 export class AuthStore {
-    private readonly localStorageAccessTokenKey: string =
-        "ACCESS_TOKEN_" + process.env.REACT_APP_BUILD;
-    private readonly localStorageRefreshTokenKey: string =
-        "REFRESH_TOKEN_" + process.env.REACT_APP_BUILD;
-    private readonly localStorageUserLogin: string = "USER_LOGIN";
-    private readonly localStorageDelta: string =
-        "DELTA_" + process.env.REACT_APP_BUILD;
+    private readonly sessionStorageAccessTokenKey: string = "ACCESS_TOKEN";
+    private readonly sessionStorageRefreshTokenKey: string = "REFRESH_TOKEN";
+    private readonly sessionStorageUserLogin: string = "USER_LOGIN";
+    private readonly sessionStorageDelta: string = "DELTA";
 
     accessToken: string = "";
 
@@ -49,6 +50,8 @@ export class AuthStore {
     timeOffset: number = 30000;
 
     checkedAfterStart: boolean = false;
+
+    eventBus: EventTarget = new EventTarget();
 
     get isAdmin() {
         return this.roles.some((item) => item === RoleType.Admin);
@@ -84,66 +87,112 @@ export class AuthStore {
         return this.remainingTokenTime <= 0;
     }
 
+    isUpdateTokenProcessActive: boolean = false;
+
+    interval: NodeJS.Timeout | null = null;
+
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
 
         makeAutoObservable(this);
 
-        const authToken = localStorage.getItem(this.localStorageAccessTokenKey);
-        const refreshToken = localStorage.getItem(
-            this.localStorageRefreshTokenKey,
+        const authToken = sessionStorage.getItem(
+            this.sessionStorageAccessTokenKey,
         );
-        const userLogin = localStorage.getItem(this.localStorageUserLogin);
+        const refreshToken = sessionStorage.getItem(
+            this.sessionStorageRefreshTokenKey,
+        );
+        const userLogin = sessionStorage.getItem(this.sessionStorageUserLogin);
 
         if (authToken && refreshToken && userLogin) {
             this.setToken(authToken, refreshToken);
             this.userLogin = userLogin;
             this.isAuthorized = true;
             this.fetchUsername();
+            this.init();
         }
 
-        const checkoutRemainingTime = () => {
-            const diff =
-                this.renewTime.diff(this.currentTime) +
-                this.deltaTime +
-                this.timeOffset;
-            return diff >= 0;
-        };
+        window.addEventListener("focus", () => {
+            if (this.isAuthorized) {
+                this.verifyToken();
+            }
+        });
 
-        window.addEventListener("focus", () => checkoutRemainingTime());
+        if (this.isAuthorized) {
+            this.verifyToken();
+        }
+    }
 
-        setInterval(() => {
+    checkoutRemainingTime() {
+        const diff =
+            this.renewTime.diff(this.currentTime) +
+            this.deltaTime +
+            this.timeOffset;
+        return diff >= 0;
+    }
+
+    init() {
+        this.interval = setInterval(() => {
             this.setCurrentTime(moment());
             if (this.isAuthorized) {
-                const hasRemainedTime = checkoutRemainingTime();
+                const hasRemainedTime = this.checkoutRemainingTime();
                 if (!hasRemainedTime) {
-                    this.renewToken();
+                    if (!this.isUpdateTokenProcessActive) {
+                        this.renewToken();
+                    }
                 }
             }
         }, 1000);
-
-        this.verifyToken();
     }
 
     async verifyToken() {
-        const response = await Axios.post<
-            IJsonRpcResponse<AccessTokenVerifyStatus>
-        >(
-            authEndpoint.url,
-            new JsonRpcPayload("verify", {
-                token: this.accessToken,
-            }),
-        );
+        try {
+            const response = await Axios.post<
+                IJsonRpcResponse<AccessTokenVerifyStatus>
+            >(
+                authEndpoint.url,
+                new JsonRpcPayload("verify", {
+                    token: this.accessToken,
+                }),
+            );
 
-        if (!response.data.error) {
-            this.setCheckedAfterStart(true);
+            if (!response.data.error) {
+                this.setCheckedAfterStart(true);
+
+                this.eventBus.dispatchEvent(
+                    new CustomEvent(AuthEventType.SuccessVerifyToken),
+                );
+            } else {
+                this.eventBus.dispatchEvent(
+                    new CustomEvent(AuthEventType.FailedVerifyToken),
+                );
+            }
+
+            if (response.data.result === AccessTokenVerifyStatus.Expired) {
+                this.renewToken();
+            }
+            if (response.data.result === AccessTokenVerifyStatus.NotFound) {
+                this.eventBus.dispatchEvent(
+                    new CustomEvent(AuthEventType.TokenNotFound),
+                );
+
+                this.logout();
+            }
+
+            return new JsonRpcResult({
+                status: !response.data.error,
+                result: response.data.result === AccessTokenVerifyStatus.Ok,
+            });
+        } catch (e) {
+            this.eventBus.dispatchEvent(
+                new CustomEvent(AuthEventType.FailedVerifyToken),
+            );
+
+            return new JsonRpcResult({
+                status: false,
+            });
         }
-
-        return new JsonRpcResult({
-            status: !response.data.error,
-            result: response.data.result === AccessTokenVerifyStatus.Ok,
-        });
     }
 
     setToken(accessToken: string, refreshToken: string) {
@@ -164,27 +213,33 @@ export class AuthStore {
             this.createTime = moment.utc(refreshTokenData?.created);
             this.renewTime = moment.utc(refreshTokenData?.renew);
 
-            const localStorageDelta = localStorage.getItem(
-                this.localStorageDelta,
+            const sessionStorageDelta = sessionStorage.getItem(
+                this.sessionStorageDelta,
             );
 
-            if (!localStorageDelta) {
+            this.eventBus.dispatchEvent(
+                new CustomEvent(AuthEventType.UpdateToken, {
+                    detail: this.accessToken,
+                }),
+            );
+
+            if (!sessionStorageDelta) {
                 this.deltaTime = this.currentTime.diff(this.createTime);
-                localStorage.setItem(
-                    this.localStorageDelta,
+                sessionStorage.setItem(
+                    this.sessionStorageDelta,
                     this.deltaTime.toString(),
                 );
             } else {
-                this.deltaTime = parseInt(localStorageDelta);
+                this.deltaTime = parseInt(sessionStorageDelta);
             }
 
-            localStorage.setItem(
-                this.localStorageAccessTokenKey,
+            sessionStorage.setItem(
+                this.sessionStorageAccessTokenKey,
                 this.accessToken,
             );
 
-            localStorage.setItem(
-                this.localStorageRefreshTokenKey,
+            sessionStorage.setItem(
+                this.sessionStorageRefreshTokenKey,
                 this.refreshToken,
             );
             Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
@@ -193,9 +248,9 @@ export class AuthStore {
         }
     }
 
-    injectAuthTokenInExternalApplication(app: ExternalApplication) {
+    injectAuthTokenInProcess(appProccess: ApplicationProcess) {
         try {
-            app.emitter.emit(ShellMessageType.UpdateAuthToken, {
+            appProccess.emitter.emit(ShellMessageType.UpdateAuthToken, {
                 token: this.accessToken,
                 login: this.userLogin,
             });
@@ -206,34 +261,36 @@ export class AuthStore {
 
     async renewToken() {
         try {
+            this.isUpdateTokenProcessActive = true;
+
             const response = await Axios.post<IJsonRpcResponse<IAuthResponse>>(
                 authEndpoint.url,
                 new JsonRpcPayload("renew", {
                     token: this.refreshToken,
                 }),
             );
-            localStorage.removeItem(this.localStorageDelta);
+            sessionStorage.removeItem(this.sessionStorageDelta);
             if (!response.data.error) {
                 const result = response.data.result;
                 this.setToken(result.access_token, result.refresh_token);
-                this.store.applicationManager.executedApplications.forEach(
-                    (item) => {
-                        if (item instanceof ExternalApplication) {
-                            item.emitter.emit(
-                                ShellMessageType.UpdateAuthToken,
-                                {
-                                    token: this.accessToken,
-                                    login: this.userLogin,
-                                },
-                            );
-                        }
-                    },
+
+                // TODO: Move to Process Store
+                this.store.processManager.processes.forEach((appProcess) =>
+                    this.injectAuthTokenInProcess(appProcess),
                 );
             } else {
+                this.eventBus.dispatchEvent(
+                    new CustomEvent(AuthEventType.FailedRenewToken, {
+                        detail: response.data.error,
+                    }),
+                );
+
                 this.logout();
             }
         } catch (e) {
             console.error(e);
+        } finally {
+            this.isUpdateTokenProcessActive = false;
         }
     }
 
@@ -257,13 +314,15 @@ export class AuthStore {
                 this.setAuthorized(true);
                 this.setCheckedAfterStart(true);
 
-                localStorage.setItem(
-                    this.localStorageUserLogin,
+                sessionStorage.setItem(
+                    this.sessionStorageUserLogin,
                     this.userLogin,
                 );
 
                 this.fetchUsername();
             }
+            this.init();
+
             return response.data;
         } catch (e) {
             this.store.message.showMessage(
@@ -298,11 +357,18 @@ export class AuthStore {
 
             dispatchEvent(new CustomEvent(ShellEvents.Logout));
 
-            this.store.windowManager.closeAllWindows();
+            this.eventBus.dispatchEvent(new CustomEvent(AuthEventType.Logout));
 
-            localStorage.removeItem(this.localStorageAccessTokenKey);
+            sessionStorage.removeItem(this.sessionStorageAccessTokenKey);
+            sessionStorage.removeItem(this.sessionStorageRefreshTokenKey);
+
             this.accessToken = "";
+            this.refreshToken = "";
             this.setAuthorized(false);
+
+            if (this.interval) {
+                clearInterval(this.interval);
+            }
 
             return new JsonRpcResult({
                 status: !response.data.error,

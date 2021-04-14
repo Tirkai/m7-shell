@@ -16,6 +16,8 @@ export class NotificationGroupModel {
     icon: string;
     count: number;
     isFetching: boolean = false;
+    isLocked: boolean = false;
+
     constructor(options: INotificationGroupModelOptions) {
         makeAutoObservable(this);
         this.id = options.id;
@@ -47,6 +49,10 @@ export class NotificationGroupModel {
 
     setFetching(value: boolean) {
         this.isFetching = value;
+    }
+
+    setLocked(value: boolean) {
+        this.isLocked = value;
     }
 
     clearNotifications() {

@@ -3,24 +3,25 @@ import { AudioHub } from "components/audio/AudioHub/AudioHub";
 import { ShellContextMenu } from "components/contextMenu/ShellContextMenu/ShellContextMenu";
 import { ShellContextMenuOverlay } from "components/contextMenu/ShellContextMenuOverlay/ShellContextMenuOverlay";
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
+import { DesktopConfigHub } from "components/desktop/DesktopConfigHub/DesktopConfigHub";
+import { DesktopGridArea } from "components/desktop/DesktopGridArea/DesktopGridArea";
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
-import { AppWindow } from "components/window/AppWindow/AppWindow";
+import { AppWindowArea } from "components/window/AppWindowArea/AppWindowArea";
 import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/AppWindowPinContainer";
-import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { ShellEvents } from "enum/ShellEvents";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
+import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
 import React, { Component } from "react";
-import { DraggableData, DraggableEvent } from "react-draggable";
-import { ResizeCallbackData } from "react-resizable";
 import { v4 } from "uuid";
 import style from "./style.module.css";
+
 @inject("store")
 @observer
 export class ShellScreen extends Component<IStore> {
@@ -46,7 +47,14 @@ export class ShellScreen extends Component<IStore> {
                 const app = this.store.applicationManager.findByKey(autoRunApp);
 
                 if (app) {
-                    this.store.applicationManager.executeApplication(app);
+                    const appProcess = new ApplicationProcess({
+                        app,
+                        window: new ApplicationWindow({
+                            isFullscreen: isAutorunFullscreen,
+                        }),
+                    });
+
+                    this.store.processManager.execute(appProcess);
                 }
             }
 
@@ -59,75 +67,17 @@ export class ShellScreen extends Component<IStore> {
                     isVisibleInStartMenu: false,
                 });
 
-                this.store.applicationManager.addApplication(app);
+                const appProcess = new ApplicationProcess({
+                    app,
+                    window: new ApplicationWindow({
+                        isFullscreen: isAutorunFullscreen,
+                    }),
+                });
 
-                this.store.applicationManager.executeApplication(app);
+                this.store.processManager.execute(appProcess);
             }
         }
     }
-
-    handleWindowResizeStart = (
-        appWindow: ApplicationWindow,
-        event: MouseEvent,
-        data: ResizeCallbackData,
-    ) => {
-        appWindow.setResizing(true);
-        appWindow.setResizeOriginPoint(event.clientX, event.clientY);
-    };
-
-    handleWindowResize = (
-        appWindow: ApplicationWindow,
-        event: MouseEvent,
-        data: ResizeCallbackData,
-    ) => {
-        const size = data.size;
-        let position = { x: event.clientX, y: event.clientY };
-
-        if (
-            data.handle === ResizeHandleDirection.NorthEast ||
-            data.handle === ResizeHandleDirection.NorthWest ||
-            data.handle === ResizeHandleDirection.SouthEast ||
-            data.handle === ResizeHandleDirection.SouthWest
-        ) {
-            if (
-                appWindow.width < appWindow.application.minWidth ||
-                appWindow.height < appWindow.application.minHeight
-            ) {
-                position = {
-                    x: appWindow.minXPosition,
-                    y: appWindow.minYPosition,
-                };
-                event.preventDefault();
-            }
-        } else {
-            if (appWindow.width < appWindow.application.minWidth) {
-                position = {
-                    x: appWindow.minXPosition,
-                    y: event.clientY,
-                };
-            }
-            if (appWindow.height < appWindow.application.minHeight) {
-                position = {
-                    x: event.clientX,
-                    y: appWindow.minYPosition,
-                };
-            }
-        }
-
-        appWindow.resize(data.handle, position, size);
-    };
-
-    handleCloseWindow = (appWindow: ApplicationWindow) => {
-        this.store.windowManager.closeWindow(appWindow);
-    };
-
-    handleDrag = (
-        appWindow: ApplicationWindow,
-        event: DraggableEvent,
-        data: DraggableData,
-    ) => {
-        appWindow.setPosition(data.x, data.y);
-    };
 
     handleClickDesktop = () => {
         window.dispatchEvent(new CustomEvent(ShellEvents.DesktopClick));
@@ -139,28 +89,11 @@ export class ShellScreen extends Component<IStore> {
                 <div
                     className={style.desktop}
                     onClick={this.handleClickDesktop}
-                ></div>
-                {this.store.windowManager.windows.map((appWindow) => (
-                    <AppWindow
-                        key={appWindow.id}
-                        {...appWindow}
-                        window={appWindow}
-                        onResizeStart={(event, data) =>
-                            this.handleWindowResizeStart(appWindow, event, data)
-                        }
-                        onResizeStop={() => appWindow.setResizing(false)}
-                        onResize={(event, data) =>
-                            this.handleWindowResize(appWindow, event, data)
-                        }
-                        onDragStart={() => appWindow.setDragging(true)}
-                        onDragStop={() => appWindow.setDragging(false)}
-                        onDrag={(event, data) =>
-                            this.handleDrag(appWindow, event, data)
-                        }
-                        onClose={() => this.handleCloseWindow(appWindow)}
-                    />
-                ))}
+                >
+                    <DesktopGridArea />
+                </div>
 
+                <AppWindowArea disabled={this.store.desktop.isEditMode} />
                 <AppsMenu />
                 <NotificationToasts />
                 <NotificationHub />
@@ -169,8 +102,8 @@ export class ShellScreen extends Component<IStore> {
                 <AppWindowPinContainer />
                 <AudioContainer />
                 <AudioHub />
+                <DesktopConfigHub />
                 <ShellContextMenuOverlay />
-
                 <ShellContextMenu />
             </div>
         );

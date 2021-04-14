@@ -1,7 +1,7 @@
 import { ApplicationPlace } from "enum/ApplicationPlace";
 
 export interface IApplicationOptions {
-    id: string;
+    id?: string;
     name: string;
     key?: string;
     icon?: string;

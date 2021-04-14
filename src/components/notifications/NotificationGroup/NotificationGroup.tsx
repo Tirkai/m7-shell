@@ -7,10 +7,10 @@ interface INotificationGroupProps {
     icon: string;
     title: string;
     count?: number;
-    children: JSX.Element | JSX.Element[];
-    isFetching?: boolean;
+    children: React.ReactNode;
     onClear: () => void;
     onTitleClick: () => void;
+    overlay: React.ReactNode | null;
 }
 
 export const NotificationGroup = (props: INotificationGroupProps) => {
@@ -26,7 +26,11 @@ export const NotificationGroup = (props: INotificationGroupProps) => {
                     <div className={style.titleText}>{props.title}</div>
                     <div className={style.count}>{props.count}</div>
                 </div>
-                <div className={style.actions}>
+                <div
+                    className={classNames(style.actions, {
+                        [style.disabledActions]: props.overlay !== null,
+                    })}
+                >
                     <div
                         className={style.actionItem}
                         onClick={handleClearGroup}
@@ -40,9 +44,11 @@ export const NotificationGroup = (props: INotificationGroupProps) => {
 
                 <div
                     className={classNames(style.overlay, {
-                        [style.show]: props.isFetching,
+                        [style.show]: props.overlay !== null,
                     })}
-                ></div>
+                >
+                    {props.overlay}
+                </div>
             </div>
         </div>
     );

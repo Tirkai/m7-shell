@@ -1,16 +1,14 @@
 import classNames from "classnames";
-import { PerformanceContext } from "contexts/PerformanceContext";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
-import React, { useContext } from "react";
+import React from "react";
 import { ShellContextMenuItem } from "../ShellContextMenuItem/ShellContextMenuItem";
 import style from "./style.module.css";
 const className = style.contextMenu;
 
 export const ShellContextMenu: React.FC = observer(() => {
     const store = useStore();
-    const performanceMode = useContext(PerformanceContext);
     const handleClick = (item: ContextMenuItemModel) => {
         store.contextMenu.hideContextMenu();
 
@@ -28,11 +26,7 @@ export const ShellContextMenu: React.FC = observer(() => {
             }}
             id="context-menu"
         >
-            <div
-                className={classNames(style.container, {
-                    "no-animate": !performanceMode.mode.enableAnimation,
-                })}
-            >
+            <div className={classNames(style.container)}>
                 {store.contextMenu.items.map((item) => (
                     <ShellContextMenuItem
                         key={item.id}

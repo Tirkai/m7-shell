@@ -1,0 +1,11 @@
+.appWindowArea {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    height: calc(100% - 48px);
+}
+
+.disabled {
+    display: none;
+}
