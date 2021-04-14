@@ -1,0 +1,11 @@
+.panelInformer {
+    display: block;
+    border-radius: 4px;
+    width: 100%;
+    background: white;
+}
+
+.container {
+    padding: 12px;
+    box-sizing: border-box;
+}

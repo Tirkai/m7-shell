@@ -1,13 +1,10 @@
 import { SVGIcon } from "@algont/m7-ui";
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-} from "@material-ui/core";
+import { Button, CircularProgress } from "@material-ui/core";
 import { empty } from "assets/icons";
 import classNames from "classnames";
+import { PanelInformer } from "components/informer/PanelInformer/PanelInformer";
+import { PanelInformerActions } from "components/informer/PanelInformerActions/PanelInformerActions";
+import { PanelInformerText } from "components/informer/PanelInformerText/PanelInformerText";
 import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
 import { NOTIFICATION_APP_GUID } from "constants/config";
 import { PerformanceContext } from "contexts/PerformanceContext";
@@ -22,6 +19,7 @@ import { NotificationGroupModel } from "models/NotificationGroupModel";
 import { NotificationModel } from "models/NotificationModel";
 import React, { useContext, useEffect, useState } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
+import { NotificationClearDialogContainer } from "../NotificationClearDialogContainer/NotificationClearDialogContainer";
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
 import style from "./style.module.css";
 
@@ -51,6 +49,12 @@ export const NotificationHub = observer(() => {
         connectNotifications();
         return () => disconnectNotifications();
     }, []);
+
+    useEffect(() => {
+        if (store.shell.activePanel !== ShellPanelType.NotificationHub) {
+            setShowClearGroupDialog({ isShow: false, group: null });
+        }
+    }, [store.shell.activePanel]);
 
     const handleClearGroup = async (group: NotificationGroupModel | null) => {
         setShowClearGroupDialog({ isShow: false, group: null });
@@ -147,6 +151,51 @@ export const NotificationHub = observer(() => {
         }
     };
 
+    const getGroupOverlay = (group: NotificationGroupModel) => {
+        if (group.isFetching || group.isLocked) {
+            return <CircularProgress color="secondary" />;
+        }
+        if (
+            group.id === showClearGroupDialog?.group?.id &&
+            showClearGroupDialog.isShow
+        ) {
+            return (
+                <NotificationClearDialogContainer>
+                    <PanelInformer>
+                        <PanelInformerText>
+                            Удалить группу уведомлений?
+                        </PanelInformerText>
+                        <PanelInformerActions>
+                            <Button
+                                onClick={() => {
+                                    handleClearGroup(
+                                        showClearGroupDialog.group,
+                                    );
+                                }}
+                            >
+                                Удалить
+                            </Button>
+                            <Button
+                                color="primary"
+                                variant="contained"
+                                onClick={() =>
+                                    setShowClearGroupDialog({
+                                        isShow: false,
+                                        group: null,
+                                    })
+                                }
+                            >
+                                Отмена
+                            </Button>
+                        </PanelInformerActions>
+                    </PanelInformer>
+                </NotificationClearDialogContainer>
+            );
+        }
+
+        return null;
+    };
+
     return (
         <div
             className={classNames(style.notificationHub, {
@@ -183,9 +232,7 @@ export const NotificationHub = observer(() => {
                                     icon={group.icon}
                                     title={group.name}
                                     count={group.count}
-                                    isFetching={
-                                        group.isFetching || group.isLocked
-                                    }
+                                    overlay={getGroupOverlay(group)}
                                 >
                                     {group.notifications.map((notification) => (
                                         <NotificationCard
@@ -224,40 +271,6 @@ export const NotificationHub = observer(() => {
                     </div>
                 </div>
             </div>
-            {/* TODO: locale */}
-            <Dialog
-                fullWidth
-                open={showClearGroupDialog.isShow}
-                onClose={() =>
-                    setShowClearGroupDialog({ isShow: false, group: null })
-                }
-            >
-                <DialogTitle>Удалить все уведомления в группе?</DialogTitle>
-                <DialogContent>
-                    Данное действие невозможно отменить
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        onClick={() => {
-                            handleClearGroup(showClearGroupDialog.group);
-                        }}
-                    >
-                        Удалить
-                    </Button>
-                    <Button
-                        color="primary"
-                        variant="contained"
-                        onClick={() =>
-                            setShowClearGroupDialog({
-                                isShow: false,
-                                group: null,
-                            })
-                        }
-                    >
-                        Отмена
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </div>
     );
 });
