@@ -1,6 +1,6 @@
 .audioHub {
     position: absolute;
-    bottom: 48px;
+    bottom: 0;
     right: 0;
     width: 300px;
     background-attachment: fixed;

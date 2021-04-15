@@ -10,6 +10,7 @@ import { NetworkStore } from "./NetworkStore";
 import { NotificationStore } from "./NotificationStore";
 import { ProcessManagerStore } from "./ProcessManagerStore";
 import { ShellStore } from "./ShellStore";
+import { TileManager } from "./TileManager";
 import { UserStore } from "./UserStore";
 import { WindowManagerStore } from "./WindowManagerStore";
 
@@ -28,6 +29,7 @@ export class AppStore {
     user: UserStore;
     network: NetworkStore;
     desktop: DesktopStore;
+    tile: TileManager;
     constructor() {
         this.auth = new AuthStore(this);
         this.dateTime = new DateTimeStore(this);
@@ -43,6 +45,7 @@ export class AppStore {
         this.user = new UserStore(this);
         this.network = new NetworkStore(this);
         this.desktop = new DesktopStore(this);
+        this.tile = new TileManager(this);
         console.warn("STORE", this);
     }
 }

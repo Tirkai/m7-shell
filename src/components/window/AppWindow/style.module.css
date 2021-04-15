@@ -5,7 +5,8 @@
     box-sizing: border-box;
 }
 .windowContainer {
-    display: block;
+    display: grid;
+    grid-template-rows: 30px 1fr;
     height: 100%;
     width: 100%;
     overflow: hidden;
@@ -21,7 +22,7 @@
 }
 
 .withHeader {
-    height: calc(100% - 31px);
+    grid-row: span 2;
 }
 
 .collapsed {

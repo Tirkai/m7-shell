@@ -37,7 +37,7 @@ export class AppWindowPinContainer extends Component<IStore> {
                     top: 0,
                     left: 0,
                     width: window.innerWidth,
-                    height: window.innerHeight - taskbarHeight,
+                    height: window.innerHeight,
                     isFullscreen: true,
                 },
             },
@@ -48,14 +48,13 @@ export class AppWindowPinContainer extends Component<IStore> {
                     top: CORNER_SIZE,
                     left: window.innerWidth - EDGE_SIZE,
                     width: EDGE_SIZE,
-                    height:
-                        window.innerHeight - taskbarHeight - CORNER_SIZE * 2,
+                    height: window.innerHeight - CORNER_SIZE * 2,
                 },
                 windowArea: {
                     top: 0,
                     left: window.innerWidth / 2,
                     width: window.innerWidth / 2,
-                    height: window.innerHeight - taskbarHeight,
+                    height: window.innerHeight,
                 },
             },
             {
@@ -64,13 +63,13 @@ export class AppWindowPinContainer extends Component<IStore> {
                     top: CORNER_SIZE,
                     left: 0,
                     width: EDGE_SIZE,
-                    height: window.innerHeight - taskbarHeight - CORNER_SIZE,
+                    height: window.innerHeight - CORNER_SIZE,
                 },
                 windowArea: {
                     top: 0,
                     left: 0,
                     width: window.innerWidth / 2,
-                    height: window.innerHeight - taskbarHeight,
+                    height: window.innerHeight,
                 },
             },
 
@@ -86,7 +85,7 @@ export class AppWindowPinContainer extends Component<IStore> {
                     top: 0,
                     left: 0,
                     width: window.innerWidth / 2,
-                    height: window.innerHeight / 2 - taskbarHeight,
+                    height: window.innerHeight / 2,
                 },
             },
             {
@@ -101,19 +100,19 @@ export class AppWindowPinContainer extends Component<IStore> {
                     top: 0,
                     left: window.innerWidth / 2,
                     width: window.innerWidth / 2,
-                    height: window.innerHeight / 2 - taskbarHeight,
+                    height: window.innerHeight / 2,
                 },
             },
             {
                 key: "bottomRight",
                 pinArea: {
-                    top: window.innerHeight - taskbarHeight - CORNER_SIZE,
+                    top: window.innerHeight - CORNER_SIZE,
                     left: window.innerWidth - CORNER_SIZE,
                     width: CORNER_SIZE,
                     height: CORNER_SIZE,
                 },
                 windowArea: {
-                    top: window.innerHeight / 2 - taskbarHeight,
+                    top: window.innerHeight / 2,
                     left: window.innerWidth / 2,
                     width: window.innerWidth / 2,
                     height: window.innerHeight / 2,
@@ -123,13 +122,13 @@ export class AppWindowPinContainer extends Component<IStore> {
             {
                 key: "bottomLeft",
                 pinArea: {
-                    top: window.innerHeight - taskbarHeight - CORNER_SIZE,
+                    top: window.innerHeight - CORNER_SIZE,
                     left: 0,
                     width: CORNER_SIZE,
                     height: CORNER_SIZE,
                 },
                 windowArea: {
-                    top: window.innerHeight / 2 - taskbarHeight,
+                    top: window.innerHeight / 2,
                     left: 0,
                     width: window.innerWidth / 2,
                     height: window.innerHeight / 2,
@@ -137,12 +136,6 @@ export class AppWindowPinContainer extends Component<IStore> {
             },
         ];
 
-        return (
-            <>
-                {pins.map((item) => (
-                    <AppWindowPinArea {...item} />
-                ))}
-            </>
-        );
+        return pins.map((item) => <AppWindowPinArea {...item} />);
     }
 }

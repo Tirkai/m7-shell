@@ -1,7 +1,7 @@
 .notificationHub {
     width: 400px;
     position: absolute;
-    bottom: 48px;
+    bottom: 0;
     right: 0px;
     color: white;
     z-index: 100;
@@ -9,7 +9,7 @@
     background-position: right;
     background-size: cover;
     overflow: hidden;
-    height: calc(100vh - 48px);
+    height: 100%;
     border-top-left-radius: 4px;
     transition: transform ease 0.3s, opacity 0.3s;
     pointer-events: none;

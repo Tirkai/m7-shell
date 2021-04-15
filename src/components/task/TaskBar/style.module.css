@@ -1,8 +1,5 @@
 .taskBar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 48px;
+    height: 100%;
     width: 100%;
     display: flex;
     z-index: 100;
@@ -11,6 +8,7 @@
     transform: translateY(48px);
     transition: ease 0.3s;
     pointer-events: none;
+    position: relative;
 }
 .container {
     display: flex;

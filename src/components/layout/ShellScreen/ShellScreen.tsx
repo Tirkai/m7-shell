@@ -3,12 +3,14 @@ import { AudioHub } from "components/audio/AudioHub/AudioHub";
 import { ShellContextMenu } from "components/contextMenu/ShellContextMenu/ShellContextMenu";
 import { ShellContextMenuOverlay } from "components/contextMenu/ShellContextMenuOverlay/ShellContextMenuOverlay";
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
-import { DesktopConfigHub } from "components/desktop/DesktopConfigHub/DesktopConfigHub";
-import { DesktopGridArea } from "components/desktop/DesktopGridArea/DesktopGridArea";
+import { DesktopContainer } from "components/desktop/DesktopContainer/DesktopContainer";
+import { DesktopForeground } from "components/desktop/DesktopForeground/DesktopForeground";
+import { DesktopLayer } from "components/layer/DesktopLayer/DesktopLayer";
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
+import { TileDesktopContainer } from "components/tile/TileDesktopContainer/TileDesktopContainer";
 import { AppWindowArea } from "components/window/AppWindowArea/AppWindowArea";
 import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/AppWindowPinContainer";
 import { ShellEvents } from "enum/ShellEvents";
@@ -20,6 +22,7 @@ import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
 import React, { Component } from "react";
 import { v4 } from "uuid";
+import { DesktopLayout } from "../DesktopLayout/DesktopLayout";
 import style from "./style.module.css";
 
 @inject("store")
@@ -86,23 +89,44 @@ export class ShellScreen extends Component<IStore> {
     render() {
         return (
             <div className={style.shellScreen}>
-                <div
-                    className={style.desktop}
-                    onClick={this.handleClickDesktop}
-                >
-                    <DesktopGridArea />
-                </div>
+                <DesktopLayout
+                    desktop={
+                        <DesktopContainer>
+                            <DesktopLayer enabled priority={1}>
+                                <DesktopForeground
+                                    onDesktopClick={this.handleClickDesktop}
+                                />
+                            </DesktopLayer>
+                            <DesktopLayer enabled priority={1}>
+                                <AppWindowArea
+                                    disabled={this.store.desktop.isEditMode}
+                                />
+                            </DesktopLayer>
+                            <DesktopLayer enabled={false} priority={2}>
+                                <TileDesktopContainer />
+                            </DesktopLayer>
+                            <DesktopLayer enabled priority={3}>
+                                <AppsMenu />
+                            </DesktopLayer>
+                            <DesktopLayer enabled priority={3}>
+                                <NotificationToasts />
+                                <NotificationHub />
+                            </DesktopLayer>
+                            <DesktopLayer enabled priority={3}>
+                                <AppWindowPinContainer />
+                            </DesktopLayer>
+                            <DesktopLayer enabled priority={3}>
+                                <AudioContainer />
+                                <AudioHub />
+                            </DesktopLayer>
+                            <DesktopLayer enabled={false} priority={4}>
+                                <BuildVersion />
+                            </DesktopLayer>
+                        </DesktopContainer>
+                    }
+                    taskBar={<TaskBar />}
+                />
 
-                <AppWindowArea disabled={this.store.desktop.isEditMode} />
-                <AppsMenu />
-                <NotificationToasts />
-                <NotificationHub />
-                <TaskBar />
-                <BuildVersion />
-                <AppWindowPinContainer />
-                <AudioContainer />
-                <AudioHub />
-                <DesktopConfigHub />
                 <ShellContextMenuOverlay />
                 <ShellContextMenu />
             </div>

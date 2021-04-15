@@ -1,0 +1,19 @@
+.desktopLayout {
+    display: grid;
+    grid-template-rows: 1fr 48px;
+    height: 100vh;
+    width: 100vw;
+}
+
+.desktop {
+    display: block;
+    grid-row: span 2;
+}
+
+.taskBar {
+    display: block;
+}
+
+.disableTaskBar {
+    grid-template-rows: 1fr;
+}
