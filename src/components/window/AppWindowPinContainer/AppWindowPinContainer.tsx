@@ -23,7 +23,6 @@ export class AppWindowPinContainer extends Component<IStore> {
     }
 
     render() {
-        const taskbarHeight = this.store.shell.displayMode.taskbarOffset;
         const pins: IPinAreaComponentProps[] = [
             {
                 key: "top",

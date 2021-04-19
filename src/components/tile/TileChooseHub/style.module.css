@@ -1,4 +1,4 @@
-.audioHub {
+.tileChooseHub {
     position: absolute;
     bottom: 0;
     right: 0;
@@ -14,12 +14,9 @@
 }
 
 .container {
-    background: #222222;
+    background: #222222e9;
+    padding: 16px;
     height: 100%;
-    display: grid;
-    grid-template-columns: 32px 1fr;
-    grid-template-rows: 32px;
-    grid-gap: 12px;
 }
 
 .content {

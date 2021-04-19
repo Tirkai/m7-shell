@@ -1,5 +1,5 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { apps, cross } from "assets/icons";
+import { apps, cross, tiles } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
@@ -57,9 +57,11 @@ export class TaskBar extends Component<IStore> {
         );
     };
 
-    handleShowAudioHub = (value: boolean) => {
+    handleShowAudioHub = () => {
         this.store.shell.setActivePanel(
-            value ? ShellPanelType.AudioHub : ShellPanelType.None,
+            this.store.shell.activePanel !== ShellPanelType.AudioHub
+                ? ShellPanelType.AudioHub
+                : ShellPanelType.None,
         );
     };
 
@@ -73,6 +75,14 @@ export class TaskBar extends Component<IStore> {
 
     handleShowDesktopLayoutConfig = () => {
         this.store.desktop.setEditMode(!this.store.desktop.isEditMode);
+    };
+
+    handleShowTileHub = () => {
+        this.store.shell.setActivePanel(
+            this.store.shell.activePanel !== ShellPanelType.TileHub
+                ? ShellPanelType.TileHub
+                : ShellPanelType.None,
+        );
     };
 
     componentDidMount() {
@@ -160,13 +170,10 @@ export class TaskBar extends Component<IStore> {
                                 >
                                     <SVGIcon source={layout} color="white" />
                                 </TaskBarItem> */}
-                                <TaskBarItem
-                                    onClick={() =>
-                                        this.handleShowAudioHub(
-                                            !this.store.shell.audioHubShow,
-                                        )
-                                    }
-                                >
+                                <TaskBarItem onClick={this.handleShowTileHub}>
+                                    <SVGIcon source={tiles} color="white" />
+                                </TaskBarItem>
+                                <TaskBarItem onClick={this.handleShowAudioHub}>
                                     <TaskBarSound
                                         volume={this.store.audio.volume}
                                         isMuted={this.store.audio.isMute}

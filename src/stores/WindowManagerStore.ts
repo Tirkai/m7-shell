@@ -1,6 +1,5 @@
 import { AuthEventType } from "enum/AuthEventType";
 import { ShellEvents } from "enum/ShellEvents";
-import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { max, min } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { ApplicationWindow } from "models/ApplicationWindow";
@@ -54,15 +53,15 @@ export class WindowManagerStore {
         return document.activeElement;
     }
 
-    onChangeDisplayMode(mode: IDisplayMode) {
-        try {
-            this.windows.forEach((item) => {
-                item.setDispayMode(mode);
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    }
+    // onChangeDisplayMode(mode: IDisplayMode) {
+    //     try {
+    //         this.windows.forEach((item) => {
+    //             item.setDispayMode(mode);
+    //         });
+    //     } catch (e) {
+    //         console.error(e);
+    //     }
+    // }
 
     addWindow(appWindow: ApplicationWindow) {
         this.windows.push(appWindow);

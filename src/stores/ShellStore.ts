@@ -2,7 +2,7 @@ import { DisplayModeType } from "enum/DisplayModeType";
 import { ShellEvents } from "enum/ShellEvents";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IDisplayMode } from "interfaces/display/IDisplayMode";
-import { action, makeAutoObservable, reaction } from "mobx";
+import { action, makeAutoObservable } from "mobx";
 import { DefaultDisplayMode } from "models/DefaultDisplayMode";
 import { DevModeModel } from "models/DevModeModel";
 import { EmbedDisplayMode } from "models/EmbedDisplayMode";
@@ -82,10 +82,10 @@ export class ShellStore {
             }
         }
 
-        reaction(
-            () => this.displayMode,
-            (mode) => this.store.windowManager.onChangeDisplayMode(mode),
-        );
+        // reaction(
+        //     () => this.displayMode,
+        //     (mode) => this.store.windowManager.onChangeDisplayMode(mode),
+        // );
     }
 
     setActivePanel(panel: ShellPanelType) {

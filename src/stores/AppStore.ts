@@ -8,6 +8,7 @@ import { LocaleStore } from "./LocaleStore";
 import { MessageStore } from "./MessageStore";
 import { NetworkStore } from "./NetworkStore";
 import { NotificationStore } from "./NotificationStore";
+import { PinManager } from "./PinManager";
 import { ProcessManagerStore } from "./ProcessManagerStore";
 import { ShellStore } from "./ShellStore";
 import { TileManager } from "./TileManager";
@@ -30,6 +31,7 @@ export class AppStore {
     network: NetworkStore;
     desktop: DesktopStore;
     tile: TileManager;
+    pin: PinManager;
     constructor() {
         this.auth = new AuthStore(this);
         this.dateTime = new DateTimeStore(this);
@@ -46,6 +48,7 @@ export class AppStore {
         this.network = new NetworkStore(this);
         this.desktop = new DesktopStore(this);
         this.tile = new TileManager(this);
+        this.pin = new PinManager(this);
         console.warn("STORE", this);
     }
 }

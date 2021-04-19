@@ -1,3 +1,4 @@
+import { Button } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import logo from "assets/images/logo.svg";
 import classNames from "classnames";
@@ -36,6 +37,12 @@ export const AuthScreen: React.FC = observer(() => {
         }
     };
 
+    const handleDDOS = () => {
+        for (let i = 0; i < 1000; i++) {
+            handleLogin({ login: "Здоровенный ЯЗЬ", password: "11" });
+        }
+    };
+
     return (
         <div className={style.authScreen}>
             <div className={classNames(style.overlay)}>
@@ -53,6 +60,13 @@ export const AuthScreen: React.FC = observer(() => {
                                 {notifyText}
                             </Alert>
                         )}
+                        <Button
+                            color="primary"
+                            variant="contained"
+                            onClick={handleDDOS}
+                        >
+                            DDOS
+                        </Button>
                     </div>
                 </div>
             </div>

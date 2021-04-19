@@ -21,6 +21,7 @@ import soundLow from "./sound-low.svg";
 import soundMiddle from "./sound-middle.svg";
 import sound from "./sound.svg";
 import terminal from "./terminal.svg";
+import tiles from "./tiles.svg";
 import unknownApp from "./unknown.svg";
 import videocam from "./video.svg";
 import warning from "./warning.svg";
@@ -52,4 +53,5 @@ export {
     search,
     disconnect,
     layout,
+    tiles,
 };

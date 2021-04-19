@@ -3,4 +3,5 @@ export enum ShellPanelType {
     StartMenu = "startMenu",
     NotificationHub = "notificationHub",
     AudioHub = "audioHub",
+    TileHub = "tileHub",
 }

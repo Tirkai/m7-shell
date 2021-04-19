@@ -10,6 +10,7 @@ import { NotificationHub } from "components/notifications/NotificationHub/Notifi
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
+import { TileChooseHub } from "components/tile/TileChooseHub/TileChooseHub";
 import { TileDesktopContainer } from "components/tile/TileDesktopContainer/TileDesktopContainer";
 import { AppWindowArea } from "components/window/AppWindowArea/AppWindowArea";
 import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/AppWindowPinContainer";
@@ -102,8 +103,16 @@ export class ShellScreen extends Component<IStore> {
                                     disabled={this.store.desktop.isEditMode}
                                 />
                             </DesktopLayer>
-                            <DesktopLayer enabled={false} priority={2}>
+                            <DesktopLayer
+                                enabled={
+                                    this.store.windowManager.hasDraggedWindow
+                                }
+                                priority={2}
+                            >
                                 <TileDesktopContainer />
+                            </DesktopLayer>
+                            <DesktopLayer enabled priority={2}>
+                                <TileChooseHub />
                             </DesktopLayer>
                             <DesktopLayer enabled priority={3}>
                                 <AppsMenu />

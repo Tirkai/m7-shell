@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
-import { TileArea } from "models/tile/TileArea";
 import { TilePreset } from "models/tile/TilePreset";
+import { registeredTilePresets } from "registeredTilePresets";
 import { AppStore } from "stores/AppStore";
 
 export class TileManager {
@@ -8,9 +8,19 @@ export class TileManager {
     constructor(store: AppStore) {
         this.store = store;
         makeAutoObservable(this);
+
+        this.presets = registeredTilePresets;
     }
 
     presets: TilePreset[] = [];
 
-    tiles: TileArea[] = [];
+    activePreset: TilePreset | null = null;
+
+    applyPreset(preset: TilePreset) {
+        this.activePreset = preset;
+    }
+
+    resetPreset() {
+        this.activePreset = null;
+    }
 }

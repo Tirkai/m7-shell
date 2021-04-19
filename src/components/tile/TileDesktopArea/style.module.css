@@ -1,5 +1,7 @@
 .tileDesktopArea {
     display: block;
     border-radius: 4px;
-    z-index: 1000;
+    /* TODO: TILE */
+    z-index: 95;
+    grid-gap: 8px;
 }

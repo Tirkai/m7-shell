@@ -1,4 +1,4 @@
-.audioHub {
+.baseHub {
     position: absolute;
     bottom: 0;
     right: 0;
@@ -11,22 +11,17 @@
     opacity: 0;
     transition: transform ease 0.3s, opacity 0.3s;
     z-index: 99;
+    height: auto;
+}
+.baseHub > * {
+    pointer-events: none;
 }
 
 .container {
     background: #222222;
+    padding: 16px;
     height: 100%;
-    display: grid;
-    grid-template-columns: 32px 1fr;
-    grid-template-rows: 32px;
-    grid-gap: 12px;
-}
-
-.content {
-    display: grid;
-    grid-template-columns: 32px 1fr;
-    grid-template-rows: 32px;
-    grid-gap: 12px;
+    border-radius: 4px;
 }
 
 .show {
@@ -36,18 +31,8 @@
     animation: show 0.3s;
 }
 
-.icon {
-    cursor: pointer;
-}
-
-.icon svg {
-    width: 32px;
-    height: 32px;
-    fill: white;
-}
-
-.slider {
-    background: #096dd9;
+.show > * {
+    pointer-events: all;
 }
 
 @keyframes show {

@@ -7,13 +7,12 @@ import {
 } from "constants/config";
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { IAppParams } from "interfaces/app/IAppParams";
-import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { IApplicationWindowOptions } from "interfaces/window/IApplicationWindowOptions";
-import { IPinArea } from "interfaces/window/IPinArea";
 import { makeAutoObservable } from "mobx";
 import { ResizeHandle } from "react-resizable";
 import { v4 } from "uuid";
-import { DefaultDisplayMode } from "./DefaultDisplayMode";
+import { CustomEventHandler } from "./event/CustomEventHandler";
+import { ApplicationWindowEventType } from "./window/ApplicationWindowEventType";
 
 export class ApplicationWindow {
     id: string;
@@ -25,8 +24,7 @@ export class ApplicationWindow {
     height: number = 600;
     x: number;
     y: number;
-    pinArea: IPinArea | null = null;
-    displayMode: IDisplayMode;
+    // displayMode: IDisplayMode;
     resizeOriginPoint: { x: number; y: number } = { x: 0, y: 0 };
     lockedWidth: number;
     lockedHeight: number;
@@ -34,6 +32,10 @@ export class ApplicationWindow {
     lockedY: number;
     isDragging: boolean = false;
     isResizing: boolean = false;
+
+    eventTarget: CustomEventHandler<
+        ApplicationWindowEventType
+    > = new CustomEventHandler();
 
     get minYPosition() {
         return this.y + this.height - MIN_WINDOW_HEIGHT;
@@ -48,9 +50,7 @@ export class ApplicationWindow {
             x: !this.isFullScreen ? this.x : 0,
             y: !this.isFullScreen ? this.y : 0,
             width: !this.isFullScreen ? this.width : window.innerWidth,
-            height: !this.isFullScreen
-                ? this.height
-                : window.innerHeight - this.displayMode.taskbarOffset + 1,
+            height: !this.isFullScreen ? this.height : window.innerHeight,
         };
     }
 
@@ -77,7 +77,11 @@ export class ApplicationWindow {
         this.lockedHeight = this.height;
         this.lockedX = this.x;
         this.lockedY = this.y;
-        this.displayMode = options?.displayMode ?? new DefaultDisplayMode();
+
+        this.eventTarget.add<ApplicationWindow>(
+            ApplicationWindowEventType.OnDragChange,
+            (payload) => console.log(payload.isDragging),
+        );
     }
 
     calculatePosition() {
@@ -95,26 +99,31 @@ export class ApplicationWindow {
     setDragging(value: boolean) {
         this.isDragging = value;
 
-        if (!this.isDragging && this.pinArea) {
-            if (!this.pinArea.isFullscreen) {
-                this.setSize(this.pinArea.width, this.pinArea.height);
-                this.setPosition(this.pinArea.left, this.pinArea.top);
-            } else {
-                this.setFullScreen(true);
-            }
-            this.setPinArea(null);
-        }
+        this.eventTarget.dispatch<ApplicationWindow>(
+            ApplicationWindowEventType.OnDragChange,
+            this,
+        );
     }
 
     setPosition(x: number, y: number) {
         this.x = Math.floor(x);
         this.y = Math.floor(y);
+
+        this.eventTarget.dispatch<ApplicationWindow>(
+            ApplicationWindowEventType.OnPositionChange,
+            this,
+        );
     }
 
     setSize(width: number, height: number) {
         const [w, h] = this.getSizeWithBounds(width, height);
         this.width = Math.floor(w);
         this.height = Math.floor(h);
+
+        this.eventTarget.dispatch<ApplicationWindow>(
+            ApplicationWindowEventType.OnResize,
+            this,
+        );
     }
 
     setResizeOriginPoint(x: number, y: number) {
@@ -188,14 +197,6 @@ export class ApplicationWindow {
     setCollapsed(value: boolean) {
         this.isFocused = false;
         this.isCollapsed = value;
-    }
-
-    setPinArea(area: IPinArea | null) {
-        this.pinArea = area;
-    }
-
-    setDispayMode(mode: IDisplayMode) {
-        this.displayMode = mode;
     }
 
     recalculateFullScreenSize() {

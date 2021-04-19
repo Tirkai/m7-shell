@@ -1,0 +1,28 @@
+.tileChooserItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    color: white;
+    border-radius: 4px;
+    min-height: 80px;
+    background: #444;
+    cursor: pointer;
+}
+
+.container {
+    display: grid;
+    grid-gap: 8px;
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+}
+
+.gridItem {
+    width: 100%;
+    height: 100%;
+}
