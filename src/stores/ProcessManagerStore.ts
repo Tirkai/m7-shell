@@ -25,7 +25,7 @@ export class ProcessManagerStore {
         makeAutoObservable(this);
 
         this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
-            this.killAllProcesses(),
+            this.destroyAllProcesses(),
         );
 
         window.onmessage = (event: MessageEvent) => {
@@ -156,8 +156,11 @@ export class ProcessManagerStore {
         return this.processes.find((item) => item.app.id === app.id);
     }
 
-    killAllProcesses() {
-        this.processes.forEach((appProcess) => this.killProcess(appProcess));
+    destroyAllProcesses() {
+        // console.log("PROCESSES", this.processes);
+
+        // this.processes.forEach((appProcess) => this.killProcess(appProcess));
+        this.processes = [];
     }
 
     // TODO: Implement checkout exist process method
