@@ -157,7 +157,7 @@ export class ProcessManagerStore {
     }
 
     killAllProcesses() {
-        this.processes.forEach((appProcess) => this.killProcess(appProcess));
+        this.processes = [];
     }
 
     // TODO: Implement checkout exist process method
