@@ -6,7 +6,7 @@
     background-attachment: fixed;
     background-position: right;
     background-size: cover;
-    pointer-events: none;
+    pointer-events: none !important;
     transform: translateY(50%);
     opacity: 0;
     transition: transform ease 0.3s, opacity 0.3s;

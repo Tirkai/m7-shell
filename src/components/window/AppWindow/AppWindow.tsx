@@ -206,14 +206,6 @@ export const AppWindow = (props: IAppWindowProps) => {
                     <div
                         className={classNames(style.windowContainer)}
                         onMouseDown={handleFocus}
-                        // style={{
-                        //     width: !props.window.isFullScreen
-                        //         ? props.window.width
-                        //         : "100%",
-                        //     height: !props.window.isFullScreen
-                        //         ? props.window.height
-                        //         : "100%",
-                        // }}
                     >
                         <AppWindowHeader
                             icon={props.process.app.icon}

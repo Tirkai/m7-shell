@@ -16,15 +16,30 @@ export class TileCell {
     endColumn: TileGridUnit = "span";
     startRow: TileGridUnit = "span";
     endRow: TileGridUnit = "span";
+    x: number = 0;
+    y: number = 0;
+    width: number = 0;
+    height: number = 0;
 
-    appWindow: ApplicationWindow | null = null;
+    draggedAppWindow: ApplicationWindow | null = null;
 
-    get hasWindow() {
-        return this.appWindow !== null;
+    attachedAppWindow: ApplicationWindow | null = null;
+
+    get hasDraggedWindow() {
+        return this.draggedAppWindow !== null;
     }
 
-    setAppWindow(appWindow: ApplicationWindow | null) {
-        this.appWindow = appWindow;
+    get hasAttachedWindow() {
+        return this.attachedAppWindow !== null;
+    }
+
+    setDraggedAppWindow(appWindow: ApplicationWindow | null) {
+        this.draggedAppWindow = appWindow;
+    }
+
+    setAttachedAppWindow(appWindow: ApplicationWindow | null) {
+        console.log("setAttachedAppWindow", appWindow);
+        this.attachedAppWindow = appWindow;
     }
 
     constructor(options: ITileCellOptions) {
@@ -35,5 +50,21 @@ export class TileCell {
         this.endColumn = options.endColumn;
         this.startRow = options.startRow;
         this.endRow = options.endRow;
+    }
+
+    setSize(width: number, height: number) {
+        this.width = Math.floor(width);
+        this.height = Math.floor(height);
+        if (this.attachedAppWindow) {
+            this.attachedAppWindow.setSize(this.width, this.height);
+        }
+    }
+
+    setPosition(x: number, y: number) {
+        this.x = Math.floor(x);
+        this.y = Math.floor(y);
+        if (this.attachedAppWindow) {
+            this.attachedAppWindow.setPosition(this.x, this.y);
+        }
     }
 }

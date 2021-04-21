@@ -1,5 +1,9 @@
 import { v4 } from "uuid";
 
+interface ICustomEventOptions {
+    once?: boolean;
+}
+
 interface ICustomEventListener<T, K = any> {
     id: string;
     type: T;
@@ -15,10 +19,13 @@ export class CustomEventHandler<T> {
         return listener;
     }
 
-    dispatch<K = any>(type: T, payload?: K) {
-        this.listeners
-            .filter((item) => item.type === type)
-            .forEach((item) => item.callback(payload));
+    async dispatch<K = any>(type: T, payload?: K) {
+        return new Promise<null>((resolve) => {
+            this.listeners
+                .filter((item) => item.type === type)
+                .forEach((item) => item.callback(payload));
+            resolve(null);
+        });
     }
 
     remove(id: string) {

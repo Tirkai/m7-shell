@@ -53,16 +53,6 @@ export class WindowManagerStore {
         return document.activeElement;
     }
 
-    // onChangeDisplayMode(mode: IDisplayMode) {
-    //     try {
-    //         this.windows.forEach((item) => {
-    //             item.setDispayMode(mode);
-    //         });
-    //     } catch (e) {
-    //         console.error(e);
-    //     }
-    // }
-
     addWindow(appWindow: ApplicationWindow) {
         this.windows.push(appWindow);
         this.focusWindow(appWindow);
@@ -112,6 +102,7 @@ export class WindowManagerStore {
 
     closeWindow(appWindow: ApplicationWindow) {
         try {
+            // appWindow.eventTarget.dispatch(ApplicationWindowEventType.OnClose);
             this.windows.splice(this.windows.indexOf(appWindow), 1);
         } catch (e) {
             console.error(e);

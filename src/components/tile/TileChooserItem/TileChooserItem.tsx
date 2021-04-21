@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { LayerBoxVisualizer } from "components/debug/LayerBoxVisualizer/LayerBoxVisualizer";
 import { TilePreset } from "models/tile/TilePreset";
 import React from "react";
@@ -6,13 +7,17 @@ import style from "./style.module.css";
 interface ITileChooserItemProps {
     name?: string;
     preset?: TilePreset;
+    active: boolean;
     onClick: () => void;
 }
 
 const className = style.tileChooserItem;
 
 export const TileChooserItem = (props: ITileChooserItemProps) => (
-    <div className={className} onClick={props.onClick}>
+    <div
+        className={classNames(className, { [style.active]: props.active })}
+        onClick={props.onClick}
+    >
         {props.name}
 
         {props.preset && (

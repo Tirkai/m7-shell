@@ -27,12 +27,17 @@ export const TileChooseHub = observer(() => {
         <BaseHub show={store.shell.activePanel === ShellPanelType.TileHub}>
             <TileChooserGrid>
                 {/* TODO: locale */}
-                <TileChooserItem name="нет" onClick={handleResetPreset} />
+                <TileChooserItem
+                    active={store.tile.activePreset === null}
+                    name="нет"
+                    onClick={handleResetPreset}
+                />
                 {store.tile.presets.map((preset) => (
                     <TileChooserItem
                         key={preset.id}
                         onClick={() => handleApplyPreset(preset)}
                         preset={preset}
+                        active={preset.id === store.tile.activePreset?.id}
                     />
                 ))}
             </TileChooserGrid>

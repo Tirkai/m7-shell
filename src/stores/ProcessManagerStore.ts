@@ -12,6 +12,7 @@ import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
+import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import { portalEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
@@ -129,6 +130,7 @@ export class ProcessManagerStore {
 
             this.startProcess(appProcess);
         } catch (e) {
+            console.error(e);
             this.store.message.showMessage("[ph] Execute failed", "[ph]");
             appProcess.app.setExecuted(false);
         }
@@ -136,16 +138,31 @@ export class ProcessManagerStore {
 
     startProcess(appProcess: ApplicationProcess) {
         this.processes.push(appProcess);
+        console.log("Start Process", appProcess);
 
         appProcess.app.setExecuted(true);
+        // TODO:
+        // Think about it
+        const tileManager = this.store.tile;
+
+        if (tileManager.hasActivePreset && tileManager.freeCells) {
+            this.store.tile.attachWindowToTileCell(
+                appProcess.window,
+                tileManager.nearbyFreeCell,
+            );
+        }
 
         this.store.windowManager.addWindow(appProcess.window);
     }
 
-    killProcess(appProcess: ApplicationProcess) {
+    async killProcess(appProcess: ApplicationProcess) {
         const index = this.processes.indexOf(appProcess);
 
         appProcess.app.setExecuted(false);
+
+        await appProcess.window.eventTarget.dispatch(
+            ApplicationWindowEventType.OnClose,
+        );
 
         this.store.windowManager.closeWindow(appProcess.window);
 
@@ -157,9 +174,6 @@ export class ProcessManagerStore {
     }
 
     destroyAllProcesses() {
-        // console.log("PROCESSES", this.processes);
-
-        // this.processes.forEach((appProcess) => this.killProcess(appProcess));
         this.processes = [];
     }
 

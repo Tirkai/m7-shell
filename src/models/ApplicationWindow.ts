@@ -69,19 +69,14 @@ export class ApplicationWindow {
 
         const [x, y] = this.calculatePosition();
 
-        this.x = x;
-        this.y = y;
+        this.x = options?.x ?? x;
+        this.y = options?.y ?? y;
 
         this.isFullScreen = options?.isFullscreen ?? false;
         this.lockedWidth = this.width;
         this.lockedHeight = this.height;
         this.lockedX = this.x;
         this.lockedY = this.y;
-
-        this.eventTarget.add<ApplicationWindow>(
-            ApplicationWindowEventType.OnDragChange,
-            (payload) => console.log(payload.isDragging),
-        );
     }
 
     calculatePosition() {
@@ -192,11 +187,21 @@ export class ApplicationWindow {
 
     setFullScreen(value: boolean) {
         this.isFullScreen = value;
+
+        this.eventTarget.dispatch<ApplicationWindow>(
+            ApplicationWindowEventType.OnFullscreen,
+            this,
+        );
     }
 
     setCollapsed(value: boolean) {
         this.isFocused = false;
         this.isCollapsed = value;
+
+        this.eventTarget.dispatch<ApplicationWindow>(
+            ApplicationWindowEventType.OnCollapse,
+            this,
+        );
     }
 
     recalculateFullScreenSize() {

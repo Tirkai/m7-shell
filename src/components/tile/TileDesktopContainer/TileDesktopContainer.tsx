@@ -1,6 +1,7 @@
 import { useStore } from "hooks/useStore";
+import { get } from "lodash";
 import { observer } from "mobx-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { TileDesktopArea } from "../TileDesktopArea/TileDesktopArea";
 import style from "./style.module.css";
 
@@ -12,6 +13,20 @@ export const TileDesktopContainer = observer(() => {
     const activePreset = store.tile.activePreset;
 
     const draggedWindow = store.windowManager.draggedWindow;
+
+    useEffect(() => {
+        if (activePreset) {
+            const slicedWindows = store.windowManager.windows.filter(
+                (item) => !item.isCollapsed && !item.isFullScreen,
+            );
+            store.tile.activePreset?.cells.forEach((item, index) => {
+                const indexedWindow = get(slicedWindows, index);
+                if (indexedWindow) {
+                    store.tile.attachWindowToTileCell(indexedWindow, item);
+                }
+            });
+        }
+    }, [activePreset]);
 
     return activePreset ? (
         <div className={className}>
@@ -27,7 +42,8 @@ export const TileDesktopContainer = observer(() => {
                         key={cell.id}
                         cell={cell}
                         draggedWindow={draggedWindow}
-                        hasWindow={cell.hasWindow}
+                        hasDraggedWindow={cell.hasDraggedWindow}
+                        hasAttachedWindow={cell.hasAttachedWindow}
                     />
                 ))}
             </div>
