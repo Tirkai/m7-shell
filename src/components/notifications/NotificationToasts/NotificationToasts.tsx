@@ -1,87 +1,87 @@
 import classNames from "classnames";
-import { IStore } from "interfaces/common/IStore";
-import { computed } from "mobx";
-import { inject, observer } from "mobx-react";
+import { ShellPanelType } from "enum/ShellPanelType";
+import { useStore } from "hooks/useStore";
+import { observer } from "mobx-react";
+import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationModel } from "models/NotificationModel";
 import { ToastNotification } from "models/ToastNotification";
-import React, { Component } from "react";
+import React from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import style from "./style.module.css";
 
-@inject("store")
-@observer
-export class NotificationToasts extends Component<IStore> {
-    @computed
-    get store() {
-        return this.props.store!;
-    }
-
-    handleRunApplication = (toast: ToastNotification) => {
-        const { applicationManager, windowManager } = this.store;
-
-        const app = applicationManager.findById(
+export const NotificationToasts = observer(() => {
+    const store = useStore();
+    const handleRunApplication = (toast: ToastNotification) => {
+        const app = store.applicationManager.findById(
             toast.notification.applicationId,
         );
         if (app instanceof ExternalApplication) {
-            applicationManager.executeApplicationWithUrl(
-                app,
-                toast.notification.url,
-            );
+            store.shell.setActivePanel(ShellPanelType.None);
 
-            const appWindow = windowManager.findWindowByApp(app);
-
-            if (appWindow) {
-                windowManager.focusWindow(appWindow);
+            if (!app.isExecuted) {
+                const appProcess = new ApplicationProcess({
+                    app,
+                    window: new ApplicationWindow(),
+                    url: toast.notification.url,
+                });
+                store.processManager.execute(appProcess);
+            } else {
+                const activeProcess = store.processManager.findProcessByApp(
+                    app,
+                );
+                if (activeProcess) {
+                    activeProcess.setUrl(toast.notification.url);
+                    store.windowManager.focusWindow(activeProcess.window);
+                }
             }
         }
 
         toast.setShow(false);
-        this.handleRemoveNotification(toast.notification);
+        handleRemoveNotification(toast.notification);
     };
 
-    handleFadeOutAnimationEnd = (
+    const handleFadeOutAnimationEnd = (
         event: React.AnimationEvent<HTMLDivElement>,
         toast: ToastNotification,
     ) => {
         if (event.animationName === style.fadeOut) {
-            this.store.notification.removeToast(toast);
+            store.notification.removeToast(toast);
         }
     };
 
-    handleClose = (toast: ToastNotification) => {
+    const handleClose = (toast: ToastNotification) => {
         toast.setShow(false);
-        this.handleRemoveNotification(toast.notification);
+        handleRemoveNotification(toast.notification);
     };
 
-    handleRemoveNotification = (notification: NotificationModel) => {
-        this.store.notification.removeNotifications(
-            [notification],
-            this.store.auth.userLogin,
+    const handleRemoveNotification = (notification: NotificationModel) => {
+        store.notification.removeNotifications(
+            [notification.id],
+            store.auth.userLogin,
         );
     };
 
-    render() {
-        return (
-            <div className={style.notificationToasts}>
-                {this.store.notification.toasts.map((item) => (
-                    <div
-                        key={item.notification.id}
-                        className={classNames(style.toastItem, {
-                            [style.isHidden]: !item.isShow,
-                        })}
-                        onAnimationEnd={(event) =>
-                            this.handleFadeOutAnimationEnd(event, item)
-                        }
-                    >
-                        <NotificationCard
-                            {...item.notification}
-                            onClick={() => this.handleRunApplication(item)}
-                            onClose={() => this.handleClose(item)}
-                        />
-                    </div>
-                ))}
-            </div>
-        );
-    }
-}
+    return (
+        <div className={style.notificationToasts}>
+            {store.notification.toasts.map((item) => (
+                <div
+                    key={item.notification.id}
+                    className={classNames(style.toastItem, {
+                        [style.isHidden]: !item.isShow,
+                    })}
+                    onAnimationEnd={(event) =>
+                        handleFadeOutAnimationEnd(event, item)
+                    }
+                >
+                    <NotificationCard
+                        {...item.notification}
+                        onClick={() => handleRunApplication(item)}
+                        onClose={() => handleClose(item)}
+                    />
+                </div>
+            ))}
+        </div>
+    );
+});

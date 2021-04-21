@@ -1,23 +1,22 @@
-import { TASKBAR_HEIGHT } from "constants/config";
+import {
+    BASE_WINDOW_HEIGHT,
+    BASE_WINDOW_WIDTH,
+    MIN_WINDOW_HEIGHT,
+    MIN_WINDOW_WIDTH,
+    TASKBAR_HEIGHT,
+} from "constants/config";
 import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
+import { IAppParams } from "interfaces/app/IAppParams";
 import { IDisplayMode } from "interfaces/display/IDisplayMode";
+import { IApplicationWindowOptions } from "interfaces/window/IApplicationWindowOptions";
 import { IPinArea } from "interfaces/window/IPinArea";
 import { makeAutoObservable } from "mobx";
 import { ResizeHandle } from "react-resizable";
-import { Application } from "./Application";
+import { v4 } from "uuid";
 import { DefaultDisplayMode } from "./DefaultDisplayMode";
-
-interface IApplicationWindowOptions {
-    id: string;
-    width: number;
-    height: number;
-    isFullscreen?: boolean;
-    dispayMode?: IDisplayMode;
-}
 
 export class ApplicationWindow {
     id: string;
-    application: Application;
     depthIndex: number = 1;
     isFocused: boolean = false;
     isFullScreen: boolean = false;
@@ -37,11 +36,11 @@ export class ApplicationWindow {
     isResizing: boolean = false;
 
     get minYPosition() {
-        return this.y + this.height - this.application.minHeight;
+        return this.y + this.height - MIN_WINDOW_HEIGHT;
     }
 
     get minXPosition() {
-        return this.x + this.width - this.application.minWidth;
+        return this.x + this.width - MIN_WINDOW_WIDTH;
     }
 
     get bounds() {
@@ -55,30 +54,38 @@ export class ApplicationWindow {
         };
     }
 
-    constructor(app: Application, options: IApplicationWindowOptions) {
+    constructor(options?: IApplicationWindowOptions) {
         makeAutoObservable(this);
 
-        this.application = app;
-        this.id = options.id;
+        this.id = options?.id ?? v4();
 
         const [width, height] = this.getSizeWithBounds(
-            options.width,
-            options.height,
+            options?.width ?? BASE_WINDOW_WIDTH,
+            options?.height ?? BASE_WINDOW_HEIGHT,
         );
 
         this.width = width;
         this.height = height;
 
-        this.x = Math.floor(window.innerWidth / 2 - this.width / 2);
-        this.y = Math.floor(
-            window.innerHeight / 2 - this.height / 2 - TASKBAR_HEIGHT / 2,
-        );
-        this.isFullScreen = options.isFullscreen ?? false;
+        const [x, y] = this.calculatePosition();
+
+        this.x = x;
+        this.y = y;
+
+        this.isFullScreen = options?.isFullscreen ?? false;
         this.lockedWidth = this.width;
         this.lockedHeight = this.height;
         this.lockedX = this.x;
         this.lockedY = this.y;
-        this.displayMode = options.dispayMode ?? new DefaultDisplayMode();
+        this.displayMode = options?.displayMode ?? new DefaultDisplayMode();
+    }
+
+    calculatePosition() {
+        const x = Math.floor(window.innerWidth / 2 - this.width / 2);
+        const y = Math.floor(
+            window.innerHeight / 2 - this.height / 2 - TASKBAR_HEIGHT / 2,
+        );
+        return [x, y];
     }
 
     setResizing(value: boolean) {
@@ -126,6 +133,7 @@ export class ApplicationWindow {
         const dir = ResizeHandleDirection;
         const deltaX = this.resizeOriginPoint.x - position.x;
         const deltaY = this.resizeOriginPoint.y - position.y;
+
         if (
             handle === dir.East ||
             handle === dir.SouthEast ||
@@ -140,8 +148,16 @@ export class ApplicationWindow {
             this.setSize(this.lockedWidth + deltaX, this.height);
         }
         if (handle === dir.North) {
-            this.setPosition(this.x, position.y);
-            this.setSize(this.width, this.lockedHeight + deltaY);
+            if (position.y > 0) {
+                this.setPosition(this.x, position.y);
+                this.setSize(this.width, this.lockedHeight + deltaY);
+            } else {
+                this.setPosition(this.x, 0);
+                this.setSize(
+                    this.width,
+                    this.lockedHeight + deltaY - Math.abs(position.y),
+                );
+            }
         }
         if (handle === dir.SouthWest) {
             this.setPosition(position.x, this.lockedY);
@@ -195,5 +211,16 @@ export class ApplicationWindow {
                 ? height
                 : window.innerHeight - TASKBAR_HEIGHT;
         return [resultWidth, resultHeight];
+    }
+
+    setParams(params: IAppParams) {
+        this.width = params.width ?? this.width;
+        this.height = params.height ?? this.height;
+        this.isFullScreen = params.maximize ?? this.isFullScreen;
+
+        const [x, y] = this.calculatePosition();
+
+        this.x = x;
+        this.y = y;
     }
 }

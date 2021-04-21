@@ -8,6 +8,11 @@ export const AUTH_TOKEN_HEADER = "X-M7-Authorization-Token";
 
 export const TASKBAR_HEIGHT = 48;
 
+export const BASE_WINDOW_WIDTH = 800;
+export const BASE_WINDOW_HEIGHT = 600;
+export const MIN_WINDOW_HEIGHT = 300;
+export const MIN_WINDOW_WIDTH = 400;
+
 export const UPPER_LEVEL_DOMAIN =
     nodeEnv === "development" ? developmentDomain : upperLevelDomain;
 

@@ -1,0 +1,22 @@
+.desktopPane {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+}
+
+.shrink {
+    transform: scale(0.8);
+    pointer-events: none;
+    margin-top: 30px;
+}

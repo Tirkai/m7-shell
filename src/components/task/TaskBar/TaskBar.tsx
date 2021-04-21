@@ -9,13 +9,14 @@ import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { computed, reaction } from "mobx";
 import { inject, observer } from "mobx-react";
-import { Application } from "models/Application";
+import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import React, { Component } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
 import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
+import { TaskHint } from "../TaskHint/TaskHint";
 import style from "./style.module.css";
 
 @inject("store")
@@ -43,12 +44,6 @@ export class TaskBar extends Component<IStore> {
         }
     };
 
-    handleExecuteApp = (app: Application) => {
-        this.store.shell.setActivePanel(ShellPanelType.None);
-
-        this.store.applicationManager.executeApplication(app);
-    };
-
     handleFocusAppWindow = (appWindow: ApplicationWindow) => {
         this.store.windowManager.focusWindow(appWindow);
         if (appWindow.isCollapsed) {
@@ -68,8 +63,16 @@ export class TaskBar extends Component<IStore> {
         );
     };
 
-    handleCloseWindow = (appWindow: ApplicationWindow) => {
-        this.store.windowManager.closeWindow(appWindow);
+    handleKillProcess = (appProcess: ApplicationProcess) => {
+        this.store.processManager.killProcess(appProcess);
+    };
+
+    handleShowNetworkTroubleMessage = () => {
+        this.store.message.showMessage("[ph] Network trouble", "[ph]");
+    };
+
+    handleShowDesktopLayoutConfig = () => {
+        this.store.desktop.setEditMode(!this.store.desktop.isEditMode);
     };
 
     componentDidMount() {
@@ -87,11 +90,11 @@ export class TaskBar extends Component<IStore> {
         );
     }
 
-    createCloseApplicationContextMenuItem = (appWindow: ApplicationWindow) =>
+    createCloseApplicationContextMenuItem = (appProcess: ApplicationProcess) =>
         new ContextMenuItemModel({
             icon: cross,
             content: strings.application.actions.close,
-            onClick: () => this.handleCloseWindow(appWindow),
+            onClick: () => this.handleKillProcess(appProcess),
         });
 
     render() {
@@ -115,34 +118,48 @@ export class TaskBar extends Component<IStore> {
                                 >
                                     <SVGIcon source={apps} color="white" />
                                 </TaskBarItem>
-                                {this.store.windowManager.windows.map(
-                                    (appWindow) => (
+                                {this.store.processManager.processes.map(
+                                    (appProcess) => (
                                         <TaskBarItem
-                                            key={appWindow.id}
+                                            key={appProcess.id}
                                             executed
-                                            focused={appWindow.isFocused}
+                                            hint={
+                                                <TaskHint
+                                                    title={appProcess.name}
+                                                />
+                                            }
+                                            focused={
+                                                appProcess.window.isFocused
+                                            }
                                             onClick={() =>
                                                 this.handleFocusAppWindow(
-                                                    appWindow,
+                                                    appProcess.window,
                                                 )
                                             }
                                             menu={[
                                                 this.createCloseApplicationContextMenuItem(
-                                                    appWindow,
+                                                    appProcess,
                                                 ),
                                             ]}
                                         >
                                             <SVGIcon
-                                                source={
-                                                    appWindow.application.icon
-                                                }
+                                                source={appProcess.app.icon}
                                                 color="white"
                                             />
                                         </TaskBarItem>
                                     ),
                                 )}
                             </div>
+
                             <div className={style.actions}>
+                                {/* TODO: Secret feature
+                                <TaskBarItem
+                                    onClick={() =>
+                                        this.handleShowDesktopLayoutConfig()
+                                    }
+                                >
+                                    <SVGIcon source={layout} color="white" />
+                                </TaskBarItem> */}
                                 <TaskBarItem
                                     onClick={() =>
                                         this.handleShowAudioHub(
@@ -155,9 +172,10 @@ export class TaskBar extends Component<IStore> {
                                         isMuted={this.store.audio.isMute}
                                     />
                                 </TaskBarItem>
-                                <TaskBarItem onClick={() => true} autoWidth>
+                                <TaskBarItem autoWidth>
                                     <TaskBarDateTime />
                                 </TaskBarItem>
+
                                 <TaskBarItem
                                     badge={
                                         this.store.notification.status ===

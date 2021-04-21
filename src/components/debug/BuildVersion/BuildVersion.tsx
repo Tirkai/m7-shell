@@ -13,13 +13,6 @@ export class BuildVersion extends Component<IStore> {
         return this.props.store!;
     }
 
-    version = process.env.REACT_APP_VERSION;
-    author = process.env.REACT_APP_AUTHOR;
-    commit = process.env.REACT_APP_COMMIT;
-    date = process.env.REACT_APP_DATE;
-    email = process.env.REACT_APP_EMAIL;
-    branch = process.env.REACT_APP_BRANCH;
-
     render() {
         if (this.store.shell.enabledDevMode) {
             return (
@@ -27,11 +20,6 @@ export class BuildVersion extends Component<IStore> {
                     <div>{`🔑${moment
                         .utc(this.store.auth.remainingTokenTimeInSeconds * 1000)
                         .format("HH:mm:ss")}`}</div>
-                    <div>{`📦m7-shell@${this.version} [${this.branch}]`}</div>
-                    <div>{`${this.author} [${this.email}]`}</div>
-                    <div>{`${moment(this.date).format(
-                        "DD.MM.YYYY HH.mm:ss",
-                    )} [${this.commit}]`}</div>
                 </div>
             );
         } else return "";

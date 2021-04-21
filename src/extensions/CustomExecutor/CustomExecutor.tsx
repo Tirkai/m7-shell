@@ -1,70 +1,54 @@
 import { Button, TextField } from "@material-ui/core";
-import { IStore } from "interfaces/common/IStore";
+import { useStore } from "hooks/useStore";
 import { strings } from "locale";
-import { computed } from "mobx";
-import { inject, observer } from "mobx-react";
+import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { v4 } from "uuid";
 import style from "./style.module.css";
 
-@inject("store")
-@observer
-export class CustomExecutor extends Component<IStore> {
-    @computed
-    get store() {
-        return this.props.store;
-    }
+export const CustomExecutor = () => {
+    const store = useStore();
+    const [value, setValue] = useState("http://");
 
-    state = {
-        link: "",
-    };
-
-    handleCreateAppInstance = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleExecuteProcess = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const id = v4();
 
         const app = new ExternalApplication({
             id,
-            name: `App ${this.state.link}`,
-            url: this.state.link,
-            baseHeight: 600,
-            baseWidth: 800,
+            name: value,
+            url: value,
             key: `${id}`,
         });
 
-        this.store?.applicationManager.addApplication(app);
+        store.applicationManager.addApplication(app);
 
-        this.store?.applicationManager.executeApplication(app);
-    };
-
-    handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        this.setState({
-            link: value,
+        const appProccess = new ApplicationProcess({
+            app,
+            window: new ApplicationWindow(),
         });
+
+        store.processManager.execute(appProccess);
     };
 
-    render() {
-        return (
-            <div className={style.customExecutor}>
-                <form onSubmit={this.handleCreateAppInstance}>
-                    <div className={style.container}>
-                        <TextField
-                            value={this.state.link}
-                            onChange={this.handleChange}
-                        ></TextField>
-                        <Button
-                            type="submit"
-                            color="primary"
-                            variant="contained"
-                        >
-                            {strings.shellApps.customExecutor.execute}
-                        </Button>
-                    </div>
-                </form>
-            </div>
-        );
-    }
-}
+    return (
+        <div className={style.customExecutor}>
+            <form onSubmit={handleExecuteProcess}>
+                <div className={style.container}>
+                    <TextField
+                        value={value}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setValue(e.target.value)
+                        }
+                    ></TextField>
+                    <Button type="submit" color="primary" variant="contained">
+                        {strings.shellApps.customExecutor.execute}
+                    </Button>
+                </div>
+            </form>
+        </div>
+    );
+};

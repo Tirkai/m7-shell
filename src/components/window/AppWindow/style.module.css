@@ -1,14 +1,13 @@
 .appWindow {
-    background: #333;
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     box-sizing: border-box;
-    user-select: none;
 }
 .windowContainer {
     display: block;
     height: 100%;
+    width: 100%;
     overflow: hidden;
     border-radius: 4px;
     box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);

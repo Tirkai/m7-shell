@@ -3,18 +3,16 @@ import { Slider } from "@material-ui/core";
 import { mute, sound, soundLow, soundMiddle } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
-import { PerformanceContext } from "contexts/PerformanceContext";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import style from "./style.module.css";
 const className = style.audioHub;
 
 export const AudioHub = observer(() => {
     const store = useStore();
     const [isShowBackdrop, setShowBackdrop] = useState(false);
-    const performanceMode = useContext(PerformanceContext);
 
     const handleChangeVolume = (value: number | number[]) => {
         if (typeof value === "number") {
@@ -48,7 +46,6 @@ export const AudioHub = observer(() => {
             className={classNames(className, {
                 [style.show]:
                     store.shell.activePanel === ShellPanelType.AudioHub,
-                "no-animate": !performanceMode.mode.enableAnimation,
             })}
             onAnimationStart={() => setShowBackdrop(false)}
             onAnimationEnd={() => setShowBackdrop(true)}

@@ -1,0 +1,35 @@
+.attachmentPoint {
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 0;
+    pointer-events: none;
+}
+
+.attachmentPoint::after {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: 100%;
+    background: black;
+    content: "";
+    clip-path: polygon(100% 0%, 0 0, 50% 100%);
+}
+
+.taskHint {
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    background: black;
+    font-size: 14px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    width: auto;
+}
+
+.container {
+    padding: 8px;
+}

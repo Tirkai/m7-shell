@@ -3,13 +3,14 @@ import { search as searchIcon } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
-import { PerformanceContext } from "contexts/PerformanceContext";
 import { ApplicationPlace } from "enum/ApplicationPlace";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { observer } from "mobx-react";
 import { Application } from "models/Application";
-import React, { useContext, useState } from "react";
+import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationWindow } from "models/ApplicationWindow";
+import React, { useState } from "react";
 import { AppsMenuItem } from "../AppsMenuItem/AppsMenuItem";
 import AppsMenuSearch from "../AppsMenuSearch/AppsMenuSearch";
 import { AppsProfilePreview } from "../AppsProfilePreview/AppsProfilePreview";
@@ -19,7 +20,6 @@ import style from "./style.module.css";
 
 export const AppsMenu: React.FC = observer(() => {
     const store = useStore();
-    const performanceMode = useContext(PerformanceContext);
     const [isShowBackdrop, setShowBackdrop] = useState(false);
     const [search, setSearch] = useState("");
     const [isSearching, setSearching] = useState(false);
@@ -30,14 +30,17 @@ export const AppsMenu: React.FC = observer(() => {
     };
 
     const handleExecuteApp = (app: Application) => {
-        if (app.isAvailable) {
-            if (!app.isExecuted) {
-                store.applicationManager.executeApplication(app);
-            } else {
-                const appWindow = store.windowManager.findWindowByApp(app);
-                if (appWindow) {
-                    store.windowManager.focusWindow(appWindow);
-                }
+        if (!app.isExecuted) {
+            const appProccess = new ApplicationProcess({
+                app,
+                window: new ApplicationWindow(),
+            });
+
+            store.processManager.execute(appProccess);
+        } else {
+            const activeProcess = store.processManager.findProcessByApp(app);
+            if (activeProcess) {
+                store.windowManager.focusWindow(activeProcess.window);
             }
         }
     };
@@ -88,7 +91,6 @@ export const AppsMenu: React.FC = observer(() => {
         <div
             className={classNames(style.appsMenu, {
                 [style.show]: store.shell.appMenuShow,
-                "no-animate": !performanceMode.mode.enableAnimation,
             })}
             onAnimationStart={() => setShowBackdrop(false)}
             onAnimationEnd={() => setShowBackdrop(true)}

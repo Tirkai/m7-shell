@@ -1,8 +1,8 @@
+import { AuthEventType } from "enum/AuthEventType";
 import { ShellEvents } from "enum/ShellEvents";
 import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { max, min } from "lodash";
 import { makeAutoObservable } from "mobx";
-import { Application } from "models/Application";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { AppStore } from "./AppStore";
 
@@ -14,6 +14,10 @@ export class WindowManagerStore {
         this.store = store;
 
         makeAutoObservable(this);
+
+        this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
+            this.closeAllWindows(),
+        );
 
         window.addEventListener(ShellEvents.FocusShellControls, () =>
             this.clearFocus(),
@@ -58,10 +62,6 @@ export class WindowManagerStore {
         } catch (e) {
             console.error(e);
         }
-    }
-
-    findWindowByApp(app: Application) {
-        return this.windows.find((item) => item.application.id === app.id);
     }
 
     addWindow(appWindow: ApplicationWindow) {
@@ -113,13 +113,6 @@ export class WindowManagerStore {
 
     closeWindow(appWindow: ApplicationWindow) {
         try {
-            const app = this.store.applicationManager.findById(
-                appWindow.application.id,
-            );
-            if (app) {
-                app.setExecuted(false);
-            }
-
             this.windows.splice(this.windows.indexOf(appWindow), 1);
         } catch (e) {
             console.error(e);
