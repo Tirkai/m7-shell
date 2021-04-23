@@ -1,10 +1,16 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { Button, CircularProgress } from "@material-ui/core";
+import {
+    Button,
+    CircularProgress,
+    FormControlLabel,
+    Radio,
+    RadioGroup,
+} from "@material-ui/core";
 import { empty } from "assets/icons";
 import classNames from "classnames";
 import { PanelInformer } from "components/informer/PanelInformer/PanelInformer";
 import { PanelInformerActions } from "components/informer/PanelInformerActions/PanelInformerActions";
-import { PanelInformerText } from "components/informer/PanelInformerText/PanelInformerText";
+import { PanelInformerContent } from "components/informer/PanelInformerText/PanelInformerText";
 import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
 import { NOTIFICATION_APP_GUID } from "constants/config";
 import { PerformanceContext } from "contexts/PerformanceContext";
@@ -23,6 +29,11 @@ import { NotificationClearDialogContainer } from "../NotificationClearDialogCont
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
 import style from "./style.module.css";
 
+enum NotificationDeletionType {
+    DeleteVisible = "visible",
+    DeleteAll = "all",
+}
+
 export const NotificationHub = observer(() => {
     const store = useStore();
     const performanceMode = useContext(PerformanceContext);
@@ -31,7 +42,14 @@ export const NotificationHub = observer(() => {
     const [showClearGroupDialog, setShowClearGroupDialog] = useState<{
         isShow: boolean;
         group: NotificationGroupModel | null;
-    }>({ isShow: false, group: null });
+    }>({
+        isShow: false,
+        group: null,
+    });
+
+    const [deletionType, setDeletionType] = useState(
+        NotificationDeletionType.DeleteVisible,
+    );
 
     const connectNotifications = async () => {
         await store.notification.fetchApps(store.auth.userLogin);
@@ -56,6 +74,21 @@ export const NotificationHub = observer(() => {
         }
     }, [store.shell.activePanel]);
 
+    const handleDeleteNotifications = (
+        group: NotificationGroupModel | null,
+        type: NotificationDeletionType,
+    ) => {
+        if (group) {
+            if (type === NotificationDeletionType.DeleteVisible) {
+                handleClearVisibleNotifications(group);
+            }
+            if (type === NotificationDeletionType.DeleteAll) {
+                handleClearGroup(group);
+            }
+            setDeletionType(NotificationDeletionType.DeleteVisible);
+        }
+    };
+
     const handleClearGroup = async (group: NotificationGroupModel | null) => {
         setShowClearGroupDialog({ isShow: false, group: null });
         if (group) {
@@ -70,11 +103,32 @@ export const NotificationHub = observer(() => {
                     group,
                     store.auth.userLogin,
                 );
-                group.setFetching(false);
             } catch (e) {
-                group.setFetching(false);
-
                 console.error(e);
+            } finally {
+                group.setFetching(false);
+            }
+        }
+    };
+
+    const handleClearVisibleNotifications = async (
+        group: NotificationGroupModel | null,
+    ) => {
+        if (group) {
+            setShowClearGroupDialog({
+                isShow: false,
+                group: null,
+            });
+            group.setFetching(true);
+            try {
+                await store.notification.removeNotifications(
+                    group.notifications.map((item) => item.id),
+                    store.auth.userLogin,
+                );
+            } catch (e) {
+                console.error(e);
+            } finally {
+                group.setFetching(false);
             }
         }
     };
@@ -151,6 +205,13 @@ export const NotificationHub = observer(() => {
         }
     };
 
+    const handleSetDeletionType = (
+        event: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        const value = event.target.value as NotificationDeletionType;
+        setDeletionType(value);
+    };
+
     const getGroupOverlay = (group: NotificationGroupModel) => {
         if (group.isFetching || group.isLocked) {
             return <CircularProgress color="secondary" />;
@@ -162,22 +223,32 @@ export const NotificationHub = observer(() => {
             return (
                 <NotificationClearDialogContainer>
                     <PanelInformer>
-                        <PanelInformerText>
+                        <PanelInformerContent>
                             Удалить группу уведомлений?
-                        </PanelInformerText>
+                        </PanelInformerContent>
+                        <PanelInformerContent>
+                            <RadioGroup
+                                color="primary"
+                                name="deleteChoose"
+                                value={deletionType}
+                                onChange={handleSetDeletionType}
+                            >
+                                <FormControlLabel
+                                    value={
+                                        NotificationDeletionType.DeleteVisible
+                                    }
+                                    control={<Radio color="primary" />}
+                                    label="Удалить текущие"
+                                />
+                                <FormControlLabel
+                                    value={NotificationDeletionType.DeleteAll}
+                                    control={<Radio color="primary" />}
+                                    label="Удалить все"
+                                />
+                            </RadioGroup>
+                        </PanelInformerContent>
                         <PanelInformerActions>
                             <Button
-                                onClick={() => {
-                                    handleClearGroup(
-                                        showClearGroupDialog.group,
-                                    );
-                                }}
-                            >
-                                Удалить
-                            </Button>
-                            <Button
-                                color="primary"
-                                variant="contained"
                                 onClick={() =>
                                     setShowClearGroupDialog({
                                         isShow: false,
@@ -186,6 +257,17 @@ export const NotificationHub = observer(() => {
                                 }
                             >
                                 Отмена
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    handleDeleteNotifications(
+                                        showClearGroupDialog.group,
+                                        deletionType,
+                                    );
+                                }}
+                                classes={{ root: style.deletionButton }}
+                            >
+                                Удалить
                             </Button>
                         </PanelInformerActions>
                     </PanelInformer>
