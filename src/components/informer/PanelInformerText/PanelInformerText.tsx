@@ -1,12 +1,12 @@
 import React from "react";
 import style from "./style.module.css";
 
-interface IPanelInformerTextProps {
+interface IPanelInformerContentProps {
     children: React.ReactNode;
 }
 
-const className = style.panelInformerText;
+const className = style.panelInformerContent;
 
-export const PanelInformerText = (props: IPanelInformerTextProps) => (
+export const PanelInformerContent = (props: IPanelInformerContentProps) => (
     <div className={className}>{props.children}</div>
 );

@@ -1,7 +1,7 @@
 import {
     AppMessageType,
     EmitterMessage,
-    invokeListeners,
+    invokeListeners
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
