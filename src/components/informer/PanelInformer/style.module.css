@@ -9,3 +9,7 @@
     padding: 12px;
     box-sizing: border-box;
 }
+
+.nonPadding {
+    padding: 0;
+}
