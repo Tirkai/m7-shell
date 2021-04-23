@@ -74,6 +74,14 @@
     padding: 12px;
 }
 
+.confirmDeletionControlLabel {
+    font-size: 14px;
+}
+
+.deletionButton {
+    color: red;
+}
+
 @keyframes show {
     0% {
         opacity: 0;
