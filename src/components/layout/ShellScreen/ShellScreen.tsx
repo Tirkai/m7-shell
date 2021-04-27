@@ -105,7 +105,6 @@ export class ShellScreen extends Component<IStore> {
                             </DesktopLayer>
                             <DesktopLayer
                                 enabled={
-                                    // true
                                     this.store.windowManager.hasDraggedWindow
                                 }
                                 priority={2}

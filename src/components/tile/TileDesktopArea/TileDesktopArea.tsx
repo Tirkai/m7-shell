@@ -10,6 +10,15 @@ interface ITileDesktopAreaProps {
     draggedWindow?: ApplicationWindow;
     hasDraggedWindow: boolean;
     hasAttachedWindow: boolean;
+    onReplaceWindow?: (
+        attachedWindow: ApplicationWindow,
+        targetWindow: ApplicationWindow,
+        tileBounds: DOMRect,
+    ) => void;
+    onAttachWindow?: (
+        appWindow: ApplicationWindow,
+        tileBounds: DOMRect,
+    ) => void;
 }
 
 const className = style.tileDesktopArea;
@@ -48,6 +57,7 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
         if (props.draggedWindow) {
             props.cell.setDraggedAppWindow(props.draggedWindow);
 
+            // Detach window after drag and drop
             if (props.draggedWindow.id === props.cell.attachedAppWindow?.id) {
                 props.cell.setAttachedAppWindow(null);
             }
@@ -55,21 +65,57 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
             const listener = props.cell.draggedAppWindow?.eventTarget.add<
                 ApplicationWindow
             >(ApplicationWindowEventType.OnDragChange, (appWindow) => {
+                // Trigger event when dragging window is dropped
                 if (!appWindow.isDragging) {
                     const tileBounds = ref.current?.getBoundingClientRect();
+                    // Check exist tile area bounds
                     if (tileBounds) {
                         if (!props.cell.hasAttachedWindow) {
-                            props.cell.draggedAppWindow?.setSize(
-                                tileBounds.width,
-                                tileBounds.height,
-                            );
-                            props.cell.draggedAppWindow?.setPosition(
-                                tileBounds.x,
-                                tileBounds.y,
-                            );
-                            props.cell.setAttachedAppWindow(appWindow);
+                            if (
+                                props.onAttachWindow &&
+                                props.cell.draggedAppWindow
+                            ) {
+                                props.onAttachWindow(
+                                    props.cell.draggedAppWindow,
+                                    tileBounds,
+                                );
+                            }
+                        } else {
+                            if (
+                                props.onReplaceWindow &&
+                                props.cell.attachedAppWindow &&
+                                props.cell.draggedAppWindow
+                            ) {
+                                props.onReplaceWindow(
+                                    props.cell.attachedAppWindow,
+                                    props.cell.draggedAppWindow,
+                                    tileBounds,
+                                );
+                            }
+                            // if (props.onReplaceWindow && w) {
+                            //     props.onReplaceWindow(w);
+                            // }
+                            // props.cell.draggedAppWindow?.setSize(
+                            //     tileBounds.width,
+                            //     tileBounds.height,
+                            // );
+                            // props.cell.draggedAppWindow?.setPosition(
+                            //     tileBounds.x,
+                            //     tileBounds.y,
+                            // );
+                            // props.cell.setAttachedAppWindow(appWindow);
                         }
                     }
+
+                    // if (props.hasAttachedWindow) {
+                    //     const cellAttachedWindow = props.cell.attachedAppWindow;
+                    //     if (cellAttachedWindow) {
+                    //         props.cell.setAttachedAppWindow(null);
+                    //         props.cell.setAttachedAppWindow(appWindow);
+
+                    //         // alert("DRAG_STOP_ATTACHED_AREA");
+                    //     }
+                    // }
                 }
             });
             if (listener) {
@@ -82,13 +128,6 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
         if (eventListener) {
             props.cell.draggedAppWindow?.eventTarget.remove(eventListener.id);
         }
-
-        // console.log(props.draggedWindow);
-
-        // if (props.draggedWindow && props.cell.attachedAppWindow) {
-        //     console.log("Detached");
-        //     props.cell.setAttachedAppWindow(null);
-        // }
 
         props.cell.setDraggedAppWindow(null);
     };
@@ -104,15 +143,14 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
                 gridColumn: `${props.cell.startColumn}/${props.cell.endColumn}`,
             }}
         >
-            <div className={style.debug}>
-                <div>ID: {props.cell.id}</div>
-                <div>
-                    Dragged: {JSON.stringify(props.cell.draggedAppWindow)}
-                </div>
+            {/* <div className={style.debug}>
                 <div>
                     Attached: {JSON.stringify(props.cell.attachedAppWindow)}
                 </div>
-            </div>
+                <div>
+                    Dragged: {JSON.stringify(props.cell.draggedAppWindow)}
+                </div>
+            </div> */}
             {props.hasDraggedWindow && !props.hasAttachedWindow && (
                 <LayerBoxVisualizer />
             )}

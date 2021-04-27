@@ -118,3 +118,7 @@ div::-webkit-scrollbar-track {
     transition-duration: 0s !important;
     animation-duration: 0s !important;
 }
+
+.react-draggable-transparent-selection .appWindow {
+    transition: none;
+}

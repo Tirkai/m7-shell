@@ -1,6 +1,8 @@
 import { useStore } from "hooks/useStore";
 import { get } from "lodash";
 import { observer } from "mobx-react";
+import { ApplicationWindow } from "models/ApplicationWindow";
+import { TileCell } from "models/tile/TileCell";
 import React, { useEffect } from "react";
 import { TileDesktopArea } from "../TileDesktopArea/TileDesktopArea";
 import style from "./style.module.css";
@@ -28,6 +30,35 @@ export const TileDesktopContainer = observer(() => {
         }
     }, [activePreset]);
 
+    const handleAttach = (
+        cell: TileCell,
+        appWindow: ApplicationWindow,
+        tileBounds: DOMRect,
+    ) => {
+        cell.draggedAppWindow?.setSize(tileBounds.width, tileBounds.height);
+        cell.draggedAppWindow?.setPosition(tileBounds.x, tileBounds.y);
+        cell.setAttachedAppWindow(appWindow);
+    };
+
+    const handleReplace = (
+        cell: TileCell,
+        attachedWindow: ApplicationWindow,
+        targetWindow: ApplicationWindow,
+        tileBounds: DOMRect,
+    ) => {
+        const freeCell = store.tile.nearbyFreeCell;
+        if (freeCell) {
+            cell.setAttachedAppWindow(null);
+
+            store.tile.attachWindowToTileCell(attachedWindow, freeCell);
+
+            attachedWindow.setSize(freeCell.width, freeCell.height);
+            attachedWindow.setPosition(freeCell.x, freeCell.y);
+
+            store.tile.attachWindowToTileCell(targetWindow, cell);
+        }
+    };
+
     return activePreset ? (
         <div className={className}>
             <div
@@ -44,6 +75,21 @@ export const TileDesktopContainer = observer(() => {
                         draggedWindow={draggedWindow}
                         hasDraggedWindow={cell.hasDraggedWindow}
                         hasAttachedWindow={cell.hasAttachedWindow}
+                        onReplaceWindow={(
+                            attachedAppWindow,
+                            targetWindow,
+                            tileBounds,
+                        ) =>
+                            handleReplace(
+                                cell,
+                                attachedAppWindow,
+                                targetWindow,
+                                tileBounds,
+                            )
+                        }
+                        onAttachWindow={(appWindow, tileBounds) =>
+                            handleAttach(cell, appWindow, tileBounds)
+                        }
                     />
                 ))}
             </div>

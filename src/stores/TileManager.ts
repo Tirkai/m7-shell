@@ -3,7 +3,6 @@ import { makeAutoObservable } from "mobx";
 import { ApplicationWindow } from "models/ApplicationWindow";
 import { TileCell } from "models/tile/TileCell";
 import { TilePreset } from "models/tile/TilePreset";
-import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import { registeredTilePresets } from "registeredTilePresets";
 import { AppStore } from "stores/AppStore";
 
@@ -58,23 +57,26 @@ export class TileManager {
 
             // TODO: IMPORTANT
             // Clear events
-            appWindow.eventTarget.add(ApplicationWindowEventType.OnClose, () =>
-                tileCell.setAttachedAppWindow(null),
-            );
 
-            appWindow.eventTarget.add(
-                ApplicationWindowEventType.OnFullscreen,
-                () => {
-                    tileCell.setAttachedAppWindow(null);
-                },
-            );
+            console.log("APP_W", appWindow.eventTarget.listeners);
 
-            appWindow.eventTarget.add(
-                ApplicationWindowEventType.OnCollapse,
-                () => {
-                    tileCell.setAttachedAppWindow(null);
-                },
-            );
+            // appWindow.eventTarget.add(ApplicationWindowEventType.OnClose, () =>
+            //     tileCell.setAttachedAppWindow(null),
+            // );
+
+            // appWindow.eventTarget.add(
+            //     ApplicationWindowEventType.OnFullscreen,
+            //     () => {
+            //         tileCell.setAttachedAppWindow(null);
+            //     },
+            // );
+
+            // appWindow.eventTarget.add(
+            //     ApplicationWindowEventType.OnCollapse,
+            //     () => {
+            //         tileCell.setAttachedAppWindow(null);
+            //     },
+            // );
 
             tileCell.setAttachedAppWindow(appWindow);
         }

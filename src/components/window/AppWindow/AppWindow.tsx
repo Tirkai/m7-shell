@@ -180,7 +180,7 @@ export const AppWindow = (props: IAppWindowProps) => {
             }}
         >
             <div
-                className={classNames(style.appWindow, {
+                className={classNames(style.appWindow, "appWindow", {
                     [style.collapsed]: props.window.isCollapsed,
                 })}
                 style={{

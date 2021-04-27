@@ -1,5 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import { ApplicationWindow } from "models/ApplicationWindow";
+import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import { v4 } from "uuid";
 import { TileGridUnit } from "./TileGridUnit";
 
@@ -33,12 +34,45 @@ export class TileCell {
         return this.attachedAppWindow !== null;
     }
 
+    appWindowListenersIds: string[] = [];
+
     setDraggedAppWindow(appWindow: ApplicationWindow | null) {
         this.draggedAppWindow = appWindow;
     }
 
     setAttachedAppWindow(appWindow: ApplicationWindow | null) {
         console.log("setAttachedAppWindow", appWindow);
+        if (appWindow) {
+            const closeListener = appWindow.eventTarget.add(
+                ApplicationWindowEventType.OnClose,
+                () => this.setAttachedAppWindow(null),
+            );
+
+            const fullScreenListener = appWindow.eventTarget.add(
+                ApplicationWindowEventType.OnFullscreen,
+                () => {
+                    this.setAttachedAppWindow(null);
+                },
+            );
+
+            const collapseListener = appWindow.eventTarget.add(
+                ApplicationWindowEventType.OnCollapse,
+                () => {
+                    this.setAttachedAppWindow(null);
+                },
+            );
+
+            this.appWindowListenersIds = [
+                closeListener,
+                fullScreenListener,
+                collapseListener,
+            ].map((item) => item.id);
+        } else {
+            this.appWindowListenersIds.map((item) => {
+                this.attachedAppWindow?.eventTarget.remove(item);
+            });
+        }
+
         this.attachedAppWindow = appWindow;
     }
 

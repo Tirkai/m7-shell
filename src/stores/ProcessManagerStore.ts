@@ -1,7 +1,7 @@
 import {
     AppMessageType,
     EmitterMessage,
-    invokeListeners
+    invokeListeners,
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
@@ -146,10 +146,31 @@ export class ProcessManagerStore {
         const tileManager = this.store.tile;
 
         if (tileManager.hasActivePreset && tileManager.freeCells) {
-            this.store.tile.attachWindowToTileCell(
-                appProcess.window,
-                tileManager.nearbyFreeCell,
-            );
+            const tileCell = tileManager.nearbyFreeCell;
+            const appWindow = appProcess.window;
+
+            // if (tileCell) {
+            //     appWindow.eventTarget.add(
+            //         ApplicationWindowEventType.OnClose,
+            //         () => tileCell.setAttachedAppWindow(null),
+            //     );
+
+            //     appWindow.eventTarget.add(
+            //         ApplicationWindowEventType.OnFullscreen,
+            //         () => {
+            //             tileCell.setAttachedAppWindow(null);
+            //         },
+            //     );
+
+            //     appWindow.eventTarget.add(
+            //         ApplicationWindowEventType.OnCollapse,
+            //         () => {
+            //             tileCell.setAttachedAppWindow(null);
+            //         },
+            //     );
+            // }
+
+            this.store.tile.attachWindowToTileCell(appWindow, tileCell);
         }
 
         this.store.windowManager.addWindow(appProcess.window);

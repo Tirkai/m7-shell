@@ -3,6 +3,7 @@
     top: 0;
     left: 0;
     box-sizing: border-box;
+    transition: transform ease 0.3s, width ease 0.3s, height ease 0.3s;
 }
 .windowContainer {
     display: grid;
