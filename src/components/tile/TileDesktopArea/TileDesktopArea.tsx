@@ -1,6 +1,6 @@
 import { LayerBoxVisualizer } from "components/debug/LayerBoxVisualizer/LayerBoxVisualizer";
-import { ApplicationWindow } from "models/ApplicationWindow";
 import { TileCell } from "models/tile/TileCell";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import React, { useEffect, useRef, useState } from "react";
 import style from "./style.module.css";
@@ -62,62 +62,41 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
                 props.cell.setAttachedAppWindow(null);
             }
 
-            const listener = props.cell.draggedAppWindow?.eventTarget.add<
-                ApplicationWindow
-            >(ApplicationWindowEventType.OnDragChange, (appWindow) => {
-                // Trigger event when dragging window is dropped
-                if (!appWindow.isDragging) {
-                    const tileBounds = ref.current?.getBoundingClientRect();
-                    // Check exist tile area bounds
-                    if (tileBounds) {
-                        if (!props.cell.hasAttachedWindow) {
-                            if (
-                                props.onAttachWindow &&
-                                props.cell.draggedAppWindow
-                            ) {
-                                props.onAttachWindow(
-                                    props.cell.draggedAppWindow,
-                                    tileBounds,
-                                );
+            const listener = props.cell.draggedAppWindow?.eventTarget.add(
+                ApplicationWindowEventType.OnDragChange,
+                (appWindow: ApplicationWindow) => {
+                    // Trigger event when dragging window is dropped
+                    if (!appWindow.isDragging) {
+                        const tileBounds = ref.current?.getBoundingClientRect();
+                        // Check exist tile area bounds
+                        if (tileBounds) {
+                            if (!props.cell.hasAttachedWindow) {
+                                if (
+                                    props.onAttachWindow &&
+                                    props.cell.draggedAppWindow
+                                ) {
+                                    props.onAttachWindow(
+                                        props.cell.draggedAppWindow,
+                                        tileBounds,
+                                    );
+                                }
+                            } else {
+                                if (
+                                    props.onReplaceWindow &&
+                                    props.cell.attachedAppWindow &&
+                                    props.cell.draggedAppWindow
+                                ) {
+                                    props.onReplaceWindow(
+                                        props.cell.attachedAppWindow,
+                                        props.cell.draggedAppWindow,
+                                        tileBounds,
+                                    );
+                                }
                             }
-                        } else {
-                            if (
-                                props.onReplaceWindow &&
-                                props.cell.attachedAppWindow &&
-                                props.cell.draggedAppWindow
-                            ) {
-                                props.onReplaceWindow(
-                                    props.cell.attachedAppWindow,
-                                    props.cell.draggedAppWindow,
-                                    tileBounds,
-                                );
-                            }
-                            // if (props.onReplaceWindow && w) {
-                            //     props.onReplaceWindow(w);
-                            // }
-                            // props.cell.draggedAppWindow?.setSize(
-                            //     tileBounds.width,
-                            //     tileBounds.height,
-                            // );
-                            // props.cell.draggedAppWindow?.setPosition(
-                            //     tileBounds.x,
-                            //     tileBounds.y,
-                            // );
-                            // props.cell.setAttachedAppWindow(appWindow);
                         }
                     }
-
-                    // if (props.hasAttachedWindow) {
-                    //     const cellAttachedWindow = props.cell.attachedAppWindow;
-                    //     if (cellAttachedWindow) {
-                    //         props.cell.setAttachedAppWindow(null);
-                    //         props.cell.setAttachedAppWindow(appWindow);
-
-                    //         // alert("DRAG_STOP_ATTACHED_AREA");
-                    //     }
-                    // }
-                }
-            });
+                },
+            );
             if (listener) {
                 setEventListener(listener);
             }
@@ -135,7 +114,6 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
     return (
         <div
             className={className}
-            ref={ref}
             onMouseEnter={handleEnter}
             onMouseLeave={handleExit}
             style={{
@@ -143,17 +121,9 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
                 gridColumn: `${props.cell.startColumn}/${props.cell.endColumn}`,
             }}
         >
-            {/* <div className={style.debug}>
-                <div>
-                    Attached: {JSON.stringify(props.cell.attachedAppWindow)}
-                </div>
-                <div>
-                    Dragged: {JSON.stringify(props.cell.draggedAppWindow)}
-                </div>
-            </div> */}
-            {props.hasDraggedWindow && !props.hasAttachedWindow && (
-                <LayerBoxVisualizer />
-            )}
+            <div className={style.container} ref={ref}>
+                {props.hasDraggedWindow && <LayerBoxVisualizer />}
+            </div>
         </div>
     );
 };

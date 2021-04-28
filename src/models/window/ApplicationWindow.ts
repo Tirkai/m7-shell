@@ -11,8 +11,8 @@ import { IApplicationWindowOptions } from "interfaces/window/IApplicationWindowO
 import { makeAutoObservable } from "mobx";
 import { ResizeHandle } from "react-resizable";
 import { v4 } from "uuid";
-import { CustomEventHandler } from "./event/CustomEventHandler";
-import { ApplicationWindowEventType } from "./window/ApplicationWindowEventType";
+import { EventBus } from "../event/EventBus";
+import { ApplicationWindowEventType } from "./ApplicationWindowEventType";
 
 export class ApplicationWindow {
     id: string;
@@ -32,10 +32,9 @@ export class ApplicationWindow {
     lockedY: number;
     isDragging: boolean = false;
     isResizing: boolean = false;
+    namespace: string = "";
 
-    eventTarget: CustomEventHandler<
-        ApplicationWindowEventType
-    > = new CustomEventHandler();
+    eventTarget: EventBus = new EventBus();
 
     get minYPosition() {
         return this.y + this.height - MIN_WINDOW_HEIGHT;
@@ -228,5 +227,9 @@ export class ApplicationWindow {
 
         this.x = x;
         this.y = y;
+    }
+
+    setNamespace(value: string) {
+        this.namespace = value;
     }
 }

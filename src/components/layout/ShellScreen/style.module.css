@@ -1,7 +1,9 @@
 .shellScreen {
-    position: relative;
+    position: absolute;
     box-sizing: border-box;
     width: 100vw;
     height: 100vh;
+    top: 0;
+    left: 0;
     background-size: cover;
 }

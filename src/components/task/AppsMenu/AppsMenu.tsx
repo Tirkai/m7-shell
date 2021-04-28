@@ -9,7 +9,7 @@ import { strings } from "locale";
 import { observer } from "mobx-react";
 import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { useState } from "react";
 import { AppsMenuItem } from "../AppsMenuItem/AppsMenuItem";
 import AppsMenuSearch from "../AppsMenuSearch/AppsMenuSearch";

@@ -4,7 +4,8 @@ import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React from "react";
 import { DraggableData, DraggableEvent } from "react-draggable";
 import { ResizeCallbackData } from "react-resizable";
@@ -13,6 +14,7 @@ import style from "./style.module.css";
 
 interface IAppWindowAreaProps {
     disabled?: boolean;
+    viewport?: VirtualViewportModel;
 }
 
 export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
@@ -87,8 +89,12 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
                 [style.disabled]: props.disabled,
             })}
         >
-            {store.processManager.processes.map(
-                (process: ApplicationProcess) => (
+            {store.processManager.processes
+                .filter(
+                    (process) =>
+                        process.viewport?.id === props.viewport?.id ?? true,
+                )
+                .map((process: ApplicationProcess) => (
                     <AppWindow
                         key={process.window.id}
                         process={process}
@@ -109,8 +115,7 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
                         }
                         onClose={() => handleCloseWindow(process)}
                     />
-                ),
-            )}
+                ))}
         </div>
     );
 });

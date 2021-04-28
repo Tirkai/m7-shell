@@ -24,6 +24,7 @@ import terminal from "./terminal.svg";
 import tiles from "./tiles.svg";
 import unknownApp from "./unknown.svg";
 import videocam from "./video.svg";
+import virtual from "./virtual.svg";
 import warning from "./warning.svg";
 
 export {
@@ -54,4 +55,5 @@ export {
     disconnect,
     layout,
     tiles,
+    virtual,
 };

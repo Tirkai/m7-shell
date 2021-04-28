@@ -1,5 +1,5 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { apps, cross, tiles } from "assets/icons";
+import { apps, cross, tiles, virtual } from "assets/icons";
 import classNames from "classnames";
 import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
@@ -10,8 +10,8 @@ import { strings } from "locale";
 import { computed, reaction } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { Component } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
@@ -85,6 +85,14 @@ export class TaskBar extends Component<IStore> {
         );
     };
 
+    handleShowVirtualHub = () => {
+        this.store.shell.setActivePanel(
+            this.store.shell.activePanel !== ShellPanelType.Virtual
+                ? ShellPanelType.Virtual
+                : ShellPanelType.None,
+        );
+    };
+
     componentDidMount() {
         this.setState({
             isShow: this.store.shell.displayMode.taskbarVisible,
@@ -128,6 +136,11 @@ export class TaskBar extends Component<IStore> {
                                 >
                                     <SVGIcon source={apps} color="white" />
                                 </TaskBarItem>
+                                <TaskBarItem
+                                    onClick={() => this.handleShowVirtualHub()}
+                                >
+                                    <SVGIcon source={virtual} color="white" />
+                                </TaskBarItem>
                                 {this.store.processManager.processes.map(
                                     (appProcess) => (
                                         <TaskBarItem
@@ -170,6 +183,7 @@ export class TaskBar extends Component<IStore> {
                                 >
                                     <SVGIcon source={layout} color="white" />
                                 </TaskBarItem> */}
+
                                 <TaskBarItem onClick={this.handleShowTileHub}>
                                     <SVGIcon source={tiles} color="white" />
                                 </TaskBarItem>

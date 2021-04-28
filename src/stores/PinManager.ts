@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import { ApplicationWindow } from "models/ApplicationWindow";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { AppStore } from "stores/AppStore";
 
 export class PinManager {

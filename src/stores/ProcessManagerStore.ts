@@ -10,9 +10,9 @@ import { IAppParams } from "interfaces/app/IAppParams";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
-import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
+import { ProcessEventType } from "models/process/ProcessEventType";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { portalEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
@@ -138,54 +138,28 @@ export class ProcessManagerStore {
 
     startProcess(appProcess: ApplicationProcess) {
         this.processes.push(appProcess);
-        console.log("Start Process", appProcess);
 
         appProcess.app.setExecuted(true);
-        // TODO:
-        // Think about it
-        const tileManager = this.store.tile;
 
-        if (tileManager.hasActivePreset && tileManager.freeCells) {
-            const tileCell = tileManager.nearbyFreeCell;
-            const appWindow = appProcess.window;
-
-            // if (tileCell) {
-            //     appWindow.eventTarget.add(
-            //         ApplicationWindowEventType.OnClose,
-            //         () => tileCell.setAttachedAppWindow(null),
-            //     );
-
-            //     appWindow.eventTarget.add(
-            //         ApplicationWindowEventType.OnFullscreen,
-            //         () => {
-            //             tileCell.setAttachedAppWindow(null);
-            //         },
-            //     );
-
-            //     appWindow.eventTarget.add(
-            //         ApplicationWindowEventType.OnCollapse,
-            //         () => {
-            //             tileCell.setAttachedAppWindow(null);
-            //         },
-            //     );
-            // }
-
-            this.store.tile.attachWindowToTileCell(appWindow, tileCell);
-        }
-
-        this.store.windowManager.addWindow(appProcess.window);
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.StartProcess,
+            appProcess,
+        );
     }
 
-    async killProcess(appProcess: ApplicationProcess) {
+    killProcess(appProcess: ApplicationProcess) {
         const index = this.processes.indexOf(appProcess);
 
         appProcess.app.setExecuted(false);
 
-        await appProcess.window.eventTarget.dispatch(
-            ApplicationWindowEventType.OnClose,
-        );
+        // await appProcess.window.eventTarget.dispatch(
+        //     ApplicationWindowEventType.OnClose,
+        // );
 
-        this.store.windowManager.closeWindow(appProcess.window);
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.KillProcess,
+            appProcess,
+        );
 
         this.processes.splice(index, 1);
     }

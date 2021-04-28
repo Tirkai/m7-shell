@@ -15,8 +15,6 @@ export class TilePreset {
     rows: number;
     columns: number;
 
-    // tiles: TileArea[] = [];
-
     get maxTilesCount() {
         return this.cells.length;
     }
@@ -34,8 +32,4 @@ export class TilePreset {
     setCells(cells: TileCell[]) {
         this.cells = cells;
     }
-
-    // setTiles(tiles: TileArea[]) {
-    //     this.tiles = tiles;
-    // }
 }

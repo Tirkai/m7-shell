@@ -1,12 +1,12 @@
-import { AppMessageType, ShellMessageType } from "@algont/m7-shell-emitter";
+import { AppMessageType } from "@algont/m7-shell-emitter";
 import classNames from "classnames";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { useStore } from "hooks/useStore";
 import { IStore } from "interfaces/common/IStore";
 import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { useEffect, useMemo, useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import { Resizable, ResizeCallbackData, ResizeHandle } from "react-resizable";
@@ -97,25 +97,27 @@ export const AppWindow = (props: IAppWindowProps) => {
     };
 
     const handleFullScreen = () => {
-        props.window.setFullScreen(!props.window.isFullScreen);
+        // props.window.setFullScreen(!props.window.isFullScreen);
+        store.windowManager.applyFullscreenToWindow(
+            props.window,
+            !props.window.isFullScreen,
+        );
     };
 
     const handleCollapse = () => {
-        props.window.setCollapsed(true);
+        // props.window.setCollapsed(true);
+        store.windowManager.applyCollapseToWindow(props.window, true);
     };
 
-    const handleHeaderDoubleClick = () => {
-        const appWindow = props.window;
-        appWindow.setFullScreen(!appWindow.isFullScreen);
-    };
+    const handleHeaderDoubleClick = () => handleFullScreen();
 
     const handleReload = () => {
-        props.process.emitter.emit(ShellMessageType.ReloadPage, {});
+        // props.process.emitter.emit(ShellMessageType.ReloadPage, {});
 
-        // const iFrame = (frame as unknown) as HTMLIFrameElement;
-        // if (iFrame) {
-        //     iFrame.setAttribute("src", iFrame.getAttribute("src") ?? "");
-        // }
+        const iFrame = (frame as unknown) as HTMLIFrameElement;
+        if (iFrame) {
+            iFrame.setAttribute("src", iFrame.getAttribute("src") ?? "");
+        }
     };
 
     useEffect(() => {

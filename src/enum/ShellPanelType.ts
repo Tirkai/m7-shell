@@ -3,5 +3,6 @@ export enum ShellPanelType {
     StartMenu = "startMenu",
     NotificationHub = "notificationHub",
     AudioHub = "audioHub",
+    Virtual = "virtual",
     TileHub = "tileHub",
 }

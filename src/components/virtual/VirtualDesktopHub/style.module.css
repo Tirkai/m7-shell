@@ -1,0 +1,19 @@
+.virtualDesktopHub {
+    height: 100%;
+}
+
+.container {
+    display: grid;
+    grid-template-rows: calc(100% - 180px) 180px;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.frames {
+    box-sizing: border-box;
+}
+
+.framesContainer {
+    background: #222;
+    height: 100%;
+}

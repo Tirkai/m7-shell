@@ -12,6 +12,9 @@ import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { TileChooseHub } from "components/tile/TileChooseHub/TileChooseHub";
 import { TileDesktopContainer } from "components/tile/TileDesktopContainer/TileDesktopContainer";
+import { VirtualDesktopHub } from "components/virtual/VirtualDesktopHub/VirtualDesktopHub";
+import { VirtualFrame } from "components/virtual/VirtualFrame/VirtualFrame";
+import { VirtualViewport } from "components/virtual/VirtualViewport/VirtualViewport";
 import { AppWindowArea } from "components/window/AppWindowArea/AppWindowArea";
 import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/AppWindowPinContainer";
 import { ShellEvents } from "enum/ShellEvents";
@@ -19,8 +22,8 @@ import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
 import { ExternalApplication } from "models/ExternalApplication";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { Component } from "react";
 import { v4 } from "uuid";
 import { DesktopLayout } from "../DesktopLayout/DesktopLayout";
@@ -98,36 +101,102 @@ export class ShellScreen extends Component<IStore> {
                                     onDesktopClick={this.handleClickDesktop}
                                 />
                             </DesktopLayer>
-                            <DesktopLayer enabled priority={1}>
-                                <AppWindowArea
-                                    disabled={this.store.desktop.isEditMode}
-                                />
-                            </DesktopLayer>
-                            <DesktopLayer
-                                enabled={
-                                    this.store.windowManager.hasDraggedWindow
+                            <VirtualViewport
+                                displayed={
+                                    true
+                                    // this.store.shell.activePanel !==
+                                    // ShellPanelType.Virtual
                                 }
-                                priority={2}
                             >
-                                <TileDesktopContainer />
-                            </DesktopLayer>
+                                {this.store.virtualViewport.viewports.map(
+                                    (viewport) => (
+                                        <VirtualFrame>
+                                            <DesktopLayer enabled priority={1}>
+                                                <AppWindowArea
+                                                    viewport={viewport}
+                                                    disabled={
+                                                        this.store.desktop
+                                                            .isEditMode
+                                                    }
+                                                />
+                                            </DesktopLayer>
+                                            <DesktopLayer
+                                                enabled={
+                                                    this.store.windowManager
+                                                        .hasDraggedWindow
+                                                }
+                                                priority={2}
+                                            >
+                                                <TileDesktopContainer />
+                                            </DesktopLayer>
+                                        </VirtualFrame>
+                                    ),
+                                )}
+                                {/* <VirtualFrame>
+                                    <DesktopLayer enabled priority={1}>
+                                        <AppWindowArea
+                                            disabled={
+                                                this.store.desktop.isEditMode
+                                            }
+                                        />
+                                    </DesktopLayer>
+                                    <DesktopLayer
+                                        enabled={
+                                            this.store.windowManager
+                                                .hasDraggedWindow
+                                        }
+                                        priority={2}
+                                    >
+                                        <TileDesktopContainer />
+                                    </DesktopLayer>
+                                </VirtualFrame> */}
+
+                                {/* <VirtualFrame>1</VirtualFrame>
+                                <VirtualFrame>2</VirtualFrame>
+                                <VirtualFrame>3</VirtualFrame> */}
+
+                                {/* <DesktopLayer enabled priority={1}>
+                                    <AppWindowArea
+                                        disabled={this.store.desktop.isEditMode}
+                                    />
+                                </DesktopLayer>
+                                <DesktopLayer
+                                    enabled={
+                                        this.store.windowManager
+                                            .hasDraggedWindow
+                                    }
+                                    priority={2}
+                                >
+                                    <TileDesktopContainer />
+                                </DesktopLayer> */}
+                            </VirtualViewport>
+
                             <DesktopLayer enabled priority={2}>
                                 <TileChooseHub />
                             </DesktopLayer>
+
+                            <DesktopLayer enabled priority={2}>
+                                <VirtualDesktopHub />
+                            </DesktopLayer>
+
                             <DesktopLayer enabled priority={3}>
                                 <AppsMenu />
                             </DesktopLayer>
+
                             <DesktopLayer enabled priority={3}>
                                 <NotificationToasts />
                                 <NotificationHub />
                             </DesktopLayer>
-                            <DesktopLayer enabled priority={3}>
+
+                            <DesktopLayer enabled={false} priority={3}>
                                 <AppWindowPinContainer />
                             </DesktopLayer>
+
                             <DesktopLayer enabled priority={3}>
                                 <AudioContainer />
                                 <AudioHub />
                             </DesktopLayer>
+
                             <DesktopLayer enabled={false} priority={4}>
                                 <BuildVersion />
                             </DesktopLayer>

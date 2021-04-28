@@ -2,7 +2,6 @@
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 300px;
     background-attachment: fixed;
     background-position: right;
     background-size: cover;
@@ -18,10 +17,10 @@
 }
 
 .container {
-    background: #222222;
-    padding: 16px;
+    /* background: #222222; */
+    /* padding: 16px; */
     height: 100%;
-    border-radius: 4px;
+    /* border-radius: 4px; */
 }
 
 .show {
@@ -33,6 +32,10 @@
 
 .show > * {
     pointer-events: all;
+}
+
+.content {
+    height: 100%;
 }
 
 @keyframes show {

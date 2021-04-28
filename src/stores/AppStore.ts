@@ -10,12 +10,15 @@ import { NetworkStore } from "./NetworkStore";
 import { NotificationStore } from "./NotificationStore";
 import { PinManager } from "./PinManager";
 import { ProcessManagerStore } from "./ProcessManagerStore";
+import { SharedEventBus } from "./SharedEventBus";
 import { ShellStore } from "./ShellStore";
 import { TileManager } from "./TileManager";
 import { UserStore } from "./UserStore";
+import { VirtualViewportManager } from "./VirtualViewportManager";
 import { WindowManagerStore } from "./WindowManagerStore";
 
 export class AppStore {
+    sharedEventBus: SharedEventBus;
     auth: AuthStore;
     dateTime: DateTimeStore;
     processManager: ProcessManagerStore;
@@ -32,7 +35,9 @@ export class AppStore {
     desktop: DesktopStore;
     tile: TileManager;
     pin: PinManager;
+    virtualViewport: VirtualViewportManager;
     constructor() {
+        this.sharedEventBus = new SharedEventBus(this);
         this.auth = new AuthStore(this);
         this.dateTime = new DateTimeStore(this);
         this.processManager = new ProcessManagerStore(this);
@@ -49,6 +54,7 @@ export class AppStore {
         this.desktop = new DesktopStore(this);
         this.tile = new TileManager(this);
         this.pin = new PinManager(this);
+        this.virtualViewport = new VirtualViewportManager(this);
         console.warn("STORE", this);
     }
 }

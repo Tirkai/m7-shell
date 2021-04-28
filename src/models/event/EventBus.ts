@@ -1,25 +1,25 @@
 import { v4 } from "uuid";
 
-interface ICustomEventOptions {
+interface IEventBusOptions {
     once?: boolean;
 }
 
-interface ICustomEventListener<T, K = any> {
+interface IEventBusListener<T = any> {
     id: string;
-    type: T;
-    callback: (payload: K) => void;
+    type: string;
+    callback: (payload: T) => void;
 }
 
-export class CustomEventHandler<T> {
-    listeners: ICustomEventListener<T>[] = [];
+export class EventBus {
+    listeners: IEventBusListener[] = [];
 
-    add<K>(type: T, callback: (payload: K) => void) {
+    add<K>(type: string, callback: (payload: K) => void) {
         const listener = { id: v4(), type, callback };
         this.listeners.push(listener);
         return listener;
     }
 
-    async dispatch<K = any>(type: T, payload?: K) {
+    async dispatch<T = any>(type: string, payload?: T) {
         return new Promise<null>((resolve) => {
             this.listeners
                 .filter((item) => item.type === type)

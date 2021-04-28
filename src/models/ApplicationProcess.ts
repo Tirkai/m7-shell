@@ -2,8 +2,9 @@ import { ShellMessageEmitter } from "@algont/m7-shell-emitter";
 import { makeAutoObservable } from "mobx";
 import { v4 } from "uuid";
 import { Application } from "./Application";
-import { ApplicationWindow } from "./ApplicationWindow";
 import { ExternalApplication } from "./ExternalApplication";
+import { VirtualViewportModel } from "./virtual/VirtualViewportModel";
+import { ApplicationWindow } from "./window/ApplicationWindow";
 
 interface IApplicationProcessOptions {
     app: Application;
@@ -12,6 +13,7 @@ interface IApplicationProcessOptions {
     name?: string;
     params?: Map<string, string>;
     disableParams?: boolean;
+    viewport?: VirtualViewportModel;
 }
 
 export class ApplicationProcess {
@@ -24,6 +26,7 @@ export class ApplicationProcess {
     emitter: ShellMessageEmitter;
     hash: string;
     disableParams: boolean;
+    viewport: VirtualViewportModel | null = null;
 
     constructor(options: IApplicationProcessOptions) {
         makeAutoObservable(this);
@@ -36,6 +39,7 @@ export class ApplicationProcess {
         this.emitter = new ShellMessageEmitter(this.app.id);
         this.name = options.name ?? this.app.name;
         this.disableParams = options.disableParams ?? false;
+        this.viewport = options.viewport ?? null;
 
         if (this.app instanceof ExternalApplication) {
             this.url = options.url ?? this.app.url;
@@ -59,6 +63,10 @@ export class ApplicationProcess {
 
     setParams(value: Map<string, string>) {
         this.params = value;
+    }
+
+    setViewport(viewport: VirtualViewportModel) {
+        this.viewport = viewport;
     }
 
     get modifiedUrl() {

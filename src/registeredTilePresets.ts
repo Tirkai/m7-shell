@@ -3,6 +3,18 @@ import { TilePreset } from "models/tile/TilePreset";
 
 export const registeredTilePresets = [
     new TilePreset({
+        columns: 1,
+        rows: 1,
+        cells: [
+            new TileCell({
+                startColumn: 1,
+                endColumn: 1,
+                startRow: 1,
+                endRow: 1,
+            }),
+        ],
+    }),
+    new TilePreset({
         columns: 2,
         rows: 2,
         cells: [

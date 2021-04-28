@@ -1,4 +1,5 @@
 import { BaseHub } from "components/hub/BaseHub/BaseHub";
+import { HubBackdrop } from "components/hub/HubBackdrop/HubBackdrop";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
@@ -25,22 +26,24 @@ export const TileChooseHub = observer(() => {
 
     return (
         <BaseHub show={store.shell.activePanel === ShellPanelType.TileHub}>
-            <TileChooserGrid>
-                {/* TODO: locale */}
-                <TileChooserItem
-                    active={store.tile.activePreset === null}
-                    name="нет"
-                    onClick={handleResetPreset}
-                />
-                {store.tile.presets.map((preset) => (
+            <HubBackdrop>
+                <TileChooserGrid>
+                    {/* TODO: locale */}
                     <TileChooserItem
-                        key={preset.id}
-                        onClick={() => handleApplyPreset(preset)}
-                        preset={preset}
-                        active={preset.id === store.tile.activePreset?.id}
+                        active={store.tile.activePreset === null}
+                        name="нет"
+                        onClick={handleResetPreset}
                     />
-                ))}
-            </TileChooserGrid>
+                    {store.tile.presets.map((preset) => (
+                        <TileChooserItem
+                            key={preset.id}
+                            onClick={() => handleApplyPreset(preset)}
+                            preset={preset}
+                            active={preset.id === store.tile.activePreset?.id}
+                        />
+                    ))}
+                </TileChooserGrid>
+            </HubBackdrop>
         </BaseHub>
     );
 });

@@ -1,8 +1,8 @@
 import { useStore } from "hooks/useStore";
 import { get } from "lodash";
 import { observer } from "mobx-react";
-import { ApplicationWindow } from "models/ApplicationWindow";
 import { TileCell } from "models/tile/TileCell";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { useEffect } from "react";
 import { TileDesktopArea } from "../TileDesktopArea/TileDesktopArea";
 import style from "./style.module.css";
@@ -24,7 +24,7 @@ export const TileDesktopContainer = observer(() => {
             store.tile.activePreset?.cells.forEach((item, index) => {
                 const indexedWindow = get(slicedWindows, index);
                 if (indexedWindow) {
-                    store.tile.attachWindowToTileCell(indexedWindow, item);
+                    store.tile.attachWindowToCell(indexedWindow, item);
                 }
             });
         }
@@ -48,14 +48,14 @@ export const TileDesktopContainer = observer(() => {
     ) => {
         const freeCell = store.tile.nearbyFreeCell;
         if (freeCell) {
-            cell.setAttachedAppWindow(null);
+            store.tile.detachWindowFromCell(cell);
 
-            store.tile.attachWindowToTileCell(attachedWindow, freeCell);
+            store.tile.attachWindowToCell(attachedWindow, freeCell);
 
             attachedWindow.setSize(freeCell.width, freeCell.height);
             attachedWindow.setPosition(freeCell.x, freeCell.y);
 
-            store.tile.attachWindowToTileCell(targetWindow, cell);
+            store.tile.attachWindowToCell(targetWindow, cell);
         }
     };
 

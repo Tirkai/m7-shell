@@ -2,7 +2,10 @@ import { AuthEventType } from "enum/AuthEventType";
 import { ShellEvents } from "enum/ShellEvents";
 import { max, min } from "lodash";
 import { makeAutoObservable } from "mobx";
-import { ApplicationWindow } from "models/ApplicationWindow";
+import { ApplicationProcess } from "models/ApplicationProcess";
+import { ProcessEventType } from "models/process/ProcessEventType";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
+import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import { AppStore } from "./AppStore";
 
 export class WindowManagerStore {
@@ -29,6 +32,16 @@ export class WindowManagerStore {
                     item.recalculateFullScreenSize();
                 });
         });
+
+        this.store.sharedEventBus.eventBus.add(
+            ProcessEventType.StartProcess,
+            (appProcess: ApplicationProcess) => this.onProcessStart(appProcess),
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            ProcessEventType.KillProcess,
+            (appProcess: ApplicationProcess) => this.onProcessKill(appProcess),
+        );
     }
 
     focusedWindow: ApplicationWindow | null = null;
@@ -56,6 +69,14 @@ export class WindowManagerStore {
     addWindow(appWindow: ApplicationWindow) {
         this.windows.push(appWindow);
         this.focusWindow(appWindow);
+    }
+
+    onProcessStart(appProcess: ApplicationProcess) {
+        this.addWindow(appProcess.window);
+    }
+
+    onProcessKill(appProcess: ApplicationProcess) {
+        this.closeWindow(appProcess.window);
     }
 
     focusWindow(appWindow: ApplicationWindow) {
@@ -102,11 +123,32 @@ export class WindowManagerStore {
 
     closeWindow(appWindow: ApplicationWindow) {
         try {
-            // appWindow.eventTarget.dispatch(ApplicationWindowEventType.OnClose);
+            this.store.sharedEventBus.eventBus.dispatch(
+                ApplicationWindowEventType.OnClose,
+                appWindow,
+            );
             this.windows.splice(this.windows.indexOf(appWindow), 1);
         } catch (e) {
             console.error(e);
         }
+    }
+
+    applyCollapseToWindow(appWindow: ApplicationWindow, value: boolean) {
+        appWindow.setCollapsed(value);
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            ApplicationWindowEventType.OnCollapse,
+            appWindow,
+        );
+    }
+
+    applyFullscreenToWindow(appWindow: ApplicationWindow, value: boolean) {
+        appWindow.setFullScreen(value);
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            ApplicationWindowEventType.OnFullscreen,
+            appWindow,
+        );
     }
 
     closeAllWindows() {
