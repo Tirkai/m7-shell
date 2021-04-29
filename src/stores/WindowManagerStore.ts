@@ -34,12 +34,12 @@ export class WindowManagerStore {
         });
 
         this.store.sharedEventBus.eventBus.add(
-            ProcessEventType.StartProcess,
+            ProcessEventType.OnInstantiateProcess,
             (appProcess: ApplicationProcess) => this.onProcessStart(appProcess),
         );
 
         this.store.sharedEventBus.eventBus.add(
-            ProcessEventType.KillProcess,
+            ProcessEventType.OnKillProcess,
             (appProcess: ApplicationProcess) => this.onProcessKill(appProcess),
         );
     }
@@ -81,6 +81,11 @@ export class WindowManagerStore {
 
     focusWindow(appWindow: ApplicationWindow) {
         try {
+            this.store.sharedEventBus.eventBus.dispatch(
+                ApplicationWindowEventType.OnFocusWindow,
+                appWindow,
+            );
+
             window.dispatchEvent(new CustomEvent(ShellEvents.FocusAnyWindow));
 
             if (appWindow.isFocused) return;

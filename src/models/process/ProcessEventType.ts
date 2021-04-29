@@ -1,4 +1,4 @@
 export enum ProcessEventType {
-    StartProcess = "startProcess",
-    KillProcess = "killProcess",
+    OnInstantiateProcess = "OnInstantiateProcess",
+    OnKillProcess = "OnKillProcess",
 }

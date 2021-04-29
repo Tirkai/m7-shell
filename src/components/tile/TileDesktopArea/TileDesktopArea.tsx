@@ -121,6 +121,11 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
                 gridColumn: `${props.cell.startColumn}/${props.cell.endColumn}`,
             }}
         >
+            {/* <div className={style.debug}>
+                ATTACHED: {JSON.stringify(props.cell.attachedAppWindow)}
+                <br />
+                DRAGGED: {JSON.stringify(props.cell.draggedAppWindow)}
+            </div> */}
             <div className={style.container} ref={ref}>
                 {props.hasDraggedWindow && <LayerBoxVisualizer />}
             </div>

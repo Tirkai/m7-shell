@@ -1,5 +1,6 @@
+import { TileFactory } from "factories/TileFactory";
 import { clone } from "lodash";
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, when } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileCell } from "models/tile/TileCell";
@@ -19,96 +20,127 @@ export class TileManager {
         this.presets = registeredTilePresets;
 
         this.store.sharedEventBus.eventBus.add(
-            ProcessEventType.StartProcess,
+            ProcessEventType.OnInstantiateProcess,
             (appProcess: ApplicationProcess) => {
                 this.onProcessStart(appProcess);
             },
         );
 
+        // TODO: IMPORTANT
+
         this.store.sharedEventBus.eventBus.add(
             ApplicationWindowEventType.OnClose,
             (appWindow: ApplicationWindow) => {
-                const cell = this.findCellByAttacheWindowId(appWindow.id);
-                if (cell) {
-                    this.detachWindowFromCell(cell);
+                const preset = this.store.virtualViewport.currentViewport
+                    .tilePreset;
+                if (preset) {
+                    const cell = this.findCellInPresetByAttacheWindowId(
+                        preset,
+                        appWindow.id,
+                    );
+                    if (cell) {
+                        this.detachWindowFromCell(cell);
+                    }
                 }
             },
         );
 
-        this.store.sharedEventBus.eventBus.add(
-            ApplicationWindowEventType.OnCollapse,
-            (appWindow: ApplicationWindow) => {
-                const cell = this.findCellByAttacheWindowId(appWindow.id);
-                if (cell) {
-                    this.detachWindowFromCell(cell);
-                }
-            },
-        );
+        // this.store.sharedEventBus.eventBus.add(
+        //     ApplicationWindowEventType.OnCollapse,
+        //     (appWindow: ApplicationWindow) => {
+        //         const cell = this.findCellByAttacheWindowId(appWindow.id);
+        //         if (cell) {
+        //             this.detachWindowFromCell(cell);
+        //         }
+        //     },
+        // );
 
-        this.store.sharedEventBus.eventBus.add(
-            ApplicationWindowEventType.OnFullscreen,
-            (appWindow: ApplicationWindow) => {
-                const cell = this.findCellByAttacheWindowId(appWindow.id);
-                if (cell) {
-                    this.detachWindowFromCell(cell);
-                }
-            },
-        );
+        // this.store.sharedEventBus.eventBus.add(
+        //     ApplicationWindowEventType.OnFullscreen,
+        //     (appWindow: ApplicationWindow) => {
+        //         const cell = this.findCellByAttacheWindowId(appWindow.id);
+        //         if (cell) {
+        //             this.detachWindowFromCell(cell);
+        //         }
+        //     },
+        // );
     }
 
     presets: TilePreset[] = [];
 
-    activePreset: TilePreset | null = null;
+    // activePreset: TilePreset | null = null;
 
-    get hasActivePreset() {
-        return this.activePreset !== null;
+    // get hasActivePreset() {
+    //     return this.activePreset !== null;
+    // }
+
+    findCellInPresetByAttacheWindowId(preset: TilePreset, id: string) {
+        return preset.cells.find((cell) => cell.attachedAppWindow?.id === id);
     }
 
-    findCellByAttacheWindowId(id: string) {
-        return this.activePreset?.cells.find(
-            (cell) => cell.attachedAppWindow?.id === id,
-        );
-    }
+    // get freeCells() {
+    //     return (
+    //         this.activePreset?.cells.filter(
+    //             (item) => !item.hasAttachedWindow,
+    //         ) ?? []
+    //     );
+    // }
 
-    get freeCells() {
-        return (
-            this.activePreset?.cells.filter(
-                (item) => !item.hasAttachedWindow,
-            ) ?? []
-        );
-    }
+    // get hasFreeCells() {
+    //     return this.freeCells.length > 0;
+    // }
 
-    get hasFreeCells() {
-        return this.freeCells.length > 0;
-    }
+    async onProcessStart(appProcess: ApplicationProcess) {
+        console.log("TileManager:onProcessStart");
 
-    onProcessStart(appProcess: ApplicationProcess) {
-        if (this.hasActivePreset && this.freeCells) {
-            const tileCell = this.nearbyFreeCell;
+        // TODO: Think about it
+        await when(() => !!appProcess.viewport?.tilePreset);
+        const preset = appProcess.viewport?.tilePreset;
+
+        console.log("[PRESET]", preset);
+
+        if (preset?.freeCells) {
+            console.log("FREE_CELLS", preset?.freeCells);
+            const tileCell = preset.nearbyFreeCell;
             const appWindow = appProcess.window;
 
-            this.store.tile.attachWindowToCell(appWindow, tileCell);
+            this.store.tile.attachWindowToCell(appWindow, preset, tileCell);
         }
     }
 
-    applyPreset(preset: TilePreset) {
-        const clonedPreset = clone(preset);
+    applyPreset(preset: TilePreset | null) {
+        // const clonedPreset = clone(preset);
 
-        this.detachAllWindows();
-        this.activePreset = clonedPreset;
+        if (preset) {
+            const clonedPreset = clone(preset);
+            const createdPreset = TileFactory.createTilePreset(clonedPreset);
+            console.log("APPLY_PRESET", createdPreset);
 
-        this.store.sharedEventBus.eventBus.dispatch(
-            TileEventType.OnChangePreset,
-            clonedPreset,
-        );
+            this.store.sharedEventBus.eventBus.dispatch(
+                TileEventType.OnChangePreset,
+                createdPreset,
+            );
+        } else {
+            this.store.sharedEventBus.eventBus.dispatch(
+                TileEventType.OnChangePreset,
+                null,
+            );
+        }
+
+        // this.detachAllWindows();
+        // this.activePreset = clonedPreset;
     }
 
-    get nearbyFreeCell() {
-        return this.freeCells[0] ?? null;
-    }
+    // get nearbyFreeCell() {
+    //     return this.freeCells[0] ?? null;
+    // }
 
-    attachWindowToCell(appWindow: ApplicationWindow, tileCell: TileCell) {
-        if (this.hasFreeCells) {
+    attachWindowToCell(
+        appWindow: ApplicationWindow,
+        preset: TilePreset,
+        tileCell: TileCell,
+    ) {
+        if (preset.hasFreeCells) {
             appWindow.setSize(tileCell.width, tileCell.height);
             appWindow.setPosition(tileCell.x, tileCell.y);
 
@@ -131,17 +163,11 @@ export class TileManager {
         );
     }
 
-    detachAllWindows() {
-        this.activePreset?.cells.forEach((item) =>
-            this.detachWindowFromCell(item),
-        );
+    detachAllWindows(preset: TilePreset) {
+        preset.cells.forEach((item) => this.detachWindowFromCell(item));
 
         this.store.sharedEventBus.eventBus.dispatch(
             TileEventType.OnDetachAllWindows,
         );
-    }
-
-    resetPreset() {
-        this.activePreset = null;
     }
 }

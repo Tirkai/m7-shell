@@ -6,6 +6,8 @@ import { action, makeAutoObservable } from "mobx";
 import { DefaultDisplayMode } from "models/DefaultDisplayMode";
 import { DevModeModel } from "models/DevModeModel";
 import { EmbedDisplayMode } from "models/EmbedDisplayMode";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
+import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import moment from "moment";
 import { AppStore } from "./AppStore";
 
@@ -36,20 +38,26 @@ export class ShellStore {
 
         makeAutoObservable(this);
 
-        window.addEventListener(
-            ShellEvents.DesktopClick,
-            action(() => {
-                this.activePanel = ShellPanelType.None;
-                this.store.windowManager.clearFocus();
-            }),
+        // window.addEventListener(
+        //     ShellEvents.DesktopClick,
+        //     action(() => {
+        //         this.activePanel = ShellPanelType.None;
+        //         this.store.windowManager.clearFocus();
+        //     }),
+        // );
+
+        this.store.sharedEventBus.eventBus.add(
+            ApplicationWindowEventType.OnFocusWindow,
+            (_appWindow: ApplicationWindow) =>
+                this.setActivePanel(ShellPanelType.None),
         );
 
-        window.addEventListener(
-            ShellEvents.FocusAnyWindow,
-            action(() => {
-                this.activePanel = ShellPanelType.None;
-            }),
-        );
+        // window.addEventListener(
+        //     ShellEvents.FocusAnyWindow,
+        //     action(() => {
+        //         this.activePanel = ShellPanelType.None;
+        //     }),
+        // );
 
         window.addEventListener(
             ShellEvents.StartMenuOpen,

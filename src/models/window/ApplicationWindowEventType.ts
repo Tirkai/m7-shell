@@ -5,4 +5,5 @@ export enum ApplicationWindowEventType {
     OnClose = "OnClose",
     OnCollapse = "OnCollapse",
     OnFullscreen = "OnFullscreen",
+    OnFocusWindow = "OnFocusWindow",
 }

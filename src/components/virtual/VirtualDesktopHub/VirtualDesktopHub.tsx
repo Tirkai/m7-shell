@@ -4,7 +4,7 @@ import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
-import React from "react";
+import React, { useMemo } from "react";
 import { VirtualFrameList } from "../VirtualFrameList/VirtualFrameList";
 import { VirtualFramePreview } from "../VirtualFramePreview/VirtualFramePreview";
 import style from "./style.module.css";
@@ -24,9 +24,21 @@ export const VirtualDesktopHub = observer(() => {
         store.virtualViewport.addViewport(viewport);
     };
 
-    const handleDeleteViewport = (viewport: VirtualViewportModel) => {
+    const handleRemoveViewport = (viewport: VirtualViewportModel) => {
         store.virtualViewport.removeViewport(viewport);
     };
+
+    const handleClearViewport = (viewport: VirtualViewportModel) => {
+        store.virtualViewport.clearViewport(viewport);
+    };
+
+    const removeViewportAction = useMemo(() => {
+        if (store.virtualViewport.viewports.length > 1) {
+            return handleRemoveViewport;
+        } else {
+            return handleClearViewport;
+        }
+    }, [store.virtualViewport.viewports.length]);
 
     return (
         <BaseHub
@@ -36,7 +48,7 @@ export const VirtualDesktopHub = observer(() => {
         >
             <div className={style.virtualDesktopHub}>
                 <div className={style.container}>
-                    <div className={style.applications}>Applications</div>
+                    <div className={style.applications}></div>
                     <div className={style.frames}>
                         <div className={style.framesContainer}>
                             <VirtualFrameList
@@ -54,14 +66,8 @@ export const VirtualDesktopHub = observer(() => {
                                                     .currentViewport.id ===
                                                 item.id
                                             }
-                                            onDelete={
-                                                store.virtualViewport.viewports
-                                                    .length > 1
-                                                    ? () =>
-                                                          handleDeleteViewport(
-                                                              item,
-                                                          )
-                                                    : undefined
+                                            onDelete={() =>
+                                                removeViewportAction(item)
                                             }
                                         >
                                             {index + 1}

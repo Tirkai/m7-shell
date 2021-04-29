@@ -13,17 +13,27 @@ interface IVirtualFramePreviewProps {
 
 const className = style.virtualFramePreview;
 
-export const VirtualFramePreview = (props: IVirtualFramePreviewProps) => (
-    <div className={classNames(className, { [style.active]: props.active })}>
-        {props.onDelete && (
-            <div className={style.actions}>
-                <IconButton color="secondary" onClick={props.onDelete}>
-                    <Clear />
-                </IconButton>
-            </div>
-        )}
-        <div className={style.content} onClick={props.onClick}>
-            {props.children}
+export const VirtualFramePreview = (props: IVirtualFramePreviewProps) => {
+    const handleDelete = (e: React.MouseEvent) => {
+        if (props.onDelete) {
+            props.onDelete();
+        }
+        e.stopPropagation();
+    };
+
+    return (
+        <div
+            className={classNames(className, { [style.active]: props.active })}
+            onClick={props.onClick}
+        >
+            {props.onDelete && (
+                <div className={style.actions}>
+                    <IconButton color="secondary" onClick={handleDelete}>
+                        <Clear />
+                    </IconButton>
+                </div>
+            )}
+            <div className={style.content}>{props.children}</div>
         </div>
-    </div>
-);
+    );
+};

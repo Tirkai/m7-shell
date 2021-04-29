@@ -12,6 +12,8 @@ import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ExternalApplication } from "models/ExternalApplication";
 import { ProcessEventType } from "models/process/ProcessEventType";
+import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { portalEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
@@ -29,6 +31,22 @@ export class ProcessManagerStore {
             this.destroyAllProcesses(),
         );
 
+        this.store.sharedEventBus.eventBus.add(
+            VirtualViewportEventType.OnRemoveViewportFrame,
+            (viewport: VirtualViewportModel) =>
+                this.onRemoveViewportFrame(viewport),
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            VirtualViewportEventType.OnClearViewportFrame,
+            (viewport: VirtualViewportModel) =>
+                this.onRemoveViewportFrame(viewport),
+        );
+
+        this.bindOnMessageHandler();
+    }
+
+    bindOnMessageHandler() {
         window.onmessage = (event: MessageEvent) => {
             const message: EmitterMessage<unknown> = event.data;
             let apps = [];
@@ -54,6 +72,14 @@ export class ProcessManagerStore {
                 return;
             });
         };
+    }
+
+    onRemoveViewportFrame(viewport: VirtualViewportModel) {
+        const findedProcesses = this.processes.filter(
+            (item) => item.viewport?.id === viewport.id,
+        );
+
+        findedProcesses.forEach((item) => this.killProcess(item));
     }
 
     async execute(appProcess: ApplicationProcess) {
@@ -142,7 +168,7 @@ export class ProcessManagerStore {
         appProcess.app.setExecuted(true);
 
         this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
-            ProcessEventType.StartProcess,
+            ProcessEventType.OnInstantiateProcess,
             appProcess,
         );
     }
@@ -152,12 +178,8 @@ export class ProcessManagerStore {
 
         appProcess.app.setExecuted(false);
 
-        // await appProcess.window.eventTarget.dispatch(
-        //     ApplicationWindowEventType.OnClose,
-        // );
-
         this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
-            ProcessEventType.KillProcess,
+            ProcessEventType.OnKillProcess,
             appProcess,
         );
 

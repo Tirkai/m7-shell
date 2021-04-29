@@ -1,22 +1,32 @@
+import { ITilePresetOptions } from "interfaces/tile/ITilePresetOptions";
 import { makeAutoObservable } from "mobx";
 import { v4 } from "uuid";
+import { ITilePreset } from "./ITilePreset";
 import { TileCell } from "./TileCell";
 
-interface ITilePresetOptions {
-    cells: TileCell[];
-    rows: number;
-    columns: number;
-}
-
-export class TilePreset {
+export class TilePreset implements ITilePreset {
     id: string;
 
     cells: TileCell[] = [];
     rows: number;
     columns: number;
 
+    alias: string;
+
+    get freeCells() {
+        return this.cells.filter((item) => !item.hasAttachedWindow) ?? [];
+    }
+
+    get hasFreeCells() {
+        return this.freeCells.length > 0;
+    }
+
     get maxTilesCount() {
         return this.cells.length;
+    }
+
+    get nearbyFreeCell() {
+        return this.freeCells[0] ?? null;
     }
 
     constructor(options: ITilePresetOptions) {
@@ -27,6 +37,7 @@ export class TilePreset {
         this.rows = options.rows;
         this.columns = options.columns;
         this.cells = options.cells;
+        this.alias = options.alias;
     }
 
     setCells(cells: TileCell[]) {

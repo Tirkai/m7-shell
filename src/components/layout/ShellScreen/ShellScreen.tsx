@@ -96,11 +96,6 @@ export class ShellScreen extends Component<IStore> {
                 <DesktopLayout
                     desktop={
                         <DesktopContainer>
-                            <DesktopLayer enabled priority={1}>
-                                <DesktopForeground
-                                    onDesktopClick={this.handleClickDesktop}
-                                />
-                            </DesktopLayer>
                             <VirtualViewport
                                 displayed={
                                     true
@@ -110,7 +105,14 @@ export class ShellScreen extends Component<IStore> {
                             >
                                 {this.store.virtualViewport.viewports.map(
                                     (viewport) => (
-                                        <VirtualFrame>
+                                        <VirtualFrame key={viewport.id}>
+                                            <DesktopLayer enabled priority={1}>
+                                                <DesktopForeground
+                                                    onDesktopClick={
+                                                        this.handleClickDesktop
+                                                    }
+                                                />
+                                            </DesktopLayer>
                                             <DesktopLayer enabled priority={1}>
                                                 <AppWindowArea
                                                     viewport={viewport}
@@ -127,48 +129,13 @@ export class ShellScreen extends Component<IStore> {
                                                 }
                                                 priority={2}
                                             >
-                                                <TileDesktopContainer />
+                                                <TileDesktopContainer
+                                                    preset={viewport.tilePreset}
+                                                />
                                             </DesktopLayer>
                                         </VirtualFrame>
                                     ),
                                 )}
-                                {/* <VirtualFrame>
-                                    <DesktopLayer enabled priority={1}>
-                                        <AppWindowArea
-                                            disabled={
-                                                this.store.desktop.isEditMode
-                                            }
-                                        />
-                                    </DesktopLayer>
-                                    <DesktopLayer
-                                        enabled={
-                                            this.store.windowManager
-                                                .hasDraggedWindow
-                                        }
-                                        priority={2}
-                                    >
-                                        <TileDesktopContainer />
-                                    </DesktopLayer>
-                                </VirtualFrame> */}
-
-                                {/* <VirtualFrame>1</VirtualFrame>
-                                <VirtualFrame>2</VirtualFrame>
-                                <VirtualFrame>3</VirtualFrame> */}
-
-                                {/* <DesktopLayer enabled priority={1}>
-                                    <AppWindowArea
-                                        disabled={this.store.desktop.isEditMode}
-                                    />
-                                </DesktopLayer>
-                                <DesktopLayer
-                                    enabled={
-                                        this.store.windowManager
-                                            .hasDraggedWindow
-                                    }
-                                    priority={2}
-                                >
-                                    <TileDesktopContainer />
-                                </DesktopLayer> */}
                             </VirtualViewport>
 
                             <DesktopLayer enabled priority={2}>

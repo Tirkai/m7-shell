@@ -1,6 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { v4 } from "uuid";
+import { ITileCell } from "./ITileCell";
 import { TileGridUnit } from "./TileGridUnit";
 
 interface ITileCellOptions {
@@ -10,7 +11,7 @@ interface ITileCellOptions {
     endRow: TileGridUnit;
 }
 
-export class TileCell {
+export class TileCell implements ITileCell {
     id: string;
     startColumn: TileGridUnit = "span";
     endColumn: TileGridUnit = "span";
