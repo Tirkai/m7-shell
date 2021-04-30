@@ -364,6 +364,7 @@ export class AuthStore {
 
             this.accessToken = "";
             this.refreshToken = "";
+            this.deltaTime = 0;
             this.setAuthorized(false);
 
             if (this.interval) {

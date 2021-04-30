@@ -1,6 +1,6 @@
 const nodeEnv = process.env.NODE_ENV;
 
-const developmentDomain = "develop-opo";
+const developmentDomain = "zab";
 
 const [, upperLevelDomain] = window.location.hostname.split(".");
 
