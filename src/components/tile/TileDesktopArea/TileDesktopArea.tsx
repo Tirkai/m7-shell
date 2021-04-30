@@ -62,6 +62,7 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
                 props.cell.setAttachedAppWindow(null);
             }
 
+            // TODO : Think about it
             const listener = props.cell.draggedAppWindow?.eventTarget.add(
                 ApplicationWindowEventType.OnDragChange,
                 (appWindow: ApplicationWindow) => {

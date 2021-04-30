@@ -30,6 +30,7 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
             new ApplicationProcess({
                 app,
                 window: new ApplicationWindow(),
+                viewport: this.store.virtualViewport.currentViewport,
             }),
         );
     };

@@ -1,8 +1,10 @@
-import { AuthEventType } from "enum/AuthEventType";
 import { ShellEvents } from "enum/ShellEvents";
 import { max, min } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
+import { AuthEventType } from "models/auth/AuthEventType";
+import { DesktopEventType } from "models/desktop/DesktopEventType";
+import { PanelEventType } from "models/panel/PanelEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
@@ -15,11 +17,12 @@ export class WindowManagerStore {
     constructor(store: AppStore) {
         this.store = store;
 
+        const { eventBus } = store.sharedEventBus;
         makeAutoObservable(this);
 
-        this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
-            this.closeAllWindows(),
-        );
+        // this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
+        //     this.closeAllWindows(),
+        // );
 
         window.addEventListener(ShellEvents.FocusShellControls, () =>
             this.clearFocus(),
@@ -33,15 +36,25 @@ export class WindowManagerStore {
                 });
         });
 
-        this.store.sharedEventBus.eventBus.add(
+        eventBus.add(
             ProcessEventType.OnInstantiateProcess,
             (appProcess: ApplicationProcess) => this.onProcessStart(appProcess),
         );
 
-        this.store.sharedEventBus.eventBus.add(
+        eventBus.add(
             ProcessEventType.OnKillProcess,
             (appProcess: ApplicationProcess) => this.onProcessKill(appProcess),
         );
+
+        eventBus.add(DesktopEventType.OnDesktopClick, () =>
+            this.onDesktopClick(),
+        );
+
+        eventBus.add(PanelEventType.OnShowAnyPanel, () =>
+            this.onShowAnyPanel(),
+        );
+
+        eventBus.add(AuthEventType.OnLogout, () => this.closeAllWindows());
     }
 
     focusedWindow: ApplicationWindow | null = null;
@@ -77,6 +90,14 @@ export class WindowManagerStore {
 
     onProcessKill(appProcess: ApplicationProcess) {
         this.closeWindow(appProcess.window);
+    }
+
+    onDesktopClick() {
+        this.clearFocus();
+    }
+
+    onShowAnyPanel() {
+        this.clearFocus();
     }
 
     focusWindow(appWindow: ApplicationWindow) {

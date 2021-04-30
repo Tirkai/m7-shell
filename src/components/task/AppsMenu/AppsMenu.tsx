@@ -34,6 +34,7 @@ export const AppsMenu: React.FC = observer(() => {
             const appProccess = new ApplicationProcess({
                 app,
                 window: new ApplicationWindow(),
+                viewport: store.virtualViewport.currentViewport,
             });
 
             store.processManager.execute(appProccess);

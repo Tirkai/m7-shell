@@ -20,8 +20,10 @@ export const VirtualDesktopHub = observer(() => {
     };
 
     const handleCreateViewport = () => {
+        const current = store.virtualViewport.currentViewport;
+
         const viewport = new VirtualViewportModel();
-        store.virtualViewport.addViewport(viewport);
+        store.virtualViewport.addViewport(viewport, current.tilePreset);
     };
 
     const handleRemoveViewport = (viewport: VirtualViewportModel) => {
@@ -58,6 +60,7 @@ export const VirtualDesktopHub = observer(() => {
                                 {store.virtualViewport.viewports.map(
                                     (item, index) => (
                                         <VirtualFramePreview
+                                            key={item.id}
                                             onClick={() =>
                                                 handleSetViewport(item)
                                             }

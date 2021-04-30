@@ -13,6 +13,8 @@ export class TilePreset implements ITilePreset {
 
     alias: string;
 
+    isEmptyPreset: boolean;
+
     get freeCells() {
         return this.cells.filter((item) => !item.hasAttachedWindow) ?? [];
     }
@@ -38,6 +40,7 @@ export class TilePreset implements ITilePreset {
         this.columns = options.columns;
         this.cells = options.cells;
         this.alias = options.alias;
+        this.isEmptyPreset = options.isEmptyPreset ?? false;
     }
 
     setCells(cells: TileCell[]) {

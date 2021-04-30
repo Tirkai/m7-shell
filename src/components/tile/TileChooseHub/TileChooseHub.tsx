@@ -19,23 +19,23 @@ export const TileChooseHub = observer(() => {
         store.shell.setActivePanel(ShellPanelType.None);
     };
 
-    const handleResetPreset = () => {
-        store.tile.applyPreset(null);
-        store.shell.setActivePanel(ShellPanelType.None);
-    };
+    // const handleResetPreset = () => {
+    //     store.tile.applyPreset(null);
+    //     store.shell.setActivePanel(ShellPanelType.None);
+    // };
 
     return (
         <BaseHub show={store.shell.activePanel === ShellPanelType.TileHub}>
             <HubBackdrop>
                 <TileChooserGrid>
                     {/* TODO: locale */}
-                    <TileChooserItem
+                    {/* <TileChooserItem
                         active={
                             !store.virtualViewport.currentViewport.tilePreset
                         }
                         name="нет"
                         onClick={handleResetPreset}
-                    />
+                    /> */}
                     {store.tile.presets.map((preset) => (
                         <TileChooserItem
                             key={preset.id}

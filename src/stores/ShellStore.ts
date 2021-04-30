@@ -1,11 +1,12 @@
 import { DisplayModeType } from "enum/DisplayModeType";
-import { ShellEvents } from "enum/ShellEvents";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IDisplayMode } from "interfaces/display/IDisplayMode";
-import { action, makeAutoObservable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { DefaultDisplayMode } from "models/DefaultDisplayMode";
+import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { DevModeModel } from "models/DevModeModel";
 import { EmbedDisplayMode } from "models/EmbedDisplayMode";
+import { PanelEventType } from "models/panel/PanelEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import moment from "moment";
@@ -38,13 +39,12 @@ export class ShellStore {
 
         makeAutoObservable(this);
 
-        // window.addEventListener(
-        //     ShellEvents.DesktopClick,
-        //     action(() => {
-        //         this.activePanel = ShellPanelType.None;
-        //         this.store.windowManager.clearFocus();
-        //     }),
-        // );
+        this.store.sharedEventBus.eventBus.add(
+            DesktopEventType.OnDesktopClick,
+            () => {
+                this.setActivePanel(ShellPanelType.None);
+            },
+        );
 
         this.store.sharedEventBus.eventBus.add(
             ApplicationWindowEventType.OnFocusWindow,
@@ -59,26 +59,26 @@ export class ShellStore {
         //     }),
         // );
 
-        window.addEventListener(
-            ShellEvents.StartMenuOpen,
-            action(() => {
-                this.store.windowManager.clearFocus();
-            }),
-        );
+        // window.addEventListener(
+        //     ShellEvents.StartMenuOpen,
+        //     action(() => {
+        //         this.store.windowManager.clearFocus();
+        //     }),
+        // );
 
-        window.addEventListener(
-            ShellEvents.NotificationHubOpen,
-            action(() => {
-                this.store.windowManager.clearFocus();
-            }),
-        );
+        // window.addEventListener(
+        //     ShellEvents.NotificationHubOpen,
+        //     action(() => {
+        //         this.store.windowManager.clearFocus();
+        //     }),
+        // );
 
-        window.addEventListener(
-            ShellEvents.AudioHubOpen,
-            action(() => {
-                this.store.windowManager.clearFocus();
-            }),
-        );
+        // window.addEventListener(
+        //     ShellEvents.AudioHubOpen,
+        //     action(() => {
+        //         this.store.windowManager.clearFocus();
+        //     }),
+        // );
 
         const storagedDevMode = JSON.parse(
             localStorage.getItem(this.localStorageDevModeKey) ?? "{}",
@@ -89,36 +89,26 @@ export class ShellStore {
                 this.setDevMode(storagedDevMode.enabled);
             }
         }
-
-        // reaction(
-        //     () => this.displayMode,
-        //     (mode) => this.store.windowManager.onChangeDisplayMode(mode),
-        // );
     }
 
     setActivePanel(panel: ShellPanelType) {
         this.activePanel = panel;
 
-        switch (panel) {
-            case ShellPanelType.StartMenu: {
-                window.dispatchEvent(
-                    new CustomEvent(ShellEvents.StartMenuOpen),
-                );
-                break;
-            }
-            case ShellPanelType.NotificationHub: {
-                window.dispatchEvent(
-                    new CustomEvent(ShellEvents.NotificationHubOpen),
-                );
-                break;
-            }
-            case ShellPanelType.AudioHub: {
-                window.dispatchEvent(new CustomEvent(ShellEvents.AudioHubOpen));
-                break;
-            }
-            default:
-                break;
+        if (panel !== ShellPanelType.None) {
+            this.store.sharedEventBus.eventBus.dispatch(
+                PanelEventType.OnShowAnyPanel,
+                panel,
+            );
+        } else {
+            this.store.sharedEventBus.eventBus.dispatch(
+                PanelEventType.OnHideAnyPanel,
+                panel,
+            );
         }
+        this.store.sharedEventBus.eventBus.dispatch(
+            PanelEventType.OnChangePanel,
+            panel,
+        );
     }
 
     setDevMode(value: boolean) {

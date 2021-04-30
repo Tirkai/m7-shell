@@ -19,4 +19,14 @@ export class TileFactory {
             ),
         });
     }
+
+    static createEmptyPreset() {
+        return new TilePreset({
+            columns: 0,
+            rows: 0,
+            alias: "none",
+            cells: [],
+            isEmptyPreset: true,
+        });
+    }
 }

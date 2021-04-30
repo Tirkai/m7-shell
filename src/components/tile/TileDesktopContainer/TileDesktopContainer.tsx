@@ -9,7 +9,7 @@ import { TileDesktopArea } from "../TileDesktopArea/TileDesktopArea";
 import style from "./style.module.css";
 
 interface ITileDesktopContainerProps {
-    preset?: TilePreset;
+    preset: TilePreset;
 }
 
 const className = style.tileDesktopContainer;

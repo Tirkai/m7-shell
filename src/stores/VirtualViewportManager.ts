@@ -46,6 +46,11 @@ export class VirtualViewportManager {
         );
 
         this.store.sharedEventBus.eventBus.add(
+            TileEventType.OnTileGridOverflow,
+            (process: ApplicationProcess) => this.onTileGridOverflow(process),
+        );
+
+        this.store.sharedEventBus.eventBus.add(
             ApplicationWindowEventType.OnFocusWindow,
             (appWindow: ApplicationWindow) => this.onFocusWindow(appWindow),
         );
@@ -78,6 +83,18 @@ export class VirtualViewportManager {
         }
     }
 
+    onTileGridOverflow(appProcess: ApplicationProcess) {
+        const current = this.currentViewport;
+
+        const newViewport = new VirtualViewportModel();
+
+        appProcess.setViewport(newViewport);
+
+        this.insertViewport(newViewport, current);
+
+        // this.addViewport(newViewport);
+    }
+
     onFocusWindow(appWindow: ApplicationWindow) {
         // TODO: think about it
         const findedProcess = this.store.processManager.processes.find(
@@ -92,8 +109,35 @@ export class VirtualViewportManager {
         }
     }
 
-    addViewport(viewport: VirtualViewportModel) {
+    addViewport(viewport: VirtualViewportModel, preset?: TilePreset) {
         this.viewports.push(viewport);
+
+        this.setCurrentViewport(viewport);
+
+        // if (preset) {
+        //     const p = this.store.tile.presets.find(
+        //         (item) => item.alias === preset.alias,
+        //     );
+        //     if (p) {
+        //         viewport.setTilePreset(TileFactory.createTilePreset(p));
+        //     }
+        // }
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            VirtualViewportEventType.OnAddViewportFrame,
+            viewport,
+        );
+    }
+
+    insertViewport(
+        viewport: VirtualViewportModel,
+        insertAfterViewport: VirtualViewportModel,
+    ) {
+        const index = this.viewports.findIndex(
+            (item) => insertAfterViewport.id === item.id,
+        );
+
+        this.viewports.splice(index + 1, 0, viewport);
 
         this.setCurrentViewport(viewport);
 

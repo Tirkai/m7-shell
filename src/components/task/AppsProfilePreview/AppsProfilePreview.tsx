@@ -32,6 +32,7 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
             new ApplicationProcess({
                 app,
                 window: new ApplicationWindow(),
+                viewport: this.store.virtualViewport.currentViewport,
             }),
         );
     };

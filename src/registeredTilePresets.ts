@@ -3,6 +3,13 @@ import { ITilePreset } from "models/tile/ITilePreset";
 
 const rawTilePresets: ITilePreset[] = [
     {
+        columns: 0,
+        rows: 0,
+        alias: "none",
+        cells: [],
+        isEmptyPreset: true,
+    },
+    {
         columns: 1,
         rows: 1,
         alias: "1x1",

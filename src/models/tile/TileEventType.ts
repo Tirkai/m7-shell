@@ -1,6 +1,7 @@
 export enum TileEventType {
-    OnAttachWindow = "attachWindow",
-    OnDetachWindow = "detachWindow",
-    OnDetachAllWindows = "detachAllWindow",
-    OnChangePreset = "changePreset",
+    OnAttachWindow = "OnAttachWindow",
+    OnDetachWindow = "OnDetachWindow",
+    OnDetachAllWindows = "OnDetachAllWindows",
+    OnChangePreset = "OnChangePreset",
+    OnTileGridOverflow = "OnTileGridOverflow",
 }

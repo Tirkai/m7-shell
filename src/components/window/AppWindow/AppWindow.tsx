@@ -70,11 +70,19 @@ export const AppWindow = (props: IAppWindowProps) => {
         appProcess.emitter.on(AppMessageType.Connected, () => {
             handleAppReady();
 
-            store.auth.injectAuthTokenInProcess(appProcess);
+            store.processManager.injectAuthTokenInProcess(
+                appProcess,
+                store.auth.accessToken,
+                store.auth.userLogin,
+            );
         });
 
         appProcess.emitter.on(AppMessageType.ForceRecieveToken, () =>
-            store.auth.injectAuthTokenInProcess(appProcess),
+            store.processManager.injectAuthTokenInProcess(
+                appProcess,
+                store.auth.accessToken,
+                store.auth.userLogin,
+            ),
         );
     };
 

@@ -2,14 +2,15 @@ import {
     AppMessageType,
     EmitterMessage,
     invokeListeners,
+    ShellMessageType,
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
-import { AuthEventType } from "enum/AuthEventType";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
+import { AuthEventType } from "models/auth/AuthEventType";
 import { ExternalApplication } from "models/ExternalApplication";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
@@ -24,23 +25,27 @@ export class ProcessManagerStore {
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
-
+        const { eventBus } = this.store.sharedEventBus;
         makeAutoObservable(this);
 
-        this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
-            this.destroyAllProcesses(),
-        );
-
-        this.store.sharedEventBus.eventBus.add(
+        eventBus.add(
             VirtualViewportEventType.OnRemoveViewportFrame,
             (viewport: VirtualViewportModel) =>
                 this.onRemoveViewportFrame(viewport),
         );
 
-        this.store.sharedEventBus.eventBus.add(
+        eventBus.add(
             VirtualViewportEventType.OnClearViewportFrame,
             (viewport: VirtualViewportModel) =>
                 this.onRemoveViewportFrame(viewport),
+        );
+
+        eventBus.add(AuthEventType.OnLogout, () => this.onLogout());
+
+        eventBus.add(
+            AuthEventType.OnRenewToken,
+            (payload: { token: string; login: string }) =>
+                this.onRecieveToken(payload),
         );
 
         this.bindOnMessageHandler();
@@ -72,6 +77,35 @@ export class ProcessManagerStore {
                 return;
             });
         };
+    }
+
+    injectAuthTokenInProcess(
+        appProccess: ApplicationProcess,
+        token: string,
+        login: string,
+    ) {
+        try {
+            appProccess.emitter.emit(ShellMessageType.UpdateAuthToken, {
+                token,
+                login,
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onRecieveToken(payload: { token: string; login: string }) {
+        this.processes.forEach((appProcess) =>
+            this.injectAuthTokenInProcess(
+                appProcess,
+                payload.token,
+                payload.login,
+            ),
+        );
+    }
+
+    onLogout() {
+        this.destroyAllProcesses();
     }
 
     onRemoveViewportFrame(viewport: VirtualViewportModel) {
@@ -118,6 +152,8 @@ export class ProcessManagerStore {
                                     app: findedApp,
                                     window: new ApplicationWindow(),
                                     url,
+                                    viewport: this.store.virtualViewport
+                                        .currentViewport,
                                 },
                             );
                             this.execute(createdAppProcessInstance);
@@ -141,6 +177,8 @@ export class ProcessManagerStore {
                                     url,
                                 }),
                                 window: new ApplicationWindow(),
+                                viewport: this.store.virtualViewport
+                                    .currentViewport,
                             },
                         );
                         this.execute(createdAppProcessInstance);

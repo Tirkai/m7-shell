@@ -5,4 +5,5 @@ export interface ITilePreset {
     rows: number;
     columns: number;
     alias: string;
+    isEmptyPreset?: boolean;
 }

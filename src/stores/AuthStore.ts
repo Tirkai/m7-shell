@@ -1,4 +1,3 @@
-import { ShellMessageType } from "@algont/m7-shell-emitter";
 import {
     IJsonRpcResponse,
     JsonRpcPayload,
@@ -7,16 +6,14 @@ import {
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
 import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
-import { AuthEventType } from "enum/AuthEventType";
 import { RoleType } from "enum/RoleType";
-import { ShellEvents } from "enum/ShellEvents";
 import { IAccessTokenMetadata } from "interfaces/auth/IAccessTokenMetadata";
 import { IRefreshTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { Base64 } from "js-base64";
 import { strings } from "locale";
 import { makeAutoObservable } from "mobx";
-import { ApplicationProcess } from "models/ApplicationProcess";
+import { AuthEventType } from "models/auth/AuthEventType";
 import moment, { Moment } from "moment";
 import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
@@ -147,6 +144,7 @@ export class AuthStore {
     }
 
     async verifyToken() {
+        const { eventBus } = this.store.sharedEventBus;
         try {
             const response = await Axios.post<
                 IJsonRpcResponse<AccessTokenVerifyStatus>
@@ -160,12 +158,14 @@ export class AuthStore {
             if (!response.data.error) {
                 this.setCheckedAfterStart(true);
 
-                this.eventBus.dispatchEvent(
-                    new CustomEvent(AuthEventType.SuccessVerifyToken),
+                eventBus.dispatch(
+                    AuthEventType.OnSuccessVerifyToken,
+                    this.accessToken,
                 );
             } else {
-                this.eventBus.dispatchEvent(
-                    new CustomEvent(AuthEventType.FailedVerifyToken),
+                eventBus.dispatch(
+                    AuthEventType.OnFailedVerifyToken,
+                    this.accessToken,
                 );
             }
 
@@ -173,10 +173,10 @@ export class AuthStore {
                 this.renewToken();
             }
             if (response.data.result === AccessTokenVerifyStatus.NotFound) {
-                this.eventBus.dispatchEvent(
-                    new CustomEvent(AuthEventType.TokenNotFound),
+                eventBus.dispatch(
+                    AuthEventType.OnTokenNotFound,
+                    this.accessToken,
                 );
-
                 this.logout();
             }
 
@@ -185,8 +185,9 @@ export class AuthStore {
                 result: response.data.result === AccessTokenVerifyStatus.Ok,
             });
         } catch (e) {
-            this.eventBus.dispatchEvent(
-                new CustomEvent(AuthEventType.FailedVerifyToken),
+            eventBus.dispatch(
+                AuthEventType.OnFailedVerifyToken,
+                this.accessToken,
             );
 
             return new JsonRpcResult({
@@ -196,6 +197,7 @@ export class AuthStore {
     }
 
     setToken(accessToken: string, refreshToken: string) {
+        const { eventBus } = this.store.sharedEventBus;
         try {
             this.accessToken = accessToken;
             this.refreshToken = refreshToken;
@@ -208,6 +210,11 @@ export class AuthStore {
                 accessToken,
             );
 
+            eventBus.dispatch(AuthEventType.OnRecieveToken, {
+                token: this.accessToken,
+                login: this.userLogin,
+            });
+
             this.roles = accessTokenData?.roles ?? [];
 
             this.createTime = moment.utc(refreshTokenData?.created);
@@ -217,11 +224,7 @@ export class AuthStore {
                 this.sessionStorageDelta,
             );
 
-            this.eventBus.dispatchEvent(
-                new CustomEvent(AuthEventType.UpdateToken, {
-                    detail: this.accessToken,
-                }),
-            );
+            eventBus.dispatch(AuthEventType.OnUpdateToken, this.accessToken);
 
             if (!sessionStorageDelta) {
                 this.deltaTime = this.currentTime.diff(this.createTime);
@@ -248,18 +251,19 @@ export class AuthStore {
         }
     }
 
-    injectAuthTokenInProcess(appProccess: ApplicationProcess) {
-        try {
-            appProccess.emitter.emit(ShellMessageType.UpdateAuthToken, {
-                token: this.accessToken,
-                login: this.userLogin,
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    }
+    // injectAuthTokenInProcess(appProccess: ApplicationProcess) {
+    //     try {
+    //         appProccess.emitter.emit(ShellMessageType.UpdateAuthToken, {
+    //             token: this.accessToken,
+    //             login: this.userLogin,
+    //         });
+    //     } catch (e) {
+    //         console.error(e);
+    //     }
+    // }
 
     async renewToken() {
+        const { eventBus } = this.store.sharedEventBus;
         try {
             this.isUpdateTokenProcessActive = true;
 
@@ -274,16 +278,16 @@ export class AuthStore {
                 const result = response.data.result;
                 this.setToken(result.access_token, result.refresh_token);
 
-                // TODO: Move to Process Store
-                this.store.processManager.processes.forEach((appProcess) =>
-                    this.injectAuthTokenInProcess(appProcess),
-                );
+                eventBus.dispatch(AuthEventType.OnRenewToken, {
+                    token: this.accessToken,
+                    login: this.userLogin,
+                });
+                eventBus.dispatch(AuthEventType.OnRecieveToken, {
+                    token: this.accessToken,
+                    login: this.userLogin,
+                });
             } else {
-                this.eventBus.dispatchEvent(
-                    new CustomEvent(AuthEventType.FailedRenewToken, {
-                        detail: response.data.error,
-                    }),
-                );
+                eventBus.dispatch(AuthEventType.OnFailedRenewToken);
 
                 this.logout();
             }
@@ -347,6 +351,7 @@ export class AuthStore {
     }
 
     async logout() {
+        const { eventBus } = this.store.sharedEventBus;
         try {
             const response = await Axios.post<IJsonRpcResponse<unknown>>(
                 authEndpoint.url,
@@ -355,9 +360,7 @@ export class AuthStore {
                 }),
             );
 
-            dispatchEvent(new CustomEvent(ShellEvents.Logout));
-
-            this.eventBus.dispatchEvent(new CustomEvent(AuthEventType.Logout));
+            eventBus.dispatch(AuthEventType.OnLogout);
 
             sessionStorage.removeItem(this.sessionStorageAccessTokenKey);
             sessionStorage.removeItem(this.sessionStorageRefreshTokenKey);

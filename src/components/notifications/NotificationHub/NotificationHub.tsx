@@ -163,6 +163,7 @@ export const NotificationHub = observer(() => {
                     app,
                     window: new ApplicationWindow(),
                     url,
+                    viewport: store.virtualViewport.currentViewport,
                 });
                 store.processManager.execute(appProcess);
             } else {
@@ -189,6 +190,7 @@ export const NotificationHub = observer(() => {
                     app: notificationApp,
                     window: new ApplicationWindow(),
                     params: new Map([["filterByAppId", group.id]]),
+                    viewport: store.virtualViewport.currentViewport,
                 });
                 store.processManager.execute(appProcess);
             } else {

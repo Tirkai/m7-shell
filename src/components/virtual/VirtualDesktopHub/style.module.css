@@ -11,6 +11,7 @@
 
 .frames {
     box-sizing: border-box;
+    width: 100vw;
 }
 
 .framesContainer {

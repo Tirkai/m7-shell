@@ -17,11 +17,11 @@ import { VirtualFrame } from "components/virtual/VirtualFrame/VirtualFrame";
 import { VirtualViewport } from "components/virtual/VirtualViewport/VirtualViewport";
 import { AppWindowArea } from "components/window/AppWindowArea/AppWindowArea";
 import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/AppWindowPinContainer";
-import { ShellEvents } from "enum/ShellEvents";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
+import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { ExternalApplication } from "models/ExternalApplication";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { Component } from "react";
@@ -59,6 +59,7 @@ export class ShellScreen extends Component<IStore> {
                         window: new ApplicationWindow({
                             isFullscreen: isAutorunFullscreen,
                         }),
+                        viewport: this.store.virtualViewport.currentViewport,
                     });
 
                     this.store.processManager.execute(appProcess);
@@ -79,6 +80,7 @@ export class ShellScreen extends Component<IStore> {
                     window: new ApplicationWindow({
                         isFullscreen: isAutorunFullscreen,
                     }),
+                    viewport: this.store.virtualViewport.currentViewport,
                 });
 
                 this.store.processManager.execute(appProcess);
@@ -87,7 +89,9 @@ export class ShellScreen extends Component<IStore> {
     }
 
     handleClickDesktop = () => {
-        window.dispatchEvent(new CustomEvent(ShellEvents.DesktopClick));
+        this.store.sharedEventBus.eventBus.dispatch(
+            DesktopEventType.OnDesktopClick,
+        );
     };
 
     render() {

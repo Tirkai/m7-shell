@@ -25,6 +25,7 @@ export const NotificationToasts = observer(() => {
                     app,
                     window: new ApplicationWindow(),
                     url: toast.notification.url,
+                    viewport: store.virtualViewport.currentViewport,
                 });
                 store.processManager.execute(appProcess);
             } else {

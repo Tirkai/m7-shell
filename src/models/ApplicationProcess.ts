@@ -13,7 +13,7 @@ interface IApplicationProcessOptions {
     name?: string;
     params?: Map<string, string>;
     disableParams?: boolean;
-    viewport?: VirtualViewportModel;
+    viewport: VirtualViewportModel;
 }
 
 export class ApplicationProcess {
@@ -26,7 +26,7 @@ export class ApplicationProcess {
     emitter: ShellMessageEmitter;
     hash: string;
     disableParams: boolean;
-    viewport: VirtualViewportModel | null = null;
+    viewport: VirtualViewportModel;
 
     constructor(options: IApplicationProcessOptions) {
         makeAutoObservable(this);
@@ -39,7 +39,7 @@ export class ApplicationProcess {
         this.emitter = new ShellMessageEmitter(this.app.id);
         this.name = options.name ?? this.app.name;
         this.disableParams = options.disableParams ?? false;
-        this.viewport = options.viewport ?? null;
+        this.viewport = options.viewport;
 
         if (this.app instanceof ExternalApplication) {
             this.url = options.url ?? this.app.url;
