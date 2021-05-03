@@ -1,5 +1,7 @@
+import { TileFactory } from "factories/TileFactory";
 import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
+import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileEventType } from "models/tile/TileEventType";
 import { TilePreset } from "models/tile/TilePreset";
@@ -12,9 +14,7 @@ import { AppStore } from "stores/AppStore";
 export class VirtualViewportManager {
     private store: AppStore;
 
-    viewports: VirtualViewportModel[] = [
-        new VirtualViewportModel({ index: 0 }),
-    ];
+    viewports: VirtualViewportModel[] = [new VirtualViewportModel()];
 
     currentViewport: VirtualViewportModel;
 
@@ -55,7 +55,35 @@ export class VirtualViewportManager {
             (appWindow: ApplicationWindow) => this.onFocusWindow(appWindow),
         );
 
+        this.store.sharedEventBus.eventBus.add(
+            KeyboardEventType.ArrowLeftWithControl,
+            () => this.onKeyboardArrowLeftWithControl(),
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            KeyboardEventType.ArrowRightWithControl,
+            () => this.onKeyboardArrowRightWithControl(),
+        );
+
         makeAutoObservable(this);
+    }
+
+    onKeyboardArrowLeftWithControl() {
+        const currentViewportIndex = this.viewports.findIndex(
+            (item) => item.id === this.currentViewport.id,
+        );
+        if (currentViewportIndex - 1 >= 0) {
+            this.setCurrentViewport(this.viewports[currentViewportIndex - 1]);
+        }
+    }
+
+    onKeyboardArrowRightWithControl() {
+        const currentViewportIndex = this.viewports.findIndex(
+            (item) => item.id === this.currentViewport.id,
+        );
+        if (currentViewportIndex + 1 < this.viewports.length) {
+            this.setCurrentViewport(this.viewports[currentViewportIndex + 1]);
+        }
     }
 
     onChangePreset(preset: TilePreset) {
@@ -63,7 +91,7 @@ export class VirtualViewportManager {
     }
 
     onInstantiateProcess(process: ApplicationProcess) {
-        process.setViewport(this.currentViewport);
+        process.window.setViewport(this.currentViewport);
     }
 
     onRemoveViewportFrame(viewport: VirtualViewportModel) {
@@ -84,32 +112,24 @@ export class VirtualViewportManager {
     }
 
     onTileGridOverflow(appProcess: ApplicationProcess) {
+        const defaultTileTemplate = this.store.tile.defaultTileTemplate;
+
         const current = this.currentViewport;
 
         const newViewport = new VirtualViewportModel();
 
-        appProcess.setViewport(newViewport);
+        appProcess.window.setViewport(newViewport);
 
         this.insertViewport(newViewport, current);
-
-        // this.addViewport(newViewport);
     }
 
     onFocusWindow(appWindow: ApplicationWindow) {
-        // TODO: think about it
-        const findedProcess = this.store.processManager.processes.find(
-            (process) => process.window.id === appWindow.id,
-        );
-
-        if (findedProcess) {
-            const viewport = findedProcess.viewport;
-            if (viewport) {
-                this.setCurrentViewport(viewport);
-            }
-        }
+        this.setCurrentViewport(appWindow.viewport);
     }
 
     addViewport(viewport: VirtualViewportModel, preset?: TilePreset) {
+        const defaultTileTemplate = this.store.tile.defaultTileTemplate;
+
         this.viewports.push(viewport);
 
         this.setCurrentViewport(viewport);
@@ -123,6 +143,10 @@ export class VirtualViewportManager {
         //     }
         // }
 
+        // viewport.setTilePreset(
+        //     TileFactory.createTilePreset(defaultTileTemplate),
+        // );
+
         this.store.sharedEventBus.eventBus.dispatch(
             VirtualViewportEventType.OnAddViewportFrame,
             viewport,
@@ -133,6 +157,8 @@ export class VirtualViewportManager {
         viewport: VirtualViewportModel,
         insertAfterViewport: VirtualViewportModel,
     ) {
+        const defaultTileTemplate = this.store.tile.defaultTileTemplate;
+
         const index = this.viewports.findIndex(
             (item) => insertAfterViewport.id === item.id,
         );
@@ -140,6 +166,14 @@ export class VirtualViewportManager {
         this.viewports.splice(index + 1, 0, viewport);
 
         this.setCurrentViewport(viewport);
+
+        // TODO: Think about it
+        setTimeout(() => {
+            // this.store.tile.applyPreset(defaultTileTemplate);
+            viewport.setTilePreset(
+                TileFactory.createTilePreset(defaultTileTemplate),
+            );
+        }, 500);
 
         this.store.sharedEventBus.eventBus.dispatch(
             VirtualViewportEventType.OnAddViewportFrame,

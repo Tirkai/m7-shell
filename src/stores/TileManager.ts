@@ -1,14 +1,16 @@
 import { TileFactory } from "factories/TileFactory";
-import { clone } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileCell } from "models/tile/TileCell";
 import { TileEventType } from "models/tile/TileEventType";
 import { TilePreset } from "models/tile/TilePreset";
+import { TileTemplate } from "models/tile/TileTemplate";
+import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
-import { registeredTilePresets } from "registeredTilePresets";
+import { registeredTileTemplates } from "registeredTilePresets";
 import { AppStore } from "stores/AppStore";
 
 export class TileManager {
@@ -17,12 +19,23 @@ export class TileManager {
         this.store = store;
         makeAutoObservable(this);
 
-        this.presets = registeredTilePresets;
+        this.templates = registeredTileTemplates;
+
+        const [firstTemplate] = registeredTileTemplates;
+
+        this.defaultTileTemplate = firstTemplate;
 
         this.store.sharedEventBus.eventBus.add(
             ProcessEventType.OnInstantiateProcess,
             (appProcess: ApplicationProcess) => {
                 this.onProcessStart(appProcess);
+            },
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            VirtualViewportEventType.OnAddViewportFrame,
+            (viewport: VirtualViewportModel) => {
+                this.onAddViewportFrame(viewport);
             },
         );
 
@@ -34,7 +47,15 @@ export class TileManager {
         );
     }
 
-    presets: TilePreset[] = [];
+    templates: TileTemplate[] = [];
+
+    defaultTileTemplate: TileTemplate;
+
+    onAddViewportFrame(viewport: VirtualViewportModel) {
+        const preset = TileFactory.createTilePreset(this.defaultTileTemplate);
+        this.applyPreset(this.defaultTileTemplate);
+        // viewport.setTilePreset(preset);
+    }
 
     findCellInPresetByAttacheWindowId(preset: TilePreset, id: string) {
         return preset.cells.find((cell) => cell.attachedAppWindow?.id === id);
@@ -55,7 +76,7 @@ export class TileManager {
     }
 
     onProcessStart(appProcess: ApplicationProcess) {
-        const preset = appProcess.viewport.tilePreset;
+        const preset = appProcess.window.viewport.tilePreset;
 
         if (!preset.isEmptyPreset) {
             if (preset.freeCells.length) {
@@ -72,10 +93,11 @@ export class TileManager {
         }
     }
 
-    applyPreset(preset: TilePreset) {
-        if (preset) {
-            const clonedPreset = clone(preset);
-            const createdPreset = TileFactory.createTilePreset(clonedPreset);
+    applyPreset(template: TileTemplate) {
+        if (template) {
+            const createdPreset = TileFactory.createTilePreset(template);
+
+            this.setDefaultTileTemplate(template);
 
             this.store.sharedEventBus.eventBus.dispatch(
                 TileEventType.OnChangePreset,
@@ -118,5 +140,9 @@ export class TileManager {
         this.store.sharedEventBus.eventBus.dispatch(
             TileEventType.OnDetachAllWindows,
         );
+    }
+
+    setDefaultTileTemplate(template: TileTemplate) {
+        this.defaultTileTemplate = template;
     }
 }

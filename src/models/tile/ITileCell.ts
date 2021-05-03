@@ -1,6 +1,7 @@
 import { TileGridUnit } from "./TileGridUnit";
 
 export interface ITileCell {
+    id: string;
     startColumn: TileGridUnit;
     endColumn: TileGridUnit;
     startRow: TileGridUnit;

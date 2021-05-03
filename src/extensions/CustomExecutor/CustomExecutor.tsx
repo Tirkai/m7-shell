@@ -28,8 +28,9 @@ export const CustomExecutor = () => {
 
         const appProccess = new ApplicationProcess({
             app,
-            window: new ApplicationWindow(),
-            viewport: store.virtualViewport.currentViewport,
+            window: new ApplicationWindow({
+                viewport: store.virtualViewport.currentViewport,
+            }),
         });
 
         store.processManager.execute(appProccess);

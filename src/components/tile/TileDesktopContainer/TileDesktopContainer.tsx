@@ -26,7 +26,7 @@ export const TileDesktopContainer = observer(
                 const sw = store.processManager.processes
                     .filter(
                         (process) =>
-                            process.viewport?.id ===
+                            process.window.viewport.id ===
                             store.virtualViewport.currentViewport.id,
                     )
                     .map((process) => process.window)

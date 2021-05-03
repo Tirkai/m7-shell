@@ -1,13 +1,14 @@
-import { ITilePreset } from "models/tile/ITilePreset";
 import { TileCell } from "models/tile/TileCell";
 import { TilePreset } from "models/tile/TilePreset";
+import { TileTemplate } from "models/tile/TileTemplate";
 
 export class TileFactory {
-    static createTilePreset(options: ITilePreset) {
+    static createTilePreset(options: TileTemplate) {
         return new TilePreset({
             columns: options.columns,
             rows: options.rows,
             alias: options.alias,
+            isEmptyPreset: options.columns <= 0 || options.rows <= 0,
             cells: options.cells.map(
                 (cell) =>
                     new TileCell({

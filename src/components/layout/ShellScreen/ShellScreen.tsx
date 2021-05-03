@@ -58,8 +58,9 @@ export class ShellScreen extends Component<IStore> {
                         app,
                         window: new ApplicationWindow({
                             isFullscreen: isAutorunFullscreen,
+                            viewport: this.store.virtualViewport
+                                .currentViewport,
                         }),
-                        viewport: this.store.virtualViewport.currentViewport,
                     });
 
                     this.store.processManager.execute(appProcess);
@@ -79,8 +80,8 @@ export class ShellScreen extends Component<IStore> {
                     app,
                     window: new ApplicationWindow({
                         isFullscreen: isAutorunFullscreen,
+                        viewport: this.store.virtualViewport.currentViewport,
                     }),
-                    viewport: this.store.virtualViewport.currentViewport,
                 });
 
                 this.store.processManager.execute(appProcess);
@@ -109,7 +110,14 @@ export class ShellScreen extends Component<IStore> {
                             >
                                 {this.store.virtualViewport.viewports.map(
                                     (viewport) => (
-                                        <VirtualFrame key={viewport.id}>
+                                        <VirtualFrame
+                                            key={viewport.id}
+                                            active={
+                                                this.store.virtualViewport
+                                                    .currentViewport.id ===
+                                                viewport.id
+                                            }
+                                        >
                                             <DesktopLayer enabled priority={1}>
                                                 <DesktopForeground
                                                     onDesktopClick={

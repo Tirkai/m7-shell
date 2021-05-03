@@ -92,7 +92,8 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
             {store.processManager.processes
                 .filter(
                     (process) =>
-                        process.viewport?.id === props.viewport?.id ?? true,
+                        process.window.viewport.id === props.viewport?.id ??
+                        true,
                 )
                 .map((process: ApplicationProcess) => (
                     <AppWindow

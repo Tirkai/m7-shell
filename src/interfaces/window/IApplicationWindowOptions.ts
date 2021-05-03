@@ -1,3 +1,5 @@
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
+
 export interface IApplicationWindowOptions {
     id?: string;
     width?: number;
@@ -6,4 +8,5 @@ export interface IApplicationWindowOptions {
     // displayMode?: IDisplayMode;
     x?: number;
     y?: number;
+    viewport: VirtualViewportModel;
 }

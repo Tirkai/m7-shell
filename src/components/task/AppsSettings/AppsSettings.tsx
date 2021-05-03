@@ -29,8 +29,9 @@ export class AppsSettings extends Component<IAppsSettingsProps> {
     handleExecuteApp = (app: Application) => {
         const appProcess = new ApplicationProcess({
             app,
-            window: new ApplicationWindow(),
-            viewport: this.store.virtualViewport.currentViewport,
+            window: new ApplicationWindow({
+                viewport: this.store.virtualViewport.currentViewport,
+            }),
         });
         this.store.processManager.execute(appProcess);
     };

@@ -9,6 +9,7 @@ import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { IApplicationWindowOptions } from "interfaces/window/IApplicationWindowOptions";
 import { makeAutoObservable } from "mobx";
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ResizeHandle } from "react-resizable";
 import { v4 } from "uuid";
 import { EventBus } from "../event/EventBus";
@@ -33,6 +34,7 @@ export class ApplicationWindow {
     isDragging: boolean = false;
     isResizing: boolean = false;
     namespace: string = "";
+    viewport: VirtualViewportModel;
 
     eventTarget: EventBus = new EventBus();
 
@@ -53,7 +55,7 @@ export class ApplicationWindow {
         };
     }
 
-    constructor(options?: IApplicationWindowOptions) {
+    constructor(options: IApplicationWindowOptions) {
         makeAutoObservable(this);
 
         this.id = options?.id ?? v4();
@@ -76,6 +78,8 @@ export class ApplicationWindow {
         this.lockedHeight = this.height;
         this.lockedX = this.x;
         this.lockedY = this.y;
+
+        this.viewport = options?.viewport;
     }
 
     calculatePosition() {
@@ -229,7 +233,7 @@ export class ApplicationWindow {
         this.y = y;
     }
 
-    setNamespace(value: string) {
-        this.namespace = value;
+    setViewport(viewport: VirtualViewportModel) {
+        this.viewport = viewport;
     }
 }

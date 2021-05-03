@@ -110,7 +110,7 @@ export class ProcessManagerStore {
 
     onRemoveViewportFrame(viewport: VirtualViewportModel) {
         const findedProcesses = this.processes.filter(
-            (item) => item.viewport?.id === viewport.id,
+            (item) => item.window.viewport?.id === viewport.id,
         );
 
         findedProcesses.forEach((item) => this.killProcess(item));
@@ -150,10 +150,11 @@ export class ProcessManagerStore {
                             const createdAppProcessInstance = new ApplicationProcess(
                                 {
                                     app: findedApp,
-                                    window: new ApplicationWindow(),
+                                    window: new ApplicationWindow({
+                                        viewport: this.store.virtualViewport
+                                            .currentViewport,
+                                    }),
                                     url,
-                                    viewport: this.store.virtualViewport
-                                        .currentViewport,
                                 },
                             );
                             this.execute(createdAppProcessInstance);
@@ -176,9 +177,10 @@ export class ProcessManagerStore {
                                     name: processUrl.host,
                                     url,
                                 }),
-                                window: new ApplicationWindow(),
-                                viewport: this.store.virtualViewport
-                                    .currentViewport,
+                                window: new ApplicationWindow({
+                                    viewport: this.store.virtualViewport
+                                        .currentViewport,
+                                }),
                             },
                         );
                         this.execute(createdAppProcessInstance);

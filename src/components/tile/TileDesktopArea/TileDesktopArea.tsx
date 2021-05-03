@@ -47,6 +47,7 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
 
     useEffect(() => {
         const bounds = ref.current?.getBoundingClientRect();
+
         if (bounds) {
             props.cell.setSize(bounds.width, bounds.height);
             props.cell.setPosition(bounds.x, bounds.y);

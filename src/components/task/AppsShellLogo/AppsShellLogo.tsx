@@ -29,8 +29,9 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
         this.store.processManager.execute(
             new ApplicationProcess({
                 app,
-                window: new ApplicationWindow(),
-                viewport: this.store.virtualViewport.currentViewport,
+                window: new ApplicationWindow({
+                    viewport: this.store.virtualViewport.currentViewport,
+                }),
             }),
         );
     };

@@ -23,9 +23,10 @@ export const NotificationToasts = observer(() => {
             if (!app.isExecuted) {
                 const appProcess = new ApplicationProcess({
                     app,
-                    window: new ApplicationWindow(),
+                    window: new ApplicationWindow({
+                        viewport: store.virtualViewport.currentViewport,
+                    }),
                     url: toast.notification.url,
-                    viewport: store.virtualViewport.currentViewport,
                 });
                 store.processManager.execute(appProcess);
             } else {

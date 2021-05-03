@@ -1,12 +1,12 @@
 import classNames from "classnames";
 import { LayerBoxVisualizer } from "components/debug/LayerBoxVisualizer/LayerBoxVisualizer";
-import { TilePreset } from "models/tile/TilePreset";
+import { TileTemplate } from "models/tile/TileTemplate";
 import React from "react";
 import style from "./style.module.css";
 
 interface ITileChooserItemProps {
     name?: string;
-    preset?: TilePreset;
+    template?: TileTemplate;
     active: boolean;
     onClick: () => void;
 }
@@ -20,15 +20,15 @@ export const TileChooserItem = (props: ITileChooserItemProps) => (
     >
         {props.name}
 
-        {props.preset && (
+        {props.template && (
             <div
                 className={style.container}
                 style={{
-                    gridTemplateColumns: `repeat(${props.preset.columns},1fr)`,
-                    gridTemplateRows: `repeat(${props.preset.rows},1fr)`,
+                    gridTemplateColumns: `repeat(${props.template.columns},1fr)`,
+                    gridTemplateRows: `repeat(${props.template.rows},1fr)`,
                 }}
             >
-                {props.preset.cells.map((item) => (
+                {props.template.cells.map((item) => (
                     <div
                         className={style.gridItem}
                         style={{
