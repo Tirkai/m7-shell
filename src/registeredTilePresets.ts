@@ -3,12 +3,6 @@ import { v4 } from "uuid";
 
 export const registeredTileTemplates: TileTemplate[] = [
     new TileTemplate({
-        columns: 0,
-        rows: 0,
-        alias: "none",
-        cells: [],
-    }),
-    new TileTemplate({
         columns: 1,
         rows: 1,
         alias: "1x1",

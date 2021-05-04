@@ -8,10 +8,11 @@ import { PanelEventType } from "models/panel/PanelEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
+import { IApplicationWindow } from "models/window/IApplicationWindow";
 import { AppStore } from "./AppStore";
 
 export class WindowManagerStore {
-    windows: ApplicationWindow[] = [];
+    windows: IApplicationWindow[] = [];
 
     private store: AppStore;
     constructor(store: AppStore) {
@@ -30,9 +31,17 @@ export class WindowManagerStore {
 
         window.addEventListener(ShellEvents.Resize, () => {
             this.windows
-                .filter((item) => item.isFullScreen)
+                .filter((item) => {
+                    if (item instanceof ApplicationWindow) {
+                        return item.isFullScreen;
+                    }
+                    return false;
+                })
                 .forEach((item) => {
-                    item.recalculateFullScreenSize();
+                    if (item instanceof ApplicationWindow) {
+                        // return item.isFullScreen;
+                        item.recalculateFullScreenSize();
+                    }
                 });
         });
 
@@ -57,7 +66,7 @@ export class WindowManagerStore {
         eventBus.add(AuthEventType.OnLogout, () => this.closeAllWindows());
     }
 
-    focusedWindow: ApplicationWindow | null = null;
+    focusedWindow: IApplicationWindow | null = null;
 
     get draggedWindow() {
         return this.windows.find((item) => item.isDragging);
@@ -68,7 +77,9 @@ export class WindowManagerStore {
     }
 
     get resizedWindow() {
-        return this.windows.find((item) => item.isResizing);
+        return this.windows.find(
+            (item) => item instanceof ApplicationWindow && item.isResizing,
+        );
     }
 
     get hasResizedWindow() {
@@ -79,7 +90,7 @@ export class WindowManagerStore {
         return document.activeElement;
     }
 
-    addWindow(appWindow: ApplicationWindow) {
+    addWindow(appWindow: IApplicationWindow) {
         this.windows.push(appWindow);
         this.focusWindow(appWindow);
     }
@@ -100,7 +111,7 @@ export class WindowManagerStore {
         this.clearFocus();
     }
 
-    focusWindow(appWindow: ApplicationWindow) {
+    focusWindow(appWindow: IApplicationWindow) {
         try {
             this.store.sharedEventBus.eventBus.dispatch(
                 ApplicationWindowEventType.OnFocusWindow,
@@ -111,7 +122,9 @@ export class WindowManagerStore {
 
             if (appWindow.isFocused) return;
 
-            if (appWindow.isCollapsed) this.expandWindow(appWindow);
+            if (appWindow instanceof ApplicationWindow) {
+                if (appWindow.isCollapsed) this.expandWindow(appWindow);
+            }
 
             const indexes = [...this.windows.map((item) => item.depthIndex)];
 
@@ -147,7 +160,7 @@ export class WindowManagerStore {
         }
     }
 
-    closeWindow(appWindow: ApplicationWindow) {
+    closeWindow(appWindow: IApplicationWindow) {
         try {
             this.store.sharedEventBus.eventBus.dispatch(
                 ApplicationWindowEventType.OnClose,

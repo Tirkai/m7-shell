@@ -14,7 +14,7 @@ import { AppStore } from "stores/AppStore";
 export class VirtualViewportManager {
     private store: AppStore;
 
-    viewports: VirtualViewportModel[] = [new VirtualViewportModel()];
+    viewports: VirtualViewportModel[] = [];
 
     currentViewport: VirtualViewportModel;
 
@@ -64,6 +64,8 @@ export class VirtualViewportManager {
             KeyboardEventType.ArrowRightWithControl,
             () => this.onKeyboardArrowRightWithControl(),
         );
+
+        this.addViewport(new VirtualViewportModel());
 
         makeAutoObservable(this);
     }

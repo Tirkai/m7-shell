@@ -3,11 +3,10 @@ import { settings } from "assets/icons";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { Application } from "models/Application";
-import { ApplicationProcess } from "models/ApplicationProcess";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { Point2D } from "models/Point2D";
-import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { Component } from "react";
 import { AppsMenuSidebarListItem } from "../AppsMenuSidebarListItem/AppsMenuSidebarListItem";
 import style from "./style.module.css";
@@ -27,13 +26,7 @@ export class AppsSettings extends Component<IAppsSettingsProps> {
     }
 
     handleExecuteApp = (app: Application) => {
-        const appProcess = new ApplicationProcess({
-            app,
-            window: new ApplicationWindow({
-                viewport: this.store.virtualViewport.currentViewport,
-            }),
-        });
-        this.store.processManager.execute(appProcess);
+        new ApplicationRunner(this.store).run(app);
     };
 
     handleShowDropdown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {

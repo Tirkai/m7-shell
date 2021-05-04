@@ -1,9 +1,8 @@
 import { Button, TextField } from "@material-ui/core";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
-import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/ExternalApplication";
-import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { useState } from "react";
 import { v4 } from "uuid";
 import style from "./style.module.css";
@@ -26,14 +25,7 @@ export const CustomExecutor = () => {
 
         store.applicationManager.addApplication(app);
 
-        const appProccess = new ApplicationProcess({
-            app,
-            window: new ApplicationWindow({
-                viewport: store.virtualViewport.currentViewport,
-            }),
-        });
-
-        store.processManager.execute(appProccess);
+        new ApplicationRunner(store).run(app);
     };
 
     return (

@@ -2,7 +2,6 @@ import { AppMessageType } from "@algont/m7-shell-emitter";
 import classNames from "classnames";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { useStore } from "hooks/useStore";
-import { IStore } from "interfaces/common/IStore";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ExternalApplication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
@@ -10,12 +9,12 @@ import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { useEffect, useMemo, useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import { Resizable, ResizeCallbackData, ResizeHandle } from "react-resizable";
-import AppLoader from "../AppLoader/AppLoader";
+import { AppWindowContent } from "../AppWindowContent/AppWindowContent";
 import { AppWindowHeader } from "../AppWindowHeader/AppWindowHeader";
 import { AppWindowUnfocusedOverlay } from "../AppWindowUnfocusedOverlay/AppWindowUnfocusedOverlay";
 import style from "./style.module.css";
 
-interface IAppWindowProps extends IStore {
+interface IAppWindowProps {
     process: ApplicationProcess;
     window: ApplicationWindow;
     width: number;
@@ -24,8 +23,8 @@ interface IAppWindowProps extends IStore {
     isDragging: boolean;
     isFocused: boolean;
     url: string;
-    x: number;
-    y: number;
+    // x: number;
+    // y: number;
     onResizeStart: (event: MouseEvent, data: ResizeCallbackData) => void;
     onResizeStop: () => void;
     onResize: (event: MouseEvent, data: ResizeCallbackData) => void;
@@ -40,7 +39,6 @@ export const AppWindow = (props: IAppWindowProps) => {
     const [isAppReady, setAppReady] = useState(false);
     const [frame, setFrame] = useState<HTMLIFrameElement | null>(null);
     const [url, setUrl] = useState(props.process.modifiedUrl);
-
     const handleResizeStart = (
         event: React.SyntheticEvent,
         data: ResizeCallbackData,
@@ -233,18 +231,15 @@ export const AppWindow = (props: IAppWindowProps) => {
                                 store.shell.displayMode.showAppWindowHeader
                             }
                         />
-                        <AppLoader
+                        {/* <AppLoader
                             icon={props.process.app.icon}
                             disabled={isAppReady}
+                        /> */}
+                        <AppWindowContent
+                            process={props.process}
+                            window={props.window}
+                            url={props.url}
                         />
-                        <div
-                            className={classNames(style.content, {
-                                [style.withHeader]:
-                                    store.shell.displayMode.showAppWindowHeader,
-                            })}
-                        >
-                            {appComponent}
-                        </div>
                         <AppWindowUnfocusedOverlay
                             visible={
                                 store.windowManager.hasDraggedWindow ||

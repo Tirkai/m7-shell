@@ -4,6 +4,7 @@ import { AuthStore } from "./AuthStore";
 import { ContextMenuStore } from "./ContextMenuStore";
 import { DateTimeStore } from "./DateTimeStore";
 import { DesktopStore } from "./DesktopStore";
+import { DisplayManager } from "./DisplayManager";
 import { HotkeyStore } from "./HotkeyStore";
 import { LocaleStore } from "./LocaleStore";
 import { MessageStore } from "./MessageStore";
@@ -38,6 +39,7 @@ export class AppStore {
     pin: PinManager;
     virtualViewport: VirtualViewportManager;
     hotkey: HotkeyStore;
+    display: DisplayManager;
     constructor() {
         this.sharedEventBus = new SharedEventBus(this);
         this.auth = new AuthStore(this);
@@ -58,6 +60,7 @@ export class AppStore {
         this.pin = new PinManager(this);
         this.virtualViewport = new VirtualViewportManager(this);
         this.hotkey = new HotkeyStore(this);
+        this.display = new DisplayManager(this);
 
         console.warn("STORE", this);
     }

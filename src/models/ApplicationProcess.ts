@@ -4,11 +4,11 @@ import { v4 } from "uuid";
 import { Application } from "./Application";
 import { ExternalApplication } from "./ExternalApplication";
 import { VirtualViewportModel } from "./virtual/VirtualViewportModel";
-import { ApplicationWindow } from "./window/ApplicationWindow";
+import { IApplicationWindow } from "./window/IApplicationWindow";
 
 interface IApplicationProcessOptions {
     app: Application;
-    window: ApplicationWindow;
+    window: IApplicationWindow;
     url?: string;
     name?: string;
     params?: Map<string, string>;
@@ -21,7 +21,7 @@ export class ApplicationProcess {
     app: Application;
     url: string;
     name: string;
-    window: ApplicationWindow;
+    window: IApplicationWindow;
     params: Map<string, string>;
     emitter: ShellMessageEmitter;
     hash: string;

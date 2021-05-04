@@ -10,6 +10,8 @@ import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventTyp
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
+import { IApplicationWindow } from "models/window/IApplicationWindow";
+import { TileWindowModel } from "models/window/TileWindowModel";
 import { registeredTileTemplates } from "registeredTilePresets";
 import { AppStore } from "stores/AppStore";
 
@@ -54,7 +56,7 @@ export class TileManager {
     onAddViewportFrame(viewport: VirtualViewportModel) {
         const preset = TileFactory.createTilePreset(this.defaultTileTemplate);
         this.applyPreset(this.defaultTileTemplate);
-        // viewport.setTilePreset(preset);
+        viewport.setTilePreset(preset);
     }
 
     findCellInPresetByAttacheWindowId(preset: TilePreset, id: string) {
@@ -107,20 +109,26 @@ export class TileManager {
     }
 
     attachWindowToCell(
-        appWindow: ApplicationWindow,
+        appWindow: IApplicationWindow,
         preset: TilePreset,
         tileCell: TileCell,
     ) {
-        if (preset.hasFreeCells) {
-            appWindow.setSize(tileCell.width, tileCell.height);
-            appWindow.setPosition(tileCell.x, tileCell.y);
+        if (appWindow instanceof TileWindowModel) {
+            if (preset.hasFreeCells) {
+                tileCell.setAttachedAppWindow(appWindow);
 
-            tileCell.setAttachedAppWindow(appWindow);
+                appWindow.setGrid({
+                    startColumn: tileCell.startColumn,
+                    startRow: tileCell.startRow,
+                    endColumn: tileCell.endColumn,
+                    endRow: tileCell.endRow,
+                });
 
-            this.store.sharedEventBus.eventBus.dispatch(
-                TileEventType.OnAttachWindow,
-                { appWindow, tileCell },
-            );
+                this.store.sharedEventBus.eventBus.dispatch(
+                    TileEventType.OnAttachWindow,
+                    { appWindow, tileCell },
+                );
+            }
         }
     }
 

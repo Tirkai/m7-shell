@@ -13,6 +13,7 @@
     overflow: hidden;
     border-radius: 4px;
     box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+    grid-template-rows: 30px 1fr;
 }
 .content {
     height: 100%;

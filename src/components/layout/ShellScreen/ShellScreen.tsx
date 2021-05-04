@@ -20,10 +20,9 @@ import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/A
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
-import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { ExternalApplication } from "models/ExternalApplication";
-import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { Component } from "react";
 import { v4 } from "uuid";
 import { DesktopLayout } from "../DesktopLayout/DesktopLayout";
@@ -50,20 +49,12 @@ export class ShellScreen extends Component<IStore> {
         if (!!parseInt(enableAutoRun ?? "0")) {
             const isAutorunFullscreen = !!parseInt(autoRunFullscreen ?? "0");
 
+            const runner = new ApplicationRunner(this.store);
             if (autoRunApp) {
                 const app = this.store.applicationManager.findByKey(autoRunApp);
 
-                if (app) {
-                    const appProcess = new ApplicationProcess({
-                        app,
-                        window: new ApplicationWindow({
-                            isFullscreen: isAutorunFullscreen,
-                            viewport: this.store.virtualViewport
-                                .currentViewport,
-                        }),
-                    });
-
-                    this.store.processManager.execute(appProcess);
+                if (app instanceof ExternalApplication) {
+                    runner.run(app);
                 }
             }
 
@@ -76,15 +67,7 @@ export class ShellScreen extends Component<IStore> {
                     isVisibleInStartMenu: false,
                 });
 
-                const appProcess = new ApplicationProcess({
-                    app,
-                    window: new ApplicationWindow({
-                        isFullscreen: isAutorunFullscreen,
-                        viewport: this.store.virtualViewport.currentViewport,
-                    }),
-                });
-
-                this.store.processManager.execute(appProcess);
+                runner.run(app);
             }
         }
     }
@@ -125,26 +108,33 @@ export class ShellScreen extends Component<IStore> {
                                                     }
                                                 />
                                             </DesktopLayer>
-                                            <DesktopLayer enabled priority={1}>
-                                                <AppWindowArea
-                                                    viewport={viewport}
-                                                    disabled={
-                                                        this.store.desktop
-                                                            .isEditMode
-                                                    }
-                                                />
-                                            </DesktopLayer>
-                                            <DesktopLayer
-                                                enabled={
-                                                    this.store.windowManager
-                                                        .hasDraggedWindow
-                                                }
-                                                priority={2}
-                                            >
-                                                <TileDesktopContainer
-                                                    preset={viewport.tilePreset}
-                                                />
-                                            </DesktopLayer>
+                                            {true && (
+                                                <DesktopLayer
+                                                    enabled
+                                                    priority={2}
+                                                >
+                                                    <TileDesktopContainer
+                                                        viewport={viewport}
+                                                        preset={
+                                                            viewport.tilePreset
+                                                        }
+                                                    />
+                                                </DesktopLayer>
+                                            )}
+                                            {true && (
+                                                <DesktopLayer
+                                                    enabled
+                                                    priority={1}
+                                                >
+                                                    <AppWindowArea
+                                                        viewport={viewport}
+                                                        disabled={
+                                                            this.store.desktop
+                                                                .isEditMode
+                                                        }
+                                                    />
+                                                </DesktopLayer>
+                                            )}
                                         </VirtualFrame>
                                     ),
                                 )}

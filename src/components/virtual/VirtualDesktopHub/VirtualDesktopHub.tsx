@@ -53,37 +53,42 @@ export const VirtualDesktopHub = observer(() => {
                     <div className={style.applications}></div>
                     <div className={style.frames}>
                         <div className={style.framesContainer}>
-                            <VirtualFrameList
-                                count={store.virtualViewport.viewports.length}
-                            >
-                                {/* TODO: Refactor  */}
-                                {store.virtualViewport.viewports.map(
-                                    (item, index) => (
-                                        <VirtualFramePreview
-                                            key={item.id}
-                                            onClick={() =>
-                                                handleSetViewport(item)
-                                            }
-                                            active={
-                                                store.virtualViewport
-                                                    .currentViewport.id ===
-                                                item.id
-                                            }
-                                            onDelete={() =>
-                                                removeViewportAction(item)
-                                            }
-                                        >
-                                            {index + 1}
-                                        </VirtualFramePreview>
-                                    ),
-                                )}
-                                <VirtualFramePreview
-                                    onClick={handleCreateViewport}
-                                    active={false}
+                            {store.shell.activePanel ===
+                                ShellPanelType.Virtual && (
+                                <VirtualFrameList
+                                    count={
+                                        store.virtualViewport.viewports.length
+                                    }
                                 >
-                                    <Add />
-                                </VirtualFramePreview>
-                            </VirtualFrameList>
+                                    {/* TODO: Refactor  */}
+                                    {store.virtualViewport.viewports.map(
+                                        (item, index) => (
+                                            <VirtualFramePreview
+                                                key={item.id}
+                                                onClick={() =>
+                                                    handleSetViewport(item)
+                                                }
+                                                active={
+                                                    store.virtualViewport
+                                                        .currentViewport.id ===
+                                                    item.id
+                                                }
+                                                onDelete={() =>
+                                                    removeViewportAction(item)
+                                                }
+                                            >
+                                                {index + 1}
+                                            </VirtualFramePreview>
+                                        ),
+                                    )}
+                                    <VirtualFramePreview
+                                        onClick={handleCreateViewport}
+                                        active={false}
+                                    >
+                                        <Add />
+                                    </VirtualFramePreview>
+                                </VirtualFrameList>
+                            )}
                         </div>
                     </div>
                 </div>

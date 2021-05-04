@@ -10,7 +10,7 @@ export class ContextMenuItemModel {
     id: string;
     icon?: string;
     content: string;
-    onClick: () => void;
+    onClick: () => any;
 
     constructor(options: IContextMenuItemModelOptions) {
         this.id = v4();

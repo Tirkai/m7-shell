@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import { ApplicationWindow } from "models/window/ApplicationWindow";
+import { IApplicationWindow } from "models/window/IApplicationWindow";
 import { v4 } from "uuid";
 import { ITileCell } from "./ITileCell";
 import { TileGridUnit } from "./TileGridUnit";
@@ -22,9 +22,9 @@ export class TileCell implements ITileCell {
     width: number = 0;
     height: number = 0;
 
-    draggedAppWindow: ApplicationWindow | null = null;
+    draggedAppWindow: IApplicationWindow | null = null;
 
-    attachedAppWindow: ApplicationWindow | null = null;
+    attachedAppWindow: IApplicationWindow | null = null;
 
     get hasDraggedWindow() {
         return this.draggedAppWindow !== null;
@@ -36,11 +36,11 @@ export class TileCell implements ITileCell {
 
     appWindowListenersIds: string[] = [];
 
-    setDraggedAppWindow(appWindow: ApplicationWindow | null) {
+    setDraggedAppWindow(appWindow: IApplicationWindow | null) {
         this.draggedAppWindow = appWindow;
     }
 
-    setAttachedAppWindow(appWindow: ApplicationWindow | null) {
+    setAttachedAppWindow(appWindow: IApplicationWindow | null) {
         this.attachedAppWindow = appWindow;
     }
 
@@ -58,7 +58,8 @@ export class TileCell implements ITileCell {
         this.width = Math.floor(width);
         this.height = Math.floor(height);
         if (this.attachedAppWindow) {
-            this.attachedAppWindow.setSize(this.width, this.height);
+            // TODO: FIX
+            // this.attachedAppWindow.setSize(this.width, this.height);
         }
     }
 
@@ -66,7 +67,8 @@ export class TileCell implements ITileCell {
         this.x = Math.floor(x);
         this.y = Math.floor(y);
         if (this.attachedAppWindow) {
-            this.attachedAppWindow.setPosition(this.x, this.y);
+            // TODO: FIX
+            // this.attachedAppWindow.setPosition(this.x, this.y);
         }
     }
 }

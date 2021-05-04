@@ -12,6 +12,7 @@ import { inject, observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
+import { IApplicationWindow } from "models/window/IApplicationWindow";
 import React, { Component } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
@@ -44,10 +45,12 @@ export class TaskBar extends Component<IStore> {
         }
     };
 
-    handleFocusAppWindow = (appWindow: ApplicationWindow) => {
+    handleFocusAppWindow = (appWindow: IApplicationWindow) => {
         this.store.windowManager.focusWindow(appWindow);
-        if (appWindow.isCollapsed) {
-            this.store.windowManager.expandWindow(appWindow);
+        if (appWindow instanceof ApplicationWindow) {
+            if (appWindow.isCollapsed) {
+                this.store.windowManager.expandWindow(appWindow);
+            }
         }
     };
 

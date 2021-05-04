@@ -14,8 +14,9 @@ import { ResizeHandle } from "react-resizable";
 import { v4 } from "uuid";
 import { EventBus } from "../event/EventBus";
 import { ApplicationWindowEventType } from "./ApplicationWindowEventType";
+import { IApplicationWindow } from "./IApplicationWindow";
 
-export class ApplicationWindow {
+export class ApplicationWindow implements IApplicationWindow {
     id: string;
     depthIndex: number = 1;
     isFocused: boolean = false;
@@ -33,7 +34,6 @@ export class ApplicationWindow {
     lockedY: number;
     isDragging: boolean = false;
     isResizing: boolean = false;
-    namespace: string = "";
     viewport: VirtualViewportModel;
 
     eventTarget: EventBus = new EventBus();

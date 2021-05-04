@@ -2,11 +2,10 @@ import classNames from "classnames";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationModel } from "models/NotificationModel";
 import { ToastNotification } from "models/ToastNotification";
-import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import style from "./style.module.css";
@@ -20,24 +19,9 @@ export const NotificationToasts = observer(() => {
         if (app instanceof ExternalApplication) {
             store.shell.setActivePanel(ShellPanelType.None);
 
-            if (!app.isExecuted) {
-                const appProcess = new ApplicationProcess({
-                    app,
-                    window: new ApplicationWindow({
-                        viewport: store.virtualViewport.currentViewport,
-                    }),
-                    url: toast.notification.url,
-                });
-                store.processManager.execute(appProcess);
-            } else {
-                const activeProcess = store.processManager.findProcessByApp(
-                    app,
-                );
-                if (activeProcess) {
-                    activeProcess.setUrl(toast.notification.url);
-                    store.windowManager.focusWindow(activeProcess.window);
-                }
-            }
+            const runner = new ApplicationRunner(store);
+
+            runner.run(app, { url: toast.notification.url });
         }
 
         toast.setShow(false);

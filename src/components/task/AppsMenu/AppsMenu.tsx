@@ -7,9 +7,8 @@ import { ApplicationPlace } from "enum/ApplicationPlace";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { observer } from "mobx-react";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { Application } from "models/Application";
-import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { useState } from "react";
 import { AppsMenuItem } from "../AppsMenuItem/AppsMenuItem";
 import AppsMenuSearch from "../AppsMenuSearch/AppsMenuSearch";
@@ -30,21 +29,8 @@ export const AppsMenu: React.FC = observer(() => {
     };
 
     const handleExecuteApp = (app: Application) => {
-        if (!app.isExecuted) {
-            const appProccess = new ApplicationProcess({
-                app,
-                window: new ApplicationWindow({
-                    viewport: store.virtualViewport.currentViewport,
-                }),
-            });
-
-            store.processManager.execute(appProccess);
-        } else {
-            const activeProcess = store.processManager.findProcessByApp(app);
-            if (activeProcess) {
-                store.windowManager.focusWindow(activeProcess.window);
-            }
-        }
+        const runner = new ApplicationRunner(store);
+        runner.run(app);
     };
 
     const getFilteredByPlace = (

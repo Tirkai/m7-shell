@@ -1,16 +1,14 @@
 import { UtilsFunctions } from "@algont/m7-utils";
 import { Avatar } from "@material-ui/core";
 import { exit } from "assets/icons";
-import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { Application } from "models/Application";
-import { ApplicationProcess } from "models/ApplicationProcess";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { Point2D } from "models/Point2D";
-import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { Component } from "react";
 import { AppsMenuSidebarListItem } from "../AppsMenuSidebarListItem/AppsMenuSidebarListItem";
 import style from "./style.module.css";
@@ -28,14 +26,7 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
     }
 
     handleExecuteApp = (app: Application) => {
-        this.store.processManager.execute(
-            new ApplicationProcess({
-                app,
-                window: new ApplicationWindow({
-                    viewport: this.store.virtualViewport.currentViewport,
-                }),
-            }),
-        );
+        new ApplicationRunner(this.store).run(app);
     };
 
     handleShowDropdown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -57,9 +48,6 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
     };
 
     handleLogout = () => {
-        this.store.applicationManager.destroyUserSession();
-        this.store.windowManager.closeAllWindows();
-        this.store.shell.setActivePanel(ShellPanelType.None);
         this.setState({ showMenu: false });
         this.store.auth.logout();
     };

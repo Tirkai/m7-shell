@@ -8,6 +8,7 @@ import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { makeAutoObservable } from "mobx";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
@@ -84,6 +85,7 @@ export class ProcessManagerStore {
         token: string,
         login: string,
     ) {
+        console.log("INJECT_AUTH_TOKEN ", appProccess, token);
         try {
             appProccess.emitter.emit(ShellMessageType.UpdateAuthToken, {
                 token,
@@ -128,11 +130,12 @@ export class ProcessManagerStore {
                 }),
             );
 
-            if (!applicationParamsResponse.data.error) {
-                appProcess.window.setParams(
-                    applicationParamsResponse.data.result,
-                );
-            }
+            // TODO: Fix
+            // if (!applicationParamsResponse.data.error) {
+            //     appProcess.window.setParams(
+            //         applicationParamsResponse.data.result,
+            //     );
+            // }
 
             // Bindings
 
@@ -145,30 +148,33 @@ export class ProcessManagerStore {
                         ? this.store.applicationManager.findById(appId)
                         : this.store.applicationManager.findByUrlPart(url);
 
+                    const runner = new ApplicationRunner(this.store);
+
                     if (findedApp) {
-                        if (!findedApp.isExecuted) {
-                            const createdAppProcessInstance = new ApplicationProcess(
-                                {
-                                    app: findedApp,
-                                    window: new ApplicationWindow({
-                                        viewport: this.store.virtualViewport
-                                            .currentViewport,
-                                    }),
-                                    url,
-                                },
-                            );
-                            this.execute(createdAppProcessInstance);
-                        } else {
-                            const activeProcess = this.findProcessByApp(
-                                findedApp,
-                            );
-                            if (activeProcess) {
-                                activeProcess.setUrl(url);
-                                this.store.windowManager.focusWindow(
-                                    activeProcess.window,
-                                );
-                            }
-                        }
+                        runner.run(findedApp, { url });
+                        // if (!findedApp.isExecuted) {
+                        //     const createdAppProcessInstance = new ApplicationProcess(
+                        //         {
+                        //             app: findedApp,
+                        //             window: new ApplicationWindow({
+                        //                 viewport: this.store.virtualViewport
+                        //                     .currentViewport,
+                        //             }),
+                        //             url,
+                        //         },
+                        //     );
+                        //     this.execute(createdAppProcessInstance);
+                        // } else {
+                        //     const activeProcess = this.findProcessByApp(
+                        //         findedApp,
+                        //     );
+                        //     if (activeProcess) {
+                        //         activeProcess.setUrl(url);
+                        //         this.store.windowManager.focusWindow(
+                        //             activeProcess.window,
+                        //         );
+                        //     }
+                        // }
                     } else {
                         const processUrl = new URL(url);
                         const createdAppProcessInstance = new ApplicationProcess(

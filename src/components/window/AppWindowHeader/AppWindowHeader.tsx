@@ -18,11 +18,11 @@ interface IAppWindowHeaderProps extends IStore {
     hasReload?: boolean;
     isFocused: boolean;
     onDoubleClick?: () => void;
-    onClose: () => void;
-    onFullscreen: () => void;
-    onCollapse: () => void;
-    onBackward: () => void;
-    onReload: () => void;
+    onClose?: () => void;
+    onFullscreen?: () => void;
+    onCollapse?: () => void;
+    onBackward?: () => void;
+    onReload?: () => void;
     visible: boolean;
 }
 
@@ -35,13 +35,36 @@ export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
     }
 
     handleShowContextMenu = (e: React.MouseEvent) => {
-        this.store.contextMenu.showContextMenu(new Point2D(e.pageX, e.pageY), [
-            new ContextMenuItemModel({
-                icon: refresh,
-                content: strings.application.actions.hardReset,
-                onClick: this.props.onReload,
-            }),
-        ]);
+        if (this.props.onReload) {
+            this.store.contextMenu.showContextMenu(
+                new Point2D(e.pageX, e.pageY),
+                [
+                    new ContextMenuItemModel({
+                        icon: refresh,
+                        content: strings.application.actions.hardReset,
+                        onClick: this.props.onReload,
+                    }),
+                ],
+            );
+        }
+    };
+
+    handleCollapse = () => {
+        if (this.props.onCollapse) {
+            this.props.onCollapse();
+        }
+    };
+
+    handleFullscreen = () => {
+        if (this.props.onFullscreen) {
+            this.props.onFullscreen();
+        }
+    };
+
+    handleClose = () => {
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
     };
 
     render() {
@@ -70,18 +93,24 @@ export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
                         <div className={style.title}>{this.props.title}</div>
                     </div>
                     <div className={style.actions}>
-                        <AppWindowHeaderAction
-                            icon={collapse}
-                            onClick={this.props.onCollapse}
-                        />
-                        <AppWindowHeaderAction
-                            icon={fullscreen}
-                            onClick={this.props.onFullscreen}
-                        />
-                        <AppWindowHeaderAction
-                            icon={cross}
-                            onClick={this.props.onClose}
-                        />
+                        {this.props.onCollapse && (
+                            <AppWindowHeaderAction
+                                icon={collapse}
+                                onClick={this.props.onCollapse}
+                            />
+                        )}
+                        {this.props.onFullscreen && (
+                            <AppWindowHeaderAction
+                                icon={fullscreen}
+                                onClick={this.props.onFullscreen}
+                            />
+                        )}
+                        {this.props.onClose && (
+                            <AppWindowHeaderAction
+                                icon={cross}
+                                onClick={this.props.onClose}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

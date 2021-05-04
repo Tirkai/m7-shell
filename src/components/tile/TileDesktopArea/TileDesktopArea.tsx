@@ -1,24 +1,23 @@
-import { LayerBoxVisualizer } from "components/debug/LayerBoxVisualizer/LayerBoxVisualizer";
 import { TileCell } from "models/tile/TileCell";
-import { ApplicationWindow } from "models/window/ApplicationWindow";
-import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
+import { IApplicationWindow } from "models/window/IApplicationWindow";
 import React, { useEffect, useRef, useState } from "react";
 import style from "./style.module.css";
 
 interface ITileDesktopAreaProps {
     cell: TileCell;
-    draggedWindow?: ApplicationWindow;
+    draggedWindow?: IApplicationWindow;
     hasDraggedWindow: boolean;
     hasAttachedWindow: boolean;
     onReplaceWindow?: (
-        attachedWindow: ApplicationWindow,
-        targetWindow: ApplicationWindow,
+        attachedWindow: IApplicationWindow,
+        targetWindow: IApplicationWindow,
         tileBounds: DOMRect,
     ) => void;
     onAttachWindow?: (
-        appWindow: ApplicationWindow,
+        appWindow: IApplicationWindow,
         tileBounds: DOMRect,
     ) => void;
+    children?: React.ReactNode;
 }
 
 const className = style.tileDesktopArea;
@@ -64,51 +63,52 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
             }
 
             // TODO : Think about it
-            const listener = props.cell.draggedAppWindow?.eventTarget.add(
-                ApplicationWindowEventType.OnDragChange,
-                (appWindow: ApplicationWindow) => {
-                    // Trigger event when dragging window is dropped
-                    if (!appWindow.isDragging) {
-                        const tileBounds = ref.current?.getBoundingClientRect();
-                        // Check exist tile area bounds
-                        if (tileBounds) {
-                            if (!props.cell.hasAttachedWindow) {
-                                if (
-                                    props.onAttachWindow &&
-                                    props.cell.draggedAppWindow
-                                ) {
-                                    props.onAttachWindow(
-                                        props.cell.draggedAppWindow,
-                                        tileBounds,
-                                    );
-                                }
-                            } else {
-                                if (
-                                    props.onReplaceWindow &&
-                                    props.cell.attachedAppWindow &&
-                                    props.cell.draggedAppWindow
-                                ) {
-                                    props.onReplaceWindow(
-                                        props.cell.attachedAppWindow,
-                                        props.cell.draggedAppWindow,
-                                        tileBounds,
-                                    );
-                                }
-                            }
-                        }
-                    }
-                },
-            );
-            if (listener) {
-                setEventListener(listener);
-            }
+            // TODO: FIX
+            // const listener = props.cell.draggedAppWindow?.eventTarget.add(
+            //     ApplicationWindowEventType.OnDragChange,
+            //     (appWindow: ApplicationWindow) => {
+            //         // Trigger event when dragging window is dropped
+            //         if (!appWindow.isDragging) {
+            //             const tileBounds = ref.current?.getBoundingClientRect();
+            //             // Check exist tile area bounds
+            //             if (tileBounds) {
+            //                 if (!props.cell.hasAttachedWindow) {
+            //                     if (
+            //                         props.onAttachWindow &&
+            //                         props.cell.draggedAppWindow
+            //                     ) {
+            //                         props.onAttachWindow(
+            //                             props.cell.draggedAppWindow,
+            //                             tileBounds,
+            //                         );
+            //                     }
+            //                 } else {
+            //                     if (
+            //                         props.onReplaceWindow &&
+            //                         props.cell.attachedAppWindow &&
+            //                         props.cell.draggedAppWindow
+            //                     ) {
+            //                         props.onReplaceWindow(
+            //                             props.cell.attachedAppWindow,
+            //                             props.cell.draggedAppWindow,
+            //                             tileBounds,
+            //                         );
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     },
+            // );
+            // if (listener) {
+            //     setEventListener(listener);
+            // }
         }
     };
 
     const handleExit = () => {
-        if (eventListener) {
-            props.cell.draggedAppWindow?.eventTarget.remove(eventListener.id);
-        }
+        // if (eventListener) {
+        //     props.cell.draggedAppWindow?.eventTarget.remove(eventListener.id);
+        // }
 
         props.cell.setDraggedAppWindow(null);
     };
@@ -129,7 +129,8 @@ export const TileDesktopArea = (props: ITileDesktopAreaProps) => {
                 DRAGGED: {JSON.stringify(props.cell.draggedAppWindow)}
             </div> */}
             <div className={style.container} ref={ref}>
-                {props.hasDraggedWindow && <LayerBoxVisualizer />}
+                {props.children}
+                {/* {props.hasDraggedWindow && <LayerBoxVisualizer />} */}
             </div>
         </div>
     );
