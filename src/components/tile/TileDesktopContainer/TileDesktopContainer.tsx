@@ -2,12 +2,13 @@ import { TileWindow } from "components/window/TileWindow/TileWindow";
 import { useStore } from "hooks/useStore";
 import { get } from "lodash";
 import { observer } from "mobx-react";
+import { ApplicationProcess } from "models/ApplicationProcess";
 import { TileCell } from "models/tile/TileCell";
 import { TilePreset } from "models/tile/TilePreset";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
-import { IApplicationWindow } from "models/window/IApplicationWindow";
 import { TileWindowModel } from "models/window/TileWindowModel";
 import React, { useEffect } from "react";
+import { DraggableData, DraggableEvent } from "react-draggable";
 import { TileDesktopArea } from "../TileDesktopArea/TileDesktopArea";
 import style from "./style.module.css";
 
@@ -34,10 +35,7 @@ export const TileDesktopContainer = observer(
                             store.virtualViewport.currentViewport.id,
                     )
                     .map((process) => process.window);
-                // .filter(
-                //     (appWindow) =>
-                //         !appWindow.isCollapsed && !appWindow.isFullScreen,
-                // );
+
                 preset.cells.forEach((item, index) => {
                     const indexedWindow = get(sw, index);
                     if (indexedWindow) {
@@ -51,48 +49,34 @@ export const TileDesktopContainer = observer(
             }
         }, [props.preset]);
 
-        const handleAttach = (
-            cell: TileCell,
-            appWindow: IApplicationWindow,
-            tileBounds: DOMRect,
-        ) => {
-            // TODO: Fix
-            // cell.draggedAppWindow?.setSize(tileBounds.width, tileBounds.height);
-            // cell.draggedAppWindow?.setPosition(tileBounds.x, tileBounds.y);
-            cell.setAttachedAppWindow(appWindow);
+        const handleClose = (process: ApplicationProcess) => {
+            store.processManager.killProcess(process);
         };
 
-        const handleReplace = (
-            cell: TileCell,
-            attachedWindow: IApplicationWindow,
-            targetWindow: IApplicationWindow,
-            tileBounds: DOMRect,
+        const handleDragStart = (tileWindow: TileWindowModel) => {
+            store.windowManager.startDragWindow(tileWindow);
+        };
+
+        const handleDragEnd = (tileWindow: TileWindowModel) => {
+            store.windowManager.stopDragWindow(tileWindow);
+        };
+
+        const handleEnter = (tileCell: TileCell) => {
+            store.tile.setActiveCell(tileCell);
+        };
+
+        const handleDrag = (
+            appWindow: TileWindowModel,
+            event: DraggableEvent,
+            data: DraggableData,
         ) => {
-            const preset = props.preset;
-            if (preset) {
-                const freeCell = preset.nearbyFreeCell;
-                if (freeCell) {
-                    // store.tile.detachWindowFromCell(cell);
-
-                    store.tile.attachWindowToCell(
-                        attachedWindow,
-                        preset,
-                        freeCell,
-                    );
-
-                    // TODO: Fix
-
-                    // attachedWindow.setSize(freeCell.width, freeCell.height);
-                    // attachedWindow.setPosition(freeCell.x, freeCell.y);
-
-                    // store.tile.attachWindowToCell(targetWindow, preset, cell);
-                }
-            }
+            appWindow.setPosition(data.x, data.y);
         };
 
         const gridStyles = {
             gridTemplateColumns: `repeat(${props.preset.columns},1fr)`,
             gridTemplateRows: `repeat(${props.preset.rows},1fr)`,
+            gridTemplateAreas: props.preset.areas,
         };
 
         return props.preset ? (
@@ -100,30 +84,17 @@ export const TileDesktopContainer = observer(
                 <div className={style.container} style={gridStyles}>
                     <div
                         className={style.floatedArea}
-                        style={{ ...gridStyles, pointerEvents: "none" }}
+                        style={{
+                            ...gridStyles,
+                            pointerEvents: draggedWindow ? "all" : "none",
+                        }}
                     >
                         {props.preset.cells.map((cell) => (
                             <TileDesktopArea
                                 key={cell.id}
                                 cell={cell}
-                                draggedWindow={draggedWindow}
-                                hasDraggedWindow={cell.hasDraggedWindow}
-                                hasAttachedWindow={cell.hasAttachedWindow}
-                                onReplaceWindow={(
-                                    attachedAppWindow,
-                                    targetWindow,
-                                    tileBounds,
-                                ) =>
-                                    handleReplace(
-                                        cell,
-                                        attachedAppWindow,
-                                        targetWindow,
-                                        tileBounds,
-                                    )
-                                }
-                                onAttachWindow={(appWindow, tileBounds) =>
-                                    handleAttach(cell, appWindow, tileBounds)
-                                }
+                                onEnter={() => handleEnter(cell)}
+                                active={!!draggedWindow}
                             />
                         ))}
                     </div>
@@ -140,24 +111,32 @@ export const TileDesktopContainer = observer(
                                 <TileWindow
                                     key={process.id}
                                     process={process}
-                                    window={process.window}
+                                    window={process.window as TileWindowModel}
                                     url={process.modifiedUrl}
-                                    startColumn={
-                                        (process.window as TileWindowModel)
-                                            .startColumn
+                                    isFocused={process.window.isFocused}
+                                    area={
+                                        (process.window as TileWindowModel).area
                                     }
-                                    endColumn={
-                                        (process.window as TileWindowModel)
-                                            .endColumn
+                                    onClose={() => handleClose(process)}
+                                    onDragStart={() =>
+                                        handleDragStart(
+                                            process.window as TileWindowModel,
+                                        )
                                     }
-                                    startRow={
-                                        (process.window as TileWindowModel)
-                                            .startRow
+                                    onDragEnd={() =>
+                                        handleDragEnd(
+                                            process.window as TileWindowModel,
+                                        )
                                     }
-                                    endRow={
-                                        (process.window as TileWindowModel)
-                                            .endRow
+                                    onDrag={(event, data) =>
+                                        handleDrag(
+                                            process.window as TileWindowModel,
+                                            event,
+                                            data,
+                                        )
                                     }
+                                    x={process.window.x}
+                                    y={process.window.y}
                                 />
                             ))}
                     </div>

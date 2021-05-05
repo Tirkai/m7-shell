@@ -41,6 +41,18 @@ export class TileManager {
             },
         );
 
+        this.store.sharedEventBus.eventBus.add(
+            ApplicationWindowEventType.OnDragStart,
+            (tileWindow: TileWindowModel) => {
+                //
+            },
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            ApplicationWindowEventType.OnDragStop,
+            (tileWindow: TileWindowModel) => this.onDragStop(tileWindow),
+        );
+
         // TODO: IMPORTANT
 
         this.store.sharedEventBus.eventBus.add(
@@ -52,6 +64,42 @@ export class TileManager {
     templates: TileTemplate[] = [];
 
     defaultTileTemplate: TileTemplate;
+
+    activeCell: TileCell | null = null;
+
+    setActiveCell(tileCell: TileCell) {
+        this.activeCell = tileCell;
+    }
+
+    onDragStop(tileWindow: TileWindowModel) {
+        const currentPreset = this.store.virtualViewport.currentViewport
+            .tilePreset;
+
+        const sourceCell = currentPreset.cells.find(
+            (cell) => cell.attachedAppWindow?.id === tileWindow.id,
+        );
+
+        if (sourceCell) {
+            this.detachWindowFromCell(sourceCell);
+        }
+
+        if (this.activeCell) {
+            if (this.activeCell.attachedAppWindow) {
+                const sourceAttachedWindow = this.activeCell.attachedAppWindow;
+
+                this.activeCell.setAttachedAppWindow(tileWindow);
+
+                this.attachWindowToCell(
+                    sourceAttachedWindow,
+                    currentPreset,
+                    currentPreset.nearbyFreeCell,
+                );
+            } else {
+                this.activeCell.setAttachedAppWindow(tileWindow);
+            }
+            tileWindow.setArea(this.activeCell.area);
+        }
+    }
 
     onAddViewportFrame(viewport: VirtualViewportModel) {
         const preset = TileFactory.createTilePreset(this.defaultTileTemplate);
@@ -117,12 +165,14 @@ export class TileManager {
             if (preset.hasFreeCells) {
                 tileCell.setAttachedAppWindow(appWindow);
 
-                appWindow.setGrid({
-                    startColumn: tileCell.startColumn,
-                    startRow: tileCell.startRow,
-                    endColumn: tileCell.endColumn,
-                    endRow: tileCell.endRow,
-                });
+                appWindow.setArea(tileCell.area);
+
+                // appWindow.setGrid({
+                //     startColumn: tileCell.startColumn,
+                //     startRow: tileCell.startRow,
+                //     endColumn: tileCell.endColumn,
+                //     endRow: tileCell.endRow,
+                // });
 
                 this.store.sharedEventBus.eventBus.dispatch(
                     TileEventType.OnAttachWindow,

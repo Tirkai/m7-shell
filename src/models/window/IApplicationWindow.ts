@@ -9,4 +9,8 @@ export interface IApplicationWindow {
     setViewport: (viewport: VirtualViewportModel) => void;
     depthIndex: number;
     setDepthIndex: (value: number) => void;
+    setDragging: (value: boolean) => void;
+    x: number;
+    y: number;
+    setPosition: (x: number, y: number) => void;
 }

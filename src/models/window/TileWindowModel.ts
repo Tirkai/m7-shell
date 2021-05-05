@@ -7,6 +7,7 @@ import { IApplicationWindow } from "./IApplicationWindow";
 interface ITileWindowModelOptions {
     id?: string;
     viewport: VirtualViewportModel;
+    area?: string;
 }
 
 export class TileWindowModel implements IApplicationWindow {
@@ -19,17 +20,23 @@ export class TileWindowModel implements IApplicationWindow {
     endColumn: TileGridUnit;
     startRow: TileGridUnit;
     endRow: TileGridUnit;
+    area: string;
+    x: number;
+    y: number;
 
     constructor(options: ITileWindowModelOptions) {
         this.id = options.id ?? v4();
         this.viewport = options.viewport;
         this.isFocused = false;
         this.isDragging = false;
-        this.depthIndex = 0;
+        this.depthIndex = 1;
         this.startColumn = 1;
         this.endColumn = 1;
         this.startRow = 1;
         this.endRow = 1;
+        this.area = options.area ?? "a";
+        this.x = 0;
+        this.y = 0;
         makeAutoObservable(this);
     }
 
@@ -59,5 +66,14 @@ export class TileWindowModel implements IApplicationWindow {
         this.endColumn = grid.endColumn;
         this.startRow = grid.startRow;
         this.endRow = grid.endRow;
+    }
+
+    setArea(area: string) {
+        this.area = area;
+    }
+
+    setPosition(x: number, y: number) {
+        this.x = Math.floor(x);
+        this.y = Math.floor(y);
     }
 }

@@ -2,25 +2,19 @@ import { makeAutoObservable } from "mobx";
 import { IApplicationWindow } from "models/window/IApplicationWindow";
 import { v4 } from "uuid";
 import { ITileCell } from "./ITileCell";
-import { TileGridUnit } from "./TileGridUnit";
 
 interface ITileCellOptions {
-    startColumn: TileGridUnit;
-    endColumn: TileGridUnit;
-    startRow: TileGridUnit;
-    endRow: TileGridUnit;
+    area: string;
 }
 
 export class TileCell implements ITileCell {
     id: string;
-    startColumn: TileGridUnit = "span";
-    endColumn: TileGridUnit = "span";
-    startRow: TileGridUnit = "span";
-    endRow: TileGridUnit = "span";
     x: number = 0;
     y: number = 0;
     width: number = 0;
     height: number = 0;
+
+    area: string;
 
     draggedAppWindow: IApplicationWindow | null = null;
 
@@ -48,10 +42,7 @@ export class TileCell implements ITileCell {
         makeAutoObservable(this);
 
         this.id = v4();
-        this.startColumn = options.startColumn;
-        this.endColumn = options.endColumn;
-        this.startRow = options.startRow;
-        this.endRow = options.endRow;
+        this.area = options.area;
     }
 
     setSize(width: number, height: number) {

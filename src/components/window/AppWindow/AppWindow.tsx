@@ -1,14 +1,12 @@
-import { AppMessageType } from "@algont/m7-shell-emitter";
 import classNames from "classnames";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { useStore } from "hooks/useStore";
 import { ApplicationProcess } from "models/ApplicationProcess";
-import { ExternalApplication } from "models/ExternalApplication";
-import { ShellApplication } from "models/ShellApplication";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import { Resizable, ResizeCallbackData, ResizeHandle } from "react-resizable";
+import AppLoader from "../AppLoader/AppLoader";
 import { AppWindowContent } from "../AppWindowContent/AppWindowContent";
 import { AppWindowHeader } from "../AppWindowHeader/AppWindowHeader";
 import { AppWindowUnfocusedOverlay } from "../AppWindowUnfocusedOverlay/AppWindowUnfocusedOverlay";
@@ -39,6 +37,7 @@ export const AppWindow = (props: IAppWindowProps) => {
     const [isAppReady, setAppReady] = useState(false);
     const [frame, setFrame] = useState<HTMLIFrameElement | null>(null);
     const [url, setUrl] = useState(props.process.modifiedUrl);
+
     const handleResizeStart = (
         event: React.SyntheticEvent,
         data: ResizeCallbackData,
@@ -48,44 +47,6 @@ export const AppWindow = (props: IAppWindowProps) => {
 
     const handleResizeEnd = () => {
         props.onResizeStop();
-    };
-
-    const handleFrameLoaded = (frameRef: HTMLIFrameElement) => {
-        const context = frameRef?.contentWindow;
-        if (context) {
-            setFrame(frameRef);
-
-            if (!isAppReady) {
-                handleBindingEmitterEvents(props.process);
-            }
-
-            props.process.setEmitterContext(context);
-            handleAppReady();
-        }
-    };
-
-    const handleBindingEmitterEvents = (appProcess: ApplicationProcess) => {
-        appProcess.emitter.on(AppMessageType.Connected, () => {
-            handleAppReady();
-
-            store.processManager.injectAuthTokenInProcess(
-                appProcess,
-                store.auth.accessToken,
-                store.auth.userLogin,
-            );
-        });
-
-        appProcess.emitter.on(AppMessageType.ForceRecieveToken, () =>
-            store.processManager.injectAuthTokenInProcess(
-                appProcess,
-                store.auth.accessToken,
-                store.auth.userLogin,
-            ),
-        );
-    };
-
-    const handleAppReady = () => {
-        setAppReady(true);
     };
 
     const handleResize = (
@@ -128,33 +89,6 @@ export const AppWindow = (props: IAppWindowProps) => {
 
     useEffect(() => {
         setUrl(props.process.modifiedUrl);
-    }, [props.process.modifiedUrl]);
-
-    const appComponent = useMemo(() => {
-        if (props.process.app instanceof ExternalApplication) {
-            return (
-                <iframe
-                    onLoad={handleAppReady}
-                    src={props.url}
-                    ref={handleFrameLoaded}
-                    title={props.process.name}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        pointerEvents:
-                            props.isResizing || props.isDragging
-                                ? "none"
-                                : "all",
-                    }}
-                    frameBorder={0}
-                ></iframe>
-            );
-        }
-        if (props.process.app instanceof ShellApplication) {
-            handleAppReady();
-            return props.process.app.Component;
-        }
-        return <div>Unknown component</div>;
     }, [props.process.modifiedUrl]);
 
     const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
@@ -231,14 +165,15 @@ export const AppWindow = (props: IAppWindowProps) => {
                                 store.shell.displayMode.showAppWindowHeader
                             }
                         />
-                        {/* <AppLoader
+                        <AppLoader
                             icon={props.process.app.icon}
                             disabled={isAppReady}
-                        /> */}
+                        />
                         <AppWindowContent
                             process={props.process}
                             window={props.window}
                             url={props.url}
+                            onReady={() => setAppReady(true)}
                         />
                         <AppWindowUnfocusedOverlay
                             visible={

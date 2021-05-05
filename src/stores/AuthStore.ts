@@ -123,10 +123,22 @@ export class AuthStore {
 
     checkoutRemainingTime() {
         const diff =
-            this.renewTime.diff(this.currentTime) +
-            this.deltaTime +
+            this.currentTime.diff(this.renewTime) -
+            // this.renewTime.diff(this.currentTime) +
+            // this.deltaTime +
             this.timeOffset;
-        return diff >= 0;
+        console.debug(
+            "Time",
+            `${this.currentTime
+                .toDate()
+                .getTime()} - ${this.renewTime
+                .toDate()
+                .getTime()} = ${this.currentTime.diff(
+                this.renewTime,
+            )} (${this.currentTime.diff(this.renewTime) -
+                this.timeOffset}) [${diff}]`,
+        );
+        return diff <= 0;
     }
 
     init() {
@@ -287,6 +299,10 @@ export class AuthStore {
                     login: this.userLogin,
                 });
             } else {
+                if (parseInt(response.data.error.code) === -2006) {
+                    return;
+                }
+
                 eventBus.dispatch(AuthEventType.OnFailedRenewToken);
 
                 this.logout();

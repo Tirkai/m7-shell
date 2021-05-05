@@ -24,6 +24,7 @@ export const TileChooserItem = (props: ITileChooserItemProps) => (
             <div
                 className={style.container}
                 style={{
+                    gridTemplateAreas: props.template.areas,
                     gridTemplateColumns: `repeat(${props.template.columns},1fr)`,
                     gridTemplateRows: `repeat(${props.template.rows},1fr)`,
                 }}
@@ -32,8 +33,7 @@ export const TileChooserItem = (props: ITileChooserItemProps) => (
                     <div
                         className={style.gridItem}
                         style={{
-                            gridRow: `${item.startRow}/${item.endRow}`,
-                            gridColumn: `${item.startColumn}/${item.endColumn}`,
+                            gridArea: item.area,
                         }}
                         key={item.id}
                     >

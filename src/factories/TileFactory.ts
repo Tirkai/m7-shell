@@ -9,13 +9,11 @@ export class TileFactory {
             rows: options.rows,
             alias: options.alias,
             isEmptyPreset: options.columns <= 0 || options.rows <= 0,
+            areas: options.areas,
             cells: options.cells.map(
                 (cell) =>
                     new TileCell({
-                        startRow: cell.startRow,
-                        startColumn: cell.startColumn,
-                        endRow: cell.endRow,
-                        endColumn: cell.endColumn,
+                        area: cell.area,
                     }),
             ),
         });
@@ -27,6 +25,7 @@ export class TileFactory {
             rows: 0,
             alias: "none",
             cells: [],
+            areas: "",
             isEmptyPreset: true,
         });
     }

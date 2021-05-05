@@ -14,6 +14,7 @@ interface IAppWindowProps extends IStore {
     process: ApplicationProcess;
     window: IApplicationWindow;
     url: string;
+    onReady?: () => void;
 }
 
 export const AppWindowContent = observer((props: IAppWindowProps) => {
@@ -24,6 +25,9 @@ export const AppWindowContent = observer((props: IAppWindowProps) => {
 
     const handleAppReady = () => {
         setAppReady(true);
+        if (props.onReady) {
+            props.onReady();
+        }
     };
 
     const handleFrameLoaded = (frameRef: HTMLIFrameElement) => {

@@ -112,6 +112,7 @@ export class WindowManagerStore {
     }
 
     focusWindow(appWindow: IApplicationWindow) {
+        console.log("TRY FOCUS");
         try {
             this.store.sharedEventBus.eventBus.dispatch(
                 ApplicationWindowEventType.OnFocusWindow,
@@ -131,7 +132,6 @@ export class WindowManagerStore {
             const minIndex = min(indexes);
 
             const maxIndex = max(indexes);
-
             if (minIndex && maxIndex) {
                 this.windows.forEach((item) => {
                     let index = 0;
@@ -145,6 +145,7 @@ export class WindowManagerStore {
                     item.setDepthIndex(index);
                 });
             }
+
             this.focusedWindow = appWindow;
         } catch (e) {
             console.error(e);
@@ -158,6 +159,23 @@ export class WindowManagerStore {
         } catch (e) {
             console.error(e);
         }
+    }
+
+    startDragWindow(appWindow: IApplicationWindow) {
+        appWindow.setDragging(true);
+        this.store.sharedEventBus.eventBus.dispatch(
+            ApplicationWindowEventType.OnDragStart,
+            appWindow,
+        );
+    }
+
+    stopDragWindow(appWindow: IApplicationWindow) {
+        appWindow.setDragging(false);
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            ApplicationWindowEventType.OnDragStop,
+            appWindow,
+        );
     }
 
     closeWindow(appWindow: IApplicationWindow) {

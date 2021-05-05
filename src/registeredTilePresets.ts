@@ -6,13 +6,11 @@ export const registeredTileTemplates: TileTemplate[] = [
         columns: 1,
         rows: 1,
         alias: "1x1",
+        areas: `"a"`,
         cells: [
             {
                 id: v4(),
-                startColumn: 1,
-                endColumn: 1,
-                startRow: 1,
-                endRow: 1,
+                area: "a",
             },
         ],
     }),
@@ -20,22 +18,18 @@ export const registeredTileTemplates: TileTemplate[] = [
         columns: 2,
         rows: 2,
         alias: "1x2-1x2",
+        areas: `
+            "a b"
+            "a b"
+        `,
         cells: [
             {
                 id: v4(),
-
-                startColumn: 1,
-                endColumn: 2,
-                startRow: 1,
-                endRow: 3,
+                area: "a",
             },
             {
                 id: v4(),
-
-                startColumn: 2,
-                endColumn: 3,
-                startRow: 1,
-                endRow: 3,
+                area: "b",
             },
         ],
     }),
@@ -43,30 +37,22 @@ export const registeredTileTemplates: TileTemplate[] = [
         columns: 2,
         rows: 2,
         alias: "1x2-1x1-1x1",
+        areas: `
+            "a b"
+            "a c"
+        `,
         cells: [
             {
                 id: v4(),
-
-                startColumn: 1,
-                endColumn: 2,
-                startRow: 1,
-                endRow: 3,
+                area: "a",
             },
             {
                 id: v4(),
-
-                startColumn: 2,
-                endColumn: 3,
-                startRow: 1,
-                endRow: 2,
+                area: "b",
             },
             {
                 id: v4(),
-
-                startColumn: 2,
-                endColumn: 3,
-                startRow: 2,
-                endRow: 3,
+                area: "c",
             },
         ],
     }),
@@ -74,38 +60,26 @@ export const registeredTileTemplates: TileTemplate[] = [
         columns: 2,
         rows: 2,
         alias: "1x1-1x1-1x1-1x1",
+        areas: `
+            "a b"
+            "c d"
+        `,
         cells: [
             {
                 id: v4(),
-
-                startColumn: 1,
-                endColumn: 2,
-                startRow: 1,
-                endRow: 2,
+                area: "a",
             },
             {
                 id: v4(),
-
-                startColumn: 2,
-                endColumn: 3,
-                startRow: 1,
-                endRow: 2,
+                area: "b",
             },
             {
                 id: v4(),
-
-                startColumn: 1,
-                endColumn: 2,
-                startRow: 2,
-                endRow: 3,
+                area: "c",
             },
             {
                 id: v4(),
-
-                startColumn: 2,
-                endColumn: 3,
-                startRow: 2,
-                endRow: 3,
+                area: "d",
             },
         ],
     }),

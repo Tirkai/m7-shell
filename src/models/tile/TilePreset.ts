@@ -13,6 +13,8 @@ export class TilePreset implements ITilePreset {
 
     alias: string;
 
+    areas: string;
+
     isEmptyPreset: boolean;
 
     get freeCells() {
@@ -41,6 +43,7 @@ export class TilePreset implements ITilePreset {
         this.cells = options.cells;
         this.alias = options.alias;
         this.isEmptyPreset = options.isEmptyPreset ?? false;
+        this.areas = options.areas;
     }
 
     setCells(cells: TileCell[]) {

@@ -108,33 +108,21 @@ export class ShellScreen extends Component<IStore> {
                                                     }
                                                 />
                                             </DesktopLayer>
-                                            {true && (
-                                                <DesktopLayer
-                                                    enabled
-                                                    priority={2}
-                                                >
-                                                    <TileDesktopContainer
-                                                        viewport={viewport}
-                                                        preset={
-                                                            viewport.tilePreset
-                                                        }
-                                                    />
-                                                </DesktopLayer>
-                                            )}
-                                            {true && (
-                                                <DesktopLayer
-                                                    enabled
-                                                    priority={1}
-                                                >
-                                                    <AppWindowArea
-                                                        viewport={viewport}
-                                                        disabled={
-                                                            this.store.desktop
-                                                                .isEditMode
-                                                        }
-                                                    />
-                                                </DesktopLayer>
-                                            )}
+                                            <DesktopLayer enabled priority={2}>
+                                                <TileDesktopContainer
+                                                    viewport={viewport}
+                                                    preset={viewport.tilePreset}
+                                                />
+                                            </DesktopLayer>
+                                            <DesktopLayer enabled priority={1}>
+                                                <AppWindowArea
+                                                    viewport={viewport}
+                                                    disabled={
+                                                        this.store.desktop
+                                                            .isEditMode
+                                                    }
+                                                />
+                                            </DesktopLayer>
                                         </VirtualFrame>
                                     ),
                                 )}

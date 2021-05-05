@@ -6,4 +6,6 @@ export enum ApplicationWindowEventType {
     OnCollapse = "OnCollapse",
     OnFullscreen = "OnFullscreen",
     OnFocusWindow = "OnFocusWindow",
+    OnDragStart = "OnDragStart",
+    OnDragStop = "OnDragStop",
 }

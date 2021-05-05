@@ -8,6 +8,7 @@ interface ITileTemplateOptions {
     rows: number;
     columns: number;
     alias: string;
+    areas: string;
 }
 
 export class TileTemplate {
@@ -16,6 +17,8 @@ export class TileTemplate {
     cells: ITileCell[] = [];
     rows: number;
     columns: number;
+
+    areas: string;
 
     alias: string;
 
@@ -26,6 +29,7 @@ export class TileTemplate {
         this.columns = options.columns;
         this.cells = options.cells;
         this.alias = options.alias;
+        this.areas = options.areas;
     }
 
     getRawTemplateData(): ITilePreset {
