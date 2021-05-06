@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import { LayerBoxVisualizer } from "components/debug/LayerBoxVisualizer/LayerBoxVisualizer";
 import { TileTemplate } from "models/tile/TileTemplate";
 import React from "react";
 import style from "./style.module.css";
@@ -36,9 +35,7 @@ export const TileChooserItem = (props: ITileChooserItemProps) => (
                             gridArea: item.area,
                         }}
                         key={item.id}
-                    >
-                        <LayerBoxVisualizer />
-                    </div>
+                    ></div>
                 ))}
             </div>
         )}

@@ -48,18 +48,10 @@ export class TileCell implements ITileCell {
     setSize(width: number, height: number) {
         this.width = Math.floor(width);
         this.height = Math.floor(height);
-        if (this.attachedAppWindow) {
-            // TODO: FIX
-            // this.attachedAppWindow.setSize(this.width, this.height);
-        }
     }
 
     setPosition(x: number, y: number) {
         this.x = Math.floor(x);
         this.y = Math.floor(y);
-        if (this.attachedAppWindow) {
-            // TODO: FIX
-            // this.attachedAppWindow.setPosition(this.x, this.y);
-        }
     }
 }

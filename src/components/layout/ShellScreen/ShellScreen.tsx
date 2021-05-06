@@ -10,7 +10,6 @@ import { NotificationHub } from "components/notifications/NotificationHub/Notifi
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
-import { TileChooseHub } from "components/tile/TileChooseHub/TileChooseHub";
 import { TileDesktopContainer } from "components/tile/TileDesktopContainer/TileDesktopContainer";
 import { VirtualDesktopHub } from "components/virtual/VirtualDesktopHub/VirtualDesktopHub";
 import { VirtualFrame } from "components/virtual/VirtualFrame/VirtualFrame";
@@ -127,10 +126,6 @@ export class ShellScreen extends Component<IStore> {
                                     ),
                                 )}
                             </VirtualViewport>
-
-                            <DesktopLayer enabled priority={2}>
-                                <TileChooseHub />
-                            </DesktopLayer>
 
                             <DesktopLayer enabled priority={2}>
                                 <VirtualDesktopHub />

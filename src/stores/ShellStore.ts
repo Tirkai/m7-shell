@@ -2,10 +2,12 @@ import { DisplayModeType } from "enum/DisplayModeType";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { makeAutoObservable } from "mobx";
+import { AuthEventType } from "models/auth/AuthEventType";
 import { DefaultDisplayMode } from "models/DefaultDisplayMode";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { DevModeModel } from "models/DevModeModel";
 import { EmbedDisplayMode } from "models/EmbedDisplayMode";
+import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { PanelEventType } from "models/panel/PanelEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
@@ -52,33 +54,19 @@ export class ShellStore {
                 this.setActivePanel(ShellPanelType.None),
         );
 
-        // window.addEventListener(
-        //     ShellEvents.FocusAnyWindow,
-        //     action(() => {
-        //         this.activePanel = ShellPanelType.None;
-        //     }),
-        // );
+        this.store.sharedEventBus.eventBus.add(
+            KeyboardEventType.ArrowUpWithControl,
+            () => this.onKeyboardArrowUpWithControl(),
+        );
 
-        // window.addEventListener(
-        //     ShellEvents.StartMenuOpen,
-        //     action(() => {
-        //         this.store.windowManager.clearFocus();
-        //     }),
-        // );
+        this.store.sharedEventBus.eventBus.add(
+            KeyboardEventType.ArrowDownWithControl,
+            () => this.onKeyboardArrowDownWithControl(),
+        );
 
-        // window.addEventListener(
-        //     ShellEvents.NotificationHubOpen,
-        //     action(() => {
-        //         this.store.windowManager.clearFocus();
-        //     }),
-        // );
-
-        // window.addEventListener(
-        //     ShellEvents.AudioHubOpen,
-        //     action(() => {
-        //         this.store.windowManager.clearFocus();
-        //     }),
-        // );
+        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () =>
+            this.onLogout(),
+        );
 
         const storagedDevMode = JSON.parse(
             localStorage.getItem(this.localStorageDevModeKey) ?? "{}",
@@ -89,6 +77,18 @@ export class ShellStore {
                 this.setDevMode(storagedDevMode.enabled);
             }
         }
+    }
+
+    onLogout() {
+        this.setActivePanel(ShellPanelType.None);
+    }
+
+    onKeyboardArrowUpWithControl() {
+        this.setActivePanel(ShellPanelType.Virtual);
+    }
+
+    onKeyboardArrowDownWithControl() {
+        this.setActivePanel(ShellPanelType.None);
     }
 
     setActivePanel(panel: ShellPanelType) {

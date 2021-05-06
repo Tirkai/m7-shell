@@ -1,9 +1,13 @@
+import { SVGIcon } from "@algont/m7-ui";
 import { Add } from "@material-ui/icons";
 import { BaseHub } from "components/hub/BaseHub/BaseHub";
+import { TileAppPreviewGrid } from "components/tile/TileAppPreviewGrid/TileAppPreviewGrid";
+import { TileAppPreviewItem } from "components/tile/TileAppPreviewItem/TileAppPreviewItem";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
+import { TileWindowModel } from "models/window/TileWindowModel";
 import React, { useMemo } from "react";
 import { VirtualFrameList } from "../VirtualFrameList/VirtualFrameList";
 import { VirtualFramePreview } from "../VirtualFramePreview/VirtualFramePreview";
@@ -46,49 +50,77 @@ export const VirtualDesktopHub = observer(() => {
         <BaseHub
             show={store.shell.activePanel === ShellPanelType.Virtual}
             width="100%"
-            height="100%"
         >
             <div className={style.virtualDesktopHub}>
                 <div className={style.container}>
-                    <div className={style.applications}></div>
                     <div className={style.frames}>
                         <div className={style.framesContainer}>
-                            {store.shell.activePanel ===
-                                ShellPanelType.Virtual && (
-                                <VirtualFrameList
-                                    count={
-                                        store.virtualViewport.viewports.length
-                                    }
-                                >
-                                    {/* TODO: Refactor  */}
-                                    {store.virtualViewport.viewports.map(
-                                        (item, index) => (
-                                            <VirtualFramePreview
-                                                key={item.id}
-                                                onClick={() =>
-                                                    handleSetViewport(item)
-                                                }
-                                                active={
-                                                    store.virtualViewport
-                                                        .currentViewport.id ===
-                                                    item.id
-                                                }
-                                                onDelete={() =>
-                                                    removeViewportAction(item)
-                                                }
-                                            >
-                                                {index + 1}
-                                            </VirtualFramePreview>
-                                        ),
-                                    )}
+                            <VirtualFrameList
+                                count={store.virtualViewport.viewports.length}
+                            >
+                                {/* TODO: Refactor  */}
+                                {store.virtualViewport.viewports.map((item) => (
                                     <VirtualFramePreview
-                                        onClick={handleCreateViewport}
-                                        active={false}
+                                        key={item.id}
+                                        onClick={() => handleSetViewport(item)}
+                                        active={
+                                            store.virtualViewport
+                                                .currentViewport.id === item.id
+                                        }
+                                        onDelete={() =>
+                                            removeViewportAction(item)
+                                        }
+                                        templates={store.tile.templates}
+                                        preset={item.tilePreset}
+                                        viewport={item}
                                     >
-                                        <Add />
+                                        <TileAppPreviewGrid
+                                            areas={item.tilePreset.areas}
+                                            columns={item.tilePreset.columns}
+                                            rows={item.tilePreset.rows}
+                                        >
+                                            {store.processManager.processes
+                                                .filter(
+                                                    (process) =>
+                                                        process.window.viewport
+                                                            .id === item.id,
+                                                )
+                                                .map((process) => (
+                                                    <TileAppPreviewItem
+                                                        area={
+                                                            (process.window as TileWindowModel)
+                                                                .area
+                                                        }
+                                                        icon={
+                                                            <SVGIcon
+                                                                source={
+                                                                    process.app
+                                                                        .icon
+                                                                }
+                                                                size={{
+                                                                    width:
+                                                                        "32px",
+                                                                    height:
+                                                                        "32px",
+                                                                }}
+                                                                color="white"
+                                                            />
+                                                        }
+                                                        title={process.app.name}
+                                                    />
+                                                ))}
+                                        </TileAppPreviewGrid>
+                                        {/* {index + 1} */}
                                     </VirtualFramePreview>
-                                </VirtualFrameList>
-                            )}
+                                ))}
+                                <VirtualFramePreview
+                                    onClick={handleCreateViewport}
+                                    active={false}
+                                    templates={[]}
+                                >
+                                    <Add />
+                                </VirtualFramePreview>
+                            </VirtualFrameList>
                         </div>
                     </div>
                 </div>

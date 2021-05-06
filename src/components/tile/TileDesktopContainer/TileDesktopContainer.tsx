@@ -94,7 +94,10 @@ export const TileDesktopContainer = observer(
                                 key={cell.id}
                                 cell={cell}
                                 onEnter={() => handleEnter(cell)}
-                                active={!!draggedWindow}
+                                active={
+                                    !!draggedWindow &&
+                                    store.display.displayMode.enableTiles
+                                }
                             />
                         ))}
                     </div>

@@ -3,11 +3,12 @@
     width: 100%;
     height: 100%;
     overflow: auto;
+    position: relative;
 }
 
 .container {
     display: grid;
-    grid-template-rows: 150px;
+    grid-template-rows: 200px;
     grid-gap: 16px;
     padding: 16px;
     box-sizing: border-box;

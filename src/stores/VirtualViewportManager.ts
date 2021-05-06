@@ -1,6 +1,7 @@
 import { TileFactory } from "factories/TileFactory";
 import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
+import { AuthEventType } from "models/auth/AuthEventType";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileEventType } from "models/tile/TileEventType";
@@ -42,7 +43,8 @@ export class VirtualViewportManager {
 
         this.store.sharedEventBus.eventBus.add(
             TileEventType.OnChangePreset,
-            (preset: TilePreset) => this.onChangePreset(preset),
+            (payload: { preset: TilePreset; viewport: VirtualViewportModel }) =>
+                this.onChangePreset(payload.preset, payload.viewport),
         );
 
         this.store.sharedEventBus.eventBus.add(
@@ -65,9 +67,22 @@ export class VirtualViewportManager {
             () => this.onKeyboardArrowRightWithControl(),
         );
 
+        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () =>
+            this.onLogout(),
+        );
+
         this.addViewport(new VirtualViewportModel());
 
         makeAutoObservable(this);
+    }
+
+    setViewports(viewports: VirtualViewportModel[]) {
+        this.viewports = viewports;
+    }
+
+    onLogout() {
+        this.setViewports([]);
+        this.addViewport(new VirtualViewportModel());
     }
 
     onKeyboardArrowLeftWithControl() {
@@ -88,8 +103,9 @@ export class VirtualViewportManager {
         }
     }
 
-    onChangePreset(preset: TilePreset) {
-        this.currentViewport.setTilePreset(preset);
+    onChangePreset(preset: TilePreset, viewport: VirtualViewportModel) {
+        viewport.setTilePreset(preset);
+        console.log("VIEWPORT", viewport);
     }
 
     onInstantiateProcess(process: ApplicationProcess) {

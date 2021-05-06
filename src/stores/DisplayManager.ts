@@ -21,6 +21,7 @@ export class DisplayManager {
 
         this.displayMode = new DisplayMode({
             windowStrategy: new TileWindowStrategy(this.store),
+            enableTiles: true,
         });
 
         makeAutoObservable(this);

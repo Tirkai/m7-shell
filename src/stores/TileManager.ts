@@ -149,9 +149,25 @@ export class TileManager {
 
             this.setDefaultTileTemplate(template);
 
+            // this.store.sharedEventBus.eventBus.dispatch(
+            //     TileEventType.OnChangePreset,
+            //     createdPreset,
+            // );
+        }
+    }
+
+    applyPresetToViewport(
+        template: TileTemplate,
+        viewport: VirtualViewportModel,
+    ) {
+        if (template) {
+            const createdPreset = TileFactory.createTilePreset(template);
+
+            this.setDefaultTileTemplate(template);
+
             this.store.sharedEventBus.eventBus.dispatch(
                 TileEventType.OnChangePreset,
-                createdPreset,
+                { preset: createdPreset, viewport },
             );
         }
     }

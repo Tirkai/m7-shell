@@ -127,17 +127,17 @@ export class AuthStore {
             // this.renewTime.diff(this.currentTime) +
             // this.deltaTime +
             this.timeOffset;
-        console.debug(
-            "Time",
-            `${this.currentTime
-                .toDate()
-                .getTime()} - ${this.renewTime
-                .toDate()
-                .getTime()} = ${this.currentTime.diff(
-                this.renewTime,
-            )} (${this.currentTime.diff(this.renewTime) -
-                this.timeOffset}) [${diff}]`,
-        );
+        // console.debug(
+        //     "Time",
+        //     `${this.currentTime
+        //         .toDate()
+        //         .getTime()} - ${this.renewTime
+        //         .toDate()
+        //         .getTime()} = ${this.currentTime.diff(
+        //         this.renewTime,
+        //     )} (${this.currentTime.diff(this.renewTime) -
+        //         this.timeOffset}) [${diff}]`,
+        // );
         return diff <= 0;
     }
 

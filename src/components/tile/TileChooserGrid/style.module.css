@@ -1,5 +1,7 @@
 .tileChooserGrid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 16px;
+    grid-template-columns: repeat(4, 48px);
+    height: 100%;
+    grid-gap: 8px;
+    align-items: center;
 }
