@@ -26,16 +26,24 @@ install:
 	npm install
 
 build: clean-build install
-	npm run build
+	CI=false npm run build
 
 deb: clean-deb
 	bash deb/build.sh $(VERSION)
 
 package: clean install build deb
 
-version:
+info:
 	@echo $(PROJECT_NAME) $(VERSION)
 	@exit 0
 
+version:
+	@echo $(VERSION)
+	@exit 0
 
-.PHONY: all clean-build clean-deb clean install build deb package
+name:
+	@echo $(PROJECT_NAME)
+	@exit 0
+
+
+.PHONY: all clean-build clean-deb clean install build deb package info name version
