@@ -2,6 +2,7 @@
     display: grid;
     grid-template-rows: 48px 1fr;
     position: relative;
+    overflow: hidden;
 }
 
 .active {
@@ -42,4 +43,9 @@
     align-items: center;
     color: white;
     overflow: hidden;
+}
+
+.tileChooseIndicator {
+    position: relative;
+    z-index: 10;
 }

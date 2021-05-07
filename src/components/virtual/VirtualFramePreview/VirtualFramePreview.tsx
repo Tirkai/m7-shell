@@ -54,11 +54,13 @@ export const VirtualFramePreview = observer(
                 <div className={style.actions}>
                     {currentActiveTemplate && (
                         <>
-                            <TileChooserItem
-                                template={currentActiveTemplate}
-                                active={false}
-                                onClick={() => setShowTileGridChooser(true)}
-                            />
+                            <div className={style.tileChooseIndicator}>
+                                <TileChooserItem
+                                    template={currentActiveTemplate}
+                                    active={isShowTileGridChooser}
+                                    onClick={() => setShowTileGridChooser(true)}
+                                />
+                            </div>
 
                             <IconButton
                                 size="small"
@@ -71,7 +73,13 @@ export const VirtualFramePreview = observer(
                     )}
                     <TilePresetChooser
                         show={isShowTileGridChooser}
-                        templates={props.templates ?? []}
+                        templates={
+                            props.templates?.filter(
+                                (template) =>
+                                    template.alias !==
+                                    props.viewport?.tilePreset.alias,
+                            ) ?? []
+                        }
                         onApply={(template) =>
                             handleApplyPreset(template, props.viewport)
                         }
