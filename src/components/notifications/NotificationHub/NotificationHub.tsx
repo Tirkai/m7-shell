@@ -226,27 +226,37 @@ export const NotificationHub = observer(() => {
                         <PanelInformerContent>
                             Удалить группу уведомлений?
                         </PanelInformerContent>
-                        <PanelInformerContent>
-                            <RadioGroup
-                                color="primary"
-                                name="deleteChoose"
-                                value={deletionType}
-                                onChange={handleSetDeletionType}
-                            >
-                                <FormControlLabel
-                                    value={
-                                        NotificationDeletionType.DeleteVisible
-                                    }
-                                    control={<Radio color="primary" />}
-                                    label="Удалить текущие"
-                                />
-                                <FormControlLabel
-                                    value={NotificationDeletionType.DeleteAll}
-                                    control={<Radio color="primary" />}
-                                    label="Удалить все"
-                                />
-                            </RadioGroup>
-                        </PanelInformerContent>
+                        {group.count > 5 && (
+                            <PanelInformerContent>
+                                <RadioGroup
+                                    color="primary"
+                                    name="deleteChoose"
+                                    value={deletionType}
+                                    onChange={handleSetDeletionType}
+                                >
+                                    <FormControlLabel
+                                        value={
+                                            NotificationDeletionType.DeleteVisible
+                                        }
+                                        control={<Radio color="primary" />}
+                                        label={
+                                            "Удалить " +
+                                            group.notifications.length +
+                                            " уведомлений"
+                                        }
+                                    />
+
+                                    <FormControlLabel
+                                        value={
+                                            NotificationDeletionType.DeleteAll
+                                        }
+                                        control={<Radio color="primary" />}
+                                        label="Удалить все"
+                                    />
+                                </RadioGroup>
+                            </PanelInformerContent>
+                        )}
+
                         <PanelInformerActions>
                             <Button
                                 onClick={() =>
