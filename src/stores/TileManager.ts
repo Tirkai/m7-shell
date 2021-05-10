@@ -53,8 +53,6 @@ export class TileManager {
             (tileWindow: TileWindowModel) => this.onDragStop(tileWindow),
         );
 
-        // TODO: IMPORTANT
-
         this.store.sharedEventBus.eventBus.add(
             ApplicationWindowEventType.OnClose,
             (appWindow: ApplicationWindow) => this.onWindowClose(appWindow),
@@ -103,7 +101,6 @@ export class TileManager {
 
     onAddViewportFrame(viewport: VirtualViewportModel) {
         const preset = TileFactory.createTilePreset(this.defaultTileTemplate);
-        this.applyPreset(this.defaultTileTemplate);
         viewport.setTilePreset(preset);
     }
 
@@ -112,7 +109,6 @@ export class TileManager {
     }
 
     onWindowClose(appWindow: ApplicationWindow) {
-        // TODO: Think about it
         const preset = this.store.virtualViewport.currentViewport.tilePreset;
         if (preset) {
             const cell = this.findCellInPresetByAttacheWindowId(
@@ -137,22 +133,9 @@ export class TileManager {
             } else {
                 this.store.sharedEventBus.eventBus.dispatch(
                     TileEventType.OnTileGridOverflow,
-                    appProcess,
+                    [appProcess],
                 );
             }
-        }
-    }
-
-    applyPreset(template: TileTemplate) {
-        if (template) {
-            const createdPreset = TileFactory.createTilePreset(template);
-
-            this.setDefaultTileTemplate(template);
-
-            // this.store.sharedEventBus.eventBus.dispatch(
-            //     TileEventType.OnChangePreset,
-            //     createdPreset,
-            // );
         }
     }
 

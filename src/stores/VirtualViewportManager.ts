@@ -1,4 +1,5 @@
 import { TileFactory } from "factories/TileFactory";
+import { chunk, isEmpty } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
@@ -6,11 +7,26 @@ import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileEventType } from "models/tile/TileEventType";
 import { TilePreset } from "models/tile/TilePreset";
+import { TileTemplate } from "models/tile/TileTemplate";
+import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
+import { TileWindowModel } from "models/window/TileWindowModel";
 import { AppStore } from "stores/AppStore";
+
+interface IViewportTemplate {
+    viewportId: string;
+    templateAlias: string;
+}
+
+interface IStoragedViewportData {
+    [UserDatabasePropKey.Viewports]: {
+        viewports: IViewportTemplate[];
+        currentViewportId: string;
+    };
+}
 
 export class VirtualViewportManager {
     private store: AppStore;
@@ -49,7 +65,16 @@ export class VirtualViewportManager {
 
         this.store.sharedEventBus.eventBus.add(
             TileEventType.OnTileGridOverflow,
-            (process: ApplicationProcess) => this.onTileGridOverflow(process),
+            (processes: ApplicationProcess[]) =>
+                this.onTileGridOverflow(processes),
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            TileEventType.OnTileViewportSpread,
+            (payload: {
+                chunks: ApplicationProcess[][];
+                viewport: VirtualViewportModel;
+            }) => this.onTileViewportSpread(payload.chunks, payload.viewport),
         );
 
         this.store.sharedEventBus.eventBus.add(
@@ -67,11 +92,28 @@ export class VirtualViewportManager {
             () => this.onKeyboardArrowRightWithControl(),
         );
 
+        this.store.sharedEventBus.eventBus.add(
+            VirtualViewportEventType.OnAddViewportFrame,
+            () => this.onChangeViewportFrame(),
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            VirtualViewportEventType.OnRemoveViewportFrame,
+            () => this.onChangeViewportFrame(),
+        );
+
         this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () =>
             this.onLogout(),
         );
 
-        this.addViewport(new VirtualViewportModel());
+        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogin, () =>
+            this.onLogin(),
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            TileEventType.OnChangePreset,
+            () => this.saveUserViewports(),
+        );
 
         makeAutoObservable(this);
     }
@@ -80,9 +122,68 @@ export class VirtualViewportManager {
         this.viewports = viewports;
     }
 
+    saveUserViewports() {
+        const data: IStoragedViewportData = {
+            [UserDatabasePropKey.Viewports]: {
+                currentViewportId: this.currentViewport.id,
+                viewports: this.viewports.map((item) => ({
+                    viewportId: item.id,
+                    templateAlias: item.tilePreset.alias,
+                })),
+            },
+        };
+
+        this.store.userDatabase.save([
+            {
+                name: UserDatabasePropKey.Viewports,
+                value: data[UserDatabasePropKey.Viewports],
+            },
+        ]);
+    }
+
+    onChangeViewportFrame() {
+        this.saveUserViewports();
+    }
+
+    onLogin() {
+        this.store.userDatabase
+            .load<IStoragedViewportData>([UserDatabasePropKey.Viewports])
+            .then(({ result }) => {
+                if (result && !isEmpty(result)) {
+                    const viewports = result[
+                        UserDatabasePropKey.Viewports
+                    ].viewports?.map((item) => {
+                        const template =
+                            this.store.tile.templates.find(
+                                (tmp) => tmp.alias === item.templateAlias,
+                            ) ??
+                            new TileTemplate({
+                                alias: "1x1",
+                                columns: 1,
+                                rows: 1,
+                                areas: "a",
+                                cells: [],
+                            });
+
+                        return new VirtualViewportModel({
+                            id: item.viewportId,
+                            tilePreset: TileFactory.createTilePreset(template),
+                        });
+                    });
+
+                    const [first] = viewports;
+                    this.setViewports(viewports);
+                    this.setCurrentViewport(first);
+
+                    // this.addViewport(new VirtualViewportModel());
+                } else {
+                    this.addViewport(new VirtualViewportModel());
+                }
+            });
+    }
+
     onLogout() {
         this.setViewports([]);
-        this.addViewport(new VirtualViewportModel());
     }
 
     onKeyboardArrowLeftWithControl() {
@@ -104,8 +205,37 @@ export class VirtualViewportManager {
     }
 
     onChangePreset(preset: TilePreset, viewport: VirtualViewportModel) {
+        const viewportProcesses = this.store.processManager.processes.filter(
+            (item) => item.window.viewport.id === viewport.id,
+        );
+
+        if (viewportProcesses.length > preset.maxTilesCount) {
+            const excessCount = viewportProcesses.length - preset.maxTilesCount;
+
+            const startExcessIndex = viewportProcesses.length - excessCount;
+
+            if (viewportProcesses.length > preset.maxTilesCount * 2) {
+                const chunks = chunk(viewportProcesses, preset.maxTilesCount);
+
+                this.store.sharedEventBus.eventBus.dispatch(
+                    TileEventType.OnTileViewportSpread,
+                    { chunks, viewport },
+                );
+
+                viewport.setTilePreset(preset);
+
+                return;
+            }
+
+            const excessProcesses = viewportProcesses.slice(startExcessIndex);
+
+            this.store.sharedEventBus.eventBus.dispatch(
+                TileEventType.OnTileGridOverflow,
+                excessProcesses,
+            );
+        }
+
         viewport.setTilePreset(preset);
-        console.log("VIEWPORT", viewport);
     }
 
     onInstantiateProcess(process: ApplicationProcess) {
@@ -129,16 +259,39 @@ export class VirtualViewportManager {
         }
     }
 
-    onTileGridOverflow(appProcess: ApplicationProcess) {
-        const defaultTileTemplate = this.store.tile.defaultTileTemplate;
+    onTileGridOverflow(processes: ApplicationProcess[]) {
+        // const defaultTileTemplate = this.store.tile.defaultTileTemplate;
 
         const current = this.currentViewport;
 
         const newViewport = new VirtualViewportModel();
 
-        appProcess.window.setViewport(newViewport);
+        processes.forEach((appProcess) => {
+            appProcess.window.setViewport(newViewport);
+        });
 
         this.insertViewport(newViewport, current);
+    }
+
+    onTileViewportSpread(
+        chunks: ApplicationProcess[][],
+        viewport: VirtualViewportModel,
+    ) {
+        chunks.forEach((processesChunk) => {
+            const newViewport = new VirtualViewportModel();
+            processesChunk.forEach((appProcess) => {
+                const appWindow = appProcess.window;
+
+                if (appWindow instanceof TileWindowModel) {
+                    // TODO: Think about it!
+                    appWindow.setArea("auto");
+
+                    appProcess.window.setViewport(newViewport);
+                }
+            });
+            this.insertViewport(newViewport, this.currentViewport);
+        });
+        this.removeViewport(viewport);
     }
 
     onFocusWindow(appWindow: ApplicationWindow) {
@@ -185,13 +338,9 @@ export class VirtualViewportManager {
 
         this.setCurrentViewport(viewport);
 
-        // TODO: Think about it
-        setTimeout(() => {
-            // this.store.tile.applyPreset(defaultTileTemplate);
-            viewport.setTilePreset(
-                TileFactory.createTilePreset(defaultTileTemplate),
-            );
-        }, 500);
+        viewport.setTilePreset(
+            TileFactory.createTilePreset(defaultTileTemplate),
+        );
 
         this.store.sharedEventBus.eventBus.dispatch(
             VirtualViewportEventType.OnAddViewportFrame,
@@ -207,13 +356,13 @@ export class VirtualViewportManager {
     }
 
     removeViewport(viewport: VirtualViewportModel) {
+        const index = this.viewports.indexOf(viewport);
+        this.viewports.splice(index, 1);
+
         this.store.sharedEventBus.eventBus.dispatch(
             VirtualViewportEventType.OnRemoveViewportFrame,
             viewport,
         );
-
-        const index = this.viewports.indexOf(viewport);
-        this.viewports.splice(index, 1);
     }
 
     setCurrentViewport(viewport: VirtualViewportModel) {

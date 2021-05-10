@@ -66,20 +66,25 @@ export class ApplicationProcess {
     }
 
     get modifiedUrl() {
-        if (this.app instanceof ExternalApplication) {
-            const url = new URL(this.url);
+        try {
+            if (this.app instanceof ExternalApplication) {
+                const url = new URL(this.url);
 
-            if (!this.disableParams) {
-                url.searchParams.set("hash", this.hash);
-                url.searchParams.set("appId", this.app.id);
+                if (!this.disableParams) {
+                    url.searchParams.set("hash", this.hash);
+                    url.searchParams.set("appId", this.app.id);
 
-                this.params.forEach((value, key) =>
-                    url.searchParams.set(key, value),
-                );
+                    this.params.forEach((value, key) =>
+                        url.searchParams.set(key, value),
+                    );
+                }
+
+                return url.toString();
             }
-
-            return url.toString();
+            return "";
+        } catch (e) {
+            console.error(e);
+            return "";
         }
-        return "";
     }
 }

@@ -38,7 +38,7 @@ export const VirtualDesktopHub = observer(() => {
         store.virtualViewport.clearViewport(viewport);
     };
 
-    const removeViewportAction = useMemo(() => {
+    const getRemoveViewportAction = useMemo(() => {
         if (store.virtualViewport.viewports.length > 1) {
             return handleRemoveViewport;
         } else {
@@ -65,10 +65,10 @@ export const VirtualDesktopHub = observer(() => {
                                         onClick={() => handleSetViewport(item)}
                                         active={
                                             store.virtualViewport
-                                                .currentViewport.id === item.id
+                                                .currentViewport?.id === item.id
                                         }
                                         onDelete={() =>
-                                            removeViewportAction(item)
+                                            getRemoveViewportAction(item)
                                         }
                                         templates={store.tile.templates}
                                         preset={item.tilePreset}
@@ -87,6 +87,7 @@ export const VirtualDesktopHub = observer(() => {
                                                 )
                                                 .map((process) => (
                                                     <TileAppPreviewItem
+                                                        key={process.id}
                                                         area={
                                                             (process.window as TileWindowModel)
                                                                 .area
@@ -110,7 +111,6 @@ export const VirtualDesktopHub = observer(() => {
                                                     />
                                                 ))}
                                         </TileAppPreviewGrid>
-                                        {/* {index + 1} */}
                                     </VirtualFramePreview>
                                 ))}
                                 <VirtualFramePreview

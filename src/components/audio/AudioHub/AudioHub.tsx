@@ -19,8 +19,15 @@ export const AudioHub = observer(() => {
         }
     };
 
+    const handleSaveVolume = (value: number | number[]) => {
+        if (typeof value === "number") {
+            store.audio.saveUserAudio();
+        }
+    };
+
     const handleMute = () => {
         store.audio.setMute(!store.audio.isMute);
+        store.audio.saveUserAudio();
     };
 
     const getIconByVolume = () => {
@@ -54,8 +61,11 @@ export const AudioHub = observer(() => {
                     <div className={style.volume}>
                         <Slider
                             value={store.audio.volume}
-                            onChange={(event, value) =>
+                            onChange={(_event, value) =>
                                 handleChangeVolume(value)
+                            }
+                            onChangeCommitted={(_event, value) =>
+                                handleSaveVolume(value)
                             }
                             classes={{
                                 track: style.slider,

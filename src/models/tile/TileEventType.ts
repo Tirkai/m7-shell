@@ -4,4 +4,5 @@ export enum TileEventType {
     OnDetachAllWindows = "OnDetachAllWindows",
     OnChangePreset = "OnChangePreset",
     OnTileGridOverflow = "OnTileGridOverflow",
+    OnTileViewportSpread = "OnTileViewportSpread",
 }

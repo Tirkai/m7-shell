@@ -15,12 +15,14 @@ import { ProcessManagerStore } from "./ProcessManagerStore";
 import { SharedEventBus } from "./SharedEventBus";
 import { ShellStore } from "./ShellStore";
 import { TileManager } from "./TileManager";
+import { UserDatabaseManager } from "./UserDataManager";
 import { UserStore } from "./UserStore";
 import { VirtualViewportManager } from "./VirtualViewportManager";
 import { WindowManagerStore } from "./WindowManagerStore";
 
 export class AppStore {
     sharedEventBus: SharedEventBus;
+    userDatabase: UserDatabaseManager;
     auth: AuthStore;
     dateTime: DateTimeStore;
     processManager: ProcessManagerStore;
@@ -42,7 +44,7 @@ export class AppStore {
     display: DisplayManager;
     constructor() {
         this.sharedEventBus = new SharedEventBus(this);
-        this.auth = new AuthStore(this);
+        this.userDatabase = new UserDatabaseManager(this);
         this.dateTime = new DateTimeStore(this);
         this.processManager = new ProcessManagerStore(this);
         this.applicationManager = new ApplicationManagerStore(this);
@@ -61,6 +63,7 @@ export class AppStore {
         this.virtualViewport = new VirtualViewportManager(this);
         this.hotkey = new HotkeyStore(this);
         this.display = new DisplayManager(this);
+        this.auth = new AuthStore(this);
 
         console.warn("STORE", this);
     }

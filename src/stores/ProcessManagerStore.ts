@@ -7,21 +7,34 @@ import {
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
 import { IAppParams } from "interfaces/app/IAppParams";
+import { isEmpty } from "lodash";
 import { makeAutoObservable } from "mobx";
+import { ApplicationEventType } from "models/app/ApplicationEventType";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { ExternalApplication } from "models/ExternalApplication";
+import { IApplicationProcess } from "models/process/IApplicationProcess";
 import { ProcessEventType } from "models/process/ProcessEventType";
+import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { portalEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
+interface IStoragedProcesses {
+    [UserDatabasePropKey.Processes]: {
+        hasActiveSession: boolean;
+        processes: IApplicationProcess[];
+    };
+}
+
 export class ProcessManagerStore {
     processes: ApplicationProcess[] = [];
+    processesSnapshot: IApplicationProcess[] = [];
+    isDisplayRecoveryProcessesMessage: boolean = false;
 
     private store: AppStore;
     constructor(store: AppStore) {
@@ -41,6 +54,15 @@ export class ProcessManagerStore {
                 this.onRemoveViewportFrame(viewport),
         );
 
+        eventBus.add(
+            ProcessEventType.OnChangeProcess,
+            (process: ApplicationProcess) => this.onChangeProcess(process),
+        );
+
+        eventBus.add(ApplicationEventType.OnApplicationListLoaded, () =>
+            this.onApplicationListLoaded(),
+        );
+
         eventBus.add(AuthEventType.OnLogout, () => this.onLogout());
 
         eventBus.add(
@@ -50,6 +72,26 @@ export class ProcessManagerStore {
         );
 
         this.bindOnMessageHandler();
+    }
+
+    setDisplayRecoveryProcessesMessage(value: boolean) {
+        this.isDisplayRecoveryProcessesMessage = value;
+    }
+
+    setProcessesSnapshot(processes: IApplicationProcess[]) {
+        this.processesSnapshot = processes;
+    }
+
+    recoveryProcesses(recoveryData: IApplicationProcess[]) {
+        const runner = new ApplicationRunner(this.store);
+
+        recoveryData.map((item) => {
+            const app = new ExternalApplication({
+                ...item.app,
+            });
+
+            runner.run(app);
+        });
     }
 
     bindOnMessageHandler() {
@@ -85,7 +127,6 @@ export class ProcessManagerStore {
         token: string,
         login: string,
     ) {
-        console.log("INJECT_AUTH_TOKEN ", appProccess, token);
         try {
             appProccess.emitter.emit(ShellMessageType.UpdateAuthToken, {
                 token,
@@ -94,6 +135,10 @@ export class ProcessManagerStore {
         } catch (e) {
             console.error(e);
         }
+    }
+
+    onApplicationListLoaded() {
+        this.loadStoragedProcesses();
     }
 
     onRecieveToken(payload: { token: string; login: string }) {
@@ -106,8 +151,50 @@ export class ProcessManagerStore {
         );
     }
 
+    loadStoragedProcesses() {
+        try {
+            const propKey = UserDatabasePropKey.Processes;
+
+            this.store.userDatabase
+                .load<IStoragedProcesses>([propKey])
+                .then(({ result }) => {
+                    if (result && !isEmpty(result)) {
+                        if (
+                            result[propKey].hasActiveSession &&
+                            result[propKey].processes
+                        ) {
+                            this.setDisplayRecoveryProcessesMessage(true);
+                            this.setProcessesSnapshot(
+                                result[propKey].processes,
+                            );
+                        }
+                        // this.recoveryProcesses(result[propKey].processes);
+                    }
+                })
+                .catch((e) => console.error(e));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     onLogout() {
         this.destroyAllProcesses();
+    }
+
+    onChangeProcess(_process: ApplicationProcess) {
+        this.store.userDatabase.save([
+            {
+                name: UserDatabasePropKey.Processes,
+                value: {
+                    hasActiveSession: !!this.processes.length,
+                    processes: this.processes.map((item) => ({
+                        app: item.app,
+                        url: item.url,
+                        name: item.name,
+                    })),
+                },
+            },
+        ]);
     }
 
     onRemoveViewportFrame(viewport: VirtualViewportModel) {
@@ -217,6 +304,11 @@ export class ProcessManagerStore {
             ProcessEventType.OnInstantiateProcess,
             appProcess,
         );
+
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.OnChangeProcess,
+            appProcess,
+        );
     }
 
     killProcess(appProcess: ApplicationProcess) {
@@ -224,12 +316,17 @@ export class ProcessManagerStore {
 
         appProcess.app.setExecuted(false);
 
+        this.processes.splice(index, 1);
+
         this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
             ProcessEventType.OnKillProcess,
             appProcess,
         );
 
-        this.processes.splice(index, 1);
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.OnChangeProcess,
+            appProcess,
+        );
     }
 
     findProcessByApp(app: Application) {

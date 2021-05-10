@@ -8,6 +8,7 @@ import { DesktopForeground } from "components/desktop/DesktopForeground/DesktopF
 import { DesktopLayer } from "components/layer/DesktopLayer/DesktopLayer";
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
+import { ProcessesRecoveryDialog } from "components/process/ProcessesRecoveryDialog/ProcessesRecoveryDialog";
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { TileDesktopContainer } from "components/tile/TileDesktopContainer/TileDesktopContainer";
@@ -77,6 +78,12 @@ export class ShellScreen extends Component<IStore> {
         );
     };
 
+    handleRecoveryProcesses = () => {
+        const pm = this.store.processManager;
+        pm.recoveryProcesses(pm.processesSnapshot);
+        pm.setDisplayRecoveryProcessesMessage(false);
+    };
+
     render() {
         return (
             <div className={style.shellScreen}>
@@ -96,7 +103,7 @@ export class ShellScreen extends Component<IStore> {
                                             key={viewport.id}
                                             active={
                                                 this.store.virtualViewport
-                                                    .currentViewport.id ===
+                                                    .currentViewport?.id ===
                                                 viewport.id
                                             }
                                         >
@@ -151,6 +158,27 @@ export class ShellScreen extends Component<IStore> {
 
                             <DesktopLayer enabled={false} priority={4}>
                                 <BuildVersion />
+                            </DesktopLayer>
+
+                            <DesktopLayer enabled priority={4}>
+                                <ProcessesRecoveryDialog
+                                    show={
+                                        this.store.processManager
+                                            .isDisplayRecoveryProcessesMessage
+                                    }
+                                    onRecovery={() =>
+                                        this.handleRecoveryProcesses()
+                                    }
+                                    onCancel={() =>
+                                        this.store.processManager.setDisplayRecoveryProcessesMessage(
+                                            false,
+                                        )
+                                    }
+                                    processes={
+                                        this.store.processManager
+                                            .processesSnapshot
+                                    }
+                                />
                             </DesktopLayer>
                         </DesktopContainer>
                     }

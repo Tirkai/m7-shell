@@ -153,6 +153,8 @@ export class AuthStore {
                 }
             }
         }, 1000);
+
+        this.store.sharedEventBus.eventBus.dispatch(AuthEventType.OnLogin);
     }
 
     async verifyToken() {
