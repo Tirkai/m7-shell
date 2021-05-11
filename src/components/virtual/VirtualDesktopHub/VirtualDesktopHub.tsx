@@ -42,7 +42,7 @@ export const VirtualDesktopHub = observer(() => {
         if (store.virtualViewport.viewports.length > 1) {
             return handleRemoveViewport;
         } else {
-            return handleClearViewport;
+            return undefined;
         }
     }, [store.virtualViewport.viewports.length]);
 
@@ -68,7 +68,11 @@ export const VirtualDesktopHub = observer(() => {
                                                 .currentViewport?.id === item.id
                                         }
                                         onDelete={() =>
-                                            getRemoveViewportAction(item)
+                                            handleRemoveViewport(item)
+                                        }
+                                        hideDeleteControl={
+                                            store.virtualViewport.viewports
+                                                .length <= 1
                                         }
                                         templates={store.tile.templates}
                                         preset={item.tilePreset}

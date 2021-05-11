@@ -112,7 +112,6 @@ export class WindowManagerStore {
     }
 
     focusWindow(appWindow: IApplicationWindow) {
-        console.log("TRY FOCUS");
         try {
             this.store.sharedEventBus.eventBus.dispatch(
                 ApplicationWindowEventType.OnFocusWindow,

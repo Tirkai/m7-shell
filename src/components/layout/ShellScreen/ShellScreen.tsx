@@ -8,7 +8,7 @@ import { DesktopForeground } from "components/desktop/DesktopForeground/DesktopF
 import { DesktopLayer } from "components/layer/DesktopLayer/DesktopLayer";
 import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
 import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
-import { ProcessesRecoveryDialog } from "components/process/ProcessesRecoveryDialog/ProcessesRecoveryDialog";
+import { RecoveryDialog } from "components/recovery/RecoveryDialog/RecoveryDialog";
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { TileDesktopContainer } from "components/tile/TileDesktopContainer/TileDesktopContainer";
@@ -70,6 +70,9 @@ export class ShellScreen extends Component<IStore> {
                 runner.run(app);
             }
         }
+        this.store.recovery.fetchLastUserSession();
+        // this.store.recovery.loadViewports();
+        // this.store.recovery.loadStoragedProcesses();
     }
 
     handleClickDesktop = () => {
@@ -78,10 +81,10 @@ export class ShellScreen extends Component<IStore> {
         );
     };
 
-    handleRecoveryProcesses = () => {
-        const pm = this.store.processManager;
-        pm.recoveryProcesses(pm.processesSnapshot);
-        pm.setDisplayRecoveryProcessesMessage(false);
+    handleRecovery = () => {
+        const recovery = this.store.recovery;
+        recovery.startRecovery();
+        recovery.setDisplayRecoveryDialog(false);
     };
 
     render() {
@@ -161,22 +164,24 @@ export class ShellScreen extends Component<IStore> {
                             </DesktopLayer>
 
                             <DesktopLayer enabled priority={4}>
-                                <ProcessesRecoveryDialog
+                                <RecoveryDialog
                                     show={
-                                        this.store.processManager
-                                            .isDisplayRecoveryProcessesMessage
+                                        this.store.recovery
+                                            .isDisplayRecoveryDialog
                                     }
-                                    onRecovery={() =>
-                                        this.handleRecoveryProcesses()
-                                    }
+                                    onRecovery={() => this.handleRecovery()}
                                     onCancel={() =>
-                                        this.store.processManager.setDisplayRecoveryProcessesMessage(
+                                        this.store.recovery.setDisplayRecoveryDialog(
                                             false,
                                         )
                                     }
                                     processes={
-                                        this.store.processManager
-                                            .processesSnapshot
+                                        this.store.recovery.processesSnapshot
+                                            ?.processes
+                                    }
+                                    viewports={
+                                        this.store.recovery.viewportsSnapshot
+                                            ?.viewports
                                     }
                                 />
                             </DesktopLayer>

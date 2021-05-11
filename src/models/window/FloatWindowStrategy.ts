@@ -1,3 +1,4 @@
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { AppStore } from "stores/AppStore";
 import { ApplicationWindow } from "./ApplicationWindow";
 import { IWindowInstantiateStrategy } from "./IWindowInstantiateStrategy";
@@ -9,9 +10,9 @@ export class FloatWindowStrategy implements IWindowInstantiateStrategy {
         this.store = store;
     }
 
-    instantiate() {
+    instantiate(viewport: VirtualViewportModel) {
         return new ApplicationWindow({
-            viewport: this.store.virtualViewport.currentViewport,
+            viewport,
         });
     }
 }

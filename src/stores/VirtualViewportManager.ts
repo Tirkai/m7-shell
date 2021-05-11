@@ -1,5 +1,5 @@
 import { TileFactory } from "factories/TileFactory";
-import { chunk, isEmpty } from "lodash";
+import { chunk } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
@@ -7,26 +7,14 @@ import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileEventType } from "models/tile/TileEventType";
 import { TilePreset } from "models/tile/TilePreset";
-import { TileTemplate } from "models/tile/TileTemplate";
 import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
+import { IVirtualViewportSnapshot } from "models/virtual/IVirtualViewportsSnapshot";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import { TileWindowModel } from "models/window/TileWindowModel";
 import { AppStore } from "stores/AppStore";
-
-interface IViewportTemplate {
-    viewportId: string;
-    templateAlias: string;
-}
-
-interface IStoragedViewportData {
-    [UserDatabasePropKey.Viewports]: {
-        viewports: IViewportTemplate[];
-        currentViewportId: string;
-    };
-}
 
 export class VirtualViewportManager {
     private store: AppStore;
@@ -106,9 +94,10 @@ export class VirtualViewportManager {
             this.onLogout(),
         );
 
-        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogin, () =>
-            this.onLogin(),
-        );
+        // this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogin, () =>
+        //     this.onLogin(),
+        // );
+        this.addViewport(new VirtualViewportModel());
 
         this.store.sharedEventBus.eventBus.add(
             TileEventType.OnChangePreset,
@@ -123,9 +112,11 @@ export class VirtualViewportManager {
     }
 
     saveUserViewports() {
-        const data: IStoragedViewportData = {
+        const data = {
             [UserDatabasePropKey.Viewports]: {
                 currentViewportId: this.currentViewport.id,
+                activeTilePresetAlias: this.store.tile.defaultTileTemplate
+                    .alias,
                 viewports: this.viewports.map((item) => ({
                     viewportId: item.id,
                     templateAlias: item.tilePreset.alias,
@@ -133,7 +124,7 @@ export class VirtualViewportManager {
             },
         };
 
-        this.store.userDatabase.save([
+        this.store.userDatabase.save<IVirtualViewportSnapshot>([
             {
                 name: UserDatabasePropKey.Viewports,
                 value: data[UserDatabasePropKey.Viewports],
@@ -145,45 +136,15 @@ export class VirtualViewportManager {
         this.saveUserViewports();
     }
 
-    onLogin() {
-        this.store.userDatabase
-            .load<IStoragedViewportData>([UserDatabasePropKey.Viewports])
-            .then(({ result }) => {
-                if (result && !isEmpty(result)) {
-                    const viewports = result[
-                        UserDatabasePropKey.Viewports
-                    ].viewports?.map((item) => {
-                        const template =
-                            this.store.tile.templates.find(
-                                (tmp) => tmp.alias === item.templateAlias,
-                            ) ??
-                            new TileTemplate({
-                                alias: "1x1",
-                                columns: 1,
-                                rows: 1,
-                                areas: "a",
-                                cells: [],
-                            });
-
-                        return new VirtualViewportModel({
-                            id: item.viewportId,
-                            tilePreset: TileFactory.createTilePreset(template),
-                        });
-                    });
-
-                    const [first] = viewports;
-                    this.setViewports(viewports);
-                    this.setCurrentViewport(first);
-
-                    // this.addViewport(new VirtualViewportModel());
-                } else {
-                    this.addViewport(new VirtualViewportModel());
-                }
-            });
-    }
-
     onLogout() {
-        this.setViewports([]);
+        const viewport = new VirtualViewportModel({
+            tilePreset: TileFactory.createTilePreset(
+                this.store.tile.defaultTileTemplate,
+            ),
+        });
+
+        this.setViewports([viewport]);
+        this.setCurrentViewport(viewport);
     }
 
     onKeyboardArrowLeftWithControl() {

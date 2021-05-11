@@ -12,6 +12,7 @@ import { NetworkStore } from "./NetworkStore";
 import { NotificationStore } from "./NotificationStore";
 import { PinManager } from "./PinManager";
 import { ProcessManagerStore } from "./ProcessManagerStore";
+import { RecoveryStore } from "./RecoveryStore";
 import { SharedEventBus } from "./SharedEventBus";
 import { ShellStore } from "./ShellStore";
 import { TileManager } from "./TileManager";
@@ -42,6 +43,7 @@ export class AppStore {
     virtualViewport: VirtualViewportManager;
     hotkey: HotkeyStore;
     display: DisplayManager;
+    recovery: RecoveryStore;
     constructor() {
         this.sharedEventBus = new SharedEventBus(this);
         this.userDatabase = new UserDatabaseManager(this);
@@ -64,6 +66,7 @@ export class AppStore {
         this.hotkey = new HotkeyStore(this);
         this.display = new DisplayManager(this);
         this.auth = new AuthStore(this);
+        this.recovery = new RecoveryStore(this);
 
         console.warn("STORE", this);
     }

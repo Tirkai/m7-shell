@@ -1,11 +1,13 @@
 import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ExternalApplication } from "models/ExternalApplication";
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { AppStore } from "stores/AppStore";
 
 interface IApplicationRunnerOptions {
     url?: string;
     params?: Map<string, string>;
+    viewport?: VirtualViewportModel;
 }
 
 export class ApplicationRunner {
@@ -26,7 +28,11 @@ export class ApplicationRunner {
         }
 
         if (!app.isExecuted) {
-            const appWindow = this.store.display.displayMode.windowInstantiateStrategy.instantiate();
+            const appWindow = this.store.display.displayMode.windowInstantiateStrategy.instantiate(
+                options?.viewport ?? this.store.virtualViewport.currentViewport,
+            );
+
+            console.log("APP_WINDOW", appWindow.viewport.id);
 
             const appProcess = new ApplicationProcess({
                 app,

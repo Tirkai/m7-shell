@@ -19,6 +19,7 @@ interface IVirtualFramePreviewProps {
     templates?: TileTemplate[];
     preset?: TilePreset;
     viewport?: VirtualViewportModel;
+    hideDeleteControl?: boolean;
 }
 
 const className = style.virtualFramePreview;
@@ -61,14 +62,15 @@ export const VirtualFramePreview = observer(
                                     onClick={() => setShowTileGridChooser(true)}
                                 />
                             </div>
-
-                            <IconButton
-                                size="small"
-                                color="secondary"
-                                onClick={handleDelete}
-                            >
-                                <Clear />
-                            </IconButton>
+                            {!props.hideDeleteControl && (
+                                <IconButton
+                                    size="small"
+                                    color="secondary"
+                                    onClick={handleDelete}
+                                >
+                                    <Clear />
+                                </IconButton>
+                            )}
                         </>
                     )}
                     <TilePresetChooser

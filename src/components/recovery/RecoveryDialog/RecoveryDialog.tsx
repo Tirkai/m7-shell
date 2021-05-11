@@ -11,26 +11,34 @@ import {
     ListItemText,
 } from "@material-ui/core";
 import { IApplicationProcess } from "models/process/IApplicationProcess";
+import { IVirtualViewportTemplate } from "models/virtual/IVirtualViewportTemplate";
 import React from "react";
 import style from "./style.module.css";
 
-interface IProcessesRecoveryDialogProps {
+interface IRecoveryDialogProps {
     show: boolean;
     onRecovery: () => void;
     onCancel: () => void;
-    processes: IApplicationProcess[];
+    processes?: IApplicationProcess[];
+    viewports?: IVirtualViewportTemplate[];
 }
 
-export const ProcessesRecoveryDialog = (
-    props: IProcessesRecoveryDialogProps,
-) => (
+export const RecoveryDialog = (props: IRecoveryDialogProps) => (
     <Dialog open={props.show} fullWidth onClose={() => props.onCancel()}>
         {/* TODO: Locale */}
         <DialogTitle>Восстановить предыдущую сессию?</DialogTitle>
         <DialogContent>
-            Будет восстановлено {props.processes.length} приложений:
+            <span>Будет восстановлено </span>
+            {(props.processes?.length ?? 0) > 0
+                ? `${props.processes?.length} приложений и `
+                : ""}
+
+            {(props.viewports?.length ?? 0) > 0
+                ? `${props.viewports?.length} рабочий(их) столов`
+                : ""}
+
             <List>
-                {props.processes.map((item) => (
+                {props.processes?.map((item) => (
                     <ListItem classes={{ gutters: style.listItem }}>
                         <ListItemAvatar>
                             <SVGIcon
@@ -44,14 +52,10 @@ export const ProcessesRecoveryDialog = (
             </List>
         </DialogContent>
         <DialogActions>
-            <Button
-                onClick={() => props.onRecovery()}
-                color="primary"
-                variant="contained"
-            >
-                Да
+            <Button onClick={() => props.onCancel()}>Начать сначала</Button>
+            <Button onClick={() => props.onRecovery()} color="primary">
+                Восстановить
             </Button>
-            <Button onClick={() => props.onCancel()}>Нет</Button>
         </DialogActions>
     </Dialog>
 );

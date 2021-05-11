@@ -3,6 +3,7 @@ import { useStore } from "hooks/useStore";
 import { get } from "lodash";
 import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
+import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { TileCell } from "models/tile/TileCell";
 import { TilePreset } from "models/tile/TilePreset";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
@@ -73,6 +74,13 @@ export const TileDesktopContainer = observer(
             appWindow.setPosition(data.x, data.y);
         };
 
+        const handleAreaClick = (e: React.MouseEvent) => {
+            e.stopPropagation();
+            store.sharedEventBus.eventBus.dispatch(
+                DesktopEventType.OnDesktopClick,
+            );
+        };
+
         const gridStyles = {
             gridTemplateColumns: `repeat(${props.preset.columns},1fr)`,
             gridTemplateRows: `repeat(${props.preset.rows},1fr)`,
@@ -81,7 +89,11 @@ export const TileDesktopContainer = observer(
 
         return props.preset ? (
             <div className={className}>
-                <div className={style.container} style={gridStyles}>
+                <div
+                    className={style.container}
+                    style={gridStyles}
+                    onClick={handleAreaClick}
+                >
                     <div
                         className={style.floatedArea}
                         style={{
