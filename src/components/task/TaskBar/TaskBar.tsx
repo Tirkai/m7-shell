@@ -16,6 +16,7 @@ import { IApplicationWindow } from "models/window/IApplicationWindow";
 import React, { Component } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
+import { TaskbarSeparator } from "../TaskbarSeparator/TaskbarSeparator";
 import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
 import { TaskHint } from "../TaskHint/TaskHint";
 import style from "./style.module.css";
@@ -144,6 +145,8 @@ export class TaskBar extends Component<IStore> {
                                 >
                                     <SVGIcon source={virtual} color="white" />
                                 </TaskBarItem>
+                                <TaskbarSeparator />
+
                                 {this.store.processManager.processes.map(
                                     (appProcess) => (
                                         <TaskBarItem

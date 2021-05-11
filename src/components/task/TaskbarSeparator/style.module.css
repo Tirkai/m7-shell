@@ -1,0 +1,12 @@
+.taskbarSeparator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+}
+
+.container {
+    height: 50%;
+    width: 2px;
+    background: #333;
+}
