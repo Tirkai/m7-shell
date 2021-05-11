@@ -7,6 +7,7 @@ import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnec
 import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
+import { groupBy } from "lodash";
 import { computed, reaction } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
@@ -120,6 +121,19 @@ export class TaskBar extends Component<IStore> {
         });
 
     render() {
+        const groups = groupBy(
+            this.store.processManager.processes,
+            "window.viewport.id",
+        );
+
+        // TODO: optimize
+        const groupedProcessesByViewport = Object.entries(groups).map(
+            ([key, value]) => ({
+                key,
+                value,
+            }),
+        );
+
         return (
             <>
                 <div
@@ -145,9 +159,52 @@ export class TaskBar extends Component<IStore> {
                                 >
                                     <SVGIcon source={virtual} color="white" />
                                 </TaskBarItem>
-                                <TaskbarSeparator />
 
-                                {this.store.processManager.processes.map(
+                                {groupedProcessesByViewport.map(
+                                    (group, groupIndex) => (
+                                        <>
+                                            {groupIndex <
+                                                groupedProcessesByViewport.length && (
+                                                <TaskbarSeparator />
+                                            )}
+                                            {group.value.map((appProcess) => (
+                                                <TaskBarItem
+                                                    key={appProcess.id}
+                                                    executed
+                                                    hint={
+                                                        <TaskHint
+                                                            title={
+                                                                appProcess.name
+                                                            }
+                                                        />
+                                                    }
+                                                    focused={
+                                                        appProcess.window
+                                                            .isFocused
+                                                    }
+                                                    onClick={() =>
+                                                        this.handleFocusAppWindow(
+                                                            appProcess.window,
+                                                        )
+                                                    }
+                                                    menu={[
+                                                        this.createCloseApplicationContextMenuItem(
+                                                            appProcess,
+                                                        ),
+                                                    ]}
+                                                >
+                                                    <SVGIcon
+                                                        source={
+                                                            appProcess.app.icon
+                                                        }
+                                                        color="white"
+                                                    />
+                                                </TaskBarItem>
+                                            ))}
+                                        </>
+                                    ),
+                                )}
+                                {/* {this.store.processManager.processes.map(
                                     (appProcess) => (
                                         <TaskBarItem
                                             key={appProcess.id}
@@ -177,7 +234,7 @@ export class TaskBar extends Component<IStore> {
                                             />
                                         </TaskBarItem>
                                     ),
-                                )}
+                                )} */}
                             </div>
 
                             <div className={style.actions}>
