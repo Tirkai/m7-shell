@@ -1,4 +1,4 @@
-.tilePresetChooser {
+.displayModeChooser {
     display: flex;
     align-items: center;
     position: absolute;
@@ -29,7 +29,7 @@
 .show {
     opacity: 1;
     pointer-events: all;
-    transform: translateX(56px);
+    transform: translateX(50px);
     transition: transform ease 0.3s;
 }
 

@@ -1,15 +1,28 @@
 import { makeAutoObservable } from "mobx";
 import { DisplayMode } from "models/display/DisplayMode";
-import { TileWindowStrategy } from "models/window/TileWindowStrategy";
+import { DisplayModeEventType } from "models/display/DisplayModeEventType";
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { AppStore } from "stores/AppStore";
 
 export class DisplayManager {
     private store: AppStore;
 
-    displayMode: DisplayMode;
+    // displayMode: DisplayMode;
 
-    setDisplayMode(displayMode: DisplayMode) {
-        this.displayMode = displayMode;
+    // setDisplayMode(displayMode: DisplayMode) {
+    //     this.displayMode = displayMode;
+    // }
+
+    applyDisplayModeToViewport(
+        displayMode: DisplayMode,
+        viewport: VirtualViewportModel,
+    ) {
+        viewport.setDisplayMode(displayMode);
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            DisplayModeEventType.OnDisplayModeChange,
+            displayMode,
+        );
     }
 
     constructor(store: AppStore) {
@@ -19,10 +32,10 @@ export class DisplayManager {
         //     windowStrategy: new FloatWindowStrategy(this.store),
         // });
 
-        this.displayMode = new DisplayMode({
-            windowStrategy: new TileWindowStrategy(this.store),
-            enableTiles: true,
-        });
+        // this.displayMode = new DisplayMode({
+        //     windowStrategy: new TileWindowStrategy(),
+        //     enableTiles: true,
+        // });
 
         makeAutoObservable(this);
     }

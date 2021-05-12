@@ -7,8 +7,7 @@ import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
-import { TileWindowModel } from "models/window/TileWindowModel";
-import React, { useMemo } from "react";
+import React from "react";
 import { VirtualFrameList } from "../VirtualFrameList/VirtualFrameList";
 import { VirtualFramePreview } from "../VirtualFramePreview/VirtualFramePreview";
 import style from "./style.module.css";
@@ -33,18 +32,6 @@ export const VirtualDesktopHub = observer(() => {
     const handleRemoveViewport = (viewport: VirtualViewportModel) => {
         store.virtualViewport.removeViewport(viewport);
     };
-
-    const handleClearViewport = (viewport: VirtualViewportModel) => {
-        store.virtualViewport.clearViewport(viewport);
-    };
-
-    const getRemoveViewportAction = useMemo(() => {
-        if (store.virtualViewport.viewports.length > 1) {
-            return handleRemoveViewport;
-        } else {
-            return undefined;
-        }
-    }, [store.virtualViewport.viewports.length]);
 
     return (
         <BaseHub
@@ -93,8 +80,7 @@ export const VirtualDesktopHub = observer(() => {
                                                     <TileAppPreviewItem
                                                         key={process.id}
                                                         area={
-                                                            (process.window as TileWindowModel)
-                                                                .area
+                                                            process.window.area
                                                         }
                                                         icon={
                                                             <SVGIcon

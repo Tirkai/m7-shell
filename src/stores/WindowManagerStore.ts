@@ -8,6 +8,7 @@ import { PanelEventType } from "models/panel/PanelEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
+import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { IApplicationWindow } from "models/window/IApplicationWindow";
 import { AppStore } from "./AppStore";
 
@@ -66,7 +67,7 @@ export class WindowManagerStore {
         eventBus.add(AuthEventType.OnLogout, () => this.closeAllWindows());
     }
 
-    focusedWindow: IApplicationWindow | null = null;
+    focusedWindow: ApplicationWindow | null = null;
 
     get draggedWindow() {
         return this.windows.find((item) => item.isDragging);
@@ -90,7 +91,7 @@ export class WindowManagerStore {
         return document.activeElement;
     }
 
-    addWindow(appWindow: IApplicationWindow) {
+    addWindow(appWindow: ApplicationWindow) {
         this.windows.push(appWindow);
         this.focusWindow(appWindow);
     }
@@ -111,20 +112,18 @@ export class WindowManagerStore {
         this.clearFocus();
     }
 
-    focusWindow(appWindow: IApplicationWindow) {
+    focusWindow(appWindow: ApplicationWindow) {
         try {
             this.store.sharedEventBus.eventBus.dispatch(
                 ApplicationWindowEventType.OnFocusWindow,
                 appWindow,
             );
 
-            window.dispatchEvent(new CustomEvent(ShellEvents.FocusAnyWindow));
+            // window.dispatchEvent(new CustomEvent(ShellEvents.FocusAnyWindow));
 
             if (appWindow.isFocused) return;
 
-            if (appWindow instanceof ApplicationWindow) {
-                if (appWindow.isCollapsed) this.expandWindow(appWindow);
-            }
+            if (appWindow.isCollapsed) this.expandWindow(appWindow);
 
             const indexes = [...this.windows.map((item) => item.depthIndex)];
 
@@ -203,6 +202,18 @@ export class WindowManagerStore {
 
         this.store.sharedEventBus.eventBus.dispatch(
             ApplicationWindowEventType.OnFullscreen,
+            appWindow,
+        );
+    }
+
+    applyTypeToWindow(
+        appWindow: ApplicationWindow,
+        value: ApplicationWindowType,
+    ) {
+        appWindow.setType(value);
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            ApplicationWindowEventType.OnTypeChange,
             appWindow,
         );
     }

@@ -28,11 +28,16 @@ export class ApplicationRunner {
         }
 
         if (!app.isExecuted) {
-            const appWindow = this.store.display.displayMode.windowInstantiateStrategy.instantiate(
-                options?.viewport ?? this.store.virtualViewport.currentViewport,
+            const viewport =
+                options?.viewport ?? this.store.virtualViewport.currentViewport;
+
+            const appWindow = viewport.displayMode.windowStrategy.instantiate(
+                viewport,
             );
 
-            console.log("APP_WINDOW", appWindow.viewport.id);
+            // const appWindow = this.store.display.displayMode.windowInstantiateStrategy.instantiate(
+            //     options?.viewport ?? this.store.virtualViewport.currentViewport,
+            // );
 
             const appProcess = new ApplicationProcess({
                 app,

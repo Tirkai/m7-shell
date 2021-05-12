@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import { IApplicationWindow } from "models/window/IApplicationWindow";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { v4 } from "uuid";
 import { ITileCell } from "./ITileCell";
 
@@ -16,9 +16,9 @@ export class TileCell implements ITileCell {
 
     area: string;
 
-    draggedAppWindow: IApplicationWindow | null = null;
+    draggedAppWindow: ApplicationWindow | null = null;
 
-    attachedAppWindow: IApplicationWindow | null = null;
+    attachedAppWindow: ApplicationWindow | null = null;
 
     get hasDraggedWindow() {
         return this.draggedAppWindow !== null;
@@ -30,11 +30,11 @@ export class TileCell implements ITileCell {
 
     appWindowListenersIds: string[] = [];
 
-    setDraggedAppWindow(appWindow: IApplicationWindow | null) {
+    setDraggedAppWindow(appWindow: ApplicationWindow | null) {
         this.draggedAppWindow = appWindow;
     }
 
-    setAttachedAppWindow(appWindow: IApplicationWindow | null) {
+    setAttachedAppWindow(appWindow: ApplicationWindow | null) {
         this.attachedAppWindow = appWindow;
     }
 

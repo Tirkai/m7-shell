@@ -18,7 +18,6 @@ import { ProcessEventType } from "models/process/ProcessEventType";
 import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
-import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { portalEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
@@ -162,11 +161,11 @@ export class ProcessManagerStore {
             );
 
             // TODO: Fix
-            // if (!applicationParamsResponse.data.error) {
-            //     appProcess.window.setParams(
-            //         applicationParamsResponse.data.result,
-            //     );
-            // }
+            if (!applicationParamsResponse.data.error) {
+                appProcess.window.setParams(
+                    applicationParamsResponse.data.result,
+                );
+            }
 
             // Bindings
 
@@ -185,19 +184,13 @@ export class ProcessManagerStore {
                         runner.run(findedApp, { url });
                     } else {
                         const processUrl = new URL(url);
-                        const createdAppProcessInstance = new ApplicationProcess(
-                            {
-                                app: new ExternalApplication({
-                                    name: processUrl.host,
-                                    url,
-                                }),
-                                window: new ApplicationWindow({
-                                    viewport: this.store.virtualViewport
-                                        .currentViewport,
-                                }),
-                            },
+
+                        runner.run(
+                            new ExternalApplication({
+                                name: processUrl.host,
+                                url,
+                            }),
                         );
-                        this.execute(createdAppProcessInstance);
                     }
                 },
             );

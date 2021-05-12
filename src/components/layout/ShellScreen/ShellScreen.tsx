@@ -71,8 +71,6 @@ export class ShellScreen extends Component<IStore> {
             }
         }
         this.store.recovery.fetchLastUserSession();
-        // this.store.recovery.loadViewports();
-        // this.store.recovery.loadStoragedProcesses();
     }
 
     handleClickDesktop = () => {

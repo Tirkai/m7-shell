@@ -1,17 +1,7 @@
 .tileChooserItem {
     display: flex;
-    justify-content: center;
-    align-items: center;
     width: 100%;
-    box-sizing: border-box;
-    color: white;
-    border-radius: 4px;
-    /* min-height: 80px; */
-    background: #444;
-    cursor: pointer;
-    width: 48px;
-    height: 32px;
-    border-radius: 4px;
+    height: 100%;
 }
 
 .container {

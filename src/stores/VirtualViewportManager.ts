@@ -13,7 +13,6 @@ import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventTyp
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
-import { TileWindowModel } from "models/window/TileWindowModel";
 import { AppStore } from "stores/AppStore";
 
 export class VirtualViewportManager {
@@ -221,8 +220,6 @@ export class VirtualViewportManager {
     }
 
     onTileGridOverflow(processes: ApplicationProcess[]) {
-        // const defaultTileTemplate = this.store.tile.defaultTileTemplate;
-
         const current = this.currentViewport;
 
         const newViewport = new VirtualViewportModel();
@@ -243,12 +240,9 @@ export class VirtualViewportManager {
             processesChunk.forEach((appProcess) => {
                 const appWindow = appProcess.window;
 
-                if (appWindow instanceof TileWindowModel) {
-                    // TODO: Think about it!
-                    appWindow.setArea("auto");
+                appWindow.setArea("auto");
 
-                    appProcess.window.setViewport(newViewport);
-                }
+                appProcess.window.setViewport(newViewport);
             });
             this.insertViewport(newViewport, this.currentViewport);
         });
@@ -260,24 +254,9 @@ export class VirtualViewportManager {
     }
 
     addViewport(viewport: VirtualViewportModel, preset?: TilePreset) {
-        const defaultTileTemplate = this.store.tile.defaultTileTemplate;
-
         this.viewports.push(viewport);
 
         this.setCurrentViewport(viewport);
-
-        // if (preset) {
-        //     const p = this.store.tile.presets.find(
-        //         (item) => item.alias === preset.alias,
-        //     );
-        //     if (p) {
-        //         viewport.setTilePreset(TileFactory.createTilePreset(p));
-        //     }
-        // }
-
-        // viewport.setTilePreset(
-        //     TileFactory.createTilePreset(defaultTileTemplate),
-        // );
 
         this.store.sharedEventBus.eventBus.dispatch(
             VirtualViewportEventType.OnAddViewportFrame,

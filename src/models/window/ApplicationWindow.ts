@@ -14,10 +14,12 @@ import { ResizeHandle } from "react-resizable";
 import { v4 } from "uuid";
 import { EventBus } from "../event/EventBus";
 import { ApplicationWindowEventType } from "./ApplicationWindowEventType";
+import { ApplicationWindowType } from "./ApplicationWindowType";
 import { IApplicationWindow } from "./IApplicationWindow";
 
 export class ApplicationWindow implements IApplicationWindow {
     id: string;
+    type: ApplicationWindowType;
     depthIndex: number = 1;
     isFocused: boolean = false;
     isFullScreen: boolean = false;
@@ -35,6 +37,7 @@ export class ApplicationWindow implements IApplicationWindow {
     isDragging: boolean = false;
     isResizing: boolean = false;
     viewport: VirtualViewportModel;
+    area: string;
 
     eventTarget: EventBus = new EventBus();
 
@@ -59,7 +62,7 @@ export class ApplicationWindow implements IApplicationWindow {
         makeAutoObservable(this);
 
         this.id = options?.id ?? v4();
-
+        this.type = options.type;
         const [width, height] = this.getSizeWithBounds(
             options?.width ?? BASE_WINDOW_WIDTH,
             options?.height ?? BASE_WINDOW_HEIGHT,
@@ -68,18 +71,46 @@ export class ApplicationWindow implements IApplicationWindow {
         this.width = width;
         this.height = height;
 
-        const [x, y] = this.calculatePosition();
+        this.x = 0;
+        this.y = 0;
 
-        this.x = options?.x ?? x;
-        this.y = options?.y ?? y;
-
-        this.isFullScreen = options?.isFullscreen ?? false;
+        this.isFullScreen = false;
         this.lockedWidth = this.width;
         this.lockedHeight = this.height;
         this.lockedX = this.x;
         this.lockedY = this.y;
 
+        this.initialize(options);
+
+        this.area = options.area ?? "auto";
+
         this.viewport = options?.viewport;
+    }
+
+    initialize(options: IApplicationWindowOptions) {
+        switch (this.type) {
+            case ApplicationWindowType.Float: {
+                const [x, y] = this.calculatePosition();
+
+                this.x = x;
+                this.y = y;
+
+                this.isFullScreen = options?.isFullscreen ?? false;
+                this.lockedWidth = this.width;
+                this.lockedHeight = this.height;
+                this.lockedX = this.x;
+                this.lockedY = this.y;
+
+                break;
+            }
+            case ApplicationWindowType.Tile: {
+                this.x = 0;
+                this.y = 0;
+                break;
+            }
+            default:
+                break;
+        }
     }
 
     calculatePosition() {
@@ -223,17 +254,29 @@ export class ApplicationWindow implements IApplicationWindow {
     }
 
     setParams(params: IAppParams) {
-        this.width = params.width ?? this.width;
-        this.height = params.height ?? this.height;
-        this.isFullScreen = params.maximize ?? this.isFullScreen;
+        if (this.type === ApplicationWindowType.Float) {
+            this.width = params.width ?? this.width;
+            this.height = params.height ?? this.height;
+            this.isFullScreen = params.maximize ?? this.isFullScreen;
 
-        const [x, y] = this.calculatePosition();
+            const [x, y] = this.calculatePosition();
 
-        this.x = x;
-        this.y = y;
+            this.x = x;
+            this.y = y;
+        }
     }
 
     setViewport(viewport: VirtualViewportModel) {
         this.viewport = viewport;
+    }
+
+    setArea(value: string) {
+        this.area = value;
+    }
+
+    setType(value: ApplicationWindowType) {
+        this.type = value;
+
+        this.initialize(this);
     }
 }

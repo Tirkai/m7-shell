@@ -13,7 +13,6 @@ import { inject, observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
-import { IApplicationWindow } from "models/window/IApplicationWindow";
 import React, { Component } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
@@ -47,7 +46,7 @@ export class TaskBar extends Component<IStore> {
         }
     };
 
-    handleFocusAppWindow = (appWindow: IApplicationWindow) => {
+    handleFocusAppWindow = (appWindow: ApplicationWindow) => {
         this.store.windowManager.focusWindow(appWindow);
         if (appWindow instanceof ApplicationWindow) {
             if (appWindow.isCollapsed) {
@@ -98,6 +97,13 @@ export class TaskBar extends Component<IStore> {
         );
     };
 
+    handleCloseViewportGroup = (process: ApplicationProcess) => {
+        const viewport = process.window.viewport;
+        this.store.processManager.processes
+            .filter((item) => item.window.viewport.id === viewport.id)
+            .forEach((item) => this.store.processManager.killProcess(item));
+    };
+
     componentDidMount() {
         this.setState({
             isShow: this.store.shell.displayMode.taskbarVisible,
@@ -113,12 +119,20 @@ export class TaskBar extends Component<IStore> {
         );
     }
 
-    createCloseApplicationContextMenuItem = (appProcess: ApplicationProcess) =>
+    createCloseApplicationContextMenuItem = (
+        appProcess: ApplicationProcess,
+    ) => [
         new ContextMenuItemModel({
             icon: cross,
             content: strings.application.actions.close,
             onClick: () => this.handleKillProcess(appProcess),
-        });
+        }),
+        new ContextMenuItemModel({
+            icon: cross,
+            content: "Закрыть группу",
+            onClick: () => this.handleCloseViewportGroup(appProcess),
+        }),
+    ];
 
     render() {
         const groups = groupBy(
@@ -162,7 +176,7 @@ export class TaskBar extends Component<IStore> {
 
                                 {groupedProcessesByViewport.map(
                                     (group, groupIndex) => (
-                                        <>
+                                        <React.Fragment key={group.key}>
                                             {groupIndex <
                                                 groupedProcessesByViewport.length && (
                                                 <TaskbarSeparator />
@@ -187,11 +201,9 @@ export class TaskBar extends Component<IStore> {
                                                             appProcess.window,
                                                         )
                                                     }
-                                                    menu={[
-                                                        this.createCloseApplicationContextMenuItem(
-                                                            appProcess,
-                                                        ),
-                                                    ]}
+                                                    menu={this.createCloseApplicationContextMenuItem(
+                                                        appProcess,
+                                                    )}
                                                 >
                                                     <SVGIcon
                                                         source={
@@ -201,7 +213,7 @@ export class TaskBar extends Component<IStore> {
                                                     />
                                                 </TaskBarItem>
                                             ))}
-                                        </>
+                                        </React.Fragment>
                                     ),
                                 )}
                                 {/* {this.store.processManager.processes.map(

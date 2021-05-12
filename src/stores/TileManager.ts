@@ -1,6 +1,8 @@
 import { TileFactory } from "factories/TileFactory";
 import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
+import { DisplayMode } from "models/display/DisplayMode";
+import { DisplayModeEventType } from "models/display/DisplayModeEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileCell } from "models/tile/TileCell";
 import { TileEventType } from "models/tile/TileEventType";
@@ -10,7 +12,7 @@ import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventTyp
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
-import { IApplicationWindow } from "models/window/IApplicationWindow";
+import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { TileWindowModel } from "models/window/TileWindowModel";
 import { registeredTileTemplates } from "registeredTilePresets";
 import { AppStore } from "stores/AppStore";
@@ -50,12 +52,17 @@ export class TileManager {
 
         this.store.sharedEventBus.eventBus.add(
             ApplicationWindowEventType.OnDragStop,
-            (tileWindow: TileWindowModel) => this.onDragStop(tileWindow),
+            (tileWindow: ApplicationWindow) => this.onDragStop(tileWindow),
         );
 
         this.store.sharedEventBus.eventBus.add(
             ApplicationWindowEventType.OnClose,
             (appWindow: ApplicationWindow) => this.onWindowClose(appWindow),
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            DisplayModeEventType.OnDisplayModeChange,
+            (displayMode: DisplayMode) => this.onDisplayModeChange(displayMode),
         );
     }
 
@@ -69,7 +76,11 @@ export class TileManager {
         this.activeCell = tileCell;
     }
 
-    onDragStop(tileWindow: TileWindowModel) {
+    onDisplayModeChange(displayMode: DisplayMode) {
+        //
+    }
+
+    onDragStop(tileWindow: ApplicationWindow) {
         const currentPreset = this.store.virtualViewport.currentViewport
             .tilePreset;
 
@@ -122,9 +133,13 @@ export class TileManager {
     }
 
     onProcessStart(appProcess: ApplicationProcess) {
-        const preset = appProcess.window.viewport.tilePreset;
+        // Think about it
 
-        if (!preset.isEmptyPreset) {
+        const viewport = appProcess.window.viewport;
+        const displayMode = viewport.displayMode;
+        const preset = viewport.tilePreset;
+
+        if (!preset.isEmptyPreset && displayMode.enableTileAttach) {
             if (preset.freeCells.length) {
                 const tileCell = preset.nearbyFreeCell;
                 const appWindow = appProcess.window;
@@ -156,11 +171,11 @@ export class TileManager {
     }
 
     attachWindowToCell(
-        appWindow: IApplicationWindow,
+        appWindow: ApplicationWindow,
         preset: TilePreset,
         tileCell: TileCell,
     ) {
-        if (appWindow instanceof TileWindowModel) {
+        if (appWindow.type === ApplicationWindowType.Tile) {
             if (preset.hasFreeCells) {
                 tileCell.setAttachedAppWindow(appWindow);
 

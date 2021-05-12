@@ -1,17 +1,22 @@
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
-import { AppStore } from "stores/AppStore";
+import { ApplicationWindow } from "./ApplicationWindow";
+import { ApplicationWindowType } from "./ApplicationWindowType";
 import { IWindowInstantiateStrategy } from "./IWindowInstantiateStrategy";
-import { TileWindowModel } from "./TileWindowModel";
+
+interface ITileWindowStrategyOptions {
+    viewport: VirtualViewportModel;
+}
 
 export class TileWindowStrategy implements IWindowInstantiateStrategy {
-    store: AppStore;
+    viewport: VirtualViewportModel;
 
-    constructor(store: AppStore) {
-        this.store = store;
+    constructor(options: ITileWindowStrategyOptions) {
+        this.viewport = options.viewport;
     }
 
     instantiate(viewport: VirtualViewportModel) {
-        return new TileWindowModel({
+        return new ApplicationWindow({
+            type: ApplicationWindowType.Tile,
             viewport,
         });
     }

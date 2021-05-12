@@ -8,4 +8,5 @@ export enum ApplicationWindowEventType {
     OnFocusWindow = "OnFocusWindow",
     OnDragStart = "OnDragStart",
     OnDragStop = "OnDragStop",
+    OnTypeChange = "OnTypeChange",
 }

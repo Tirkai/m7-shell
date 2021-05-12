@@ -4,11 +4,11 @@ import { v4 } from "uuid";
 import { Application } from "./Application";
 import { ExternalApplication } from "./ExternalApplication";
 import { VirtualViewportModel } from "./virtual/VirtualViewportModel";
-import { IApplicationWindow } from "./window/IApplicationWindow";
+import { ApplicationWindow } from "./window/ApplicationWindow";
 
 interface IApplicationProcessOptions {
     app: Application;
-    window: IApplicationWindow;
+    window: ApplicationWindow;
     url?: string;
     name?: string;
     params?: Map<string, string>;
@@ -21,7 +21,7 @@ export class ApplicationProcess {
     app: Application;
     url: string;
     name: string;
-    window: IApplicationWindow;
+    window: ApplicationWindow;
     params: Map<string, string>;
     emitter: ShellMessageEmitter;
     hash: string;
@@ -63,6 +63,10 @@ export class ApplicationProcess {
 
     setParams(value: Map<string, string>) {
         this.params = value;
+    }
+
+    setWindow(appWindow: ApplicationWindow) {
+        this.window = appWindow;
     }
 
     get modifiedUrl() {

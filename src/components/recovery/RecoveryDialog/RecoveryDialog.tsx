@@ -39,7 +39,10 @@ export const RecoveryDialog = (props: IRecoveryDialogProps) => (
 
             <List>
                 {props.processes?.map((item) => (
-                    <ListItem classes={{ gutters: style.listItem }}>
+                    <ListItem
+                        classes={{ gutters: style.listItem }}
+                        key={item.app.id}
+                    >
                         <ListItemAvatar>
                             <SVGIcon
                                 source={item.app.icon}

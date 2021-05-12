@@ -1,13 +1,18 @@
 import { IconButton } from "@material-ui/core";
 import { Clear } from "@material-ui/icons";
 import classNames from "classnames";
+import { DisplayModeChooseItem } from "components/display/DisplayModeChooseItem/DisplayModeChooseItem";
+import { DisplayModeChooser } from "components/tile/DisplayModeChooser/DisplayModeChooser";
 import { TileChooserItem } from "components/tile/TileChooserItem/TileChooserItem";
-import { TilePresetChooser } from "components/tile/TilePresetChooser/TilePresetChooser";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
+import { DisplayMode } from "models/display/DisplayMode";
 import { TilePreset } from "models/tile/TilePreset";
 import { TileTemplate } from "models/tile/TileTemplate";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
+import { ApplicationWindowType } from "models/window/ApplicationWindowType";
+import { FloatWindowStrategy } from "models/window/FloatWindowStrategy";
+import { TileWindowStrategy } from "models/window/TileWindowStrategy";
 import React, { useState } from "react";
 import style from "./style.module.css";
 
@@ -27,6 +32,7 @@ const className = style.virtualFramePreview;
 export const VirtualFramePreview = observer(
     (props: IVirtualFramePreviewProps) => {
         const store = useStore();
+
         const handleDelete = (e: React.MouseEvent) => {
             if (props.onDelete) {
                 props.onDelete();
@@ -38,15 +44,58 @@ export const VirtualFramePreview = observer(
             (item) => item.alias === props.preset?.alias,
         );
 
-        const [isShowTileGridChooser, setShowTileGridChooser] = useState(false);
+        const [isShowDisplayModeChooser, setShowDisplayModeChooser] = useState(
+            false,
+        );
 
         const handleApplyPreset = (
             template: TileTemplate,
             viewport?: VirtualViewportModel,
         ) => {
             if (template && viewport) {
+                store.display.applyDisplayModeToViewport(
+                    new DisplayMode({
+                        windowStrategy: new TileWindowStrategy({ viewport }),
+                        enableTileAttachArea: true,
+                    }),
+                    viewport,
+                );
+
                 store.tile.applyPresetToViewport(template, viewport);
-                setShowTileGridChooser(false);
+
+                store.processManager.processes
+                    .filter((item) => item.window.viewport.id === viewport.id)
+                    .forEach((item) => {
+                        store.windowManager.applyTypeToWindow(
+                            item.window,
+                            ApplicationWindowType.Tile,
+                        );
+                    });
+
+                setShowDisplayModeChooser(false);
+            }
+        };
+
+        const handleApplyFloatedDisplayMode = (
+            viewport?: VirtualViewportModel,
+        ) => {
+            if (viewport) {
+                store.display.applyDisplayModeToViewport(
+                    new DisplayMode({
+                        windowStrategy: new FloatWindowStrategy({ viewport }),
+                    }),
+                    viewport,
+                );
+                store.processManager.processes
+                    .filter((item) => item.window.viewport.id === viewport.id)
+                    .forEach((item) => {
+                        store.windowManager.applyTypeToWindow(
+                            item.window,
+                            ApplicationWindowType.Float,
+                        );
+                    });
+
+                setShowDisplayModeChooser(false);
             }
         };
 
@@ -56,11 +105,21 @@ export const VirtualFramePreview = observer(
                     {currentActiveTemplate && (
                         <>
                             <div className={style.tileChooseIndicator}>
-                                <TileChooserItem
-                                    template={currentActiveTemplate}
-                                    active={isShowTileGridChooser}
-                                    onClick={() => setShowTileGridChooser(true)}
-                                />
+                                <DisplayModeChooseItem>
+                                    <TileChooserItem
+                                        template={
+                                            // TODO: Убрать этот лютейший костыль, ибо сейчас я слишком устал, что сделать нормально
+                                            props.viewport?.displayMode
+                                                .enableTileAttach
+                                                ? currentActiveTemplate
+                                                : undefined
+                                        }
+                                        active={isShowDisplayModeChooser}
+                                        onClick={() =>
+                                            setShowDisplayModeChooser(true)
+                                        }
+                                    />
+                                </DisplayModeChooseItem>
                             </div>
                             {!props.hideDeleteControl && (
                                 <IconButton
@@ -73,8 +132,8 @@ export const VirtualFramePreview = observer(
                             )}
                         </>
                     )}
-                    <TilePresetChooser
-                        show={isShowTileGridChooser}
+                    <DisplayModeChooser
+                        show={isShowDisplayModeChooser}
                         templates={
                             props.templates?.filter(
                                 (template) =>
@@ -82,8 +141,11 @@ export const VirtualFramePreview = observer(
                                     props.viewport?.tilePreset.alias,
                             ) ?? []
                         }
-                        onApply={(template) =>
+                        onApplyTileDisplayMode={(template) =>
                             handleApplyPreset(template, props.viewport)
+                        }
+                        onApplyFloatedDisplayMode={() =>
+                            handleApplyFloatedDisplayMode(props.viewport)
                         }
                     />
                 </div>

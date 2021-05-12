@@ -1,7 +1,7 @@
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
-import { TileWindowModel } from "models/window/TileWindowModel";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import AppLoader from "../AppLoader/AppLoader";
@@ -12,13 +12,13 @@ import style from "./style.module.css";
 
 interface ITileWindowProps {
     process: ApplicationProcess;
-    window: TileWindowModel;
+    window: ApplicationWindow;
     isFocused: boolean;
     x: number;
     y: number;
     onDragStart: () => void;
     onDragEnd: () => void;
-    onClose: (appWindow: TileWindowModel) => void;
+    onClose: (appWindow: ApplicationWindow) => void;
     onDrag: DraggableEventHandler;
     url: string;
     area: string;
@@ -34,7 +34,7 @@ export const TileWindow = observer((props: ITileWindowProps) => {
         gridArea: props.area,
     };
 
-    const handleFocus = (tileWindow: TileWindowModel) => {
+    const handleFocus = (tileWindow: ApplicationWindow) => {
         store.windowManager.focusWindow(tileWindow);
     };
 

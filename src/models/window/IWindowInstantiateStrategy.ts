@@ -1,6 +1,7 @@
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
-import { IApplicationWindow } from "./IApplicationWindow";
+import { ApplicationWindow } from "./ApplicationWindow";
 
 export interface IWindowInstantiateStrategy {
-    instantiate: (viewport: VirtualViewportModel) => IApplicationWindow;
+    viewport: VirtualViewportModel;
+    instantiate: (viewport: VirtualViewportModel) => ApplicationWindow;
 }

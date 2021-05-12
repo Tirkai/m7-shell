@@ -7,7 +7,8 @@ import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { TileCell } from "models/tile/TileCell";
 import { TilePreset } from "models/tile/TilePreset";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
-import { TileWindowModel } from "models/window/TileWindowModel";
+import { ApplicationWindowType } from "models/window/ApplicationWindowType";
+import { IApplicationWindow } from "models/window/IApplicationWindow";
 import React, { useEffect } from "react";
 import { DraggableData, DraggableEvent } from "react-draggable";
 import { TileDesktopArea } from "../TileDesktopArea/TileDesktopArea";
@@ -54,11 +55,11 @@ export const TileDesktopContainer = observer(
             store.processManager.killProcess(process);
         };
 
-        const handleDragStart = (tileWindow: TileWindowModel) => {
+        const handleDragStart = (tileWindow: IApplicationWindow) => {
             store.windowManager.startDragWindow(tileWindow);
         };
 
-        const handleDragEnd = (tileWindow: TileWindowModel) => {
+        const handleDragEnd = (tileWindow: IApplicationWindow) => {
             store.windowManager.stopDragWindow(tileWindow);
         };
 
@@ -67,7 +68,7 @@ export const TileDesktopContainer = observer(
         };
 
         const handleDrag = (
-            appWindow: TileWindowModel,
+            appWindow: IApplicationWindow,
             event: DraggableEvent,
             data: DraggableData,
         ) => {
@@ -94,25 +95,24 @@ export const TileDesktopContainer = observer(
                     style={gridStyles}
                     onClick={handleAreaClick}
                 >
-                    <div
-                        className={style.floatedArea}
-                        style={{
-                            ...gridStyles,
-                            pointerEvents: draggedWindow ? "all" : "none",
-                        }}
-                    >
-                        {props.preset.cells.map((cell) => (
-                            <TileDesktopArea
-                                key={cell.id}
-                                cell={cell}
-                                onEnter={() => handleEnter(cell)}
-                                active={
-                                    !!draggedWindow &&
-                                    store.display.displayMode.enableTiles
-                                }
-                            />
-                        ))}
-                    </div>
+                    {props.viewport.displayMode.enableTileAttach && (
+                        <div
+                            className={style.floatedArea}
+                            style={{
+                                ...gridStyles,
+                                pointerEvents: draggedWindow ? "all" : "none",
+                            }}
+                        >
+                            {props.preset.cells.map((cell) => (
+                                <TileDesktopArea
+                                    key={cell.id}
+                                    cell={cell}
+                                    onEnter={() => handleEnter(cell)}
+                                    active={!!draggedWindow}
+                                />
+                            ))}
+                        </div>
+                    )}
                     <div className={style.appsArea} style={gridStyles}>
                         {store.processManager.processes
                             .filter(
@@ -120,35 +120,26 @@ export const TileDesktopContainer = observer(
                                     (process.window.viewport.id ===
                                         props.viewport?.id ??
                                         true) &&
-                                    process.window instanceof TileWindowModel,
+                                    process.window.type ===
+                                        ApplicationWindowType.Tile,
                             )
                             .map((process) => (
                                 <TileWindow
                                     key={process.id}
                                     process={process}
-                                    window={process.window as TileWindowModel}
+                                    window={process.window}
                                     url={process.modifiedUrl}
                                     isFocused={process.window.isFocused}
-                                    area={
-                                        (process.window as TileWindowModel).area
-                                    }
+                                    area={process.window.area}
                                     onClose={() => handleClose(process)}
                                     onDragStart={() =>
-                                        handleDragStart(
-                                            process.window as TileWindowModel,
-                                        )
+                                        handleDragStart(process.window)
                                     }
                                     onDragEnd={() =>
-                                        handleDragEnd(
-                                            process.window as TileWindowModel,
-                                        )
+                                        handleDragEnd(process.window)
                                     }
                                     onDrag={(event, data) =>
-                                        handleDrag(
-                                            process.window as TileWindowModel,
-                                            event,
-                                            data,
-                                        )
+                                        handleDrag(process.window, event, data)
                                     }
                                     x={process.window.x}
                                     y={process.window.y}

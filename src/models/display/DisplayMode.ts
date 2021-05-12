@@ -2,15 +2,15 @@ import { IWindowInstantiateStrategy } from "models/window/IWindowInstantiateStra
 
 interface IDisplayModeOptions {
     windowStrategy: IWindowInstantiateStrategy;
-    enableTiles?: boolean;
+    enableTileAttachArea?: boolean;
 }
 
 export class DisplayMode {
-    windowInstantiateStrategy: IWindowInstantiateStrategy;
-    enableTiles: boolean;
+    windowStrategy: IWindowInstantiateStrategy;
+    enableTileAttach: boolean;
 
     constructor(options: IDisplayModeOptions) {
-        this.windowInstantiateStrategy = options.windowStrategy;
-        this.enableTiles = options.enableTiles ?? false;
+        this.windowStrategy = options.windowStrategy;
+        this.enableTileAttach = options.enableTileAttachArea ?? false;
     }
 }

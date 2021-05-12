@@ -6,6 +6,7 @@ import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
+import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import React from "react";
 import { DraggableData, DraggableEvent } from "react-draggable";
 import { ResizeCallbackData } from "react-resizable";
@@ -94,7 +95,7 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
                     (process) =>
                         (process.window.viewport.id === props.viewport?.id ??
                             true) &&
-                        process.window instanceof ApplicationWindow,
+                        process.window.type === ApplicationWindowType.Float,
                 )
                 .map((process: ApplicationProcess) => {
                     const appWindow = process.window as ApplicationWindow;
