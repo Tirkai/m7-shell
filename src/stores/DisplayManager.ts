@@ -1,7 +1,9 @@
 import { makeAutoObservable } from "mobx";
 import { DisplayMode } from "models/display/DisplayMode";
 import { DisplayModeEventType } from "models/display/DisplayModeEventType";
+import { DisplayModeType } from "models/display/DisplayModeType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
+import { registeredDisplayModes } from "registeredDisplayModes";
 import { AppStore } from "stores/AppStore";
 
 export class DisplayManager {
@@ -13,6 +15,8 @@ export class DisplayManager {
     //     this.displayMode = displayMode;
     // }
 
+    displayModes: DisplayMode[] = registeredDisplayModes;
+
     applyDisplayModeToViewport(
         displayMode: DisplayMode,
         viewport: VirtualViewportModel,
@@ -23,6 +27,10 @@ export class DisplayManager {
             DisplayModeEventType.OnDisplayModeChange,
             displayMode,
         );
+    }
+
+    findDisplayModeByType(type: DisplayModeType) {
+        return this.displayModes.find((item) => item.type === type);
     }
 
     constructor(store: AppStore) {

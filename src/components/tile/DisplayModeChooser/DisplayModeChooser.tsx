@@ -1,47 +1,136 @@
 import classNames from "classnames";
 import { DisplayModeChooseItem } from "components/display/DisplayModeChooseItem/DisplayModeChooseItem";
 import { useStore } from "hooks/useStore";
+import { observer } from "mobx-react";
+import { DisplayMode } from "models/display/DisplayMode";
+import { DisplayModeType } from "models/display/DisplayModeType";
 import { TileTemplate } from "models/tile/TileTemplate";
-import React from "react";
-import { DisplayModeChooserGrid } from "../DisplayModeChooserGrid/DisplayModeChooserGrid";
+import React, { useMemo, useState } from "react";
 import { TileChooserItem } from "../TileChooserItem/TileChooserItem";
 import style from "./style.module.css";
 
 const className = style.displayModeChooser;
 
 interface IDisplayModeChooserProps {
-    show: boolean;
-    onApplyTileDisplayMode: (template: TileTemplate) => void;
-    onApplyFloatedDisplayMode: () => void;
-    templates: TileTemplate[];
+    // show: boolean;
+    // onApplyTileDisplayMode: (template: TileTemplate) => void;
+    // onApplyFloatedDisplayMode: () => void;
+    // templates: TileTemplate[];
+    onSelectTileMode: (
+        displayMode: DisplayMode,
+        template: TileTemplate,
+    ) => void;
+
+    displayMode?: DisplayMode;
+    presetAlias?: string;
+
+    onSelectFloatMode: (displayMode: DisplayMode) => void;
 }
 
-export const DisplayModeChooser = (props: IDisplayModeChooserProps) => {
-    const store = useStore();
+interface IDisplayModeNavigationItem {
+    id: string;
+    displayMode: DisplayMode;
+    child: React.ReactNode;
+    handler: () => void;
+}
 
-    const handleApplyPreset = (template: TileTemplate) => {
-        props.onApplyTileDisplayMode(template);
-    };
+export const DisplayModeChooser = observer(
+    (props: IDisplayModeChooserProps) => {
+        const store = useStore();
+        const [isShow, setShow] = useState(false);
 
-    return (
-        <div className={classNames(className, { [style.show]: props.show })}>
-            <DisplayModeChooserGrid>
-                {props.templates.map((template) => (
-                    <DisplayModeChooseItem key={template.id}>
-                        <TileChooserItem
-                            key={template.id}
-                            onClick={() => handleApplyPreset(template)}
-                            template={template}
-                            active={false}
-                        />
+        const floatDisplayMode = useMemo(
+            () => store.display.findDisplayModeByType(DisplayModeType.Float),
+            [],
+        );
+
+        const tileDisplayMode = useMemo(
+            () => store.display.findDisplayModeByType(DisplayModeType.Tile),
+            [],
+        );
+
+        const handleSelectTileMode = (
+            alias: string,
+            template: TileTemplate,
+        ) => {
+            setActiveItem(alias);
+            props.onSelectTileMode(tileDisplayMode!, template);
+            setShow(false);
+        };
+
+        const handleSelectFloatMode = (alias: string) => {
+            setActiveItem(alias);
+            // if (id !== activeItem) {
+            props.onSelectFloatMode(floatDisplayMode!);
+            // }
+            setShow(false);
+        };
+
+        const displayModeNaviagationItems: IDisplayModeNavigationItem[] = useMemo(() => {
+            const getTileView = (template: TileTemplate) => (
+                <TileChooserItem
+                    template={template}
+                    onClick={() => false}
+                    active={false}
+                />
+            );
+
+            const getFloatView = () => "нет";
+
+            if (floatDisplayMode && tileDisplayMode) {
+                const tiles = store.tile.templates.map((item) => ({
+                    id: item.alias,
+                    displayMode: tileDisplayMode,
+                    child: getTileView(item),
+                    handler: () => handleSelectTileMode(item.alias, item),
+                }));
+
+                const items = [
+                    ...tiles,
+
+                    {
+                        id: "none",
+                        displayMode: floatDisplayMode,
+                        child: getFloatView(),
+                        handler: () => handleSelectFloatMode("none"),
+                    },
+                ];
+                return items;
+            }
+            return [];
+        }, []);
+
+        const [activeItem, setActiveItem] = useState(
+            props.presetAlias ?? "none",
+        );
+
+        return (
+            <div className={style.displayModeChooser}>
+                <div className={style.preview} onClick={() => setShow(!isShow)}>
+                    <DisplayModeChooseItem active={isShow}>
+                        {
+                            displayModeNaviagationItems.find(
+                                (item) => item.id === activeItem,
+                            )?.child
+                        }
                     </DisplayModeChooseItem>
-                ))}
-                <DisplayModeChooseItem
-                    onClick={props.onApplyFloatedDisplayMode}
+                </div>
+                <div
+                    className={classNames(style.container, {
+                        [style.show]: isShow,
+                    })}
                 >
-                    нет
-                </DisplayModeChooseItem>
-            </DisplayModeChooserGrid>
-        </div>
-    );
-};
+                    <div className={style.content}>
+                        {displayModeNaviagationItems
+                            .filter((item) => item.id !== activeItem)
+                            .map((item) => (
+                                <DisplayModeChooseItem onClick={item.handler}>
+                                    {item.child}
+                                </DisplayModeChooseItem>
+                            ))}
+                    </div>
+                </div>
+            </div>
+        );
+    },
+);

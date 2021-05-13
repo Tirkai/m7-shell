@@ -161,9 +161,6 @@ export const AppWindow = (props: IAppWindowProps) => {
                             onReload={handleReload}
                             onCollapse={() => handleCollapse()}
                             onFullscreen={() => handleFullScreen()}
-                            visible={
-                                store.shell.displayMode.showAppWindowHeader
-                            }
                         />
                         <AppLoader
                             icon={props.process.app.icon}

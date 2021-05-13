@@ -101,6 +101,8 @@ export class ApplicationWindow implements IApplicationWindow {
                 this.lockedX = this.x;
                 this.lockedY = this.y;
 
+                // this.setArea("auto");
+
                 break;
             }
             case ApplicationWindowType.Tile: {

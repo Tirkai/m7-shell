@@ -8,7 +8,7 @@ import { ShellPanelType } from "enum/ShellPanelType";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { groupBy } from "lodash";
-import { computed, reaction } from "mobx";
+import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
@@ -105,18 +105,17 @@ export class TaskBar extends Component<IStore> {
     };
 
     componentDidMount() {
-        this.setState({
-            isShow: this.store.shell.displayMode.taskbarVisible,
-        });
-
-        reaction(
-            () => this.store.shell.displayMode,
-            () => {
-                this.setState({
-                    isShow: this.store.shell.displayMode.taskbarVisible,
-                });
-            },
-        );
+        // this.setState({
+        //     isShow: this.store.shell.displayMode.taskbarVisible,
+        // });
+        // reaction(
+        //     () => this.store.shell.displayMode,
+        //     () => {
+        //         this.setState({
+        //             isShow: this.store.shell.displayMode.taskbarVisible,
+        //         });
+        //     },
+        // );
     }
 
     createCloseApplicationContextMenuItem = (
@@ -127,11 +126,11 @@ export class TaskBar extends Component<IStore> {
             content: strings.application.actions.close,
             onClick: () => this.handleKillProcess(appProcess),
         }),
-        new ContextMenuItemModel({
-            icon: cross,
-            content: "Закрыть группу",
-            onClick: () => this.handleCloseViewportGroup(appProcess),
-        }),
+        // new ContextMenuItemModel({
+        //     icon: cross,
+        //     content: "Закрыть группу",
+        //     onClick: () => this.handleCloseViewportGroup(appProcess),
+        // }),
     ];
 
     render() {
@@ -152,7 +151,7 @@ export class TaskBar extends Component<IStore> {
             <>
                 <div
                     className={classNames(style.taskBar, {
-                        [style.show]: this.state.isShow,
+                        // [style.show]: this.state.isShow,
                     })}
                 >
                     <BackdropWrapper active>

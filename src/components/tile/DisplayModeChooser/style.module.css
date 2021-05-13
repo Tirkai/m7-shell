@@ -1,29 +1,29 @@
 .displayModeChooser {
     display: flex;
     align-items: center;
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 48px;
     z-index: 1;
-    transition: transform ease 0.3s, opacity ease 0.3s;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(-25%);
+    overflow: hidden;
     background: #222;
 }
 
 .container {
+    position: absolute;
+    display: flex;
+    align-items: center;
     background: #222;
-    height: 100%;
+    transition: transform ease 0.3s, opacity ease 0.3s;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-25%);
+    width: 100%;
 }
 
 .content {
     display: grid;
-    grid-template-columns: 32px 1fr;
-    grid-template-rows: 32px;
-    grid-gap: 12px;
+    grid-template-columns: repeat(4, 42px);
+    grid-gap: 8px;
 }
 
 .show {
@@ -35,6 +35,11 @@
 
 .icon {
     cursor: pointer;
+}
+
+.preview {
+    position: relative;
+    z-index: 10;
 }
 
 .icon svg {

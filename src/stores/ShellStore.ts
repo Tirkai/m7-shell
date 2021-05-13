@@ -1,12 +1,8 @@
-import { DisplayModeType } from "enum/DisplayModeType";
 import { ShellPanelType } from "enum/ShellPanelType";
-import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { makeAutoObservable } from "mobx";
 import { AuthEventType } from "models/auth/AuthEventType";
-import { DefaultDisplayMode } from "models/DefaultDisplayMode";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { DevModeModel } from "models/DevModeModel";
-import { EmbedDisplayMode } from "models/EmbedDisplayMode";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { PanelEventType } from "models/panel/PanelEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
@@ -32,8 +28,6 @@ export class ShellStore {
     enabledDevMode: boolean = process.env.NODE_ENV === "development";
 
     activePanel: ShellPanelType = ShellPanelType.None;
-
-    displayMode: IDisplayMode = new DefaultDisplayMode();
 
     private store: AppStore;
     constructor(store: AppStore) {
@@ -118,16 +112,5 @@ export class ShellStore {
             this.localStorageDevModeKey,
             JSON.stringify(new DevModeModel(value, moment().add(1, "hour"))),
         );
-    }
-
-    setDisplayMode(value: DisplayModeType) {
-        switch (value) {
-            case DisplayModeType.Default:
-                return (this.displayMode = new DefaultDisplayMode());
-            case DisplayModeType.Embed:
-                return (this.displayMode = new EmbedDisplayMode());
-            default:
-                break;
-        }
     }
 }

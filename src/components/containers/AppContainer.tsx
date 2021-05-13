@@ -3,7 +3,6 @@ import { AwaitVerifyScreen } from "components/layout/AwaitVerifyScreen/AwaitVeri
 import { ShellScreen } from "components/layout/ShellScreen/ShellScreen";
 import { MessageDialog } from "components/message/MessageDialog/MessageDialog";
 import { PerformanceContext } from "contexts/PerformanceContext";
-import { DisplayModeType } from "enum/DisplayModeType";
 import { PerformanceModeType } from "enum/PerformanceModeType";
 import { useStore } from "hooks/useStore";
 import { IPerformanceMode } from "interfaces/performance/IPerformanceMode";
@@ -28,6 +27,7 @@ export const AppContainer = observer(() => {
 
         window.onbeforeunload = () => getCloseBrowserWindowDenied();
 
+        // TODO: fix
         const urlParams = new URL(window.location.href).searchParams;
         const enableAutoRun = urlParams.get("enableAutoLogin");
         const autoLogin = urlParams.get("login");
@@ -52,7 +52,7 @@ export const AppContainer = observer(() => {
             }
         }
 
-        const displayMode = urlParams.get("displayMode") as DisplayModeType;
+        // const displayMode = urlParams.get("displayMode") as DisplayModeType;
 
         if (!!parseInt(enableAutoRun ?? "0")) {
             if (autoLogin && autoPassword) {
@@ -62,9 +62,9 @@ export const AppContainer = observer(() => {
             }
         }
 
-        if (displayMode) {
-            store.shell.setDisplayMode(displayMode);
-        }
+        // if (displayMode) {
+        //     store.shell.setDisplayMode(displayMode);
+        // }
     };
 
     useEffect(onMount, []);

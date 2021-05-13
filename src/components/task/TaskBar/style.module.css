@@ -5,9 +5,9 @@
     z-index: 100;
     background-size: cover;
     background-attachment: fixed;
-    transform: translateY(48px);
+    /* transform: translateY(48px); */
     transition: ease 0.3s;
-    pointer-events: none;
+    /* pointer-events: none; */
     position: relative;
 }
 .container {

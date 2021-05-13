@@ -1,8 +1,9 @@
 import { TileFactory } from "factories/TileFactory";
 import { makeAutoObservable } from "mobx";
 import { DisplayMode } from "models/display/DisplayMode";
+import { DisplayModeType } from "models/display/DisplayModeType";
 import { TilePreset } from "models/tile/TilePreset";
-import { TileWindowStrategy } from "models/window/TileWindowStrategy";
+import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { v4 } from "uuid";
 
 interface IVirtualViewportOptions {
@@ -29,7 +30,8 @@ export class VirtualViewportModel {
         this.displayMode =
             options?.displayMode ??
             new DisplayMode({
-                windowStrategy: new TileWindowStrategy({ viewport: this }),
+                type: DisplayModeType.Tile,
+                windowType: ApplicationWindowType.Tile,
                 enableTileAttachArea: true,
             });
     }

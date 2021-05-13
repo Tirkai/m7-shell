@@ -13,3 +13,7 @@
     border-radius: 4px;
     overflow: hidden;
 }
+
+.active {
+    background: #00519c;
+}

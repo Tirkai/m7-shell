@@ -98,7 +98,7 @@ export const AppWindowContent = observer((props: IAppWindowProps) => {
     return (
         <div
             className={classNames(style.appWindowContent, {
-                [style.withHeader]: store.shell.displayMode.showAppWindowHeader,
+                // [style.withHeader]: store.shell.displayMode.showAppWindowHeader,
             })}
         >
             {appComponent}

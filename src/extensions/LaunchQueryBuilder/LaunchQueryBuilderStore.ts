@@ -1,5 +1,4 @@
 import { UtilsFunctions } from "@algont/m7-utils";
-import { DisplayModeType } from "enum/DisplayModeType";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/Application";
 
@@ -18,8 +17,6 @@ export class LaunchQueryBuilderStore {
     enableAutoLogin: boolean = false;
     login: string = "";
     password: string = "";
-
-    displayMode: DisplayModeType = DisplayModeType.Default;
 
     constructor() {
         makeAutoObservable(this);
@@ -51,9 +48,6 @@ export class LaunchQueryBuilderStore {
             params.append("password", this.password);
         }
 
-        if (this.displayMode) {
-            params.append("displayMode", this.displayMode);
-        }
         return domain + "?" + params.toString();
     }
 
@@ -81,13 +75,9 @@ export class LaunchQueryBuilderStore {
     setPassword(value: string) {
         this.password = value;
     }
-    setDisplayMode(value: DisplayModeType) {
-        this.displayMode = value;
-    }
 
     reset() {
         this.enableAutoRun = false;
         this.enableAutoLogin = false;
-        this.displayMode = DisplayModeType.Default;
     }
 }

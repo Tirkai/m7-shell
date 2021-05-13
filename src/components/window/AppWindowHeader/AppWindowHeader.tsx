@@ -23,7 +23,7 @@ interface IAppWindowHeaderProps extends IStore {
     onCollapse?: () => void;
     onBackward?: () => void;
     onReload?: () => void;
-    visible: boolean;
+    visible?: boolean;
 }
 
 @inject("store")

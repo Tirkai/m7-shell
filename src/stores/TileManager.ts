@@ -181,13 +181,6 @@ export class TileManager {
 
                 appWindow.setArea(tileCell.area);
 
-                // appWindow.setGrid({
-                //     startColumn: tileCell.startColumn,
-                //     startRow: tileCell.startRow,
-                //     endColumn: tileCell.endColumn,
-                //     endRow: tileCell.endRow,
-                // });
-
                 this.store.sharedEventBus.eventBus.dispatch(
                     TileEventType.OnAttachWindow,
                     { appWindow, tileCell },

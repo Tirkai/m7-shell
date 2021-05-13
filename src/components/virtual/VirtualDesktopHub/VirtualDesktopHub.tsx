@@ -66,6 +66,10 @@ export const VirtualDesktopHub = observer(() => {
                                         viewport={item}
                                     >
                                         <TileAppPreviewGrid
+                                            enabledTiles={
+                                                item.displayMode
+                                                    .enableTileAttach
+                                            }
                                             areas={item.tilePreset.areas}
                                             columns={item.tilePreset.columns}
                                             rows={item.tilePreset.rows}
