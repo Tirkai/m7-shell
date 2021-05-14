@@ -22,10 +22,6 @@ export class WindowManagerStore {
         const { eventBus } = store.sharedEventBus;
         makeAutoObservable(this);
 
-        // this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
-        //     this.closeAllWindows(),
-        // );
-
         window.addEventListener(ShellEvents.FocusShellControls, () =>
             this.clearFocus(),
         );
@@ -119,8 +115,6 @@ export class WindowManagerStore {
                 appWindow,
             );
 
-            // window.dispatchEvent(new CustomEvent(ShellEvents.FocusAnyWindow));
-
             if (appWindow.isFocused) return;
 
             if (appWindow.isCollapsed) this.expandWindow(appWindow);
@@ -130,14 +124,14 @@ export class WindowManagerStore {
             const minIndex = min(indexes);
 
             const maxIndex = max(indexes);
-            if (minIndex && maxIndex) {
+            if (minIndex !== undefined && maxIndex !== undefined) {
                 this.windows.forEach((item) => {
                     let index = 0;
                     if (item.id === appWindow.id) {
-                        index = maxIndex - minIndex + 2;
+                        index = maxIndex - minIndex + 1;
                         appWindow.setFocused(true);
                     } else {
-                        index = item.depthIndex - minIndex + 1;
+                        index = item.depthIndex - minIndex;
                         item.setFocused(false);
                     }
                     item.setDepthIndex(index);

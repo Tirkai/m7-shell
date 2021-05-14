@@ -20,7 +20,7 @@ import { IApplicationWindow } from "./IApplicationWindow";
 export class ApplicationWindow implements IApplicationWindow {
     id: string;
     type: ApplicationWindowType;
-    depthIndex: number = 1;
+    depthIndex: number;
     isFocused: boolean = false;
     isFullScreen: boolean = false;
     isCollapsed: boolean = false;
@@ -79,6 +79,7 @@ export class ApplicationWindow implements IApplicationWindow {
         this.lockedHeight = this.height;
         this.lockedX = this.x;
         this.lockedY = this.y;
+        this.depthIndex = options.depthIndex ?? 1;
 
         this.initialize(options);
 
@@ -90,7 +91,7 @@ export class ApplicationWindow implements IApplicationWindow {
     initialize(options: IApplicationWindowOptions) {
         switch (this.type) {
             case ApplicationWindowType.Float: {
-                const [x, y] = this.calculatePosition();
+                const [x, y] = this.calculatePosition({ withShuffle: true });
 
                 this.x = x;
                 this.y = y;
@@ -115,11 +116,19 @@ export class ApplicationWindow implements IApplicationWindow {
         }
     }
 
-    calculatePosition() {
-        const x = Math.floor(window.innerWidth / 2 - this.width / 2);
-        const y = Math.floor(
-            window.innerHeight / 2 - this.height / 2 - TASKBAR_HEIGHT / 2,
+    calculatePosition(options?: { withShuffle: boolean }) {
+        const getShuffleModifier = () => Math.ceil((this.depthIndex - 1) * 5);
+
+        console.log(
+            `DEPTH_INDEX: ${this.depthIndex}, SHUFFLE: ${getShuffleModifier()}`,
         );
+
+        const x =
+            Math.floor(window.innerWidth / 2 - this.width / 2) +
+            getShuffleModifier();
+        const y =
+            Math.floor(window.innerHeight / 2 - this.height / 2) +
+            getShuffleModifier();
         return [x, y];
     }
 
