@@ -4,6 +4,8 @@ import { ShellScreen } from "components/layout/ShellScreen/ShellScreen";
 import { MessageDialog } from "components/message/MessageDialog/MessageDialog";
 import { PerformanceContext } from "contexts/PerformanceContext";
 import { PerformanceModeType } from "enum/PerformanceModeType";
+import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
+import { createBrowserHistory } from "history";
 import { useStore } from "hooks/useStore";
 import { IPerformanceMode } from "interfaces/performance/IPerformanceMode";
 import { observer } from "mobx-react";
@@ -11,6 +13,9 @@ import { DefaultPerformanceMode } from "models/DefaultPerformanceMode";
 import { PotatoPerformanceMode } from "models/PotatoPerformanceMode";
 import "moment/locale/ru";
 import React, { useEffect, useState } from "react";
+import { Route, Router, Switch } from "react-router-dom";
+
+const history = createBrowserHistory();
 
 export const AppContainer = observer(() => {
     const store = useStore();
@@ -71,15 +76,27 @@ export const AppContainer = observer(() => {
 
     return (
         <PerformanceContext.Provider value={{ mode: perfMode }}>
-            {store.auth.isAuthorized ? (
-                store.auth.checkedAfterStart ? (
-                    <ShellScreen />
-                ) : (
-                    <AwaitVerifyScreen />
-                )
-            ) : (
-                <AuthScreen />
-            )}
+            <Router history={history}>
+                <Switch>
+                    <Route path="/" exact>
+                        {store.auth.isAuthorized ? (
+                            store.auth.checkedAfterStart ? (
+                                <ShellScreen />
+                            ) : (
+                                <AwaitVerifyScreen />
+                            )
+                        ) : (
+                            <AuthScreen />
+                        )}
+                    </Route>
+                    <Route path="/internalApps/">
+                        <Route path="/internalApps/CustomExecutor">
+                            <CustomExecutor />
+                        </Route>
+                    </Route>
+                </Switch>
+            </Router>
+
             <MessageDialog />
         </PerformanceContext.Provider>
     );

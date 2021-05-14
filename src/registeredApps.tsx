@@ -28,4 +28,13 @@ export const registeredApps: Application[] = [
         isVisibleInStartMenu: false,
         icon: rocket,
     }),
+    new ShellApplication({
+        id: v4(),
+        name: "core.app",
+        key: "Core",
+        Component: <></>,
+        baseWidth: 600,
+        baseHeight: 700,
+        isVisibleInStartMenu: false,
+    }),
 ];

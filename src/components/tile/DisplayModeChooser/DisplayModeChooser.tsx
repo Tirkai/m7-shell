@@ -124,7 +124,10 @@ export const DisplayModeChooser = observer(
                         {displayModeNaviagationItems
                             .filter((item) => item.id !== activeItem)
                             .map((item) => (
-                                <DisplayModeChooseItem onClick={item.handler}>
+                                <DisplayModeChooseItem
+                                    key={item.id}
+                                    onClick={item.handler}
+                                >
                                     {item.child}
                                 </DisplayModeChooseItem>
                             ))}
