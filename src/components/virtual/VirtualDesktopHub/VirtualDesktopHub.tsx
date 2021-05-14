@@ -122,3 +122,5 @@ export const VirtualDesktopHub = observer(() => {
         </BaseHub>
     );
 });
+
+export default VirtualDesktopHub;

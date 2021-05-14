@@ -339,3 +339,5 @@ export const NotificationHub = observer(() => {
         </div>
     );
 });
+
+export default NotificationHub;

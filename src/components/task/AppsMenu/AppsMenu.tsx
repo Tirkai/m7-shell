@@ -139,3 +139,5 @@ export const AppsMenu: React.FC = observer(() => {
         </div>
     );
 });
+
+export default AppsMenu;

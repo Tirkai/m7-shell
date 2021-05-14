@@ -130,3 +130,5 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
         </div>
     );
 });
+
+export default AppWindowArea;

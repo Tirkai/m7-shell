@@ -81,3 +81,5 @@ export const AudioHub = observer(() => {
         </BaseHub>
     );
 });
+
+export default AudioHub;

@@ -71,3 +71,5 @@ export const NotificationToasts = observer(() => {
         </div>
     );
 });
+
+export default NotificationToasts;

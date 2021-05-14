@@ -10,3 +10,5 @@ const className = style.desktopForeground;
 export const DesktopForeground = (props: IDesktopForegroundProps) => (
     <div className={className} onClick={props.onDesktopClick}></div>
 );
+
+export default DesktopForeground;
