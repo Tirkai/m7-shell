@@ -16,8 +16,8 @@ import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { Component } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
-import { TaskbarSeparator } from "../TaskbarSeparator/TaskbarSeparator";
 import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
+import { TaskGroup } from "../TaskGroup/TaskGroup";
 import { TaskHint } from "../TaskHint/TaskHint";
 import style from "./style.module.css";
 
@@ -73,14 +73,6 @@ export class TaskBar extends Component<IStore> {
         this.store.processManager.killProcess(appProcess);
     };
 
-    handleShowNetworkTroubleMessage = () => {
-        this.store.message.showMessage("[ph] Network trouble", "[ph]");
-    };
-
-    handleShowDesktopLayoutConfig = () => {
-        this.store.desktop.setEditMode(!this.store.desktop.isEditMode);
-    };
-
     handleShowTileHub = () => {
         this.store.shell.setActivePanel(
             this.store.shell.activePanel !== ShellPanelType.TileHub
@@ -103,20 +95,6 @@ export class TaskBar extends Component<IStore> {
             .filter((item) => item.window.viewport.id === viewport.id)
             .forEach((item) => this.store.processManager.killProcess(item));
     };
-
-    componentDidMount() {
-        // this.setState({
-        //     isShow: this.store.shell.displayMode.taskbarVisible,
-        // });
-        // reaction(
-        //     () => this.store.shell.displayMode,
-        //     () => {
-        //         this.setState({
-        //             isShow: this.store.shell.displayMode.taskbarVisible,
-        //         });
-        //     },
-        // );
-    }
 
     createCloseApplicationContextMenuItem = (
         appProcess: ApplicationProcess,
@@ -176,76 +154,53 @@ export class TaskBar extends Component<IStore> {
                                 {groupedProcessesByViewport.map(
                                     (group, groupIndex) => (
                                         <React.Fragment key={group.key}>
-                                            {groupIndex <
-                                                groupedProcessesByViewport.length && (
-                                                <TaskbarSeparator />
-                                            )}
-                                            {group.value.map((appProcess) => (
-                                                <TaskBarItem
-                                                    key={appProcess.id}
-                                                    executed
-                                                    hint={
-                                                        <TaskHint
-                                                            title={
-                                                                appProcess.name
+                                            <TaskGroup
+                                                active={
+                                                    group.key ===
+                                                    this.store.virtualViewport
+                                                        .currentViewport.id
+                                                }
+                                            >
+                                                {group.value.map(
+                                                    (appProcess) => (
+                                                        <TaskBarItem
+                                                            key={appProcess.id}
+                                                            hint={
+                                                                <TaskHint
+                                                                    title={
+                                                                        appProcess.name
+                                                                    }
+                                                                />
                                                             }
-                                                        />
-                                                    }
-                                                    focused={
-                                                        appProcess.window
-                                                            .isFocused
-                                                    }
-                                                    onClick={() =>
-                                                        this.handleFocusAppWindow(
-                                                            appProcess.window,
-                                                        )
-                                                    }
-                                                    menu={this.createCloseApplicationContextMenuItem(
-                                                        appProcess,
-                                                    )}
-                                                >
-                                                    <SVGIcon
-                                                        source={
-                                                            appProcess.app.icon
-                                                        }
-                                                        color="white"
-                                                    />
-                                                </TaskBarItem>
-                                            ))}
+                                                            focused={
+                                                                appProcess
+                                                                    .window
+                                                                    .isFocused
+                                                            }
+                                                            onClick={() =>
+                                                                this.handleFocusAppWindow(
+                                                                    appProcess.window,
+                                                                )
+                                                            }
+                                                            menu={this.createCloseApplicationContextMenuItem(
+                                                                appProcess,
+                                                            )}
+                                                        >
+                                                            <SVGIcon
+                                                                source={
+                                                                    appProcess
+                                                                        .app
+                                                                        .icon
+                                                                }
+                                                                color="white"
+                                                            />
+                                                        </TaskBarItem>
+                                                    ),
+                                                )}
+                                            </TaskGroup>
                                         </React.Fragment>
                                     ),
                                 )}
-                                {/* {this.store.processManager.processes.map(
-                                    (appProcess) => (
-                                        <TaskBarItem
-                                            key={appProcess.id}
-                                            executed
-                                            hint={
-                                                <TaskHint
-                                                    title={appProcess.name}
-                                                />
-                                            }
-                                            focused={
-                                                appProcess.window.isFocused
-                                            }
-                                            onClick={() =>
-                                                this.handleFocusAppWindow(
-                                                    appProcess.window,
-                                                )
-                                            }
-                                            menu={[
-                                                this.createCloseApplicationContextMenuItem(
-                                                    appProcess,
-                                                ),
-                                            ]}
-                                        >
-                                            <SVGIcon
-                                                source={appProcess.app.icon}
-                                                color="white"
-                                            />
-                                        </TaskBarItem>
-                                    ),
-                                )} */}
                             </div>
 
                             <div className={style.actions}>

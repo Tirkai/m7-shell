@@ -1,0 +1,26 @@
+.taskGroup {
+    display: flex;
+    color: white;
+}
+
+.container {
+    display: flex;
+    position: relative;
+}
+
+.container:before {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    width: 0;
+    background: #b3b3b3;
+    content: "";
+    transition: ease 0.3s;
+}
+
+.container.active:before {
+    left: 0;
+    width: 100%;
+}
