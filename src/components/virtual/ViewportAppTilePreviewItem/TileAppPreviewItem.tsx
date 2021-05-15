@@ -1,15 +1,17 @@
 import React from "react";
 import style from "./style.module.css";
 
-interface ITileAppPreviewItemProps {
+interface IViewportAppTilePreviewItemProps {
     icon: React.ReactNode;
     title: React.ReactNode;
     area: string;
 }
 
-const className = style.tileAppPreview;
+const className = style.viewportAppTileItemPreview;
 
-export const TileAppPreviewItem = (props: ITileAppPreviewItemProps) => (
+export const ViewportAppTilePreviewItem = (
+    props: IViewportAppTilePreviewItemProps,
+) => (
     <div
         className={className}
         style={{

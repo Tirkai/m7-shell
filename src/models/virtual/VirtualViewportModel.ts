@@ -27,6 +27,8 @@ export class VirtualViewportModel {
             options?.tilePreset ?? TileFactory.createEmptyPreset();
         makeAutoObservable(this);
 
+        // TODO: Move
+        // Default Display Mode
         this.displayMode =
             options?.displayMode ??
             new DisplayMode({

@@ -26,6 +26,15 @@
     height: 64px;
 }
 
+.title {
+    height: 100%;
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    grid-area: b;
+}
+
 .content {
     font-size: 24px;
     width: 100%;
@@ -35,17 +44,27 @@
     align-items: center;
 }
 
-.actions {
+.header {
     width: 100%;
     box-sizing: border-box;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 50px 1fr 50px;
     align-items: center;
     color: white;
     overflow: hidden;
+    grid-gap: 4px;
+    grid-template-areas: "a b c";
 }
 
-.tileChooseIndicator {
+.indicator {
+    width: 50px;
     position: relative;
-    z-index: 10;
+    grid-area: a;
+    z-index: 1;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    grid-area: c;
 }

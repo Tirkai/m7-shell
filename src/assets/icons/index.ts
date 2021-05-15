@@ -7,6 +7,7 @@ import dotsMenu from "./dots-menu.svg";
 import empty from "./empty.svg";
 import error from "./error.svg";
 import exit from "./exit.svg";
+import floatWindowMode from "./float-window-mode.svg";
 import fullscreen from "./fullscreen.svg";
 import layout from "./layout.svg";
 import listMenu from "./list-menu.svg";
@@ -56,4 +57,5 @@ export {
     layout,
     tiles,
     virtual,
+    floatWindowMode,
 };

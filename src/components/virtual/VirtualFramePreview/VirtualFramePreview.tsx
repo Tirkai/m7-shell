@@ -5,10 +5,9 @@ import { DisplayModeChooser } from "components/tile/DisplayModeChooser/DisplayMo
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { DisplayMode } from "models/display/DisplayMode";
-import { TilePreset } from "models/tile/TilePreset";
 import { TileTemplate } from "models/tile/TileTemplate";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
-import React, { useState } from "react";
+import React from "react";
 import style from "./style.module.css";
 
 interface IVirtualFramePreviewProps {
@@ -16,10 +15,9 @@ interface IVirtualFramePreviewProps {
     onDelete?: () => void;
     active: boolean;
     children: React.ReactNode;
-    templates?: TileTemplate[];
-    preset?: TilePreset;
     viewport?: VirtualViewportModel;
-    hideDeleteControl?: boolean;
+    hasControls?: boolean;
+    index?: number;
 }
 
 const className = style.virtualFramePreview;
@@ -35,20 +33,10 @@ export const VirtualFramePreview = observer(
             e.stopPropagation();
         };
 
-        const currentActiveTemplate = props.templates?.find(
-            (item) => item.alias === props.preset?.alias,
-        );
-
-        const [isShowDisplayModeChooser, setShowDisplayModeChooser] = useState(
-            false,
-        );
-
         const handleApplyPreset = (template: TileTemplate) => {
             const viewport = props.viewport;
             if (template && viewport) {
                 store.tile.applyPresetToViewport(template, viewport);
-
-                setShowDisplayModeChooser(false);
             }
         };
 
@@ -75,28 +63,42 @@ export const VirtualFramePreview = observer(
 
         return (
             <div className={classNames(className)}>
-                <div className={style.actions}>
-                    {currentActiveTemplate && (
+                <div className={style.header}>
+                    {props.hasControls && (
                         <>
-                            <DisplayModeChooser
-                                displayMode={props.viewport?.displayMode}
-                                presetAlias={props.viewport?.tilePreset.alias}
-                                onSelectFloatMode={(displayMode) =>
-                                    handleApplyDisplayMode(displayMode)
-                                }
-                                onSelectTileMode={(displayMode, template) => {
-                                    handleApplyDisplayMode(displayMode);
-                                    handleApplyPreset(template);
-                                }}
-                            />
-                            {!props.hideDeleteControl && (
-                                <IconButton
-                                    size="small"
-                                    color="secondary"
-                                    onClick={handleDelete}
-                                >
-                                    <Clear />
-                                </IconButton>
+                            <div className={style.indicator}>
+                                <DisplayModeChooser
+                                    displayMode={props.viewport?.displayMode}
+                                    presetAlias={
+                                        props.viewport?.tilePreset.alias
+                                    }
+                                    onSelectFloatMode={(displayMode) =>
+                                        handleApplyDisplayMode(displayMode)
+                                    }
+                                    onSelectTileMode={(
+                                        displayMode,
+                                        template,
+                                    ) => {
+                                        handleApplyDisplayMode(displayMode);
+                                        handleApplyPreset(template);
+                                    }}
+                                />
+                            </div>
+                            {props.index && (
+                                <div className={style.title}>
+                                    Рабочий стол {props.index}
+                                </div>
+                            )}
+                            {props.onDelete && (
+                                <div className={style.actions}>
+                                    <IconButton
+                                        size="small"
+                                        color="secondary"
+                                        onClick={handleDelete}
+                                    >
+                                        <Clear />
+                                    </IconButton>
+                                </div>
                             )}
                         </>
                     )}

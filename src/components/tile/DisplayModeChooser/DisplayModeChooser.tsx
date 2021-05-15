@@ -1,3 +1,5 @@
+import { SVGIcon } from "@algont/m7-ui";
+import { floatWindowMode } from "assets/icons";
 import classNames from "classnames";
 import { DisplayModeChooseItem } from "components/display/DisplayModeChooseItem/DisplayModeChooseItem";
 import { useStore } from "hooks/useStore";
@@ -5,17 +7,13 @@ import { observer } from "mobx-react";
 import { DisplayMode } from "models/display/DisplayMode";
 import { DisplayModeType } from "models/display/DisplayModeType";
 import { TileTemplate } from "models/tile/TileTemplate";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { TileChooserItem } from "../TileChooserItem/TileChooserItem";
 import style from "./style.module.css";
 
 const className = style.displayModeChooser;
 
 interface IDisplayModeChooserProps {
-    // show: boolean;
-    // onApplyTileDisplayMode: (template: TileTemplate) => void;
-    // onApplyFloatedDisplayMode: () => void;
-    // templates: TileTemplate[];
     onSelectTileMode: (
         displayMode: DisplayMode,
         template: TileTemplate,
@@ -39,6 +37,8 @@ export const DisplayModeChooser = observer(
         const store = useStore();
         const [isShow, setShow] = useState(false);
 
+        const ref = useRef<HTMLDivElement | null>(null);
+
         const floatDisplayMode = useMemo(
             () => store.display.findDisplayModeByType(DisplayModeType.Float),
             [],
@@ -60,9 +60,7 @@ export const DisplayModeChooser = observer(
 
         const handleSelectFloatMode = (alias: string) => {
             setActiveItem(alias);
-            // if (id !== activeItem) {
             props.onSelectFloatMode(floatDisplayMode!);
-            // }
             setShow(false);
         };
 
@@ -75,7 +73,13 @@ export const DisplayModeChooser = observer(
                 />
             );
 
-            const getFloatView = () => "нет";
+            const getFloatView = () => (
+                <SVGIcon
+                    color="rgb(255,255,255,0.5)"
+                    size={{ width: "24px", height: "16px" }}
+                    source={floatWindowMode}
+                />
+            );
 
             if (floatDisplayMode && tileDisplayMode) {
                 const tiles = store.tile.templates.map((item) => ({
@@ -104,8 +108,24 @@ export const DisplayModeChooser = observer(
             props.presetAlias ?? "none",
         );
 
+        const handleClickAway = (e: MouseEvent) => {
+            const target = e.target as Element;
+
+            if (ref.current && ref.current.contains(target)) {
+                return;
+            }
+            setShow(false);
+        };
+
+        useEffect(() => {
+            document.addEventListener("mousedown", handleClickAway);
+
+            return () =>
+                document.removeEventListener("mousedown", handleClickAway);
+        }, []);
+
         return (
-            <div className={style.displayModeChooser}>
+            <div className={style.displayModeChooser} ref={ref}>
                 <div className={style.preview} onClick={() => setShow(!isShow)}>
                     <DisplayModeChooseItem active={isShow}>
                         {

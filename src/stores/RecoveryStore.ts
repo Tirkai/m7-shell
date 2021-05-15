@@ -103,10 +103,15 @@ export class RecoveryStore {
                         (tmp) => tmp.alias === item.templateAlias,
                     ) ?? this.store.tile.defaultTileTemplate;
 
-                return new VirtualViewportModel({
+                const preset = TileFactory.createTilePreset(template);
+
+                const viewport = new VirtualViewportModel({
                     id: item.viewportId,
-                    tilePreset: TileFactory.createTilePreset(template),
                 });
+
+                viewport.setTilePreset(preset);
+
+                return viewport;
             });
 
             const defaultTileTemplate = this.store.tile.templates.find(

@@ -198,8 +198,15 @@ export class VirtualViewportManager {
         viewport.setTilePreset(preset);
     }
 
+    applyViewportToWindow(
+        viewport: VirtualViewportModel,
+        appWindow: ApplicationWindow,
+    ) {
+        appWindow.setViewport(viewport);
+    }
+
     onInstantiateProcess(process: ApplicationProcess) {
-        process.window.setViewport(this.currentViewport);
+        this.applyViewportToWindow(this.currentViewport, process.window);
     }
 
     onRemoveViewportFrame(viewport: VirtualViewportModel) {
@@ -225,7 +232,7 @@ export class VirtualViewportManager {
         const newViewport = new VirtualViewportModel();
 
         processes.forEach((appProcess) => {
-            appProcess.window.setViewport(newViewport);
+            this.applyViewportToWindow(newViewport, appProcess.window);
         });
 
         this.insertViewport(newViewport, current);
@@ -242,7 +249,7 @@ export class VirtualViewportManager {
 
                 appWindow.setArea("auto");
 
-                appProcess.window.setViewport(newViewport);
+                this.applyViewportToWindow(newViewport, appProcess.window);
             });
             this.insertViewport(newViewport, this.currentViewport);
         });
@@ -253,7 +260,7 @@ export class VirtualViewportManager {
         this.setCurrentViewport(appWindow.viewport);
     }
 
-    addViewport(viewport: VirtualViewportModel, preset?: TilePreset) {
+    addViewport(viewport: VirtualViewportModel) {
         this.viewports.push(viewport);
 
         this.setCurrentViewport(viewport);

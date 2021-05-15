@@ -55,7 +55,9 @@ export const RecoveryDialog = (props: IRecoveryDialogProps) => (
             </List>
         </DialogContent>
         <DialogActions>
-            <Button onClick={() => props.onCancel()}>Начать сначала</Button>
+            <Button onClick={() => props.onCancel()} color="primary">
+                Начать сначала
+            </Button>
             <Button onClick={() => props.onRecovery()} color="primary">
                 Восстановить
             </Button>

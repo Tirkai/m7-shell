@@ -20,6 +20,7 @@ interface ITileWindowProps {
     onDragEnd: () => void;
     onClose: (appWindow: ApplicationWindow) => void;
     onDrag: DraggableEventHandler;
+    onFullscreen?: () => void;
     url: string;
     area: string;
 }
@@ -57,6 +58,7 @@ export const TileWindow = observer((props: ITileWindowProps) => {
                     icon={props.process.app.icon}
                     title={props.process.app.name}
                     isFocused={props.isFocused}
+                    onFullscreen={props.onFullscreen}
                     onClose={() => props.onClose(props.window)}
                     visible
                 />

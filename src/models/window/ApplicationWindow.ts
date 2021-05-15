@@ -12,8 +12,6 @@ import { makeAutoObservable } from "mobx";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ResizeHandle } from "react-resizable";
 import { v4 } from "uuid";
-import { EventBus } from "../event/EventBus";
-import { ApplicationWindowEventType } from "./ApplicationWindowEventType";
 import { ApplicationWindowType } from "./ApplicationWindowType";
 import { IApplicationWindow } from "./IApplicationWindow";
 
@@ -37,9 +35,10 @@ export class ApplicationWindow implements IApplicationWindow {
     isDragging: boolean = false;
     isResizing: boolean = false;
     viewport: VirtualViewportModel;
+    offsetIndex: number;
     area: string;
 
-    eventTarget: EventBus = new EventBus();
+    // eventTarget: EventBus = new EventBus();
 
     get minYPosition() {
         return this.y + this.height - MIN_WINDOW_HEIGHT;
@@ -80,6 +79,7 @@ export class ApplicationWindow implements IApplicationWindow {
         this.lockedX = this.x;
         this.lockedY = this.y;
         this.depthIndex = options.depthIndex ?? 1;
+        this.offsetIndex = 0;
 
         this.initialize(options);
 
@@ -101,6 +101,7 @@ export class ApplicationWindow implements IApplicationWindow {
                 this.lockedHeight = this.height;
                 this.lockedX = this.x;
                 this.lockedY = this.y;
+                this.offsetIndex = options.offsetIndex ?? 0;
 
                 // this.setArea("auto");
 
@@ -117,18 +118,11 @@ export class ApplicationWindow implements IApplicationWindow {
     }
 
     calculatePosition(options?: { withShuffle: boolean }) {
-        const getShuffleModifier = () => Math.ceil((this.depthIndex - 1) * 5);
+        const getShuffleModifier = () => Math.ceil(this.offsetIndex * 30);
 
-        console.log(
-            `DEPTH_INDEX: ${this.depthIndex}, SHUFFLE: ${getShuffleModifier()}`,
-        );
+        const x = 100 + getShuffleModifier();
+        const y = 100 + getShuffleModifier();
 
-        const x =
-            Math.floor(window.innerWidth / 2 - this.width / 2) +
-            getShuffleModifier();
-        const y =
-            Math.floor(window.innerHeight / 2 - this.height / 2) +
-            getShuffleModifier();
         return [x, y];
     }
 
@@ -139,20 +133,20 @@ export class ApplicationWindow implements IApplicationWindow {
     setDragging(value: boolean) {
         this.isDragging = value;
 
-        this.eventTarget.dispatch<ApplicationWindow>(
-            ApplicationWindowEventType.OnDragChange,
-            this,
-        );
+        // this.eventTarget.dispatch<ApplicationWindow>(
+        //     ApplicationWindowEventType.OnDragChange,
+        //     this,
+        // );
     }
 
     setPosition(x: number, y: number) {
         this.x = Math.floor(x);
         this.y = Math.floor(y);
 
-        this.eventTarget.dispatch<ApplicationWindow>(
-            ApplicationWindowEventType.OnPositionChange,
-            this,
-        );
+        // this.eventTarget.dispatch<ApplicationWindow>(
+        //     ApplicationWindowEventType.OnPositionChange,
+        //     this,
+        // );
     }
 
     setSize(width: number, height: number) {
@@ -160,10 +154,10 @@ export class ApplicationWindow implements IApplicationWindow {
         this.width = Math.floor(w);
         this.height = Math.floor(h);
 
-        this.eventTarget.dispatch<ApplicationWindow>(
-            ApplicationWindowEventType.OnResize,
-            this,
-        );
+        // this.eventTarget.dispatch<ApplicationWindow>(
+        //     ApplicationWindowEventType.OnResize,
+        //     this,
+        // );
     }
 
     setResizeOriginPoint(x: number, y: number) {
@@ -233,20 +227,20 @@ export class ApplicationWindow implements IApplicationWindow {
     setFullScreen(value: boolean) {
         this.isFullScreen = value;
 
-        this.eventTarget.dispatch<ApplicationWindow>(
-            ApplicationWindowEventType.OnFullscreen,
-            this,
-        );
+        // this.eventTarget.dispatch<ApplicationWindow>(
+        //     ApplicationWindowEventType.OnFullscreen,
+        //     this,
+        // );
     }
 
     setCollapsed(value: boolean) {
         this.isFocused = false;
         this.isCollapsed = value;
 
-        this.eventTarget.dispatch<ApplicationWindow>(
-            ApplicationWindowEventType.OnCollapse,
-            this,
-        );
+        // this.eventTarget.dispatch<ApplicationWindow>(
+        //     ApplicationWindowEventType.OnCollapse,
+        //     this,
+        // );
     }
 
     recalculateFullScreenSize() {

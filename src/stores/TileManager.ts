@@ -119,6 +119,15 @@ export class TileManager {
         return preset.cells.find((cell) => cell.attachedAppWindow?.id === id);
     }
 
+    findTileTemplateByAlias(alias: string) {
+        const template = this.templates.find((item) => item.alias === alias);
+        console.log(`FIND_TILE_TEMPLATE_BY_ALIAS`, { alias }, this.templates, {
+            template,
+        });
+
+        return template;
+    }
+
     onWindowClose(appWindow: ApplicationWindow) {
         const preset = this.store.virtualViewport.currentViewport.tilePreset;
         if (preset) {
@@ -168,6 +177,17 @@ export class TileManager {
                 { preset: createdPreset, viewport },
             );
         }
+    }
+
+    detachWindowFromCells(appWindow: ApplicationWindow, tileCells: TileCell[]) {
+        const tileCell = tileCells.find(
+            (item) => item.attachedAppWindow?.id === appWindow.id,
+        );
+        tileCell?.setAttachedAppWindow(null);
+        this.store.sharedEventBus.eventBus.dispatch(
+            TileEventType.OnDetachWindow,
+            { appWindow, tileCell },
+        );
     }
 
     attachWindowToCell(

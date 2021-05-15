@@ -13,4 +13,5 @@ export interface IApplicationWindowOptions {
     viewport: VirtualViewportModel;
     area?: string;
     depthIndex?: number;
+    offsetIndex?: number;
 }

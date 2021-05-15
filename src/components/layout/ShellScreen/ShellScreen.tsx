@@ -1,17 +1,11 @@
-// import { AudioContainer } from "components/audio/AudioContainer/AudioContainer";
-// import { AudioHub } from "components/audio/AudioHub/AudioHub";
 import { ShellContextMenu } from "components/contextMenu/ShellContextMenu/ShellContextMenu";
 import { ShellContextMenuOverlay } from "components/contextMenu/ShellContextMenuOverlay/ShellContextMenuOverlay";
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
 import { DesktopContainer } from "components/desktop/DesktopContainer/DesktopContainer";
-// import { DesktopForeground } from "components/desktop/DesktopForeground/DesktopForeground";
 import { DesktopLayer } from "components/layer/DesktopLayer/DesktopLayer";
-// import { NotificationHub } from "components/notifications/NotificationHub/NotificationHub";
-// import { NotificationToasts } from "components/notifications/NotificationToasts/NotificationToasts";
 import { RecoveryDialog } from "components/recovery/RecoveryDialog/RecoveryDialog";
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
-// import { VirtualDesktopHub } from "components/virtual/VirtualDesktopHub/VirtualDesktopHub";
 import { VirtualFrame } from "components/virtual/VirtualFrame/VirtualFrame";
 import { VirtualViewport } from "components/virtual/VirtualViewport/VirtualViewport";
 import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/AppWindowPinContainer";
@@ -132,13 +126,7 @@ export class ShellScreen extends Component<IStore> {
                 <DesktopLayout
                     desktop={
                         <DesktopContainer>
-                            <VirtualViewport
-                                displayed={
-                                    true
-                                    // this.store.shell.activePanel !==
-                                    // ShellPanelType.Virtual
-                                }
-                            >
+                            <VirtualViewport displayed={true}>
                                 {this.store.virtualViewport.viewports.map(
                                     (viewport) => (
                                         <VirtualFrame

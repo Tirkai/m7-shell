@@ -1,13 +1,13 @@
-import { SVGIcon } from "@algont/m7-ui";
 import { Add } from "@material-ui/icons";
 import { BaseHub } from "components/hub/BaseHub/BaseHub";
-import { TileAppPreviewGrid } from "components/tile/TileAppPreviewGrid/TileAppPreviewGrid";
-import { TileAppPreviewItem } from "components/tile/TileAppPreviewItem/TileAppPreviewItem";
+import { ViewportAppTilePreview } from "components/virtual/ViewportAppTilePreview/ViewportAppTilePreview";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
+import { DisplayModeType } from "models/display/DisplayModeType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import React from "react";
+import { ViewportAppWindowPreview } from "../ViewportAppWindowPreview/ViewportAppWindowPreview";
 import { VirtualFrameList } from "../VirtualFrameList/VirtualFrameList";
 import { VirtualFramePreview } from "../VirtualFramePreview/VirtualFramePreview";
 import style from "./style.module.css";
@@ -23,15 +23,18 @@ export const VirtualDesktopHub = observer(() => {
     };
 
     const handleCreateViewport = () => {
-        const current = store.virtualViewport.currentViewport;
-
         const viewport = new VirtualViewportModel();
-        store.virtualViewport.addViewport(viewport, current.tilePreset);
+        store.virtualViewport.addViewport(viewport);
     };
 
     const handleRemoveViewport = (viewport: VirtualViewportModel) => {
         store.virtualViewport.removeViewport(viewport);
     };
+
+    const getProcessesByViewport = (viewport: VirtualViewportModel) =>
+        store.processManager.processes.filter(
+            (process) => process.window.viewport.id === viewport.id,
+        );
 
     return (
         <BaseHub
@@ -46,71 +49,60 @@ export const VirtualDesktopHub = observer(() => {
                                 count={store.virtualViewport.viewports.length}
                             >
                                 {/* TODO: Refactor  */}
-                                {store.virtualViewport.viewports.map((item) => (
-                                    <VirtualFramePreview
-                                        key={item.id}
-                                        onClick={() => handleSetViewport(item)}
-                                        active={
-                                            store.virtualViewport
-                                                .currentViewport?.id === item.id
-                                        }
-                                        onDelete={() =>
-                                            handleRemoveViewport(item)
-                                        }
-                                        hideDeleteControl={
-                                            store.virtualViewport.viewports
-                                                .length <= 1
-                                        }
-                                        templates={store.tile.templates}
-                                        preset={item.tilePreset}
-                                        viewport={item}
-                                    >
-                                        <TileAppPreviewGrid
-                                            enabledTiles={
-                                                item.displayMode
-                                                    .enableTileAttach
+                                {store.virtualViewport.viewports.map(
+                                    (item, index) => (
+                                        <VirtualFramePreview
+                                            index={index + 1}
+                                            key={item.id}
+                                            onClick={() =>
+                                                handleSetViewport(item)
                                             }
-                                            areas={item.tilePreset.areas}
-                                            columns={item.tilePreset.columns}
-                                            rows={item.tilePreset.rows}
+                                            active={
+                                                store.virtualViewport
+                                                    .currentViewport?.id ===
+                                                item.id
+                                            }
+                                            onDelete={
+                                                store.virtualViewport.viewports
+                                                    .length > 1
+                                                    ? () =>
+                                                          handleRemoveViewport(
+                                                              item,
+                                                          )
+                                                    : undefined
+                                            }
+                                            hasControls
+                                            viewport={item}
                                         >
-                                            {store.processManager.processes
-                                                .filter(
-                                                    (process) =>
-                                                        process.window.viewport
-                                                            .id === item.id,
-                                                )
-                                                .map((process) => (
-                                                    <TileAppPreviewItem
-                                                        key={process.id}
-                                                        area={
-                                                            process.window.area
-                                                        }
-                                                        icon={
-                                                            <SVGIcon
-                                                                source={
-                                                                    process.app
-                                                                        .icon
-                                                                }
-                                                                size={{
-                                                                    width:
-                                                                        "32px",
-                                                                    height:
-                                                                        "32px",
-                                                                }}
-                                                                color="white"
-                                                            />
-                                                        }
-                                                        title={process.app.name}
-                                                    />
-                                                ))}
-                                        </TileAppPreviewGrid>
-                                    </VirtualFramePreview>
-                                ))}
+                                            {item.displayMode.type ===
+                                                DisplayModeType.Tile && (
+                                                <ViewportAppTilePreview
+                                                    areas={
+                                                        item.tilePreset.areas
+                                                    }
+                                                    columns={
+                                                        item.tilePreset.columns
+                                                    }
+                                                    rows={item.tilePreset.rows}
+                                                    processes={getProcessesByViewport(
+                                                        item,
+                                                    )}
+                                                />
+                                            )}
+                                            {item.displayMode.type ===
+                                                DisplayModeType.Float && (
+                                                <ViewportAppWindowPreview
+                                                    processes={getProcessesByViewport(
+                                                        item,
+                                                    )}
+                                                />
+                                            )}
+                                        </VirtualFramePreview>
+                                    ),
+                                )}
                                 <VirtualFramePreview
                                     onClick={handleCreateViewport}
                                     active={false}
-                                    templates={[]}
                                 >
                                     <Add />
                                 </VirtualFramePreview>

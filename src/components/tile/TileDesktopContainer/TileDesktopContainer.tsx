@@ -1,12 +1,16 @@
+import classNames from "classnames";
 import { TileWindow } from "components/window/TileWindow/TileWindow";
+import { TileFactory } from "factories/TileFactory";
 import { useStore } from "hooks/useStore";
 import { get } from "lodash";
 import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
+import { DisplayModeType } from "models/display/DisplayModeType";
 import { TileCell } from "models/tile/TileCell";
 import { TilePreset } from "models/tile/TilePreset";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { IApplicationWindow } from "models/window/IApplicationWindow";
 import React, { useEffect } from "react";
@@ -82,11 +86,49 @@ export const TileDesktopContainer = observer(
             );
         };
 
+        const handleFullscreen = (appWindow: ApplicationWindow) => {
+            const displayMode = store.display.findDisplayModeByType(
+                DisplayModeType.Tile,
+            );
+            const template = store.tile.findTileTemplateByAlias("1x1");
+
+            if (displayMode && template) {
+                const tilePreset = TileFactory.createTilePreset(template);
+
+                store.tile.detachWindowFromCells(
+                    appWindow,
+                    store.virtualViewport.currentViewport.tilePreset.cells,
+                );
+
+                const viewport = new VirtualViewportModel({
+                    displayMode,
+                });
+
+                store.virtualViewport.insertViewport(
+                    viewport,
+                    store.virtualViewport.currentViewport,
+                );
+
+                store.tile.applyPresetToViewport(template, viewport);
+
+                store.virtualViewport.applyViewportToWindow(
+                    viewport,
+                    appWindow,
+                );
+            }
+        };
+
         const gridStyles = {
             gridTemplateColumns: `repeat(${props.preset.columns},1fr)`,
             gridTemplateRows: `repeat(${props.preset.rows},1fr)`,
             gridTemplateAreas: props.preset.areas,
         };
+
+        const processes = store.processManager.processes.filter(
+            (process) =>
+                (process.window.viewport.id === props.viewport?.id ?? true) &&
+                process.window.type === ApplicationWindowType.Tile,
+        );
 
         return props.preset ? (
             <div className={className}>
@@ -113,38 +155,37 @@ export const TileDesktopContainer = observer(
                             ))}
                         </div>
                     )}
-                    <div className={style.appsArea} style={gridStyles}>
-                        {store.processManager.processes
-                            .filter(
-                                (process) =>
-                                    (process.window.viewport.id ===
-                                        props.viewport?.id ??
-                                        true) &&
-                                    process.window.type ===
-                                        ApplicationWindowType.Tile,
-                            )
-                            .map((process) => (
-                                <TileWindow
-                                    key={process.id}
-                                    process={process}
-                                    window={process.window}
-                                    url={process.modifiedUrl}
-                                    isFocused={process.window.isFocused}
-                                    area={process.window.area}
-                                    onClose={() => handleClose(process)}
-                                    onDragStart={() =>
-                                        handleDragStart(process.window)
-                                    }
-                                    onDragEnd={() =>
-                                        handleDragEnd(process.window)
-                                    }
-                                    onDrag={(event, data) =>
-                                        handleDrag(process.window, event, data)
-                                    }
-                                    x={process.window.x}
-                                    y={process.window.y}
-                                />
-                            ))}
+                    <div
+                        className={classNames(style.appsArea, {
+                            [style.single]: props.preset.maxTilesCount <= 1,
+                        })}
+                        style={gridStyles}
+                    >
+                        {processes.map((process) => (
+                            <TileWindow
+                                key={process.id}
+                                process={process}
+                                window={process.window}
+                                url={process.modifiedUrl}
+                                isFocused={process.window.isFocused}
+                                area={process.window.area}
+                                onClose={() => handleClose(process)}
+                                onDragStart={() =>
+                                    handleDragStart(process.window)
+                                }
+                                onDragEnd={() => handleDragEnd(process.window)}
+                                onDrag={(event, data) =>
+                                    handleDrag(process.window, event, data)
+                                }
+                                onFullscreen={
+                                    props.preset.maxTilesCount > 1
+                                        ? () => handleFullscreen(process.window)
+                                        : undefined
+                                }
+                                x={process.window.x}
+                                y={process.window.y}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>
