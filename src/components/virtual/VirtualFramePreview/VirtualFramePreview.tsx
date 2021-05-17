@@ -73,7 +73,7 @@ export const VirtualFramePreview = observer(
                                 <DisplayModeChooser
                                     displayMode={props.viewport?.displayMode}
                                     presetAlias={
-                                        props.viewport?.tilePreset.alias
+                                        props.viewport?.tilePreset?.alias
                                     }
                                     onSelectFloatMode={(displayMode) =>
                                         handleApplyDisplayMode(displayMode)

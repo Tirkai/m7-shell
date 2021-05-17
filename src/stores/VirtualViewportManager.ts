@@ -126,7 +126,7 @@ export class VirtualViewportManager {
                     .alias,
                 viewports: this.viewports.map((item) => ({
                     viewportId: item.id,
-                    templateAlias: item.tilePreset.alias,
+                    templateAlias: item.tilePreset?.alias ?? "1x1",
                 })),
             },
         };

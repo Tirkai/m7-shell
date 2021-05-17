@@ -88,12 +88,17 @@ export const VirtualDesktopHub = observer(() => {
                                                 DisplayModeType.Tile && (
                                                 <ViewportAppTilePreview
                                                     areas={
-                                                        item.tilePreset.areas
+                                                        item.tilePreset
+                                                            ?.areas ?? "a"
                                                     }
                                                     columns={
-                                                        item.tilePreset.columns
+                                                        item.tilePreset
+                                                            ?.columns ?? 0
                                                     }
-                                                    rows={item.tilePreset.rows}
+                                                    rows={
+                                                        item.tilePreset?.rows ??
+                                                        0
+                                                    }
                                                     processes={getProcessesByViewport(
                                                         item,
                                                     )}

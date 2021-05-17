@@ -87,7 +87,7 @@ export class TileManager {
         const currentPreset = this.store.virtualViewport.currentViewport
             .tilePreset;
 
-        const sourceCell = currentPreset.cells.find(
+        const sourceCell = currentPreset?.cells.find(
             (cell) => cell.attachedAppWindow?.id === tileWindow.id,
         );
 
@@ -95,7 +95,7 @@ export class TileManager {
             this.detachWindowFromCell(sourceCell);
         }
 
-        if (this.activeCell) {
+        if (this.activeCell && currentPreset && sourceCell) {
             if (this.activeCell.attachedAppWindow) {
                 const sourceAttachedWindow = this.activeCell.attachedAppWindow;
 
@@ -154,7 +154,7 @@ export class TileManager {
 
         if (!isFullscreen) {
             if (displayMode?.enableTileAttach && !isFullscreen) {
-                if (preset.freeCells.length) {
+                if (preset?.freeCells.length) {
                     const tileCell = preset.nearbyFreeCell;
                     const appWindow = appProcess.window;
 
@@ -184,7 +184,7 @@ export class TileManager {
             );
 
             if (template) {
-                if (preset.isEmptyPreset) {
+                if (preset?.isEmptyPreset) {
                     this.store.tile.applyPresetToViewport(
                         template,
                         newViewport,

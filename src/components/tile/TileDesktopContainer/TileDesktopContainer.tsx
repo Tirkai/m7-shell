@@ -19,7 +19,7 @@ import { TileDesktopArea } from "../TileDesktopArea/TileDesktopArea";
 import style from "./style.module.css";
 
 interface ITileDesktopContainerProps {
-    preset: TilePreset;
+    preset?: TilePreset;
     viewport: VirtualViewportModel;
 }
 
@@ -30,6 +30,9 @@ export const TileDesktopContainer = observer(
         const store = useStore();
 
         const draggedWindow = store.windowManager.draggedWindow;
+
+        const currentViewportPreset =
+            store.virtualViewport.currentViewport.tilePreset;
 
         useEffect(() => {
             const preset = props.preset;
@@ -91,11 +94,10 @@ export const TileDesktopContainer = observer(
                 DisplayModeType.Tile,
             );
             const template = store.tile.findTileTemplateByAlias("1x1");
-
-            if (displayMode && template) {
+            if (displayMode && template && currentViewportPreset) {
                 store.tile.detachWindowFromCells(
                     appWindow,
-                    store.virtualViewport.currentViewport.tilePreset.cells,
+                    currentViewportPreset.cells,
                 );
 
                 const viewport = new VirtualViewportModel({
@@ -117,9 +119,10 @@ export const TileDesktopContainer = observer(
         };
 
         const gridStyles = {
-            gridTemplateColumns: `repeat(${props.preset.columns},1fr)`,
-            gridTemplateRows: `repeat(${props.preset.rows},1fr)`,
-            gridTemplateAreas: props.preset.areas,
+            gridTemplateColumns: `repeat(${currentViewportPreset?.columns ??
+                0},1fr)`,
+            gridTemplateRows: `repeat(${props.preset?.rows ?? 0},1fr)`,
+            gridTemplateAreas: props.preset?.areas,
         };
 
         const processes = store.processManager.processes.filter(
@@ -128,7 +131,7 @@ export const TileDesktopContainer = observer(
                 process.window.type === ApplicationWindowType.Tile,
         );
 
-        return props.preset ? (
+        return currentViewportPreset ? (
             <div className={className}>
                 <div
                     className={style.container}
@@ -136,7 +139,7 @@ export const TileDesktopContainer = observer(
                     onClick={handleAreaClick}
                 >
                     <DebugPanel>
-                        {props.preset.cells.map((item) => (
+                        {props.preset?.cells.map((item) => (
                             <div>
                                 CellID: {item.id} WindowID:{" "}
                                 {item.attachedAppWindow?.id}
@@ -152,7 +155,7 @@ export const TileDesktopContainer = observer(
                                 pointerEvents: draggedWindow ? "all" : "none",
                             }}
                         >
-                            {props.preset.cells.map((cell) => (
+                            {props.preset?.cells.map((cell) => (
                                 <TileDesktopArea
                                     key={cell.id}
                                     cell={cell}
@@ -164,7 +167,8 @@ export const TileDesktopContainer = observer(
                     )}
                     <div
                         className={classNames(style.appsArea, {
-                            [style.single]: props.preset.maxTilesCount <= 1,
+                            [style.single]:
+                                (props.preset?.maxTilesCount ?? 0) <= 1,
                         })}
                         style={gridStyles}
                     >
@@ -185,7 +189,7 @@ export const TileDesktopContainer = observer(
                                     handleDrag(process.window, event, data)
                                 }
                                 onFullscreen={
-                                    props.preset.maxTilesCount > 1
+                                    (props.preset?.maxTilesCount ?? 0) > 1
                                         ? () => handleFullscreen(process.window)
                                         : undefined
                                 }

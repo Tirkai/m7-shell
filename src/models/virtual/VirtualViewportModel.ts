@@ -1,4 +1,3 @@
-import { TileFactory } from "factories/TileFactory";
 import { makeAutoObservable } from "mobx";
 import { DisplayMode } from "models/display/DisplayMode";
 import { TilePreset } from "models/tile/TilePreset";
@@ -16,17 +15,14 @@ export class VirtualViewportModel {
     index: number;
     displayMode?: DisplayMode;
 
-    tilePreset: TilePreset;
+    tilePreset?: TilePreset;
 
     constructor(options?: IVirtualViewportOptions) {
         this.id = options?.id ?? v4();
         this.index = options?.index ?? 0;
-        this.tilePreset =
-            options?.tilePreset ?? TileFactory.createEmptyPreset();
+        this.tilePreset = options?.tilePreset;
         makeAutoObservable(this);
 
-        // TODO: Move
-        // Default Display Mode
         this.displayMode = options?.displayMode;
     }
 
