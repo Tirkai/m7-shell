@@ -105,7 +105,9 @@ export const DisplayModeChooser = observer(
         }, []);
 
         const [activeItem, setActiveItem] = useState(
-            props.presetAlias ?? "none",
+            props.displayMode?.type === DisplayModeType.Tile
+                ? props.presetAlias
+                : "none",
         );
 
         const handleClickAway = (e: MouseEvent) => {

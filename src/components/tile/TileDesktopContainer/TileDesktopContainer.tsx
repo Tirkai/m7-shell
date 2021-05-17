@@ -138,7 +138,7 @@ export const TileDesktopContainer = observer(
                     style={gridStyles}
                     onClick={handleAreaClick}
                 >
-                    <DebugPanel>
+                    <DebugPanel show={false}>
                         {props.preset?.cells.map((item) => (
                             <div>
                                 CellID: {item.id} WindowID:{" "}
