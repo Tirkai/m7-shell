@@ -107,6 +107,7 @@ export class RecoveryStore {
 
                 const viewport = new VirtualViewportModel({
                     id: item.viewportId,
+                    displayMode: this.store.display.defaultDisplayMode,
                 });
 
                 viewport.setTilePreset(preset);

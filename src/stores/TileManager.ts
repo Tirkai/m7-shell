@@ -153,7 +153,7 @@ export class TileManager {
         const isFullscreen = appProcess.window.isFullScreen;
 
         if (!isFullscreen) {
-            if (displayMode.enableTileAttach && !isFullscreen) {
+            if (displayMode?.enableTileAttach && !isFullscreen) {
                 if (preset.freeCells.length) {
                     const tileCell = preset.nearbyFreeCell;
                     const appWindow = appProcess.window;

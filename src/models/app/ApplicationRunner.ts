@@ -3,6 +3,7 @@ import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ExternalApplication } from "models/ExternalApplication";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
+import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { AppStore } from "stores/AppStore";
 
 interface IApplicationRunnerOptions {
@@ -34,15 +35,17 @@ export class ApplicationRunner {
 
             const appWindow = WindowFactory.createWindow(
                 {
-                    type: viewport.displayMode.windowType,
+                    type:
+                        viewport.displayMode?.windowType ??
+                        ApplicationWindowType.Unknown,
                     viewport,
                 },
                 this.store,
             );
 
-            // const appWindow = this.store.display.displayMode.windowInstantiateStrategy.instantiate(
-            //     options?.viewport ?? this.store.virtualViewport.currentViewport,
-            // );
+            if (appWindow.type === ApplicationWindowType.Unknown) {
+                alert("Unknown application window type");
+            }
 
             const appProcess = new ApplicationProcess({
                 app,

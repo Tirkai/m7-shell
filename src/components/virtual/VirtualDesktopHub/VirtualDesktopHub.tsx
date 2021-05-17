@@ -24,9 +24,11 @@ export const VirtualDesktopHub = observer(() => {
     };
 
     const handleCreateViewport = () => {
-        const viewport = new VirtualViewportModel();
+        const viewport = new VirtualViewportModel({
+            displayMode: store.display.defaultDisplayMode,
+        });
 
-        viewport.setDisplayMode(store.display.defaultDisplayMode);
+        // viewport.setDisplayMode();
 
         viewport.setTilePreset(
             TileFactory.createTilePreset(store.tile.defaultTileTemplate),
@@ -82,7 +84,7 @@ export const VirtualDesktopHub = observer(() => {
                                             hasControls
                                             viewport={item}
                                         >
-                                            {item.displayMode.type ===
+                                            {item.displayMode?.type ===
                                                 DisplayModeType.Tile && (
                                                 <ViewportAppTilePreview
                                                     areas={
@@ -97,7 +99,7 @@ export const VirtualDesktopHub = observer(() => {
                                                     )}
                                                 />
                                             )}
-                                            {item.displayMode.type ===
+                                            {item.displayMode?.type ===
                                                 DisplayModeType.Float && (
                                                 <ViewportAppWindowPreview
                                                     processes={getProcessesByViewport(

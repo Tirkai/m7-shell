@@ -144,7 +144,7 @@ export const TileDesktopContainer = observer(
                         ))}
                     </DebugPanel>
 
-                    {props.viewport.displayMode.enableTileAttach && (
+                    {props.viewport.displayMode?.enableTileAttach && (
                         <div
                             className={style.floatedArea}
                             style={{

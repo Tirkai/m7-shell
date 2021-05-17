@@ -47,6 +47,7 @@ export class AppStore {
     constructor() {
         this.sharedEventBus = new SharedEventBus(this);
         this.userDatabase = new UserDatabaseManager(this);
+        this.display = new DisplayManager(this);
         this.dateTime = new DateTimeStore(this);
         this.processManager = new ProcessManagerStore(this);
         this.applicationManager = new ApplicationManagerStore(this);
@@ -64,7 +65,6 @@ export class AppStore {
         this.pin = new PinManager(this);
         this.virtualViewport = new VirtualViewportManager(this);
         this.hotkey = new HotkeyStore(this);
-        this.display = new DisplayManager(this);
         this.auth = new AuthStore(this);
         this.recovery = new RecoveryStore(this);
 

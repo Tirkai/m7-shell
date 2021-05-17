@@ -100,19 +100,16 @@ export class VirtualViewportManager {
             this.onLogout(),
         );
 
-        // this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogin, () =>
-        //     this.onLogin(),
-        // );
-        const initialViewport = new VirtualViewportModel();
-
-        this.addViewport(initialViewport);
-        // this.viewports = [initialViewport];
-        // this.setCurrentViewport(initialViewport);
-
         this.store.sharedEventBus.eventBus.add(
             TileEventType.OnChangePreset,
             () => this.saveUserViewports(),
         );
+
+        const initialViewport = new VirtualViewportModel({
+            displayMode: this.store.display.defaultDisplayMode,
+        });
+
+        this.addViewport(initialViewport);
 
         makeAutoObservable(this);
     }
@@ -232,7 +229,9 @@ export class VirtualViewportManager {
             appWindows: ApplicationWindow[],
         ) =>
             new Promise<VirtualViewportModel>((resolve) => {
-                const newViewport = new VirtualViewportModel();
+                const newViewport = new VirtualViewportModel({
+                    displayMode: this.store.display.defaultDisplayMode,
+                });
 
                 appWindows.forEach((appWindow) => {
                     this.applyViewportToWindow(newViewport, appWindow);
@@ -256,7 +255,9 @@ export class VirtualViewportManager {
     }
 
     onTileViewportOverflow(excessProcess: ApplicationProcess) {
-        const newViewport = new VirtualViewportModel();
+        const newViewport = new VirtualViewportModel({
+            displayMode: this.store.display.defaultDisplayMode,
+        });
         this.insertViewport(newViewport, this.currentViewport);
         this.applyViewportToWindow(newViewport, excessProcess.window);
     }
@@ -266,7 +267,9 @@ export class VirtualViewportManager {
         viewport: VirtualViewportModel,
     ) {
         chunks.forEach((processesChunk) => {
-            const newViewport = new VirtualViewportModel();
+            const newViewport = new VirtualViewportModel({
+                displayMode: this.store.display.defaultDisplayMode,
+            });
             processesChunk.forEach((appProcess) => {
                 const appWindow = appProcess.window;
 
