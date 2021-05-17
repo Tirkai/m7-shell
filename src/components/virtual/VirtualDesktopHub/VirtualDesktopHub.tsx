@@ -2,6 +2,7 @@ import { Add } from "@material-ui/icons";
 import { BaseHub } from "components/hub/BaseHub/BaseHub";
 import { ViewportAppTilePreview } from "components/virtual/ViewportAppTilePreview/ViewportAppTilePreview";
 import { ShellPanelType } from "enum/ShellPanelType";
+import { TileFactory } from "factories/TileFactory";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { DisplayModeType } from "models/display/DisplayModeType";
@@ -24,6 +25,13 @@ export const VirtualDesktopHub = observer(() => {
 
     const handleCreateViewport = () => {
         const viewport = new VirtualViewportModel();
+
+        viewport.setDisplayMode(store.display.defaultDisplayMode);
+
+        viewport.setTilePreset(
+            TileFactory.createTilePreset(store.tile.defaultTileTemplate),
+        );
+
         store.virtualViewport.addViewport(viewport);
     };
 

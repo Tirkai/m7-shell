@@ -1,4 +1,3 @@
-import { TileFactory } from "factories/TileFactory";
 import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { DisplayMode } from "models/display/DisplayMode";
@@ -16,6 +15,10 @@ import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { TileWindowModel } from "models/window/TileWindowModel";
 import { registeredTileTemplates } from "registeredTilePresets";
 import { AppStore } from "stores/AppStore";
+
+interface IApplyPresetToViewportOptions {
+    applyDefaultPreset?: boolean;
+}
 
 export class TileManager {
     private store: AppStore;
@@ -111,8 +114,7 @@ export class TileManager {
     }
 
     onAddViewportFrame(viewport: VirtualViewportModel) {
-        const preset = TileFactory.createTilePreset(this.defaultTileTemplate);
-        viewport.setTilePreset(preset);
+        this.applyPresetToViewport(this.defaultTileTemplate, viewport);
     }
 
     findCellInPresetByAttacheWindowId(preset: TilePreset, id: string) {
@@ -148,17 +150,63 @@ export class TileManager {
         const displayMode = viewport.displayMode;
         const preset = viewport.tilePreset;
 
-        if (!preset.isEmptyPreset && displayMode.enableTileAttach) {
-            if (preset.freeCells.length) {
-                const tileCell = preset.nearbyFreeCell;
-                const appWindow = appProcess.window;
+        const isFullscreen = appProcess.window.isFullScreen;
 
-                this.store.tile.attachWindowToCell(appWindow, preset, tileCell);
+        if (!isFullscreen) {
+            if (displayMode.enableTileAttach && !isFullscreen) {
+                if (preset.freeCells.length) {
+                    const tileCell = preset.nearbyFreeCell;
+                    const appWindow = appProcess.window;
+
+                    this.store.tile.attachWindowToCell(
+                        appWindow,
+                        preset,
+                        tileCell,
+                    );
+                } else {
+                    this.store.sharedEventBus.eventBus.dispatch(
+                        TileEventType.OnTileViewportOverflow,
+                        appProcess,
+                    );
+                }
+            }
+        } else {
+            // TODO
+            // Т.к. работа выполняется в основном с viewport, вынести отдельным событием и обрабатывать в ViewportManager
+            const currentViewport = this.store.virtualViewport.currentViewport;
+            const template = this.store.tile.findTileTemplateByAlias("1x1");
+            const newViewport = new VirtualViewportModel({
+                displayMode,
+            });
+            this.store.virtualViewport.insertViewport(
+                newViewport,
+                this.store.virtualViewport.currentViewport,
+            );
+
+            if (template) {
+                if (preset.isEmptyPreset) {
+                    this.store.tile.applyPresetToViewport(
+                        template,
+                        newViewport,
+                    );
+                    this.store.virtualViewport.applyViewportToWindow(
+                        newViewport,
+                        appProcess.window,
+                    );
+                    this.store.virtualViewport.removeViewport(currentViewport);
+                } else {
+                    this.store.tile.applyPresetToViewport(
+                        template,
+                        newViewport,
+                    );
+
+                    this.store.virtualViewport.applyViewportToWindow(
+                        newViewport,
+                        appProcess.window,
+                    );
+                }
             } else {
-                this.store.sharedEventBus.eventBus.dispatch(
-                    TileEventType.OnTileGridOverflow,
-                    [appProcess],
-                );
+                console.warn("Not found template");
             }
         }
     }
@@ -168,13 +216,11 @@ export class TileManager {
         viewport: VirtualViewportModel,
     ) {
         if (template) {
-            const createdPreset = TileFactory.createTilePreset(template);
-
-            this.setDefaultTileTemplate(template);
+            // const createdPreset = TileFactory.createTilePreset(template);
 
             this.store.sharedEventBus.eventBus.dispatch(
                 TileEventType.OnChangePreset,
-                { preset: createdPreset, viewport },
+                { template, viewport },
             );
         }
     }

@@ -1,6 +1,6 @@
 import classNames from "classnames";
+import { DebugPanel } from "components/debug/DebugPanel/DebugPanel";
 import { TileWindow } from "components/window/TileWindow/TileWindow";
-import { TileFactory } from "factories/TileFactory";
 import { useStore } from "hooks/useStore";
 import { get } from "lodash";
 import { observer } from "mobx-react";
@@ -93,8 +93,6 @@ export const TileDesktopContainer = observer(
             const template = store.tile.findTileTemplateByAlias("1x1");
 
             if (displayMode && template) {
-                const tilePreset = TileFactory.createTilePreset(template);
-
                 store.tile.detachWindowFromCells(
                     appWindow,
                     store.virtualViewport.currentViewport.tilePreset.cells,
@@ -137,6 +135,15 @@ export const TileDesktopContainer = observer(
                     style={gridStyles}
                     onClick={handleAreaClick}
                 >
+                    <DebugPanel>
+                        {props.preset.cells.map((item) => (
+                            <div>
+                                CellID: {item.id} WindowID:{" "}
+                                {item.attachedAppWindow?.id}
+                            </div>
+                        ))}
+                    </DebugPanel>
+
                     {props.viewport.displayMode.enableTileAttach && (
                         <div
                             className={style.floatedArea}

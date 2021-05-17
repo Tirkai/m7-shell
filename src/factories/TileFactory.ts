@@ -8,7 +8,6 @@ export class TileFactory {
             columns: options.columns,
             rows: options.rows,
             alias: options.alias,
-            isEmptyPreset: options.columns <= 0 || options.rows <= 0,
             areas: options.areas,
             cells: options.cells.map(
                 (cell) =>
@@ -26,7 +25,7 @@ export class TileFactory {
             alias: "none",
             cells: [],
             areas: "",
-            isEmptyPreset: true,
+            // isEmptyPreset: true,
         });
     }
 }

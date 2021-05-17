@@ -69,5 +69,7 @@ export class AppStore {
         this.recovery = new RecoveryStore(this);
 
         console.warn("STORE", this);
+
+        (window as any).store = this;
     }
 }

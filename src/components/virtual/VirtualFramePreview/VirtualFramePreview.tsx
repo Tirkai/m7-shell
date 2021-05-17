@@ -37,12 +37,15 @@ export const VirtualFramePreview = observer(
             const viewport = props.viewport;
             if (template && viewport) {
                 store.tile.applyPresetToViewport(template, viewport);
+                store.tile.setDefaultTileTemplate(template);
             }
         };
 
         const handleApplyDisplayMode = (displayMode: DisplayMode) => {
             const viewport = props.viewport;
             if (viewport) {
+                store.display.setDefaultDisplayMode(displayMode);
+
                 store.display.applyDisplayModeToViewport(displayMode, viewport);
 
                 store.processManager.processes

@@ -1,0 +1,9 @@
+.debugPanel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: black;
+    color: white;
+    z-index: 1000000;
+    padding: 4px;
+}

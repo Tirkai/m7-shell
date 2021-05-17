@@ -1,12 +1,11 @@
 import { TileFactory } from "factories/TileFactory";
-import { chunk } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileEventType } from "models/tile/TileEventType";
-import { TilePreset } from "models/tile/TilePreset";
+import { TileTemplate } from "models/tile/TileTemplate";
 import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
 import { IVirtualViewportSnapshot } from "models/virtual/IVirtualViewportsSnapshot";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
@@ -20,7 +19,7 @@ export class VirtualViewportManager {
 
     viewports: VirtualViewportModel[] = [];
 
-    currentViewport: VirtualViewportModel;
+    currentViewport: VirtualViewportModel = new VirtualViewportModel();
 
     getIndexByViewport(viewport: VirtualViewportModel) {
         return this.viewports.indexOf(viewport);
@@ -29,8 +28,8 @@ export class VirtualViewportManager {
     constructor(store: AppStore) {
         this.store = store;
 
-        const [initialViewport] = this.viewports;
-        this.currentViewport = initialViewport;
+        // const [initialViewport] = this.viewports;
+        // this.currentViewport = initialViewport;
 
         this.store.sharedEventBus.eventBus.add(
             ProcessEventType.OnInstantiateProcess,
@@ -46,14 +45,22 @@ export class VirtualViewportManager {
 
         this.store.sharedEventBus.eventBus.add(
             TileEventType.OnChangePreset,
-            (payload: { preset: TilePreset; viewport: VirtualViewportModel }) =>
-                this.onChangePreset(payload.preset, payload.viewport),
+            (payload: {
+                template: TileTemplate;
+                viewport: VirtualViewportModel;
+            }) => this.onChangePreset(payload.template, payload.viewport),
         );
 
         this.store.sharedEventBus.eventBus.add(
-            TileEventType.OnTileGridOverflow,
-            (processes: ApplicationProcess[]) =>
-                this.onTileGridOverflow(processes),
+            TileEventType.OnTileViewportSplit,
+            (excessProcesses: ApplicationProcess[]) =>
+                this.onTileViewportSplit(excessProcesses),
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            TileEventType.OnTileViewportOverflow,
+            (excessProcess: ApplicationProcess) =>
+                this.onTileViewportOverflow(excessProcess),
         );
 
         this.store.sharedEventBus.eventBus.add(
@@ -96,7 +103,11 @@ export class VirtualViewportManager {
         // this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogin, () =>
         //     this.onLogin(),
         // );
-        this.addViewport(new VirtualViewportModel());
+        const initialViewport = new VirtualViewportModel();
+
+        this.addViewport(initialViewport);
+        // this.viewports = [initialViewport];
+        // this.setCurrentViewport(initialViewport);
 
         this.store.sharedEventBus.eventBus.add(
             TileEventType.OnChangePreset,
@@ -164,33 +175,20 @@ export class VirtualViewportManager {
         }
     }
 
-    onChangePreset(preset: TilePreset, viewport: VirtualViewportModel) {
+    onChangePreset(template: TileTemplate, viewport: VirtualViewportModel) {
         const viewportProcesses = this.store.processManager.processes.filter(
             (item) => item.window.viewport.id === viewport.id,
         );
 
+        const preset = TileFactory.createTilePreset(template);
+
         if (viewportProcesses.length > preset.maxTilesCount) {
             const excessCount = viewportProcesses.length - preset.maxTilesCount;
-
             const startExcessIndex = viewportProcesses.length - excessCount;
-
-            if (viewportProcesses.length > preset.maxTilesCount * 2) {
-                const chunks = chunk(viewportProcesses, preset.maxTilesCount);
-
-                this.store.sharedEventBus.eventBus.dispatch(
-                    TileEventType.OnTileViewportSpread,
-                    { chunks, viewport },
-                );
-
-                viewport.setTilePreset(preset);
-
-                return;
-            }
-
             const excessProcesses = viewportProcesses.slice(startExcessIndex);
 
             this.store.sharedEventBus.eventBus.dispatch(
-                TileEventType.OnTileGridOverflow,
+                TileEventType.OnTileViewportSplit,
                 excessProcesses,
             );
         }
@@ -226,16 +224,41 @@ export class VirtualViewportManager {
         }
     }
 
-    onTileGridOverflow(processes: ApplicationProcess[]) {
-        const current = this.currentViewport;
+    onTileViewportSplit(excessProcesses: ApplicationProcess[]) {
+        console.log("11 onTileGridOverflow", excessProcesses);
+        const currentViewport = this.currentViewport;
 
-        const newViewport = new VirtualViewportModel();
+        const applyViewportToExcessesWindows = async (
+            appWindows: ApplicationWindow[],
+        ) =>
+            new Promise<VirtualViewportModel>((resolve) => {
+                const newViewport = new VirtualViewportModel();
 
-        processes.forEach((appProcess) => {
-            this.applyViewportToWindow(newViewport, appProcess.window);
+                appWindows.forEach((appWindow) => {
+                    this.applyViewportToWindow(newViewport, appWindow);
+                });
+                resolve(newViewport);
+            });
+
+        applyViewportToExcessesWindows(
+            excessProcesses.map((item) => item.window),
+        ).then((newViewport) => {
+            this.insertViewport(newViewport, currentViewport);
         });
+        // setTimeout(() => {
+        //     this.insertViewport(newViewport, currentViewport);
+        // });
 
-        this.insertViewport(newViewport, current);
+        // this.addViewport(newViewport);
+        // this.viewports.push(newViewport);
+
+        // this.setCurrentViewport(newViewport);
+    }
+
+    onTileViewportOverflow(excessProcess: ApplicationProcess) {
+        const newViewport = new VirtualViewportModel();
+        this.insertViewport(newViewport, this.currentViewport);
+        this.applyViewportToWindow(newViewport, excessProcess.window);
     }
 
     onTileViewportSpread(
@@ -262,7 +285,7 @@ export class VirtualViewportManager {
 
     addViewport(viewport: VirtualViewportModel) {
         this.viewports.push(viewport);
-
+        // /!!!
         this.setCurrentViewport(viewport);
 
         this.store.sharedEventBus.eventBus.dispatch(

@@ -15,7 +15,9 @@ export class TilePreset implements ITilePreset {
 
     areas: string;
 
-    isEmptyPreset: boolean;
+    get isEmptyPreset() {
+        return this.cells.every((item) => item.attachedAppWindow === null);
+    }
 
     get freeCells() {
         return this.cells.filter((item) => !item.hasAttachedWindow) ?? [];
@@ -42,7 +44,7 @@ export class TilePreset implements ITilePreset {
         this.columns = options.columns;
         this.cells = options.cells;
         this.alias = options.alias;
-        this.isEmptyPreset = options.isEmptyPreset ?? false;
+        // this.isEmptyPreset = options.isEmptyPreset ?? false;
         this.areas = options.areas;
     }
 

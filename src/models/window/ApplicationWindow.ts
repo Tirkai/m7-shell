@@ -259,10 +259,10 @@ export class ApplicationWindow implements IApplicationWindow {
     }
 
     setParams(params: IAppParams) {
+        this.isFullScreen = params.maximize ?? this.isFullScreen;
         if (this.type === ApplicationWindowType.Float) {
             this.width = params.width ?? this.width;
             this.height = params.height ?? this.height;
-            this.isFullScreen = params.maximize ?? this.isFullScreen;
 
             const [x, y] = this.calculatePosition();
 

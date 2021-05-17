@@ -17,6 +17,8 @@ export class DisplayManager {
 
     displayModes: DisplayMode[] = registeredDisplayModes;
 
+    defaultDisplayMode: DisplayMode;
+
     applyDisplayModeToViewport(
         displayMode: DisplayMode,
         viewport: VirtualViewportModel,
@@ -36,15 +38,14 @@ export class DisplayManager {
     constructor(store: AppStore) {
         this.store = store;
 
-        // this.displayMode = new DisplayMode({
-        //     windowStrategy: new FloatWindowStrategy(this.store),
-        // });
+        const [initialDisplayMode] = registeredDisplayModes;
 
-        // this.displayMode = new DisplayMode({
-        //     windowStrategy: new TileWindowStrategy(),
-        //     enableTiles: true,
-        // });
+        this.defaultDisplayMode = initialDisplayMode;
 
         makeAutoObservable(this);
+    }
+
+    setDefaultDisplayMode(displayMode: DisplayMode) {
+        this.defaultDisplayMode = displayMode;
     }
 }

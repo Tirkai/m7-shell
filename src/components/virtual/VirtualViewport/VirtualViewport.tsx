@@ -24,7 +24,7 @@ export const VirtualViewport = observer((props: IVirtualViewportProps) => {
                 [style.displayed]: props.displayed,
             })}
             style={{
-                transform: `translate(-${viewportOffset * 100}vw ,0)`,
+                transform: `translate(-${viewportOffset * 100}vw, 0)`,
             }}
         >
             <div
