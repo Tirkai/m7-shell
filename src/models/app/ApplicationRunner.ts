@@ -65,11 +65,14 @@ export class ApplicationRunner {
             if (activeProcess) {
                 if (options?.url) {
                     activeProcess.setUrl(options.url);
+                    activeProcess.rerollHash();
                 }
                 if (options?.params) {
                     activeProcess.setParams(options.params);
                 }
-                this.store.windowManager.focusWindow(activeProcess.window);
+                if (options?.focusWindowAfterInstantiate) {
+                    this.store.windowManager.focusWindow(activeProcess.window);
+                }
             }
         }
     }

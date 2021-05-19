@@ -75,6 +75,10 @@ export class ApplicationProcess {
     //     this.isReady = value;
     // }
 
+    rerollHash() {
+        this.params.set("hash", v4());
+    }
+
     get modifiedUrl() {
         try {
             if (this.app instanceof ExternalApplication) {

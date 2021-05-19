@@ -81,12 +81,15 @@ export const AppWindow = (props: IAppWindowProps) => {
     const handleReload = () => {
         // props.process.emitter.emit(ShellMessageType.ReloadPage, {});
         // alert();
+
+        props.process.rerollHash();
+
         // const ctx = props.process.emitter.context;
         // // const iFrame = (frame as unknown) as HTMLIFrameElement;
         // // console.log({ iFrame });
 
         // const url = new URL(props.process.url);
-        
+
         // url.search.
 
         // // props.process.setUrl(props.process.url);
