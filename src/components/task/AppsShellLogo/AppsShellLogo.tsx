@@ -1,3 +1,4 @@
+import { SVGIcon } from "@algont/m7-ui";
 import { Avatar } from "@material-ui/core";
 import { settings } from "assets/icons";
 import { IStore } from "interfaces/common/IStore";
@@ -34,7 +35,7 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
             .map(
                 (app) =>
                     new ContextMenuItemModel({
-                        icon: app.icon,
+                        icon: <SVGIcon source={app.icon} color="white" />,
                         content: app.name,
                         onClick: () => this.handleExecuteApp(app),
                     }),
@@ -42,7 +43,7 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
         if (this.store.auth.isAdmin) {
             menu.push(
                 new ContextMenuItemModel({
-                    icon: settings,
+                    icon: <SVGIcon source={settings} color="white" />,
                     content: strings.startMenu.devMode,
                     onClick: () =>
                         this.store.shell.setDevMode(

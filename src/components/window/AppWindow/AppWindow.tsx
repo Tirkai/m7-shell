@@ -87,6 +87,11 @@ export const AppWindow = (props: IAppWindowProps) => {
         }
     };
 
+    const handleAppReady = () => {
+        setAppReady(true);
+        // props.process.setReady(true);
+    };
+
     useEffect(() => {
         setUrl(props.process.modifiedUrl);
     }, [props.process.modifiedUrl]);
@@ -170,7 +175,7 @@ export const AppWindow = (props: IAppWindowProps) => {
                             process={props.process}
                             window={props.window}
                             url={props.url}
-                            onReady={() => setAppReady(true)}
+                            onReady={() => handleAppReady()}
                         />
                         <AppWindowUnfocusedOverlay
                             visible={

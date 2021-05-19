@@ -1,14 +1,11 @@
-import { Add } from "@material-ui/icons";
 import { BaseHub } from "components/hub/BaseHub/BaseHub";
-import { ViewportAppTilePreview } from "components/virtual/ViewportAppTilePreview/ViewportAppTilePreview";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { TileFactory } from "factories/TileFactory";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import { DisplayModeType } from "models/display/DisplayModeType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import React from "react";
-import { ViewportAppWindowPreview } from "../ViewportAppWindowPreview/ViewportAppWindowPreview";
+import { VirtualFrameActions } from "../VirtualFrameActions/VirtualFrameActions";
 import { VirtualFrameList } from "../VirtualFrameList/VirtualFrameList";
 import { VirtualFramePreview } from "../VirtualFramePreview/VirtualFramePreview";
 import style from "./style.module.css";
@@ -28,8 +25,6 @@ export const VirtualDesktopHub = observer(() => {
             displayMode: store.display.defaultDisplayMode,
         });
 
-        // viewport.setDisplayMode();
-
         viewport.setTilePreset(
             TileFactory.createTilePreset(store.tile.defaultTileTemplate),
         );
@@ -46,6 +41,9 @@ export const VirtualDesktopHub = observer(() => {
             (process) => process.window.viewport.id === viewport.id,
         );
 
+    const getDeleteHandler = (viewport: VirtualViewportModel, count: number) =>
+        count > 1 ? () => handleRemoveViewport(viewport) : undefined;
+
     return (
         <BaseHub
             show={store.shell.activePanel === ShellPanelType.Virtual}
@@ -58,10 +56,13 @@ export const VirtualDesktopHub = observer(() => {
                             <VirtualFrameList
                                 count={store.virtualViewport.viewports.length}
                             >
-                                {/* TODO: Refactor  */}
                                 {store.virtualViewport.viewports.map(
                                     (item, index) => (
                                         <VirtualFramePreview
+                                            displayMode={item.displayMode}
+                                            processes={getProcessesByViewport(
+                                                item,
+                                            )}
                                             index={index + 1}
                                             key={item.id}
                                             onClick={() =>
@@ -72,56 +73,18 @@ export const VirtualDesktopHub = observer(() => {
                                                     .currentViewport?.id ===
                                                 item.id
                                             }
-                                            onDelete={
+                                            onDelete={getDeleteHandler(
+                                                item,
                                                 store.virtualViewport.viewports
-                                                    .length > 1
-                                                    ? () =>
-                                                          handleRemoveViewport(
-                                                              item,
-                                                          )
-                                                    : undefined
-                                            }
+                                                    .length,
+                                            )}
                                             hasControls
                                             viewport={item}
-                                        >
-                                            {item.displayMode?.type ===
-                                                DisplayModeType.Tile && (
-                                                <ViewportAppTilePreview
-                                                    areas={
-                                                        item.tilePreset
-                                                            ?.areas ?? "a"
-                                                    }
-                                                    columns={
-                                                        item.tilePreset
-                                                            ?.columns ?? 0
-                                                    }
-                                                    rows={
-                                                        item.tilePreset?.rows ??
-                                                        0
-                                                    }
-                                                    processes={getProcessesByViewport(
-                                                        item,
-                                                    )}
-                                                />
-                                            )}
-                                            {item.displayMode?.type ===
-                                                DisplayModeType.Float && (
-                                                <ViewportAppWindowPreview
-                                                    processes={getProcessesByViewport(
-                                                        item,
-                                                    )}
-                                                />
-                                            )}
-                                        </VirtualFramePreview>
+                                        />
                                     ),
                                 )}
-                                <VirtualFramePreview
-                                    onClick={handleCreateViewport}
-                                    active={false}
-                                >
-                                    <Add />
-                                </VirtualFramePreview>
                             </VirtualFrameList>
+                            <VirtualFrameActions onAdd={handleCreateViewport} />
                         </div>
                     </div>
                 </div>

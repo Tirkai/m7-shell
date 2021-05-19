@@ -6,8 +6,6 @@ import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileEventType } from "models/tile/TileEventType";
 import { TileTemplate } from "models/tile/TileTemplate";
-import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
-import { IVirtualViewportSnapshot } from "models/virtual/IVirtualViewportsSnapshot";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
@@ -86,23 +84,8 @@ export class VirtualViewportManager {
             () => this.onKeyboardArrowRightWithControl(),
         );
 
-        this.store.sharedEventBus.eventBus.add(
-            VirtualViewportEventType.OnAddViewportFrame,
-            () => this.onChangeViewportFrame(),
-        );
-
-        this.store.sharedEventBus.eventBus.add(
-            VirtualViewportEventType.OnRemoveViewportFrame,
-            () => this.onChangeViewportFrame(),
-        );
-
         this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () =>
             this.onLogout(),
-        );
-
-        this.store.sharedEventBus.eventBus.add(
-            TileEventType.OnChangePreset,
-            () => this.saveUserViewports(),
         );
 
         const initialViewport = new VirtualViewportModel({
@@ -116,31 +99,6 @@ export class VirtualViewportManager {
 
     setViewports(viewports: VirtualViewportModel[]) {
         this.viewports = viewports;
-    }
-
-    saveUserViewports() {
-        const data = {
-            [UserDatabasePropKey.Viewports]: {
-                currentViewportId: this.currentViewport.id,
-                activeTilePresetAlias: this.store.tile.defaultTileTemplate
-                    .alias,
-                viewports: this.viewports.map((item) => ({
-                    viewportId: item.id,
-                    templateAlias: item.tilePreset?.alias ?? "1x1",
-                })),
-            },
-        };
-
-        this.store.userDatabase.save<IVirtualViewportSnapshot>([
-            {
-                name: UserDatabasePropKey.Viewports,
-                value: data[UserDatabasePropKey.Viewports],
-            },
-        ]);
-    }
-
-    onChangeViewportFrame() {
-        this.saveUserViewports();
     }
 
     onLogout() {
@@ -222,7 +180,6 @@ export class VirtualViewportManager {
     }
 
     onTileViewportSplit(excessProcesses: ApplicationProcess[]) {
-        console.log("11 onTileGridOverflow", excessProcesses);
         const currentViewport = this.currentViewport;
 
         const applyViewportToExcessesWindows = async (

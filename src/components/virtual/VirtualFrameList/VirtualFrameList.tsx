@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import style from "./style.module.css";
 
 interface IVirtualFrameListProps {
@@ -8,13 +8,38 @@ interface IVirtualFrameListProps {
 
 const className = style.virtualFrameList;
 
-export const VirtualFrameList = (props: IVirtualFrameListProps) => (
-    <div className={className}>
-        <div
-            className={style.container}
-            style={{ gridTemplateColumns: `repeat(${props.count + 1}, 250px)` }}
-        >
-            {props.children}
+export const VirtualFrameList = (props: IVirtualFrameListProps) => {
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
+
+    const [lastCount, setLastCount] = useState(props.count);
+
+    useEffect(() => {
+        if (lastCount < props.count) {
+            const scrollTarget = scrollRef.current;
+            const containerTarget = containerRef.current;
+
+            if (scrollTarget && containerTarget) {
+                const bounds = containerTarget.getBoundingClientRect();
+
+                scrollTarget.scrollTo({
+                    left: bounds.width,
+                    behavior: "smooth",
+                });
+            }
+        }
+        setLastCount(props.count);
+    }, [props.count]);
+
+    return (
+        <div className={className} ref={scrollRef}>
+            <div
+                className={style.container}
+                ref={containerRef}
+                style={{ gridTemplateColumns: `repeat(${props.count}, 250px)` }}
+            >
+                {props.children}
+            </div>
         </div>
-    </div>
-);
+    );
+};

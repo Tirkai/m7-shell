@@ -9,6 +9,7 @@ import { createBrowserHistory } from "history";
 import { useStore } from "hooks/useStore";
 import { IPerformanceMode } from "interfaces/performance/IPerformanceMode";
 import { observer } from "mobx-react";
+import { AuthEventType } from "models/auth/AuthEventType";
 import { DefaultPerformanceMode } from "models/DefaultPerformanceMode";
 import { PotatoPerformanceMode } from "models/PotatoPerformanceMode";
 import "moment/locale/ru";
@@ -67,6 +68,7 @@ export const AppContainer = observer(() => {
             }
         }
 
+        store.sharedEventBus.eventBus.dispatch(AuthEventType.OnEntry);
         // if (displayMode) {
         //     store.shell.setDisplayMode(displayMode);
         // }

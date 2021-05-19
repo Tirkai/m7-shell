@@ -1,0 +1,15 @@
+.virtualFrameActions {
+    display: flex;
+    align-items: center;
+    color: white;
+}
+
+.headerActions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.addAction svg {
+    width: 48px;
+    height: 48px;
+}

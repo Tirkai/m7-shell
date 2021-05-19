@@ -31,6 +31,11 @@ export const TileWindow = observer((props: ITileWindowProps) => {
     const [isAppReady, setAppReady] = useState(false);
     const store = useStore();
 
+    const handleAppReady = () => {
+        setAppReady(true);
+        // props.process.setReady(true);
+    };
+
     const gridStyle = {
         gridArea: props.area,
     };
@@ -70,7 +75,7 @@ export const TileWindow = observer((props: ITileWindowProps) => {
                     process={props.process}
                     window={props.window}
                     url={props.url}
-                    onReady={() => setAppReady(true)}
+                    onReady={() => handleAppReady()}
                 />
                 <AppWindowUnfocusedOverlay
                     visible={

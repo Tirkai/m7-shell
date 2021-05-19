@@ -26,6 +26,7 @@ export class ApplicationProcess {
     emitter: ShellMessageEmitter;
     hash: string;
     disableParams: boolean;
+    isReady: boolean;
     // viewport: VirtualViewportModel;
 
     constructor(options: IApplicationProcessOptions) {
@@ -40,6 +41,7 @@ export class ApplicationProcess {
         this.name = options.name ?? this.app.name;
         this.disableParams = options.disableParams ?? false;
         // this.viewport = options.viewport;
+        this.isReady = false;
 
         if (this.app instanceof ExternalApplication) {
             this.url = options.url ?? this.app.url;
@@ -68,6 +70,10 @@ export class ApplicationProcess {
     setWindow(appWindow: ApplicationWindow) {
         this.window = appWindow;
     }
+
+    // setReady(value: boolean) {
+    //     this.isReady = value;
+    // }
 
     get modifiedUrl() {
         try {

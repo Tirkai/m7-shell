@@ -19,6 +19,7 @@ interface IRecoveryDialogProps {
     show: boolean;
     onRecovery: () => void;
     onCancel: () => void;
+    onRestart: () => void;
     processes?: IApplicationProcess[];
     viewports?: IVirtualViewportTemplate[];
 }
@@ -55,7 +56,7 @@ export const RecoveryDialog = (props: IRecoveryDialogProps) => (
             </List>
         </DialogContent>
         <DialogActions>
-            <Button onClick={() => props.onCancel()} color="primary">
+            <Button onClick={() => props.onRestart()} color="primary">
                 Начать сначала
             </Button>
             <Button onClick={() => props.onRecovery()} color="primary">

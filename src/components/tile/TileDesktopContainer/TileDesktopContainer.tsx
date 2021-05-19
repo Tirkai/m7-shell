@@ -140,7 +140,7 @@ export const TileDesktopContainer = observer(
                 >
                     <DebugPanel show={false}>
                         {props.preset?.cells.map((item) => (
-                            <div>
+                            <div key={item.id}>
                                 CellID: {item.id} WindowID:{" "}
                                 {item.attachedAppWindow?.id}
                             </div>

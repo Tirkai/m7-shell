@@ -116,7 +116,17 @@ export class ShellScreen extends Component<IStore> {
 
     handleRecovery = () => {
         const recovery = this.store.recovery;
-        recovery.startRecovery();
+        if (recovery.dynamicSessionSnapshot) {
+            recovery.startRecovery(recovery.dynamicSessionSnapshot);
+        }
+        recovery.setDisplayRecoveryDialog(false);
+    };
+
+    handleRecoveryFreezeSnapshot = () => {
+        const recovery = this.store.recovery;
+        if (recovery.freezedSessionSnapshot) {
+            recovery.startRecovery(recovery.freezedSessionSnapshot);
+        }
         recovery.setDisplayRecoveryDialog(false);
     };
 
@@ -220,18 +230,23 @@ export class ShellScreen extends Component<IStore> {
                                             .isDisplayRecoveryDialog
                                     }
                                     onRecovery={() => this.handleRecovery()}
+                                    onRestart={() =>
+                                        this.handleRecoveryFreezeSnapshot()
+                                    }
                                     onCancel={() =>
                                         this.store.recovery.setDisplayRecoveryDialog(
                                             false,
                                         )
                                     }
                                     processes={
-                                        this.store.recovery.processesSnapshot
-                                            ?.processes
+                                        this.store.recovery
+                                            .dynamicSessionSnapshot
+                                            ?.processSnapshot?.processes
                                     }
                                     viewports={
-                                        this.store.recovery.viewportsSnapshot
-                                            ?.viewports
+                                        this.store.recovery
+                                            .dynamicSessionSnapshot
+                                            ?.viewportSnapshot?.viewports
                                     }
                                 />
                             </DesktopLayer>

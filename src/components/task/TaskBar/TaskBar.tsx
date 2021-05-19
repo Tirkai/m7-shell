@@ -100,7 +100,7 @@ export class TaskBar extends Component<IStore> {
         appProcess: ApplicationProcess,
     ) => [
         new ContextMenuItemModel({
-            icon: cross,
+            icon: <SVGIcon source={cross} color="white" />,
             content: strings.application.actions.close,
             onClick: () => this.handleKillProcess(appProcess),
         }),

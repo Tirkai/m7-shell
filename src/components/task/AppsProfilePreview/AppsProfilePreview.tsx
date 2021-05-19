@@ -1,3 +1,4 @@
+import { SVGIcon } from "@algont/m7-ui";
 import { UtilsFunctions } from "@algont/m7-utils";
 import { Avatar } from "@material-ui/core";
 import { exit } from "assets/icons";
@@ -34,13 +35,13 @@ export class AppsProfilePreview extends Component<IAppsProfilePreviewProps> {
             ...this.props.apps.map(
                 (app) =>
                     new ContextMenuItemModel({
-                        icon: app.icon,
+                        icon: <SVGIcon source={app.icon} color="white" />,
                         content: app.name,
                         onClick: () => this.handleExecuteApp(app),
                     }),
             ),
             new ContextMenuItemModel({
-                icon: exit,
+                icon: <SVGIcon source={exit} color="white" />,
                 content: strings.startMenu.logout,
                 onClick: this.handleLogout,
             }),

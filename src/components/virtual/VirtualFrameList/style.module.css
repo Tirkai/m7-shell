@@ -4,6 +4,11 @@
     height: 100%;
     overflow: auto;
     position: relative;
+    scrollbar-width: none;
+}
+
+.virtualFrameList::-webkit-scrollbar {
+    display: none;
 }
 
 .container {

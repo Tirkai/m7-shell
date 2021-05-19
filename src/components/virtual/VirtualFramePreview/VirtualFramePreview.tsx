@@ -4,19 +4,27 @@ import classNames from "classnames";
 import { DisplayModeChooser } from "components/tile/DisplayModeChooser/DisplayModeChooser";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
+import { ApplicationProcess } from "models/ApplicationProcess";
 import { DisplayMode } from "models/display/DisplayMode";
+import { DisplayModeType } from "models/display/DisplayModeType";
 import { TileTemplate } from "models/tile/TileTemplate";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import React from "react";
+import { ViewportAppTilePreview } from "../ViewportAppTilePreview/ViewportAppTilePreview";
+import { ViewportAppWindowPreview } from "../ViewportAppWindowPreview/ViewportAppWindowPreview";
+import { VirtualFramePreviewBase } from "../VirtualFramePreviewBase/VirtualFramePreviewBase";
+import { VirtualFramePreviewLayout } from "../VirtualFramePreviewLayout/VirtualFramePreviewLayout";
 import style from "./style.module.css";
 
 interface IVirtualFramePreviewProps {
+    displayMode?: DisplayMode;
     onClick?: () => void;
     onDelete?: () => void;
     active: boolean;
-    children: React.ReactNode;
+    // children: React.ReactNode;
     viewport?: VirtualViewportModel;
     hasControls?: boolean;
+    processes: ApplicationProcess[];
     index?: number;
 }
 
@@ -66,9 +74,9 @@ export const VirtualFramePreview = observer(
 
         return (
             <div className={classNames(className)}>
-                <div className={style.header}>
-                    {props.hasControls && (
-                        <>
+                <VirtualFramePreviewLayout
+                    header={
+                        <div className={style.header}>
                             <div className={style.indicator}>
                                 <DisplayModeChooser
                                     displayMode={props.viewport?.displayMode}
@@ -103,21 +111,48 @@ export const VirtualFramePreview = observer(
                                     </IconButton>
                                 </div>
                             )}
-                        </>
-                    )}
-                </div>
-                <div
-                    className={classNames(style.container)}
-                    onClick={props.onClick}
-                >
-                    <div
-                        className={classNames(style.content, {
-                            [style.active]: props.active,
-                        })}
-                    >
-                        {props.children}
-                    </div>
-                </div>
+                        </div>
+                    }
+                    content={
+                        <div
+                            className={classNames(style.container)}
+                            onClick={props.onClick}
+                        >
+                            <VirtualFramePreviewBase>
+                                <div
+                                    className={classNames(style.content, {
+                                        [style.active]: props.active,
+                                    })}
+                                >
+                                    {props.displayMode?.type ===
+                                        DisplayModeType.Tile && (
+                                        <ViewportAppTilePreview
+                                            areas={
+                                                props.viewport?.tilePreset
+                                                    ?.areas ?? "a"
+                                            }
+                                            columns={
+                                                props.viewport?.tilePreset
+                                                    ?.columns ?? 0
+                                            }
+                                            rows={
+                                                props.viewport?.tilePreset
+                                                    ?.rows ?? 0
+                                            }
+                                            processes={props.processes}
+                                        />
+                                    )}
+                                    {props.displayMode?.type ===
+                                        DisplayModeType.Float && (
+                                        <ViewportAppWindowPreview
+                                            processes={props.processes}
+                                        />
+                                    )}
+                                </div>
+                            </VirtualFramePreviewBase>
+                        </div>
+                    }
+                />
             </div>
         );
     },

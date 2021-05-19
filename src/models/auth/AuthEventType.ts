@@ -1,4 +1,5 @@
 export enum AuthEventType {
+    OnEntry = "OnEntry",
     OnLogout = "OnLogout",
     OnLogin = "OnLogin",
     OnKick = "OnKick",

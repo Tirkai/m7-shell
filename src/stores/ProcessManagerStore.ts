@@ -13,9 +13,7 @@ import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { ExternalApplication } from "models/ExternalApplication";
-import { IProcessesSnapshot } from "models/process/IProcessesSnapshot";
 import { ProcessEventType } from "models/process/ProcessEventType";
-import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { portalEndpoint } from "utils/endpoints";
@@ -59,8 +57,14 @@ export class ProcessManagerStore {
                 this.onRecieveToken(payload),
         );
 
+        // when(() => this.isAllProcessesReady).then(() => alert("ALLS"));
+
         this.bindOnMessageHandler();
     }
+
+    // get isAllProcessesReady() {
+    //     return this.processes.every((item) => item.isReady);
+    // }
 
     bindOnMessageHandler() {
         window.onmessage = (event: MessageEvent) => {
@@ -120,21 +124,21 @@ export class ProcessManagerStore {
     }
 
     onChangeProcess(_process: ApplicationProcess) {
-        this.store.userDatabase.save<IProcessesSnapshot>([
-            {
-                name: UserDatabasePropKey.Processes,
-                value: {
-                    hasActiveSession: !!this.processes.length,
-                    processes: this.processes.map((item) => ({
-                        // TODO Think about this
-                        app: item.app as ExternalApplication,
-                        url: item.url,
-                        name: item.name,
-                        viewportId: item.window.viewport.id,
-                    })),
-                },
-            },
-        ]);
+        // this.store.userDatabase.save<IProcessesSnapshot>([
+        //     {
+        //         name: UserDatabasePropKey.Processes,
+        //         value: {
+        //             hasActiveSession: !!this.processes.length,
+        //             processes: this.processes.map((item) => ({
+        //                 // TODO Think about this
+        //                 app: item.app as ExternalApplication,
+        //                 url: item.url,
+        //                 name: item.name,
+        //                 viewportId: item.window.viewport.id,
+        //             })),
+        //         },
+        //     },
+        // ]);
     }
 
     onRemoveViewportFrame(viewport: VirtualViewportModel) {
