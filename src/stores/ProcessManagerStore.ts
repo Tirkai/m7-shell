@@ -237,7 +237,6 @@ export class ProcessManagerStore {
 
     killProcess(appProcess: ApplicationProcess) {
         const index = this.processes.indexOf(appProcess);
-
         appProcess.app.setExecuted(false);
 
         this.processes.splice(index, 1);
@@ -258,6 +257,12 @@ export class ProcessManagerStore {
     }
 
     destroyAllProcesses() {
+        const processesCopy = [...this.processes];
+
+        processesCopy.forEach((item) => {
+            this.killProcess(item);
+        });
+
         this.processes = [];
     }
 
@@ -265,4 +270,7 @@ export class ProcessManagerStore {
     checkoutExsistProcessMethod() {
         //
     }
+}
+function copy(processes: ApplicationProcess[]) {
+    throw new Error("Function not implemented.");
 }

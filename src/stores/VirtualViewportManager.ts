@@ -88,13 +88,21 @@ export class VirtualViewportManager {
             this.onLogout(),
         );
 
+        this.store.sharedEventBus.eventBus.add(AuthEventType.OnEntry, () => {
+            this.init();
+        });
+
+        // this.init();
+
+        makeAutoObservable(this);
+    }
+
+    init() {
         const initialViewport = new VirtualViewportModel({
             displayMode: this.store.display.defaultDisplayMode,
         });
 
         this.addViewport(initialViewport);
-
-        makeAutoObservable(this);
     }
 
     setViewports(viewports: VirtualViewportModel[]) {
@@ -102,14 +110,13 @@ export class VirtualViewportManager {
     }
 
     onLogout() {
-        const viewport = new VirtualViewportModel({
-            tilePreset: TileFactory.createTilePreset(
-                this.store.tile.defaultTileTemplate,
-            ),
-        });
-
-        this.setViewports([viewport]);
-        this.setCurrentViewport(viewport);
+        // const viewport = new VirtualViewportModel({
+        //     tilePreset: TileFactory.createTilePreset(
+        //         this.store.tile.defaultTileTemplate,
+        //     ),
+        // });
+        this.setViewports([]);
+        // this.setCurrentViewport(viewport);
     }
 
     onKeyboardArrowLeftWithControl() {

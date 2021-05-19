@@ -4,6 +4,7 @@ import { isEmpty } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { ApplicationEventType } from "models/app/ApplicationEventType";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
+import { AuthEventType } from "models/auth/AuthEventType";
 import { DisplayModeType } from "models/display/DisplayModeType";
 import { ExternalApplication } from "models/ExternalApplication";
 import { IProcessesSnapshot } from "models/process/IProcessesSnapshot";
@@ -67,6 +68,15 @@ export class RecoveryStore {
         eventBus.add(ProcessEventType.OnChangeProcess, () => {
             this.saveSnapshot(UserDatabasePropKey.DynamicSession);
         });
+
+        eventBus.add(AuthEventType.OnLogout, () => {
+            this.onLogout();
+        });
+    }
+
+    onLogout() {
+        this.setFreezedSessionSnapshot(null);
+        this.setDynamicSessionSnapshot(null);
     }
 
     onApplicationListLoaded() {
@@ -81,18 +91,15 @@ export class RecoveryStore {
             UserDatabasePropKey.FreezedSession,
         );
 
-        if (freezedResponse.result) {
-            this.setFreezedSessionSnapshot(freezedResponse.result);
+        if (freezedResponse.status) {
+            if (freezedResponse.result) {
+                this.startRecovery(freezedResponse.result);
+            }
         }
-        const dynamicResponse = await this.loadSnapshot(
-            UserDatabasePropKey.DynamicSession,
-        );
-        if (dynamicResponse.result) {
-            this.setDynamicSessionSnapshot(dynamicResponse.result);
-        }
-        if (this.freezedSessionSnapshot) {
-            this.startRecovery(this.freezedSessionSnapshot);
-        }
+
+        // const dynamicResponse = await this.loadSnapshot(
+        //     UserDatabasePropKey.DynamicSession,
+        // );
     }
 
     get isSnapshotsReady() {
@@ -131,11 +138,11 @@ export class RecoveryStore {
         return snapshot;
     }
 
-    setFreezedSessionSnapshot(snapshot: ISessionRecovery) {
+    setFreezedSessionSnapshot(snapshot: ISessionRecovery | null) {
         this.freezedSessionSnapshot = snapshot;
     }
 
-    setDynamicSessionSnapshot(snapshot: ISessionRecovery) {
+    setDynamicSessionSnapshot(snapshot: ISessionRecovery | null) {
         this.dynamicSessionSnapshot = snapshot;
     }
 
@@ -148,7 +155,7 @@ export class RecoveryStore {
             viewportSnapshot,
         };
 
-        this.setFreezedSessionSnapshot(freezedSnapshot);
+        // this.setFreezedSessionSnapshot(freezedSnapshot);
 
         await this.store.userDatabase.save<ISessionRecovery>([
             {
@@ -182,6 +189,8 @@ export class RecoveryStore {
     // }
 
     async startRecovery(snapshot: ISessionRecovery) {
+        this.store.virtualViewport.setViewports([]);
+
         await this.recoveryViewports(snapshot.viewportSnapshot);
         await this.recoveryProcesses(snapshot.processSnapshot);
     }

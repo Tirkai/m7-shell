@@ -18,8 +18,7 @@
     background: #222;
     height: 100%;
     display: grid;
-    grid-template-columns: 1fr 270px;
-    grid-gap: 16px;
+    grid-template-columns: 1fr 64px;
 }
 
 .actions {

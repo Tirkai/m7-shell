@@ -1,5 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
+import { AuthEventType } from "models/auth/AuthEventType";
 import { DisplayMode } from "models/display/DisplayMode";
 import { DisplayModeEventType } from "models/display/DisplayModeEventType";
 import { ProcessEventType } from "models/process/ProcessEventType";
@@ -67,6 +68,11 @@ export class TileManager {
             DisplayModeEventType.OnDisplayModeChange,
             (displayMode: DisplayMode) => this.onDisplayModeChange(displayMode),
         );
+
+        this.store.sharedEventBus.eventBus.add(
+            AuthEventType.OnLogout,
+            () => this.onLogout(),
+        );
     }
 
     templates: TileTemplate[] = [];
@@ -81,6 +87,15 @@ export class TileManager {
 
     onDisplayModeChange(displayMode: DisplayMode) {
         //
+    }
+
+    onLogout(){
+
+        const template = this.findTileTemplateByAlias("1x1");
+        if(template){
+            this.setDefaultTileTemplate(template);
+        }
+
     }
 
     onDragStop(tileWindow: ApplicationWindow) {

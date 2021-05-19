@@ -1,10 +1,11 @@
 import { IconButton } from "@material-ui/core";
-import { Add, MoreHoriz, Save } from "@material-ui/icons";
+import { Add, Clear, MoreVert, Save } from "@material-ui/icons";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { Point2D } from "models/Point2D";
 import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import React from "react";
 import { VirtualFramePreviewBase } from "../VirtualFramePreviewBase/VirtualFramePreviewBase";
 import { VirtualFramePreviewLayout } from "../VirtualFramePreviewLayout/VirtualFramePreviewLayout";
@@ -24,6 +25,16 @@ export const VirtualFrameActions = observer(
             store.recovery.saveSnapshot(UserDatabasePropKey.FreezedSession);
         };
 
+        const handleClearAll = () => {
+            store.processManager.destroyAllProcesses();
+            store.virtualViewport.setViewports([]);
+            store.virtualViewport.addViewport(
+                new VirtualViewportModel({
+                    displayMode: store.display.defaultDisplayMode,
+                }),
+            );
+        };
+
         const handleShowMenu = (e: React.MouseEvent) => {
             const x = e.pageX;
             const y = e.pageY;
@@ -33,6 +44,11 @@ export const VirtualFrameActions = observer(
                     icon: <Save />,
                     content: "Сохранить сессию",
                     onClick: () => handleSaveUserSession(),
+                }),
+                new ContextMenuItemModel({
+                    icon: <Clear />,
+                    content: "Очистить все",
+                    onClick: () => handleClearAll(),
                 }),
             ]);
         };
@@ -47,12 +63,15 @@ export const VirtualFrameActions = observer(
                                 color="secondary"
                                 onClick={handleShowMenu}
                             >
-                                <MoreHoriz />
+                                <MoreVert />
                             </IconButton>
                         </div>
                     }
                     content={
-                        <VirtualFramePreviewBase onClick={props.onAdd}>
+                        <VirtualFramePreviewBase
+                            color="light"
+                            onClick={props.onAdd}
+                        >
                             <div className={style.addAction}>
                                 <Add />
                             </div>

@@ -13,6 +13,7 @@ import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
+import { AuthEventType } from "models/auth/AuthEventType";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { ExternalApplication } from "models/ExternalApplication";
 import React, { Component, lazy, Suspense } from "react";
@@ -106,6 +107,8 @@ export class ShellScreen extends Component<IStore> {
             }
         }
         this.store.recovery.fetchLastUserSession();
+
+        this.store.sharedEventBus.eventBus.dispatch(AuthEventType.OnEntry);
     }
 
     handleClickDesktop = () => {

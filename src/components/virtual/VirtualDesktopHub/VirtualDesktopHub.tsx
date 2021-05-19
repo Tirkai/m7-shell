@@ -21,15 +21,22 @@ export const VirtualDesktopHub = observer(() => {
     };
 
     const handleCreateViewport = () => {
-        const viewport = new VirtualViewportModel({
-            displayMode: store.display.defaultDisplayMode,
-        });
+        if (store.virtualViewport.viewports.length < 99) {
+            const viewport = new VirtualViewportModel({
+                displayMode: store.display.defaultDisplayMode,
+            });
 
-        viewport.setTilePreset(
-            TileFactory.createTilePreset(store.tile.defaultTileTemplate),
-        );
+            viewport.setTilePreset(
+                TileFactory.createTilePreset(store.tile.defaultTileTemplate),
+            );
 
-        store.virtualViewport.addViewport(viewport);
+            store.virtualViewport.addViewport(viewport);
+        } else {
+            store.message.showMessage(
+                "Поздравляем! 🎉🎉🎉",
+                "Вашему упорству можно позавидовать! 🙀",
+            );
+        }
     };
 
     const handleRemoveViewport = (viewport: VirtualViewportModel) => {
