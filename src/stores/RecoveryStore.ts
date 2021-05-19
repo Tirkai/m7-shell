@@ -229,6 +229,11 @@ export class RecoveryStore {
                     (v) => v.id === item.viewportId,
                 );
 
+                // console.log(
+                //     "RECOVERY_VIEWPORT",
+                //     `${viewport?.id} ${viewport?.displayMode?.type} ${viewport?.tilePreset?.alias}`,
+                // );
+
                 runner.run(app, { viewport });
             });
             resolve({});
@@ -278,7 +283,9 @@ export class RecoveryStore {
             } else {
                 this.store.virtualViewport.setCurrentViewport(first);
             }
-            resolve({});
+            setTimeout(() => {
+                resolve({});
+            }, 1000);
         });
     }
 }

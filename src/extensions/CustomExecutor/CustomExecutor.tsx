@@ -25,7 +25,9 @@ export const CustomExecutor = () => {
 
         store.applicationManager.addApplication(app);
 
-        new ApplicationRunner(store).run(app);
+        new ApplicationRunner(store).run(app, {
+            focusWindowAfterInstantiate: true,
+        });
     };
 
     return (

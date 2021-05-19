@@ -40,9 +40,12 @@ export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
                 new Point2D(e.pageX, e.pageY),
                 [
                     new ContextMenuItemModel({
-                        icon: refresh,
+                        icon: <SVGIcon source={refresh} color="white" />,
                         content: strings.application.actions.hardReset,
-                        onClick: this.props.onReload,
+                        onClick: () =>
+                            this.props.onReload
+                                ? this.props.onReload()
+                                : undefined,
                     }),
                 ],
             );

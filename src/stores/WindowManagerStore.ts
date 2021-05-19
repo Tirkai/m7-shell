@@ -89,7 +89,10 @@ export class WindowManagerStore {
 
     addWindow(appWindow: ApplicationWindow) {
         this.windows.push(appWindow);
-        this.focusWindow(appWindow);
+
+        if (appWindow.focusAfterInstantiate) {
+            this.focusWindow(appWindow);
+        }
     }
 
     onProcessStart(appProcess: ApplicationProcess) {

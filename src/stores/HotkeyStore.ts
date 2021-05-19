@@ -37,6 +37,12 @@ export class HotkeyStore {
                 eventName: KeyboardEventType.ArrowDownWithControl,
                 actionHandler: (eventName) => this.actionHandler(eventName),
             }),
+            new KeyboardBinding({
+                inputKey: "ArrowDown",
+                useControl: true,
+                eventName: KeyboardEventType.ArrowDownWithControl,
+                actionHandler: (eventName) => this.actionHandler(eventName),
+            }),
         ];
 
         window.addEventListener("keyup", (event: KeyboardEvent) => {

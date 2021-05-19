@@ -4,7 +4,7 @@ import {
     CircularProgress,
     FormControlLabel,
     Radio,
-    RadioGroup,
+    RadioGroup
 } from "@material-ui/core";
 import { empty } from "assets/icons";
 import classNames from "classnames";
@@ -158,7 +158,7 @@ export const NotificationHub = observer(() => {
             store.shell.setActivePanel(ShellPanelType.None);
 
             const runner = new ApplicationRunner(store);
-            runner.run(app, { url });
+            runner.run(app, { url, focusWindowAfterInstantiate: true });
         } else {
             console.warn("Try run application with empty URL");
         }
@@ -174,6 +174,7 @@ export const NotificationHub = observer(() => {
         if (notificationApp) {
             runner.run(notificationApp, {
                 params: new Map([["filterByAppId", group.id]]),
+                focusWindowAfterInstantiate: true
             });
         }
     };

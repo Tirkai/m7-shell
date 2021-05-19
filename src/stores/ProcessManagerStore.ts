@@ -2,7 +2,7 @@ import {
     AppMessageType,
     EmitterMessage,
     invokeListeners,
-    ShellMessageType,
+    ShellMessageType
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
@@ -185,7 +185,7 @@ export class ProcessManagerStore {
                     const runner = new ApplicationRunner(this.store);
 
                     if (findedApp) {
-                        runner.run(findedApp, { url });
+                        runner.run(findedApp, { url, focusWindowAfterInstantiate: true });
                     } else {
                         const processUrl = new URL(url);
 
@@ -194,6 +194,7 @@ export class ProcessManagerStore {
                                 name: processUrl.host,
                                 url,
                             }),
+                            { focusWindowAfterInstantiate: true }
                         );
                     }
                 },

@@ -37,6 +37,7 @@ export class ApplicationWindow implements IApplicationWindow {
     viewport: VirtualViewportModel;
     offsetIndex: number;
     area: string;
+    focusAfterInstantiate: boolean;
 
     // eventTarget: EventBus = new EventBus();
 
@@ -80,6 +81,7 @@ export class ApplicationWindow implements IApplicationWindow {
         this.lockedY = this.y;
         this.depthIndex = options.depthIndex ?? 1;
         this.offsetIndex = 0;
+        this.focusAfterInstantiate = options.focusAfterInstantiate ?? false;
 
         this.initialize(options);
 

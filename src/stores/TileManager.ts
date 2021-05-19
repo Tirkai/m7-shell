@@ -69,9 +69,8 @@ export class TileManager {
             (displayMode: DisplayMode) => this.onDisplayModeChange(displayMode),
         );
 
-        this.store.sharedEventBus.eventBus.add(
-            AuthEventType.OnLogout,
-            () => this.onLogout(),
+        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () =>
+            this.onLogout(),
         );
     }
 
@@ -89,13 +88,11 @@ export class TileManager {
         //
     }
 
-    onLogout(){
-
+    onLogout() {
         const template = this.findTileTemplateByAlias("1x1");
-        if(template){
+        if (template) {
             this.setDefaultTileTemplate(template);
         }
-
     }
 
     onDragStop(tileWindow: ApplicationWindow) {
@@ -138,9 +135,6 @@ export class TileManager {
 
     findTileTemplateByAlias(alias: string) {
         const template = this.templates.find((item) => item.alias === alias);
-        console.log(`FIND_TILE_TEMPLATE_BY_ALIAS`, { alias }, this.templates, {
-            template,
-        });
 
         return template;
     }
@@ -172,7 +166,6 @@ export class TileManager {
                 if (preset?.freeCells.length) {
                     const tileCell = preset.nearbyFreeCell;
                     const appWindow = appProcess.window;
-
                     this.store.tile.attachWindowToCell(
                         appWindow,
                         preset,
@@ -186,6 +179,7 @@ export class TileManager {
                 }
             }
         } else {
+            // return true;
             // TODO
             // Т.к. работа выполняется в основном с viewport, вынести отдельным событием и обрабатывать в ViewportManager
             const currentViewport = this.store.virtualViewport.currentViewport;
@@ -197,7 +191,6 @@ export class TileManager {
                 newViewport,
                 this.store.virtualViewport.currentViewport,
             );
-
             if (template) {
                 if (preset?.isEmptyPreset) {
                     this.store.tile.applyPresetToViewport(
@@ -214,7 +207,6 @@ export class TileManager {
                         template,
                         newViewport,
                     );
-
                     this.store.virtualViewport.applyViewportToWindow(
                         newViewport,
                         appProcess.window,

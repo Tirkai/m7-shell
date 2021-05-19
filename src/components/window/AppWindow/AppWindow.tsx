@@ -80,11 +80,21 @@ export const AppWindow = (props: IAppWindowProps) => {
 
     const handleReload = () => {
         // props.process.emitter.emit(ShellMessageType.ReloadPage, {});
+        // alert();
+        // const ctx = props.process.emitter.context;
+        // // const iFrame = (frame as unknown) as HTMLIFrameElement;
+        // // console.log({ iFrame });
 
-        const iFrame = (frame as unknown) as HTMLIFrameElement;
-        if (iFrame) {
-            iFrame.setAttribute("src", iFrame.getAttribute("src") ?? "");
-        }
+        // const url = new URL(props.process.url);
+        
+        // url.search.
+
+        // // props.process.setUrl(props.process.url);
+
+        // if (ctx) {
+        //     // iFrame.setAttribute("src", iFrame.getAttribute("src") ?? "");
+        //     // ctx.location.reload();
+        // }
     };
 
     const handleAppReady = () => {
@@ -163,7 +173,7 @@ export const AppWindow = (props: IAppWindowProps) => {
                             hasBackward={false}
                             hasReload={true}
                             onBackward={() => true}
-                            onReload={handleReload}
+                            onReload={() => handleReload()}
                             onCollapse={() => handleCollapse()}
                             onFullscreen={() => handleFullScreen()}
                         />

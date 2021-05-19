@@ -10,6 +10,7 @@ interface IApplicationRunnerOptions {
     url?: string;
     params?: Map<string, string>;
     viewport?: VirtualViewportModel;
+    focusWindowAfterInstantiate?: boolean;
 }
 
 export class ApplicationRunner {
@@ -39,6 +40,8 @@ export class ApplicationRunner {
                         viewport.displayMode?.windowType ??
                         ApplicationWindowType.Unknown,
                     viewport,
+                    focusAfterInstantiate:
+                        options?.focusWindowAfterInstantiate ?? false,
                 },
                 this.store,
             );

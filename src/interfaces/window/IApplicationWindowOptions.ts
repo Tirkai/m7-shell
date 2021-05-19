@@ -14,4 +14,5 @@ export interface IApplicationWindowOptions {
     area?: string;
     depthIndex?: number;
     offsetIndex?: number;
+    focusAfterInstantiate?: boolean;
 }

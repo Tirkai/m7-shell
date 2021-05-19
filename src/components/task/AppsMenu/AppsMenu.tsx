@@ -28,10 +28,10 @@ export const AppsMenu: React.FC = observer(() => {
         setSearching(value.length > 0);
     };
 
-    const handleExecuteApp = (app: Application) => {
-        const runner = new ApplicationRunner(store);
-        runner.run(app);
-    };
+    const handleExecuteApp = (app: Application) =>
+        new ApplicationRunner(store).run(app, {
+            focusWindowAfterInstantiate: true,
+        });
 
     const getFilteredByPlace = (
         apps: Application[],

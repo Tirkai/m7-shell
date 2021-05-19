@@ -3,4 +3,5 @@ export enum KeyboardEventType {
     ArrowRightWithControl = "ArrowRightWithControl",
     ArrowUpWithControl = "ArrowUpWithControl",
     ArrowDownWithControl = "ArrowDownWithControl",
+    PlusWithControl = "PlusWithControl",
 }

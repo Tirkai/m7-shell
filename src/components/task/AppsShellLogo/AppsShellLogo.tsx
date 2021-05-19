@@ -26,7 +26,9 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
     }
 
     handleExecuteApp = (app: Application) => {
-        new ApplicationRunner(this.store).run(app);
+        new ApplicationRunner(this.store).run(app, {
+            focusWindowAfterInstantiate: true,
+        });
     };
 
     handleShowDropdown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {

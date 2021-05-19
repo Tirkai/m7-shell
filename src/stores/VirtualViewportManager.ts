@@ -3,7 +3,6 @@ import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
-import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileEventType } from "models/tile/TileEventType";
 import { TileTemplate } from "models/tile/TileTemplate";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
@@ -29,11 +28,11 @@ export class VirtualViewportManager {
         // const [initialViewport] = this.viewports;
         // this.currentViewport = initialViewport;
 
-        this.store.sharedEventBus.eventBus.add(
-            ProcessEventType.OnInstantiateProcess,
-            (appProcess: ApplicationProcess) =>
-                this.onInstantiateProcess(appProcess),
-        );
+        // this.store.sharedEventBus.eventBus.add(
+        //     ProcessEventType.OnInstantiateProcess,
+        //     (appProcess: ApplicationProcess) =>
+        //         this.onInstantiateProcess(appProcess),
+        // );
 
         this.store.sharedEventBus.eventBus.add(
             VirtualViewportEventType.OnRemoveViewportFrame,
@@ -82,6 +81,11 @@ export class VirtualViewportManager {
         this.store.sharedEventBus.eventBus.add(
             KeyboardEventType.ArrowRightWithControl,
             () => this.onKeyboardArrowRightWithControl(),
+        );
+
+        this.store.sharedEventBus.eventBus.add(
+            KeyboardEventType.PlusWithControl,
+            () => this.onKeyboardPlusWithControl(),
         );
 
         this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () =>
@@ -137,6 +141,11 @@ export class VirtualViewportManager {
         }
     }
 
+    onKeyboardPlusWithControl() {
+        const viewport = new VirtualViewportModel();
+        this.addViewport(viewport);
+    }
+
     onChangePreset(template: TileTemplate, viewport: VirtualViewportModel) {
         const viewportProcesses = this.store.processManager.processes.filter(
             (item) => item.window.viewport.id === viewport.id,
@@ -166,7 +175,8 @@ export class VirtualViewportManager {
     }
 
     onInstantiateProcess(process: ApplicationProcess) {
-        this.applyViewportToWindow(this.currentViewport, process.window);
+        // Из за этого метода я страдал 3 дня
+        // this.applyViewportToWindow(this.currentViewport, process.window);
     }
 
     onRemoveViewportFrame(viewport: VirtualViewportModel) {
