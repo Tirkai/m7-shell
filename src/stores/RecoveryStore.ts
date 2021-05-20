@@ -61,7 +61,7 @@ export class RecoveryStore {
             this.onApplicationListLoaded();
         });
 
-        eventBus.add(VirtualViewportEventType.OnChangeViewportFrame, () => {
+        eventBus.add(VirtualViewportEventType.OnSelectViewportFrame, () => {
             this.saveSnapshot(UserDatabasePropKey.DynamicSession);
         });
 
@@ -118,6 +118,7 @@ export class RecoveryStore {
                 templateAlias: item.tilePreset?.alias ?? "1x1",
                 // TODO: Remove default display mode
                 displayModeType: item.displayMode?.type ?? DisplayModeType.Tile,
+                index: item.index,
             })),
         };
 
@@ -257,6 +258,7 @@ export class RecoveryStore {
                 const viewport = new VirtualViewportModel({
                     id: item.viewportId,
                     displayMode,
+                    index: item.index,
                 });
 
                 viewport.setTilePreset(preset);

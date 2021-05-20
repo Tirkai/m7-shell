@@ -33,4 +33,8 @@ export class VirtualViewportModel {
     setDisplayMode(displayMode: DisplayMode) {
         this.displayMode = displayMode;
     }
+
+    setIndex(value: number) {
+        this.index = value;
+    }
 }

@@ -1,5 +1,5 @@
 import { TileFactory } from "factories/TileFactory";
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, toJS } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
@@ -25,78 +25,85 @@ export class VirtualViewportManager {
     constructor(store: AppStore) {
         this.store = store;
 
-        // const [initialViewport] = this.viewports;
-        // this.currentViewport = initialViewport;
+        const subscribes = [
+            {
+                type: VirtualViewportEventType.OnRemoveViewportFrame,
+                handler: (viewport: VirtualViewportModel) =>
+                    this.onRemoveViewportFrame(viewport),
+            },
+            {
+                type: VirtualViewportEventType.OnRemoveViewportFrame,
+                handler: (viewport: VirtualViewportModel) =>
+                    this.onRemoveViewportFrame(viewport),
+            },
+            {
+                type: TileEventType.OnChangePreset,
+                handler: (payload: {
+                    template: TileTemplate;
+                    viewport: VirtualViewportModel;
+                }) => this.onChangePreset(payload.template, payload.viewport),
+            },
+            {
+                type: TileEventType.OnTileViewportSplit,
+                handler: (excessProcesses: ApplicationProcess[]) =>
+                    this.onTileViewportSplit(excessProcesses),
+            },
+            {
+                type: TileEventType.OnTileViewportOverflow,
+                handler: (excessProcess: ApplicationProcess) =>
+                    this.onTileViewportOverflow(excessProcess),
+            },
+            {
+                type: TileEventType.OnTileViewportSpread,
+                handler: (payload: {
+                    chunks: ApplicationProcess[][];
+                    viewport: VirtualViewportModel;
+                }) =>
+                    this.onTileViewportSpread(payload.chunks, payload.viewport),
+            },
+            {
+                type: ApplicationWindowEventType.OnFocusWindow,
+                handler: (appWindow: ApplicationWindow) =>
+                    this.onFocusWindow(appWindow),
+            },
+            {
+                type: VirtualViewportEventType.OnAddViewportFrame,
+                handler: (viewport: VirtualViewportModel) =>
+                    this.onChangeViewport(viewport),
+            },
+            {
+                type: VirtualViewportEventType.OnRemoveViewportFrame,
+                handler: (viewport: VirtualViewportModel) =>
+                    this.onChangeViewport(viewport),
+            },
+            {
+                type: KeyboardEventType.ArrowLeftWithControl,
+                handler: () => this.onKeyboardArrowLeftWithControl(),
+            },
+            {
+                type: KeyboardEventType.ArrowRightWithControl,
+                handler: () => this.onKeyboardArrowRightWithControl(),
+            },
+            {
+                type: KeyboardEventType.PlusWithControl,
+                handler: () => this.onKeyboardPlusWithControl(),
+            },
+            {
+                type: AuthEventType.OnLogout,
+                handler: () => this.onLogout(),
+            },
+            {
+                type: AuthEventType.OnEntry,
+                handler: () => this.init(),
+            },
+        ];
 
-        // this.store.sharedEventBus.eventBus.add(
-        //     ProcessEventType.OnInstantiateProcess,
-        //     (appProcess: ApplicationProcess) =>
-        //         this.onInstantiateProcess(appProcess),
-        // );
-
-        this.store.sharedEventBus.eventBus.add(
-            VirtualViewportEventType.OnRemoveViewportFrame,
-            (viewport: VirtualViewportModel) =>
-                this.onRemoveViewportFrame(viewport),
+        subscribes.forEach((item) =>
+            this.store.sharedEventBus.eventBus.add<any>(
+                item.type,
+                item.handler,
+            ),
         );
-
-        this.store.sharedEventBus.eventBus.add(
-            TileEventType.OnChangePreset,
-            (payload: {
-                template: TileTemplate;
-                viewport: VirtualViewportModel;
-            }) => this.onChangePreset(payload.template, payload.viewport),
-        );
-
-        this.store.sharedEventBus.eventBus.add(
-            TileEventType.OnTileViewportSplit,
-            (excessProcesses: ApplicationProcess[]) =>
-                this.onTileViewportSplit(excessProcesses),
-        );
-
-        this.store.sharedEventBus.eventBus.add(
-            TileEventType.OnTileViewportOverflow,
-            (excessProcess: ApplicationProcess) =>
-                this.onTileViewportOverflow(excessProcess),
-        );
-
-        this.store.sharedEventBus.eventBus.add(
-            TileEventType.OnTileViewportSpread,
-            (payload: {
-                chunks: ApplicationProcess[][];
-                viewport: VirtualViewportModel;
-            }) => this.onTileViewportSpread(payload.chunks, payload.viewport),
-        );
-
-        this.store.sharedEventBus.eventBus.add(
-            ApplicationWindowEventType.OnFocusWindow,
-            (appWindow: ApplicationWindow) => this.onFocusWindow(appWindow),
-        );
-
-        this.store.sharedEventBus.eventBus.add(
-            KeyboardEventType.ArrowLeftWithControl,
-            () => this.onKeyboardArrowLeftWithControl(),
-        );
-
-        this.store.sharedEventBus.eventBus.add(
-            KeyboardEventType.ArrowRightWithControl,
-            () => this.onKeyboardArrowRightWithControl(),
-        );
-
-        this.store.sharedEventBus.eventBus.add(
-            KeyboardEventType.PlusWithControl,
-            () => this.onKeyboardPlusWithControl(),
-        );
-
-        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () =>
-            this.onLogout(),
-        );
-
-        this.store.sharedEventBus.eventBus.add(AuthEventType.OnEntry, () => {
-            this.init();
-        });
-
-        // this.init();
 
         makeAutoObservable(this);
     }
@@ -114,13 +121,24 @@ export class VirtualViewportManager {
     }
 
     onLogout() {
-        // const viewport = new VirtualViewportModel({
-        //     tilePreset: TileFactory.createTilePreset(
-        //         this.store.tile.defaultTileTemplate,
-        //     ),
-        // });
         this.setViewports([]);
-        // this.setCurrentViewport(viewport);
+    }
+
+    onChangeViewport(viewport: VirtualViewportModel) {
+        // const index = this.getIndexByViewport(viewport);
+
+        // const after = this.viewports.slice(index + 1);
+        // const before = this.viewports.slice(0, index);
+
+        // before.forEach((item, i) => {
+        //     item.setIndex(i);
+        // });
+
+        this.viewports.forEach((item, index) => {
+            item.setIndex(index);
+        });
+
+        console.log("BA", toJS(this.viewports));
     }
 
     onKeyboardArrowLeftWithControl() {
@@ -172,11 +190,6 @@ export class VirtualViewportManager {
         appWindow: ApplicationWindow,
     ) {
         appWindow.setViewport(viewport);
-    }
-
-    onInstantiateProcess(process: ApplicationProcess) {
-        // Из за этого метода я страдал 3 дня
-        // this.applyViewportToWindow(this.currentViewport, process.window);
     }
 
     onRemoveViewportFrame(viewport: VirtualViewportModel) {
@@ -316,7 +329,7 @@ export class VirtualViewportManager {
         this.currentViewport = viewport;
 
         this.store.sharedEventBus.eventBus.dispatch(
-            VirtualViewportEventType.OnChangeViewportFrame,
+            VirtualViewportEventType.OnSelectViewportFrame,
             viewport,
         );
     }

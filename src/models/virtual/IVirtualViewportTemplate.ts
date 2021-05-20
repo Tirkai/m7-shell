@@ -4,4 +4,5 @@ export interface IVirtualViewportTemplate {
     viewportId: string;
     templateAlias: string;
     displayModeType: DisplayModeType;
+    index: number;
 }

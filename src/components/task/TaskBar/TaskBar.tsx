@@ -1,19 +1,17 @@
 import { SVGIcon } from "@algont/m7-ui";
 import { apps, cross, virtual } from "assets/icons";
 import classNames from "classnames";
-import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
 import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
 import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellPanelType } from "enum/ShellPanelType";
-import { IStore } from "interfaces/common/IStore";
+import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { groupBy } from "lodash";
-import { computed } from "mobx";
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
-import React, { Component } from "react";
+import React, { useMemo } from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
 import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
@@ -21,99 +19,90 @@ import { TaskGroup } from "../TaskGroup/TaskGroup";
 import { TaskHint } from "../TaskHint/TaskHint";
 import style from "./style.module.css";
 
-@inject("store")
-@observer
-export class TaskBar extends Component<IStore> {
-    @computed
-    get store() {
-        return this.props.store!;
-    }
+export const TaskBar = observer(() => {
+    const store = useStore();
 
-    state = {
-        isShow: false,
-    };
-
-    handleShowAppsMenu = (value: boolean) => {
-        if (this.store.applicationManager.applications.length) {
-            this.store.shell.setActivePanel(
+    const handleShowAppsMenu = (value: boolean) => {
+        if (store.applicationManager.applications.length) {
+            store.shell.setActivePanel(
                 value ? ShellPanelType.StartMenu : ShellPanelType.None,
             );
         } else {
-            this.store.message.showMessage(
+            store.message.showMessage(
                 strings.error.noAvailableApplications,
                 strings.error.failedGetAvailableApplications,
             );
         }
     };
 
-    handleFocusAppWindow = (appWindow: ApplicationWindow) => {
-        this.store.windowManager.focusWindow(appWindow);
+    const handleFocusAppWindow = (appWindow: ApplicationWindow) => {
+        store.windowManager.focusWindow(appWindow);
         if (appWindow instanceof ApplicationWindow) {
             if (appWindow.isCollapsed) {
-                this.store.windowManager.expandWindow(appWindow);
+                store.windowManager.expandWindow(appWindow);
             }
         }
     };
 
-    handleShowNotificationHub = (value: boolean) => {
-        this.store.shell.setActivePanel(
+    const handleShowNotificationHub = (value: boolean) => {
+        store.shell.setActivePanel(
             value ? ShellPanelType.NotificationHub : ShellPanelType.None,
         );
     };
 
-    handleShowAudioHub = () => {
-        this.store.shell.setActivePanel(
-            this.store.shell.activePanel !== ShellPanelType.AudioHub
+    const handleShowAudioHub = () => {
+        store.shell.setActivePanel(
+            store.shell.activePanel !== ShellPanelType.AudioHub
                 ? ShellPanelType.AudioHub
                 : ShellPanelType.None,
         );
     };
 
-    handleKillProcess = (appProcess: ApplicationProcess) => {
-        this.store.processManager.killProcess(appProcess);
+    const handleKillProcess = (appProcess: ApplicationProcess) => {
+        store.processManager.killProcess(appProcess);
     };
 
-    handleShowTileHub = () => {
-        this.store.shell.setActivePanel(
-            this.store.shell.activePanel !== ShellPanelType.TileHub
+    const handleShowTileHub = () => {
+        store.shell.setActivePanel(
+            store.shell.activePanel !== ShellPanelType.TileHub
                 ? ShellPanelType.TileHub
                 : ShellPanelType.None,
         );
     };
 
-    handleShowVirtualHub = () => {
-        this.store.shell.setActivePanel(
-            this.store.shell.activePanel !== ShellPanelType.Virtual
+    const handleShowVirtualHub = () => {
+        store.shell.setActivePanel(
+            store.shell.activePanel !== ShellPanelType.Virtual
                 ? ShellPanelType.Virtual
                 : ShellPanelType.None,
         );
     };
 
-    handleCloseViewportGroup = (process: ApplicationProcess) => {
+    const handleCloseViewportGroup = (process: ApplicationProcess) => {
         const viewport = process.window.viewport;
-        this.store.processManager.processes
+        store.processManager.processes
             .filter((item) => item.window.viewport.id === viewport.id)
-            .forEach((item) => this.store.processManager.killProcess(item));
+            .forEach((item) => store.processManager.killProcess(item));
     };
 
-    createCloseApplicationContextMenuItem = (
+    const createCloseApplicationContextMenuItem = (
         appProcess: ApplicationProcess,
     ) => [
         new ContextMenuItemModel({
             icon: <SVGIcon source={cross} color="white" />,
             content: strings.application.actions.close,
-            onClick: () => this.handleKillProcess(appProcess),
+            onClick: () => handleKillProcess(appProcess),
         }),
         // new ContextMenuItemModel({
         //     icon: cross,
         //     content: "Закрыть группу",
-        //     onClick: () => this.handleCloseViewportGroup(appProcess),
+        //     onClick: () => handleCloseViewportGroup(appProcess),
         // }),
     ];
 
-    render() {
+    const tasksGroups = useMemo(() => {
         const groups = groupBy(
-            this.store.processManager.processes,
+            store.processManager.processes,
             "window.viewport.id",
         );
 
@@ -125,128 +114,101 @@ export class TaskBar extends Component<IStore> {
             }),
         );
 
-        return (
-            <>
-                <div
-                    className={classNames(style.taskBar, {
-                        // [style.show]: this.state.isShow,
-                    })}
-                >
-                    <BackdropWrapper active>
-                        <div className={style.container}>
-                            <div className={style.tasks}>
+        const sortedGroups = groupedProcessesByViewport.sort((a, b) => {
+            const firstIndex = a.value[0].window.viewport.index;
+            const secondIndex = b.value[0].window.viewport.index;
+            return firstIndex - secondIndex;
+        });
+        return sortedGroups;
+    }, [store.processManager.processes.length]);
+
+    return (
+        <div
+            className={classNames(style.taskBar, {
+                // [style.show]: state.isShow,
+            })}
+        >
+            <div className={style.container}>
+                <div className={style.tasks}>
+                    <TaskBarItem
+                        onClick={() =>
+                            handleShowAppsMenu(!store.shell.appMenuShow)
+                        }
+                    >
+                        <SVGIcon source={apps} color="white" />
+                    </TaskBarItem>
+                    <TaskBarItem onClick={() => handleShowVirtualHub()}>
+                        <SVGIcon source={virtual} color="white" />
+                    </TaskBarItem>
+
+                    {tasksGroups.map((group, groupIndex) => (
+                        <TaskGroup
+                            key={group.key}
+                            active={
+                                group.key ===
+                                store.virtualViewport.currentViewport.id
+                            }
+                        >
+                            {group.value.map((appProcess) => (
                                 <TaskBarItem
+                                    key={appProcess.id}
+                                    hint={<TaskHint title={appProcess.name} />}
+                                    focused={appProcess.window.isFocused}
                                     onClick={() =>
-                                        this.handleShowAppsMenu(
-                                            !this.props.store?.shell
-                                                .appMenuShow,
-                                        )
+                                        handleFocusAppWindow(appProcess.window)
                                     }
+                                    menu={createCloseApplicationContextMenuItem(
+                                        appProcess,
+                                    )}
                                 >
-                                    <SVGIcon source={apps} color="white" />
-                                </TaskBarItem>
-                                <TaskBarItem
-                                    onClick={() => this.handleShowVirtualHub()}
-                                >
-                                    <SVGIcon source={virtual} color="white" />
-                                </TaskBarItem>
-
-                                {groupedProcessesByViewport.map(
-                                    (group, groupIndex) => (
-                                        <React.Fragment key={group.key}>
-                                            <TaskGroup
-                                                active={
-                                                    group.key ===
-                                                    this.store.virtualViewport
-                                                        .currentViewport.id
-                                                }
-                                            >
-                                                {group.value.map(
-                                                    (appProcess) => (
-                                                        <TaskBarItem
-                                                            key={appProcess.id}
-                                                            hint={
-                                                                <TaskHint
-                                                                    title={
-                                                                        appProcess.name
-                                                                    }
-                                                                />
-                                                            }
-                                                            focused={
-                                                                appProcess
-                                                                    .window
-                                                                    .isFocused
-                                                            }
-                                                            onClick={() =>
-                                                                this.handleFocusAppWindow(
-                                                                    appProcess.window,
-                                                                )
-                                                            }
-                                                            menu={this.createCloseApplicationContextMenuItem(
-                                                                appProcess,
-                                                            )}
-                                                        >
-                                                            <SVGIcon
-                                                                source={
-                                                                    appProcess
-                                                                        .app
-                                                                        .icon
-                                                                }
-                                                                color="white"
-                                                            />
-                                                        </TaskBarItem>
-                                                    ),
-                                                )}
-                                            </TaskGroup>
-                                        </React.Fragment>
-                                    ),
-                                )}
-                            </div>
-
-                            <div className={style.actions}>
-                                <TaskBarItem onClick={this.handleShowAudioHub}>
-                                    <TaskBarSound
-                                        volume={this.store.audio.volume}
-                                        isMuted={this.store.audio.isMute}
+                                    <SVGIcon
+                                        source={appProcess.app.icon}
+                                        color="white"
                                     />
                                 </TaskBarItem>
-                                <TaskBarItem autoWidth>
-                                    <TaskBarDateTime />
-                                </TaskBarItem>
-
-                                <TaskBarItem
-                                    badge={
-                                        this.store.notification.status ===
-                                        NotificationServiceConnectStatus.Connected
-                                            ? this.store.notification
-                                                  .totalCount > 0
-                                                ? this.store.notification.totalCount.toString()
-                                                : undefined
-                                            : undefined
-                                    }
-                                    onClick={() =>
-                                        this.handleShowNotificationHub(
-                                            !this.store.shell
-                                                .notificationHubShow,
-                                        )
-                                    }
-                                >
-                                    <NotificationTaskbarItem
-                                        status={this.store.notification.status}
-                                        exist={
-                                            this.store.notification.status ===
-                                            NotificationServiceConnectStatus.Connected
-                                                ? this.store.notification
-                                                      .isExistNotifications
-                                                : false
-                                        }
-                                    />
-                                </TaskBarItem>
-                            </div>
-                        </div>
-                    </BackdropWrapper>
+                            ))}
+                        </TaskGroup>
+                    ))}
                 </div>
-            </>
-        );
-    }
-}
+
+                <div className={style.actions}>
+                    <TaskBarItem onClick={handleShowAudioHub}>
+                        <TaskBarSound
+                            volume={store.audio.volume}
+                            isMuted={store.audio.isMute}
+                        />
+                    </TaskBarItem>
+                    <TaskBarItem autoWidth>
+                        <TaskBarDateTime />
+                    </TaskBarItem>
+
+                    <TaskBarItem
+                        badge={
+                            store.notification.status ===
+                            NotificationServiceConnectStatus.Connected
+                                ? store.notification.totalCount > 0
+                                    ? store.notification.totalCount.toString()
+                                    : undefined
+                                : undefined
+                        }
+                        onClick={() =>
+                            handleShowNotificationHub(
+                                !store.shell.notificationHubShow,
+                            )
+                        }
+                    >
+                        <NotificationTaskbarItem
+                            status={store.notification.status}
+                            exist={
+                                store.notification.status ===
+                                NotificationServiceConnectStatus.Connected
+                                    ? store.notification.isExistNotifications
+                                    : false
+                            }
+                        />
+                    </TaskBarItem>
+                </div>
+            </div>
+        </div>
+    );
+});

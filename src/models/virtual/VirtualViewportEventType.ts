@@ -1,7 +1,7 @@
 export enum VirtualViewportEventType {
-    OnChangeViewportFrame = "OnChangeViewportFrame",
+    OnSelectViewportFrame = "OnSelectViewportFrame",
     OnAddViewportFrame = "OnAddViewportFrame",
     OnRemoveViewportFrame = "OnRemoveViewportFrame",
     OnClearViewportFrame = "OnClearViewportFrame",
-    OnAutoCreateViewportFrame = "OnAutoCreateViewportFrame"
+    OnAutoCreateViewportFrame = "OnAutoCreateViewportFrame",
 }
