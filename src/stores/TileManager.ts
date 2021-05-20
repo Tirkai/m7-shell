@@ -17,10 +17,6 @@ import { TileWindowModel } from "models/window/TileWindowModel";
 import { registeredTileTemplates } from "registeredTilePresets";
 import { AppStore } from "stores/AppStore";
 
-interface IApplyPresetToViewportOptions {
-    applyDefaultPreset?: boolean;
-}
-
 export class TileManager {
     private store: AppStore;
     constructor(store: AppStore) {
@@ -179,7 +175,6 @@ export class TileManager {
                 }
             }
         } else {
-            // return true;
             // TODO
             // Т.к. работа выполняется в основном с viewport, вынести отдельным событием и обрабатывать в ViewportManager
             const currentViewport = this.store.virtualViewport.currentViewport;
@@ -223,8 +218,6 @@ export class TileManager {
         viewport: VirtualViewportModel,
     ) {
         if (template) {
-            // const createdPreset = TileFactory.createTilePreset(template);
-
             this.store.sharedEventBus.eventBus.dispatch(
                 TileEventType.OnChangePreset,
                 { template, viewport },

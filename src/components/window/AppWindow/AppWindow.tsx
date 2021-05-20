@@ -21,8 +21,6 @@ interface IAppWindowProps {
     isDragging: boolean;
     isFocused: boolean;
     url: string;
-    // x: number;
-    // y: number;
     onResizeStart: (event: MouseEvent, data: ResizeCallbackData) => void;
     onResizeStop: () => void;
     onResize: (event: MouseEvent, data: ResizeCallbackData) => void;
@@ -64,7 +62,6 @@ export const AppWindow = (props: IAppWindowProps) => {
     };
 
     const handleFullScreen = () => {
-        // props.window.setFullScreen(!props.window.isFullScreen);
         store.windowManager.applyFullscreenToWindow(
             props.window,
             !props.window.isFullScreen,
@@ -72,37 +69,17 @@ export const AppWindow = (props: IAppWindowProps) => {
     };
 
     const handleCollapse = () => {
-        // props.window.setCollapsed(true);
         store.windowManager.applyCollapseToWindow(props.window, true);
     };
 
     const handleHeaderDoubleClick = () => handleFullScreen();
 
     const handleReload = () => {
-        // props.process.emitter.emit(ShellMessageType.ReloadPage, {});
-        // alert();
-
         props.process.rerollHash();
-
-        // const ctx = props.process.emitter.context;
-        // // const iFrame = (frame as unknown) as HTMLIFrameElement;
-        // // console.log({ iFrame });
-
-        // const url = new URL(props.process.url);
-
-        // url.search.
-
-        // // props.process.setUrl(props.process.url);
-
-        // if (ctx) {
-        //     // iFrame.setAttribute("src", iFrame.getAttribute("src") ?? "");
-        //     // ctx.location.reload();
-        // }
     };
 
     const handleAppReady = () => {
         setAppReady(true);
-        // props.process.setReady(true);
     };
 
     useEffect(() => {

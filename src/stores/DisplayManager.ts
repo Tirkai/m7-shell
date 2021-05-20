@@ -9,12 +9,6 @@ import { AppStore } from "stores/AppStore";
 export class DisplayManager {
     private store: AppStore;
 
-    // displayMode: DisplayMode;
-
-    // setDisplayMode(displayMode: DisplayMode) {
-    //     this.displayMode = displayMode;
-    // }
-
     displayModes: DisplayMode[] = registeredDisplayModes;
 
     defaultDisplayMode: DisplayMode;

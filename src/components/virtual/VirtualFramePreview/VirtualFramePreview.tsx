@@ -21,7 +21,6 @@ interface IVirtualFramePreviewProps {
     onClick?: () => void;
     onDelete?: () => void;
     active: boolean;
-    // children: React.ReactNode;
     viewport?: VirtualViewportModel;
     hasControls?: boolean;
     processes: ApplicationProcess[];

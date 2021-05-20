@@ -25,7 +25,6 @@ export class TileFactory {
             alias: "none",
             cells: [],
             areas: "",
-            // isEmptyPreset: true,
         });
     }
 }

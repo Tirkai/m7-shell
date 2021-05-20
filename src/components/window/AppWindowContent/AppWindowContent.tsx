@@ -79,10 +79,6 @@ export const AppWindowContent = observer((props: IAppWindowProps) => {
                     style={{
                         width: "100%",
                         height: "100%",
-                        // pointerEvents:
-                        //     props.isResizing || props.isDragging
-                        //         ? "none"
-                        //         : "all",
                     }}
                     frameBorder={0}
                 ></iframe>
@@ -96,12 +92,6 @@ export const AppWindowContent = observer((props: IAppWindowProps) => {
     }, [props.process.modifiedUrl]);
 
     return (
-        <div
-            className={classNames(style.appWindowContent, {
-                // [style.withHeader]: store.shell.displayMode.showAppWindowHeader,
-            })}
-        >
-            {appComponent}
-        </div>
+        <div className={classNames(style.appWindowContent)}>{appComponent}</div>
     );
 });

@@ -33,7 +33,6 @@ export const TileWindow = observer((props: ITileWindowProps) => {
 
     const handleAppReady = () => {
         setAppReady(true);
-        // props.process.setReady(true);
     };
 
     const gridStyle = {

@@ -78,13 +78,6 @@ export const TaskBar = observer(() => {
         );
     };
 
-    const handleCloseViewportGroup = (process: ApplicationProcess) => {
-        const viewport = process.window.viewport;
-        store.processManager.processes
-            .filter((item) => item.window.viewport.id === viewport.id)
-            .forEach((item) => store.processManager.killProcess(item));
-    };
-
     const createCloseApplicationContextMenuItem = (
         appProcess: ApplicationProcess,
     ) => [
@@ -93,11 +86,6 @@ export const TaskBar = observer(() => {
             content: strings.application.actions.close,
             onClick: () => handleKillProcess(appProcess),
         }),
-        // new ContextMenuItemModel({
-        //     icon: cross,
-        //     content: "Закрыть группу",
-        //     onClick: () => handleCloseViewportGroup(appProcess),
-        // }),
     ];
 
     const tasksGroups = useMemo(() => {
@@ -123,11 +111,7 @@ export const TaskBar = observer(() => {
     }, [store.processManager.processes.length]);
 
     return (
-        <div
-            className={classNames(style.taskBar, {
-                // [style.show]: state.isShow,
-            })}
-        >
+        <div className={classNames(style.taskBar)}>
             <div className={style.container}>
                 <div className={style.tasks}>
                     <TaskBarItem

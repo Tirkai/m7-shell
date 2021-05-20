@@ -36,7 +36,6 @@ export class WindowManagerStore {
                 })
                 .forEach((item) => {
                     if (item instanceof ApplicationWindow) {
-                        // return item.isFullScreen;
                         item.recalculateFullScreenSize();
                     }
                 });

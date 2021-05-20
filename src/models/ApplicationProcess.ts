@@ -27,7 +27,6 @@ export class ApplicationProcess {
     hash: string;
     disableParams: boolean;
     isReady: boolean;
-    // viewport: VirtualViewportModel;
 
     constructor(options: IApplicationProcessOptions) {
         makeAutoObservable(this);
@@ -40,7 +39,6 @@ export class ApplicationProcess {
         this.emitter = new ShellMessageEmitter(this.app.id);
         this.name = options.name ?? this.app.name;
         this.disableParams = options.disableParams ?? false;
-        // this.viewport = options.viewport;
         this.isReady = false;
 
         if (this.app instanceof ExternalApplication) {
@@ -70,10 +68,6 @@ export class ApplicationProcess {
     setWindow(appWindow: ApplicationWindow) {
         this.window = appWindow;
     }
-
-    // setReady(value: boolean) {
-    //     this.isReady = value;
-    // }
 
     rerollHash() {
         this.params.set("hash", v4());

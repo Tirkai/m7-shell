@@ -122,22 +122,8 @@ export class AuthStore {
     }
 
     checkoutRemainingTime() {
-        const diff =
-            this.currentTime.diff(this.renewTime) -
-            // this.renewTime.diff(this.currentTime) +
-            // this.deltaTime +
-            this.timeOffset;
-        // console.debug(
-        //     "Time",
-        //     `${this.currentTime
-        //         .toDate()
-        //         .getTime()} - ${this.renewTime
-        //         .toDate()
-        //         .getTime()} = ${this.currentTime.diff(
-        //         this.renewTime,
-        //     )} (${this.currentTime.diff(this.renewTime) -
-        //         this.timeOffset}) [${diff}]`,
-        // );
+        const diff = this.currentTime.diff(this.renewTime) - this.timeOffset;
+
         return diff <= 0;
     }
 
@@ -264,17 +250,6 @@ export class AuthStore {
             console.error(e);
         }
     }
-
-    // injectAuthTokenInProcess(appProccess: ApplicationProcess) {
-    //     try {
-    //         appProccess.emitter.emit(ShellMessageType.UpdateAuthToken, {
-    //             token: this.accessToken,
-    //             login: this.userLogin,
-    //         });
-    //     } catch (e) {
-    //         console.error(e);
-    //     }
-    // }
 
     async renewToken() {
         const { eventBus } = this.store.sharedEventBus;

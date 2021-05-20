@@ -2,7 +2,7 @@ import {
     AppMessageType,
     EmitterMessage,
     invokeListeners,
-    ShellMessageType
+    ShellMessageType,
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
@@ -45,10 +45,6 @@ export class ProcessManagerStore {
             (process: ApplicationProcess) => this.onChangeProcess(process),
         );
 
-        // eventBus.add(ApplicationEventType.OnApplicationListLoaded, () =>
-        //     this.onApplicationListLoaded(),
-        // );
-
         eventBus.add(AuthEventType.OnLogout, () => this.onLogout());
 
         eventBus.add(
@@ -57,14 +53,8 @@ export class ProcessManagerStore {
                 this.onRecieveToken(payload),
         );
 
-        // when(() => this.isAllProcessesReady).then(() => alert("ALLS"));
-
         this.bindOnMessageHandler();
     }
-
-    // get isAllProcessesReady() {
-    //     return this.processes.every((item) => item.isReady);
-    // }
 
     bindOnMessageHandler() {
         window.onmessage = (event: MessageEvent) => {
@@ -124,21 +114,7 @@ export class ProcessManagerStore {
     }
 
     onChangeProcess(_process: ApplicationProcess) {
-        // this.store.userDatabase.save<IProcessesSnapshot>([
-        //     {
-        //         name: UserDatabasePropKey.Processes,
-        //         value: {
-        //             hasActiveSession: !!this.processes.length,
-        //             processes: this.processes.map((item) => ({
-        //                 // TODO Think about this
-        //                 app: item.app as ExternalApplication,
-        //                 url: item.url,
-        //                 name: item.name,
-        //                 viewportId: item.window.viewport.id,
-        //             })),
-        //         },
-        //     },
-        // ]);
+        //
     }
 
     onRemoveViewportFrame(viewport: VirtualViewportModel) {
@@ -164,7 +140,6 @@ export class ProcessManagerStore {
                 }),
             );
 
-            // TODO: Fix
             if (!applicationParamsResponse.data.error) {
                 appProcess.window.setParams(
                     applicationParamsResponse.data.result,
@@ -185,7 +160,10 @@ export class ProcessManagerStore {
                     const runner = new ApplicationRunner(this.store);
 
                     if (findedApp) {
-                        runner.run(findedApp, { url, focusWindowAfterInstantiate: true });
+                        runner.run(findedApp, {
+                            url,
+                            focusWindowAfterInstantiate: true,
+                        });
                     } else {
                         const processUrl = new URL(url);
 
@@ -194,7 +172,7 @@ export class ProcessManagerStore {
                                 name: processUrl.host,
                                 url,
                             }),
-                            { focusWindowAfterInstantiate: true }
+                            { focusWindowAfterInstantiate: true },
                         );
                     }
                 },
@@ -271,7 +249,4 @@ export class ProcessManagerStore {
     checkoutExsistProcessMethod() {
         //
     }
-}
-function copy(processes: ApplicationProcess[]) {
-    throw new Error("Function not implemented.");
 }

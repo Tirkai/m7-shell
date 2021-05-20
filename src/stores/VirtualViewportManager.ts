@@ -1,5 +1,5 @@
 import { TileFactory } from "factories/TileFactory";
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
@@ -125,20 +125,9 @@ export class VirtualViewportManager {
     }
 
     onChangeViewport(viewport: VirtualViewportModel) {
-        // const index = this.getIndexByViewport(viewport);
-
-        // const after = this.viewports.slice(index + 1);
-        // const before = this.viewports.slice(0, index);
-
-        // before.forEach((item, i) => {
-        //     item.setIndex(i);
-        // });
-
         this.viewports.forEach((item, index) => {
             item.setIndex(index);
         });
-
-        console.log("BA", toJS(this.viewports));
     }
 
     onKeyboardArrowLeftWithControl() {
@@ -231,14 +220,6 @@ export class VirtualViewportManager {
         ).then((newViewport) => {
             this.insertViewport(newViewport, currentViewport);
         });
-        // setTimeout(() => {
-        //     this.insertViewport(newViewport, currentViewport);
-        // });
-
-        // this.addViewport(newViewport);
-        // this.viewports.push(newViewport);
-
-        // this.setCurrentViewport(newViewport);
     }
 
     onTileViewportOverflow(excessProcess: ApplicationProcess) {
@@ -275,7 +256,6 @@ export class VirtualViewportManager {
 
     addViewport(viewport: VirtualViewportModel) {
         this.viewports.push(viewport);
-        // /!!!
         this.setCurrentViewport(viewport);
 
         this.store.sharedEventBus.eventBus.dispatch(

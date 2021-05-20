@@ -24,34 +24,16 @@ interface IUserSessionSnapshot {
 export class RecoveryStore {
     private store: AppStore;
 
-    // actualProcessesSnapshot: IProcessesSnapshot | null = null;
-    // actualViewportsSnapshot: IVirtualViewportSnapshot | null = null;
-
     dynamicSessionSnapshot: ISessionRecovery | null = null;
     freezedSessionSnapshot: ISessionRecovery | null = null;
 
     isDisplayRecoveryDialog: boolean = false;
-
-    // get isAllProcessesRecovered() {
-    //     const processesCount =
-    //         this.freezedSessionSnapshot?.processSnapshot.processes.length ?? 1;
-
-    //     return (
-    //         // this.store.processManager.processes.every((item) => item.isReady) &&
-    //         // this.store.processManager.processes.length >= processesCount
-    //         `${this.store.processManager.processes.length} >= ${processesCount}`
-    //     );
-    // }
 
     constructor(store: AppStore) {
         this.store = store;
         makeAutoObservable(this);
 
         const { eventBus } = this.store.sharedEventBus;
-
-        // eventBus.add(AuthEventType.OnEntry, () => {
-        //     this.loadSnapshots();
-        // });
 
         eventBus.add(TileEventType.OnChangePreset, () => {
             this.saveSnapshot(UserDatabasePropKey.DynamicSession);
@@ -80,9 +62,6 @@ export class RecoveryStore {
     }
 
     onApplicationListLoaded() {
-        // if (this.freezedSessionSnapshot?.processSnapshot.hasActiveSession) {
-        //     this.setDisplayRecoveryDialog(true);
-        // }
         this.loadSnapshots();
     }
 
@@ -96,10 +75,6 @@ export class RecoveryStore {
                 this.startRecovery(freezedResponse.result);
             }
         }
-
-        // const dynamicResponse = await this.loadSnapshot(
-        //     UserDatabasePropKey.DynamicSession,
-        // );
     }
 
     get isSnapshotsReady() {
@@ -156,8 +131,6 @@ export class RecoveryStore {
             viewportSnapshot,
         };
 
-        // this.setFreezedSessionSnapshot(freezedSnapshot);
-
         await this.store.userDatabase.save<ISessionRecovery>([
             {
                 name: propKey,
@@ -181,14 +154,6 @@ export class RecoveryStore {
         this.isDisplayRecoveryDialog = value;
     }
 
-    // setProcessesSnapshot(snapshot: IProcessesSnapshot) {
-    //     this.actualProcessesSnapshot = snapshot;
-    // }
-
-    // setViewportsSnapshot(snapshot: IVirtualViewportSnapshot) {
-    //     this.actualViewportsSnapshot = snapshot;
-    // }
-
     async startRecovery(snapshot: ISessionRecovery) {
         this.store.virtualViewport.setViewports([]);
 
@@ -197,22 +162,7 @@ export class RecoveryStore {
     }
 
     async fetchLastUserSession() {
-        // try {
-        //     const processesPropKey = UserDatabasePropKey.Processes;
-        //     const viewportsPropKey = UserDatabasePropKey.Viewports;
-        //     const { result } = await this.store.userDatabase.load<
-        //         IUserSessionSnapshot
-        //     >([processesPropKey, viewportsPropKey]);
-        //     if (result && !isEmpty(result)) {
-        //         this.setDisplayRecoveryDialog(true);
-        //         const processesSnapshot = result[processesPropKey];
-        //         const viewportsSnapshot = result[viewportsPropKey];
-        //         this.setProcessesSnapshot(processesSnapshot);
-        //         this.setViewportsSnapshot(viewportsSnapshot);
-        //     }
-        // } catch (e) {
-        //     console.error(e);
-        // }
+        //
     }
 
     async recoveryProcesses(snapshot: IProcessesSnapshot) {
@@ -229,11 +179,6 @@ export class RecoveryStore {
                 const viewport = this.store.virtualViewport.viewports.find(
                     (v) => v.id === item.viewportId,
                 );
-
-                // console.log(
-                //     "RECOVERY_VIEWPORT",
-                //     `${viewport?.id} ${viewport?.displayMode?.type} ${viewport?.tilePreset?.alias}`,
-                // );
 
                 runner.run(app, { viewport });
             });

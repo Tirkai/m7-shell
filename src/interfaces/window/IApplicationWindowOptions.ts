@@ -7,7 +7,6 @@ export interface IApplicationWindowOptions {
     width?: number;
     height?: number;
     isFullscreen?: boolean;
-    // displayMode?: IDisplayMode;
     x?: number;
     y?: number;
     viewport: VirtualViewportModel;

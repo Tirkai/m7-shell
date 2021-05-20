@@ -26,7 +26,6 @@ export class ApplicationWindow implements IApplicationWindow {
     height: number = 600;
     x: number;
     y: number;
-    // displayMode: IDisplayMode;
     resizeOriginPoint: { x: number; y: number } = { x: 0, y: 0 };
     lockedWidth: number;
     lockedHeight: number;
@@ -38,8 +37,6 @@ export class ApplicationWindow implements IApplicationWindow {
     offsetIndex: number;
     area: string;
     focusAfterInstantiate: boolean;
-
-    // eventTarget: EventBus = new EventBus();
 
     get minYPosition() {
         return this.y + this.height - MIN_WINDOW_HEIGHT;
@@ -105,8 +102,6 @@ export class ApplicationWindow implements IApplicationWindow {
                 this.lockedY = this.y;
                 this.offsetIndex = options.offsetIndex ?? 0;
 
-                // this.setArea("auto");
-
                 break;
             }
             case ApplicationWindowType.Tile: {
@@ -134,32 +129,17 @@ export class ApplicationWindow implements IApplicationWindow {
 
     setDragging(value: boolean) {
         this.isDragging = value;
-
-        // this.eventTarget.dispatch<ApplicationWindow>(
-        //     ApplicationWindowEventType.OnDragChange,
-        //     this,
-        // );
     }
 
     setPosition(x: number, y: number) {
         this.x = Math.floor(x);
         this.y = Math.floor(y);
-
-        // this.eventTarget.dispatch<ApplicationWindow>(
-        //     ApplicationWindowEventType.OnPositionChange,
-        //     this,
-        // );
     }
 
     setSize(width: number, height: number) {
         const [w, h] = this.getSizeWithBounds(width, height);
         this.width = Math.floor(w);
         this.height = Math.floor(h);
-
-        // this.eventTarget.dispatch<ApplicationWindow>(
-        //     ApplicationWindowEventType.OnResize,
-        //     this,
-        // );
     }
 
     setResizeOriginPoint(x: number, y: number) {
@@ -228,21 +208,11 @@ export class ApplicationWindow implements IApplicationWindow {
 
     setFullScreen(value: boolean) {
         this.isFullScreen = value;
-
-        // this.eventTarget.dispatch<ApplicationWindow>(
-        //     ApplicationWindowEventType.OnFullscreen,
-        //     this,
-        // );
     }
 
     setCollapsed(value: boolean) {
         this.isFocused = false;
         this.isCollapsed = value;
-
-        // this.eventTarget.dispatch<ApplicationWindow>(
-        //     ApplicationWindowEventType.OnCollapse,
-        //     this,
-        // );
     }
 
     recalculateFullScreenSize() {
