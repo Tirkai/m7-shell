@@ -3,7 +3,6 @@ import { Tab, Table, TableCell, TableRow, Tabs } from "@material-ui/core";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
-import moment from "moment";
 import React, { Component } from "react";
 import { DevModeStore } from "./DevModeStore";
 import style from "./style.module.css";
@@ -52,14 +51,6 @@ export class DevModeView extends Component<IStore> {
                         </TableRow>
                         <TableRow>
                             <TableCell>Время до обновления токена</TableCell>
-                            <TableCell>
-                                {moment
-                                    .utc(
-                                        this.store.auth
-                                            .remainingTokenTimeInSeconds * 1000,
-                                    )
-                                    .format("HH:mm:ss")}
-                            </TableCell>
                         </TableRow>
                     </Table>
                 }
