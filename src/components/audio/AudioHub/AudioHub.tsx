@@ -48,7 +48,9 @@ export const AudioHub = observer(() => {
     };
 
     return (
-        <BaseHub show={store.shell.activePanel === ShellPanelType.AudioHub}>
+        <BaseHub
+            show={store.panelManager.activePanel === ShellPanelType.AudioHub}
+        >
             <HubBackdrop>
                 <div className={style.container}>
                     <div className={style.icon} onClick={handleMute}>

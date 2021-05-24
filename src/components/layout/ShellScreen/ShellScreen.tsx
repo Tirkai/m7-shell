@@ -4,6 +4,7 @@ import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
 import { DesktopContainer } from "components/desktop/DesktopContainer/DesktopContainer";
 import { DesktopLayer } from "components/layer/DesktopLayer/DesktopLayer";
 import { RecoveryDialog } from "components/recovery/RecoveryDialog/RecoveryDialog";
+import { RecoveryLayer } from "components/recovery/RecoveryLayer/RecoveryLayer";
 import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { VirtualFrame } from "components/virtual/VirtualFrame/VirtualFrame";
@@ -227,6 +228,7 @@ export class ShellScreen extends Component<IStore> {
                             </DesktopLayer>
 
                             <DesktopLayer enabled priority={4}>
+                                <RecoveryLayer />
                                 <RecoveryDialog
                                     show={
                                         this.store.recovery

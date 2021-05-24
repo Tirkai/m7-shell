@@ -17,7 +17,7 @@ export const VirtualDesktopHub = observer(() => {
 
     const handleSetViewport = (viewport: VirtualViewportModel) => {
         store.virtualViewport.setCurrentViewport(viewport);
-        store.shell.setActivePanel(ShellPanelType.None);
+        store.panelManager.setActivePanel(ShellPanelType.None);
     };
 
     const handleCreateViewport = () => {
@@ -53,7 +53,7 @@ export const VirtualDesktopHub = observer(() => {
 
     return (
         <BaseHub
-            show={store.shell.activePanel === ShellPanelType.Virtual}
+            show={store.panelManager.activePanel === ShellPanelType.Virtual}
             width="100%"
         >
             <div className={style.virtualDesktopHub}>

@@ -5,12 +5,13 @@ import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { DevModeModel } from "models/DevModeModel";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { PanelEventType } from "models/panel/PanelEventType";
+import { RecoveryEventType } from "models/recovery/RecoveryEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import moment from "moment";
 import { AppStore } from "./AppStore";
 
-export class ShellStore {
+export class PanelManager {
     localStorageDevModeKey = "DEV_MODE";
 
     get appMenuShow() {
@@ -28,6 +29,8 @@ export class ShellStore {
     enabledDevMode: boolean = process.env.NODE_ENV === "development";
 
     activePanel: ShellPanelType = ShellPanelType.None;
+
+    isShowRecoveryPanel: boolean = false;
 
     private store: AppStore;
     constructor(store: AppStore) {
@@ -62,6 +65,11 @@ export class ShellStore {
             this.onLogout(),
         );
 
+        this.store.sharedEventBus.eventBus.add(
+            RecoveryEventType.OnDynamicSnapshotLoaded,
+            () => this.onDynamicSnapshotLoaded(),
+        );
+
         const storagedDevMode = JSON.parse(
             localStorage.getItem(this.localStorageDevModeKey) ?? "{}",
         ) as DevModeModel;
@@ -75,6 +83,7 @@ export class ShellStore {
 
     onLogout() {
         this.setActivePanel(ShellPanelType.None);
+        this.setShowRecoveryPanel(false);
     }
 
     onKeyboardArrowUpWithControl() {
@@ -83,6 +92,10 @@ export class ShellStore {
 
     onKeyboardArrowDownWithControl() {
         this.setActivePanel(ShellPanelType.None);
+    }
+
+    onDynamicSnapshotLoaded() {
+        this.setShowRecoveryPanel(true);
     }
 
     setActivePanel(panel: ShellPanelType) {
@@ -112,5 +125,9 @@ export class ShellStore {
             this.localStorageDevModeKey,
             JSON.stringify(new DevModeModel(value, moment().add(1, "hour"))),
         );
+    }
+
+    setShowRecoveryPanel(value: boolean) {
+        this.isShowRecoveryPanel = value;
     }
 }

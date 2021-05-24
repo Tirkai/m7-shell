@@ -4,7 +4,7 @@ import {
     CircularProgress,
     FormControlLabel,
     Radio,
-    RadioGroup
+    RadioGroup,
 } from "@material-ui/core";
 import { empty } from "assets/icons";
 import classNames from "classnames";
@@ -68,10 +68,10 @@ export const NotificationHub = observer(() => {
     }, []);
 
     useEffect(() => {
-        if (store.shell.activePanel !== ShellPanelType.NotificationHub) {
+        if (store.panelManager.activePanel !== ShellPanelType.NotificationHub) {
             setShowClearGroupDialog({ isShow: false, group: null });
         }
-    }, [store.shell.activePanel]);
+    }, [store.panelManager.activePanel]);
 
     const handleDeleteNotifications = (
         group: NotificationGroupModel | null,
@@ -155,7 +155,7 @@ export const NotificationHub = observer(() => {
         const app = store.applicationManager.findById(appId);
 
         if (app instanceof ExternalApplication && url.length) {
-            store.shell.setActivePanel(ShellPanelType.None);
+            store.panelManager.setActivePanel(ShellPanelType.None);
 
             const runner = new ApplicationRunner(store);
             runner.run(app, { url, focusWindowAfterInstantiate: true });
@@ -174,7 +174,7 @@ export const NotificationHub = observer(() => {
         if (notificationApp) {
             runner.run(notificationApp, {
                 params: new Map([["filterByAppId", group.id]]),
-                focusWindowAfterInstantiate: true
+                focusWindowAfterInstantiate: true,
             });
         }
     };
@@ -265,7 +265,7 @@ export const NotificationHub = observer(() => {
     return (
         <div
             className={classNames(style.notificationHub, {
-                [style.show]: store.shell.notificationHubShow,
+                [style.show]: store.panelManager.notificationHubShow,
             })}
         >
             <div className={style.container}>

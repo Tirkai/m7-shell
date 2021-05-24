@@ -10,6 +10,7 @@ import { ExternalApplication } from "models/ExternalApplication";
 import { IProcessesSnapshot } from "models/process/IProcessesSnapshot";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { ISessionRecovery } from "models/recovery/ISessionRecovery";
+import { RecoveryEventType } from "models/recovery/RecoveryEventType";
 import { TileEventType } from "models/tile/TileEventType";
 import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
 import { IVirtualViewportSnapshot } from "models/virtual/IVirtualViewportsSnapshot";
@@ -28,6 +29,8 @@ export class RecoveryStore {
     freezedSessionSnapshot: ISessionRecovery | null = null;
 
     isDisplayRecoveryDialog: boolean = false;
+
+    isSnapshotInitialized: boolean = false;
 
     constructor(store: AppStore) {
         this.store = store;
@@ -70,11 +73,35 @@ export class RecoveryStore {
             UserDatabasePropKey.FreezedSession,
         );
 
-        if (freezedResponse.status) {
-            if (freezedResponse.result) {
-                this.startRecovery(freezedResponse.result);
-            }
+        const dynamicResponse = await this.loadSnapshot(
+            UserDatabasePropKey.DynamicSession,
+        );
+
+        if (
+            dynamicResponse.status &&
+            dynamicResponse.result?.processSnapshot.hasActiveSession
+        ) {
+            this.store.sharedEventBus.eventBus.dispatch(
+                RecoveryEventType.OnDynamicSnapshotLoaded,
+                dynamicResponse.result,
+            );
+            this.setDynamicSessionSnapshot(dynamicResponse.result);
         }
+
+        if (freezedResponse.status && freezedResponse.result) {
+            this.store.sharedEventBus.eventBus.dispatch(
+                RecoveryEventType.OnFreezedSnapshotLoaded,
+                dynamicResponse.result,
+            );
+            this.startRecovery(freezedResponse.result);
+        }
+
+        this.isSnapshotInitialized = true;
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            RecoveryEventType.OnAnySnapshotLoaded,
+            dynamicResponse.result,
+        );
     }
 
     get isSnapshotsReady() {
@@ -123,20 +150,22 @@ export class RecoveryStore {
     }
 
     async saveSnapshot(propKey: UserDatabasePropKey) {
-        const processSnapshot = this.createProcessesSnapshot();
-        const viewportSnapshot = this.createViewportSnapshot();
+        if (this.isSnapshotInitialized) {
+            const processSnapshot = this.createProcessesSnapshot();
+            const viewportSnapshot = this.createViewportSnapshot();
 
-        const freezedSnapshot: ISessionRecovery = {
-            processSnapshot,
-            viewportSnapshot,
-        };
+            const freezedSnapshot: ISessionRecovery = {
+                processSnapshot,
+                viewportSnapshot,
+            };
 
-        await this.store.userDatabase.save<ISessionRecovery>([
-            {
-                name: propKey,
-                value: freezedSnapshot,
-            },
-        ]);
+            await this.store.userDatabase.save<ISessionRecovery>([
+                {
+                    name: propKey,
+                    value: freezedSnapshot,
+                },
+            ]);
+        }
     }
 
     async loadSnapshot(propKey: UserDatabasePropKey) {
@@ -156,6 +185,7 @@ export class RecoveryStore {
 
     async startRecovery(snapshot: ISessionRecovery) {
         this.store.virtualViewport.setViewports([]);
+        this.store.processManager.destroyAllProcesses();
 
         await this.recoveryViewports(snapshot.viewportSnapshot);
         await this.recoveryProcesses(snapshot.processSnapshot);

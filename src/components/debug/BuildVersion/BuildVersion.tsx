@@ -14,7 +14,7 @@ export class BuildVersion extends Component<IStore> {
     }
 
     render() {
-        if (this.store.shell.enabledDevMode) {
+        if (this.store.panelManager.enabledDevMode) {
             return (
                 <div className={style.container}>
                     <div>{`🔑${moment

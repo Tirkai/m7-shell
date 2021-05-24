@@ -45,7 +45,7 @@ export const AppsMenu: React.FC = observer(() => {
         );
 
     const applicationsList = getFilteredByPlace(
-        !store.shell.enabledDevMode
+        !store.panelManager.enabledDevMode
             ? store.applicationManager.displayedApplications
             : store.applicationManager.applications,
         ApplicationPlace.MainMenu,
@@ -78,7 +78,7 @@ export const AppsMenu: React.FC = observer(() => {
     return (
         <div
             className={classNames(style.appsMenu, {
-                [style.show]: store.shell.appMenuShow,
+                [style.show]: store.panelManager.appMenuShow,
             })}
             onAnimationStart={() => setShowBackdrop(false)}
             onAnimationEnd={() => setShowBackdrop(true)}

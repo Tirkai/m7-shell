@@ -24,7 +24,7 @@ export const TaskBar = observer(() => {
 
     const handleShowAppsMenu = (value: boolean) => {
         if (store.applicationManager.applications.length) {
-            store.shell.setActivePanel(
+            store.panelManager.setActivePanel(
                 value ? ShellPanelType.StartMenu : ShellPanelType.None,
             );
         } else {
@@ -45,14 +45,14 @@ export const TaskBar = observer(() => {
     };
 
     const handleShowNotificationHub = (value: boolean) => {
-        store.shell.setActivePanel(
+        store.panelManager.setActivePanel(
             value ? ShellPanelType.NotificationHub : ShellPanelType.None,
         );
     };
 
     const handleShowAudioHub = () => {
-        store.shell.setActivePanel(
-            store.shell.activePanel !== ShellPanelType.AudioHub
+        store.panelManager.setActivePanel(
+            store.panelManager.activePanel !== ShellPanelType.AudioHub
                 ? ShellPanelType.AudioHub
                 : ShellPanelType.None,
         );
@@ -63,16 +63,16 @@ export const TaskBar = observer(() => {
     };
 
     const handleShowTileHub = () => {
-        store.shell.setActivePanel(
-            store.shell.activePanel !== ShellPanelType.TileHub
+        store.panelManager.setActivePanel(
+            store.panelManager.activePanel !== ShellPanelType.TileHub
                 ? ShellPanelType.TileHub
                 : ShellPanelType.None,
         );
     };
 
     const handleShowVirtualHub = () => {
-        store.shell.setActivePanel(
-            store.shell.activePanel !== ShellPanelType.Virtual
+        store.panelManager.setActivePanel(
+            store.panelManager.activePanel !== ShellPanelType.Virtual
                 ? ShellPanelType.Virtual
                 : ShellPanelType.None,
         );
@@ -116,7 +116,7 @@ export const TaskBar = observer(() => {
                 <div className={style.tasks}>
                     <TaskBarItem
                         onClick={() =>
-                            handleShowAppsMenu(!store.shell.appMenuShow)
+                            handleShowAppsMenu(!store.panelManager.appMenuShow)
                         }
                     >
                         <SVGIcon source={apps} color="white" />
@@ -177,7 +177,7 @@ export const TaskBar = observer(() => {
                         }
                         onClick={() =>
                             handleShowNotificationHub(
-                                !store.shell.notificationHubShow,
+                                !store.panelManager.notificationHubShow,
                             )
                         }
                     >

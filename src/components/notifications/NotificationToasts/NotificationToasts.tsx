@@ -17,7 +17,7 @@ export const NotificationToasts = observer(() => {
             toast.notification.applicationId,
         );
         if (app instanceof ExternalApplication) {
-            store.shell.setActivePanel(ShellPanelType.None);
+            store.panelManager.setActivePanel(ShellPanelType.None);
 
             const runner = new ApplicationRunner(store);
 

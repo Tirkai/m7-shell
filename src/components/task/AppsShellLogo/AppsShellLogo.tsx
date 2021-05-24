@@ -48,8 +48,8 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
                     icon: <SVGIcon source={settings} color="white" />,
                     content: strings.startMenu.devMode,
                     onClick: () =>
-                        this.store.shell.setDevMode(
-                            !this.store.shell.enabledDevMode,
+                        this.store.panelManager.setDevMode(
+                            !this.store.panelManager.enabledDevMode,
                         ),
                 }),
             );
