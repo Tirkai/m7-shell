@@ -74,19 +74,6 @@ export class AuthStore {
         }
     }
 
-    get remainingTokenTime() {
-        const time = -this.currentTime.diff(this.renewTime) + this.deltaTime;
-        return !isNaN(time) ? time : 0;
-    }
-
-    get remainingTokenTimeInSeconds() {
-        return Math.floor((this.remainingTokenTime + this.timeOffset) / 1000);
-    }
-
-    get isTokenExpired() {
-        return this.remainingTokenTime <= 0;
-    }
-
     isUpdateTokenProcessActive: boolean = false;
 
     interval: NodeJS.Timeout | null = null;
@@ -125,11 +112,9 @@ export class AuthStore {
     }
 
     checkoutRemainingTime() {
-        const diff =
-            this.renewTime.diff(this.currentTime) +
-            this.deltaTime +
-            this.timeOffset;
-        return diff >= 0;
+        const diff = this.currentTime.diff(this.renewTime) - this.timeOffset;
+
+        return diff <= 0;
     }
 
     init() {
@@ -279,6 +264,10 @@ export class AuthStore {
                     this.injectAuthTokenInProcess(appProcess),
                 );
             } else {
+                if (parseInt(response.data.error.code) === -2006) {
+                    return;
+                }
+
                 this.eventBus.dispatchEvent(
                     new CustomEvent(AuthEventType.FailedRenewToken, {
                         detail: response.data.error,
@@ -364,6 +353,7 @@ export class AuthStore {
 
             this.accessToken = "";
             this.refreshToken = "";
+            this.deltaTime = 0;
             this.setAuthorized(false);
 
             if (this.interval) {
