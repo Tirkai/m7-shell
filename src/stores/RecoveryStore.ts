@@ -54,6 +54,10 @@ export class RecoveryStore {
             this.saveSnapshot(UserDatabasePropKey.DynamicSession);
         });
 
+        eventBus.add(TileEventType.OnTileReattach, () => {
+            this.saveSnapshot(UserDatabasePropKey.DynamicSession);
+        });
+
         eventBus.add(AuthEventType.OnLogout, () => {
             this.onLogout();
         });
@@ -136,6 +140,8 @@ export class RecoveryStore {
                 url: item.url,
                 name: item.name,
                 viewportId: item.window.viewport.id,
+                position: { x: item.window.x, y: item.window.y },
+                area: item.window.area,
             })),
         };
         return snapshot;
@@ -210,7 +216,11 @@ export class RecoveryStore {
                     (v) => v.id === item.viewportId,
                 );
 
-                runner.run(app, { viewport });
+                runner.run(app, {
+                    viewport,
+                    windowArea: item.area,
+                    windowPosition: item.position,
+                });
             });
             resolve({});
         });

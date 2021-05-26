@@ -68,8 +68,8 @@ export class ApplicationWindow implements IApplicationWindow {
         this.width = width;
         this.height = height;
 
-        this.x = 0;
-        this.y = 0;
+        this.x = options?.x ?? 0;
+        this.y = options?.y ?? 0;
 
         this.isFullScreen = false;
         this.lockedWidth = this.width;
@@ -77,7 +77,7 @@ export class ApplicationWindow implements IApplicationWindow {
         this.lockedX = this.x;
         this.lockedY = this.y;
         this.depthIndex = options.depthIndex ?? 1;
-        this.offsetIndex = 0;
+        this.offsetIndex = options.offsetIndex ?? 0;
         this.focusAfterInstantiate = options.focusAfterInstantiate ?? false;
 
         this.initialize(options);
@@ -90,7 +90,7 @@ export class ApplicationWindow implements IApplicationWindow {
     initialize(options: IApplicationWindowOptions) {
         switch (this.type) {
             case ApplicationWindowType.Float: {
-                const [x, y] = this.calculatePosition({ withShuffle: true });
+                const [x, y] = this.calculatePosition();
 
                 this.x = x;
                 this.y = y;
@@ -114,13 +114,15 @@ export class ApplicationWindow implements IApplicationWindow {
         }
     }
 
-    calculatePosition(options?: { withShuffle: boolean }) {
+    calculatePosition() {
         const getShuffleModifier = () => Math.ceil(this.offsetIndex * 30);
+        if (this.x === 0 && this.y === 0) {
+            const x = 100 + getShuffleModifier();
+            const y = 100 + getShuffleModifier();
 
-        const x = 100 + getShuffleModifier();
-        const y = 100 + getShuffleModifier();
-
-        return [x, y];
+            return [x, y];
+        }
+        return [this.x, this.y];
     }
 
     setResizing(value: boolean) {
@@ -236,10 +238,10 @@ export class ApplicationWindow implements IApplicationWindow {
             this.width = params.width ?? this.width;
             this.height = params.height ?? this.height;
 
-            const [x, y] = this.calculatePosition();
+            // const [x, y] = this.calculatePosition();
 
-            this.x = x;
-            this.y = y;
+            // this.x = x;
+            // this.y = y;
         }
     }
 

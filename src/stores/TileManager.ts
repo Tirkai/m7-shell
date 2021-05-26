@@ -118,6 +118,10 @@ export class TileManager {
                 this.activeCell.setAttachedAppWindow(tileWindow);
             }
             tileWindow.setArea(this.activeCell.area);
+
+            this.store.sharedEventBus.eventBus.dispatch(
+                TileEventType.OnTileReattach,
+            );
         }
     }
 
@@ -160,13 +164,27 @@ export class TileManager {
         if (!isFullscreen) {
             if (displayMode?.enableTileAttach && !isFullscreen) {
                 if (preset?.freeCells.length) {
-                    const tileCell = preset.nearbyFreeCell;
                     const appWindow = appProcess.window;
-                    this.store.tile.attachWindowToCell(
-                        appWindow,
-                        preset,
-                        tileCell,
-                    );
+
+                    if (appWindow.area === "auto") {
+                        this.store.tile.attachWindowToCell(
+                            appWindow,
+                            preset,
+                            preset.nearbyFreeCell,
+                        );
+                    } else {
+                        const cellWithEqualArea = preset.cells.find(
+                            (item) => item.area === appWindow.area,
+                        );
+
+                        if (cellWithEqualArea) {
+                            this.store.tile.attachWindowToCell(
+                                appWindow,
+                                preset,
+                                cellWithEqualArea,
+                            );
+                        }
+                    }
                 } else {
                     this.store.sharedEventBus.eventBus.dispatch(
                         TileEventType.OnTileViewportOverflow,

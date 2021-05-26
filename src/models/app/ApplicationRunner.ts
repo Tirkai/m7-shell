@@ -11,6 +11,8 @@ interface IApplicationRunnerOptions {
     params?: Map<string, string>;
     viewport?: VirtualViewportModel;
     focusWindowAfterInstantiate?: boolean;
+    windowPosition?: { x: number; y: number };
+    windowArea?: string;
 }
 
 export class ApplicationRunner {
@@ -42,6 +44,9 @@ export class ApplicationRunner {
                     viewport,
                     focusAfterInstantiate:
                         options?.focusWindowAfterInstantiate ?? false,
+                    area: options?.windowArea,
+                    x: options?.windowPosition?.x,
+                    y: options?.windowPosition?.y,
                 },
                 this.store,
             );

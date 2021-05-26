@@ -5,4 +5,6 @@ export interface IApplicationProcess {
     url: string;
     name: string;
     viewportId: string;
+    position: {x: number; y: number};
+    area: string;
 }

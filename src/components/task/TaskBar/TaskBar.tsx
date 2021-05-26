@@ -62,14 +62,6 @@ export const TaskBar = observer(() => {
         store.processManager.killProcess(appProcess);
     };
 
-    const handleShowTileHub = () => {
-        store.panelManager.setActivePanel(
-            store.panelManager.activePanel !== ShellPanelType.TileHub
-                ? ShellPanelType.TileHub
-                : ShellPanelType.None,
-        );
-    };
-
     const handleShowVirtualHub = () => {
         store.panelManager.setActivePanel(
             store.panelManager.activePanel !== ShellPanelType.Virtual
@@ -108,7 +100,10 @@ export const TaskBar = observer(() => {
             return firstIndex - secondIndex;
         });
         return sortedGroups;
-    }, [store.processManager.processes.length]);
+    }, [
+        store.processManager.processes.length,
+        store.virtualViewport.viewports.length,
+    ]);
 
     return (
         <div className={classNames(style.taskBar)}>
