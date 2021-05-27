@@ -8,13 +8,10 @@ import { AuthEventType } from "models/auth/AuthEventType";
 import { DisplayModeType } from "models/display/DisplayModeType";
 import { ExternalApplication } from "models/ExternalApplication";
 import { IProcessesSnapshot } from "models/process/IProcessesSnapshot";
-import { ProcessEventType } from "models/process/ProcessEventType";
 import { ISessionRecovery } from "models/recovery/ISessionRecovery";
 import { RecoveryEventType } from "models/recovery/RecoveryEventType";
-import { TileEventType } from "models/tile/TileEventType";
 import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
 import { IVirtualViewportSnapshot } from "models/virtual/IVirtualViewportsSnapshot";
-import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { AppStore } from "stores/AppStore";
 
@@ -24,6 +21,8 @@ interface IUserSessionSnapshot {
 
 export class RecoveryStore {
     private store: AppStore;
+
+    interval: NodeJS.Timeout | null = null;
 
     dynamicSessionSnapshot: ISessionRecovery | null = null;
     freezedSessionSnapshot: ISessionRecovery | null = null;
@@ -38,25 +37,25 @@ export class RecoveryStore {
 
         const { eventBus } = this.store.sharedEventBus;
 
-        eventBus.add(TileEventType.OnChangePreset, () => {
-            this.saveSnapshot(UserDatabasePropKey.DynamicSession);
-        });
+        // eventBus.add(TileEventType.OnChangePreset, () => {
+        //     this.saveSnapshot(UserDatabasePropKey.DynamicSession);
+        // });
 
         eventBus.add(ApplicationEventType.OnApplicationListLoaded, () => {
             this.onApplicationListLoaded();
         });
 
-        eventBus.add(VirtualViewportEventType.OnSelectViewportFrame, () => {
-            this.saveSnapshot(UserDatabasePropKey.DynamicSession);
-        });
+        // eventBus.add(VirtualViewportEventType.OnSelectViewportFrame, () => {
+        //     this.saveSnapshot(UserDatabasePropKey.DynamicSession);
+        // });
 
-        eventBus.add(ProcessEventType.OnChangeProcess, () => {
-            this.saveSnapshot(UserDatabasePropKey.DynamicSession);
-        });
+        // eventBus.add(ProcessEventType.OnChangeProcess, () => {
+        //     this.saveSnapshot(UserDatabasePropKey.DynamicSession);
+        // });
 
-        eventBus.add(TileEventType.OnTileReattach, () => {
-            this.saveSnapshot(UserDatabasePropKey.DynamicSession);
-        });
+        // eventBus.add(TileEventType.OnTileReattach, () => {
+        //     this.saveSnapshot(UserDatabasePropKey.DynamicSession);
+        // });
 
         eventBus.add(AuthEventType.OnLogout, () => {
             this.onLogout();
@@ -64,11 +63,20 @@ export class RecoveryStore {
     }
 
     onLogout() {
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
+
         this.setFreezedSessionSnapshot(null);
         this.setDynamicSessionSnapshot(null);
     }
 
     onApplicationListLoaded() {
+        // TODO: Think about it
+        // this.interval = setInterval(() => {
+        //     this.saveSnapshot(UserDatabasePropKey.DynamicSession);
+        // }, 10000);
+
         this.loadSnapshots();
     }
 
@@ -190,9 +198,9 @@ export class RecoveryStore {
     }
 
     async startRecovery(snapshot: ISessionRecovery) {
-        this.store.virtualViewport.setViewports([]);
         this.store.processManager.destroyAllProcesses();
 
+        this.store.virtualViewport.clearViewports();
         await this.recoveryViewports(snapshot.viewportSnapshot);
         await this.recoveryProcesses(snapshot.processSnapshot);
     }

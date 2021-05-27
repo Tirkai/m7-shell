@@ -120,6 +120,10 @@ export class VirtualViewportManager {
         this.viewports = viewports;
     }
 
+    clearViewports() {
+        this.setViewports([]);
+    }
+
     onLogout() {
         this.setViewports([]);
     }

@@ -5,7 +5,6 @@ import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { DevModeModel } from "models/DevModeModel";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { PanelEventType } from "models/panel/PanelEventType";
-import { RecoveryEventType } from "models/recovery/RecoveryEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import moment from "moment";
@@ -65,10 +64,11 @@ export class PanelManager {
             this.onLogout(),
         );
 
-        this.store.sharedEventBus.eventBus.add(
-            RecoveryEventType.OnDynamicSnapshotLoaded,
-            () => this.onDynamicSnapshotLoaded(),
-        );
+        // TODO: Think about it
+        // this.store.sharedEventBus.eventBus.add(
+        //     RecoveryEventType.OnDynamicSnapshotLoaded,
+        //     () => this.onDynamicSnapshotLoaded(),
+        // );
 
         const storagedDevMode = JSON.parse(
             localStorage.getItem(this.localStorageDevModeKey) ?? "{}",
@@ -94,6 +94,7 @@ export class PanelManager {
         this.setActivePanel(ShellPanelType.None);
     }
 
+    // TODO: Think about it
     onDynamicSnapshotLoaded() {
         this.setShowRecoveryPanel(true);
     }
