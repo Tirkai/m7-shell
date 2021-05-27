@@ -65,22 +65,24 @@ export class ProcessManagerStore {
                 (item) => item.id === message.appId,
             );
 
-            // #region Backward compatibility m7-shell-emitter@0.6
-            // Todo: Remove after update all projects
-            if (!message.appId && message.source) {
-                apps = this.store.applicationManager.applications.filter(
+            if (message.type) {
+                const findedProcess = this.processes.find(
                     (item) =>
-                        item instanceof ExternalApplication && message.source
-                            ? item.url.indexOf(message.source) > -1
-                            : false,
+                        item.app.id === message.appId ||
+                        // #region Required update m7-shell-emitter library in applications!
+                        // Its important
+                        // Remove this row after update
+                        (!message.appId &&
+                            (item.app as ExternalApplication).url.includes(
+                                message.source ?? "-1",
+                            )),
+                    // #endregion
                 );
-            }
-            // #endregion
 
-            this.processes.forEach((appProccess) => {
-                invokeListeners(message, appProccess.emitter.listeners);
-                return;
-            });
+                if (findedProcess) {
+                    invokeListeners(message, findedProcess.emitter.listeners);
+                }
+            }
         };
     }
 
