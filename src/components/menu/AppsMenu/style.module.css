@@ -27,7 +27,7 @@
     grid-template-columns: 48px 1fr;
     box-sizing: border-box;
     height: 100%;
-    background: #222222e9;
+    background: #222222;
     border-top-right-radius: 4px;
 }
 
@@ -46,19 +46,13 @@
 
 .appsContainer {
     height: 625px;
+    width: 330px;
     overflow: hidden;
     overflow-y: auto;
-    width: 325px;
     padding: 0 12px 12px 12px;
     color: white;
 }
 
-.appsList {
-    display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: repeat(auto-fit, 100px);
-    grid-gap: 12px;
-}
 .sidebar {
     display: flex;
     flex-direction: column;

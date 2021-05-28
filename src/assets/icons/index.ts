@@ -11,6 +11,7 @@ import floatWindowMode from "./float-window-mode.svg";
 import fullscreen from "./fullscreen.svg";
 import layout from "./layout.svg";
 import listMenu from "./list-menu.svg";
+import list from "./list.svg";
 import mute from "./mute.svg";
 import notificationsNone from "./notifications-none.svg";
 import notifications from "./notifications.svg";
@@ -58,4 +59,5 @@ export {
     tiles,
     virtual,
     floatWindowMode,
+    list,
 };

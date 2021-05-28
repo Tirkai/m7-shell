@@ -8,7 +8,7 @@ import { Application } from "models/Application";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { Point2D } from "models/Point2D";
 import React, { Component } from "react";
-import { AppsMenuSidebarListItem } from "../AppsMenuSidebarListItem/AppsMenuSidebarListItem";
+import { AppsMenuSidebarListItem } from "../../menu/AppsMenuSidebarListItem/AppsMenuSidebarListItem";
 import style from "./style.module.css";
 
 const className = style.appsSettings;

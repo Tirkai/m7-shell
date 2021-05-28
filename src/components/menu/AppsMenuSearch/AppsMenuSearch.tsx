@@ -24,5 +24,3 @@ export class AppsMenuSearch extends Component<IAppsMenuSearch> {
         );
     }
 }
-
-export default AppsMenuSearch;

@@ -1,6 +1,6 @@
 import { SVGIcon } from "@algont/m7-ui";
 import { Avatar } from "@material-ui/core";
-import { settings } from "assets/icons";
+import { list, settings, tiles } from "assets/icons";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { computed } from "mobx";
@@ -8,6 +8,7 @@ import { inject, observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { Application } from "models/Application";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
+import { AppsMenuViewMode } from "models/menu/AppsMenuViewMode";
 import { Point2D } from "models/Point2D";
 import React, { Component } from "react";
 import { AppsMenuSidebarListItem } from "../AppsMenuSidebarListItem/AppsMenuSidebarListItem";
@@ -50,6 +51,36 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
                     onClick: () =>
                         this.store.panelManager.setDevMode(
                             !this.store.panelManager.enabledDevMode,
+                        ),
+                }),
+            );
+        }
+
+        if (
+            this.store.panelManager.appsMenuViewMode === AppsMenuViewMode.Grid
+        ) {
+            menu.push(
+                new ContextMenuItemModel({
+                    icon: <SVGIcon source={tiles} color="white" />,
+                    content: "Режим отображения: Cетка",
+                    onClick: () =>
+                        this.store.panelManager.setAppsMenuViewMode(
+                            AppsMenuViewMode.List,
+                        ),
+                }),
+            );
+        }
+
+        if (
+            this.store.panelManager.appsMenuViewMode === AppsMenuViewMode.List
+        ) {
+            menu.push(
+                new ContextMenuItemModel({
+                    icon: <SVGIcon source={list} color="white" />,
+                    content: "Режим отображения: Список",
+                    onClick: () =>
+                        this.store.panelManager.setAppsMenuViewMode(
+                            AppsMenuViewMode.Grid,
                         ),
                 }),
             );

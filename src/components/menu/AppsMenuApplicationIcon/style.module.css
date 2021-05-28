@@ -1,4 +1,4 @@
-.startMenuApplicationIcon {
+.appsMenuApplicationIcon {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -7,17 +7,17 @@
     border-radius: 50%;
     transition: ease 0.3s;
 }
-.startMenuApplicationIcon img[src*=".svg"] {
+.appsMenuApplicationIcon img[src*=".svg"] {
     width: 16px;
     height: 16px;
 }
 
-.startMenuApplicationIcon svg {
+.appsMenuApplicationIcon svg {
     width: 16px;
     height: 16px;
 }
 
-.startMenuApplicationIcon img[src*=".png"] {
+.appsMenuApplicationIcon img[src*=".png"] {
     width: 32px;
     height: 32px;
 }

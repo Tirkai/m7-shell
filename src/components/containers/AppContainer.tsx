@@ -57,8 +57,6 @@ export const AppContainer = observer(() => {
             }
         }
 
-        // const displayMode = urlParams.get("displayMode") as DisplayModeType;
-
         if (!!parseInt(enableAutoRun ?? "0")) {
             if (autoLogin && autoPassword) {
                 store.auth.login(autoLogin, autoPassword);
@@ -66,10 +64,6 @@ export const AppContainer = observer(() => {
                 console.warn("Invalid parameters for auto login");
             }
         }
-
-        // if (displayMode) {
-        //     store.shell.setDisplayMode(displayMode);
-        // }
     };
 
     useEffect(onMount, []);

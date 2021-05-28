@@ -4,6 +4,7 @@ import { AuthEventType } from "models/auth/AuthEventType";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { DevModeModel } from "models/DevModeModel";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
+import { AppsMenuViewMode } from "models/menu/AppsMenuViewMode";
 import { PanelEventType } from "models/panel/PanelEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
@@ -12,6 +13,8 @@ import { AppStore } from "./AppStore";
 
 export class PanelManager {
     localStorageDevModeKey = "DEV_MODE";
+
+    appsMenuViewMode: AppsMenuViewMode = AppsMenuViewMode.Grid;
 
     get appMenuShow() {
         return this.activePanel === ShellPanelType.StartMenu;
@@ -130,5 +133,9 @@ export class PanelManager {
 
     setShowRecoveryPanel(value: boolean) {
         this.isShowRecoveryPanel = value;
+    }
+
+    setAppsMenuViewMode(value: AppsMenuViewMode) {
+        this.appsMenuViewMode = value;
     }
 }

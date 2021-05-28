@@ -1,6 +1,6 @@
 import { SVGIcon } from "@algont/m7-ui";
 import classNames from "classnames";
-import { StartMenuApplicationIcon } from "components/startMenu/StartMenuApplicationIcon/StartMenuApplicationIcon";
+import { AppsMenuApplicationIcon } from "components/menu/AppsMenuApplicationIcon/AppsMenuApplicationIcon";
 import React, { Component } from "react";
 import style from "./style.module.css";
 interface IAppsMenuItemProps {
@@ -11,7 +11,7 @@ interface IAppsMenuItemProps {
     onClick: () => void;
 }
 
-export class AppsMenuItem extends Component<IAppsMenuItemProps> {
+export class AppsMenuTileItem extends Component<IAppsMenuItemProps> {
     render() {
         return (
             <div
@@ -21,13 +21,13 @@ export class AppsMenuItem extends Component<IAppsMenuItemProps> {
                 })}
                 onClick={this.props.onClick}
             >
-                <StartMenuApplicationIcon>
+                <AppsMenuApplicationIcon>
                     <SVGIcon
                         source={this.props.icon}
                         size={{ width: "32px", height: "32px" }}
                         color="white"
                     />
-                </StartMenuApplicationIcon>
+                </AppsMenuApplicationIcon>
                 {this.props.isExecuted ? (
                     <div className={style.executeStatus} />
                 ) : (

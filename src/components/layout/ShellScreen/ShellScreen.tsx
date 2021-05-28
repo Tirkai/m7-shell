@@ -3,9 +3,9 @@ import { ShellContextMenuOverlay } from "components/contextMenu/ShellContextMenu
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
 import { DesktopContainer } from "components/desktop/DesktopContainer/DesktopContainer";
 import { DesktopLayer } from "components/layer/DesktopLayer/DesktopLayer";
+import { AppsMenu } from "components/menu/AppsMenu/AppsMenu";
 import { RecoveryDialog } from "components/recovery/RecoveryDialog/RecoveryDialog";
 import { RecoveryLayer } from "components/recovery/RecoveryLayer/RecoveryLayer";
-import { AppsMenu } from "components/task/AppsMenu/AppsMenu";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { VirtualFrame } from "components/virtual/VirtualFrame/VirtualFrame";
 import { VirtualViewport } from "components/virtual/VirtualViewport/VirtualViewport";
