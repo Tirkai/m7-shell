@@ -5,6 +5,7 @@
     overflow: hidden;
     width: 250px;
     height: 200px;
+    scroll-snap-align: start;
 }
 
 .active {

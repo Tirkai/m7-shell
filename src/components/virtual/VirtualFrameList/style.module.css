@@ -5,10 +5,8 @@
     overflow: auto;
     position: relative;
     scrollbar-width: none;
-}
-
-.virtualFrameList::-webkit-scrollbar {
-    display: none;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 16px;
 }
 
 .container {

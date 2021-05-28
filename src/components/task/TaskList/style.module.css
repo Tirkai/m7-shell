@@ -1,0 +1,27 @@
+.taskList {
+    display: flex;
+    width: 100%;
+    position: relative;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    height: 48px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+}
+
+.expandAction {
+    position: absolute;
+    top: 0;
+    right: 0;
+    justify-self: flex-end;
+}
+
+.expanded {
+    position: absolute;
+    bottom: 0;
+    height: auto;
+}

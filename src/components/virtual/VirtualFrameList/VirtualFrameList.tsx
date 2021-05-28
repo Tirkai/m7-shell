@@ -36,7 +36,9 @@ export const VirtualFrameList = (props: IVirtualFrameListProps) => {
             <div
                 className={style.container}
                 ref={containerRef}
-                style={{ gridTemplateColumns: `repeat(${props.count}, 250px)` }}
+                style={{
+                    gridTemplateColumns: `repeat(${props.count}, 260px)`,
+                }}
             >
                 {props.children}
             </div>

@@ -11,15 +11,23 @@
     position: relative;
 }
 .container {
-    display: flex;
+    display: grid;
+    grid-template-columns: 96px 1fr 164px;
     width: 100%;
     justify-content: space-between;
     background: #000000cc;
 }
-.tasks {
+.controls {
     display: flex;
 }
+.tasks {
+    display: flex;
+    width: 100%;
+}
 
+.tasksContainer {
+    display: flex;
+}
 .actions {
     display: flex;
 }

@@ -1,22 +1,19 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { apps, cross, virtual } from "assets/icons";
+import { apps, virtual } from "assets/icons";
 import classNames from "classnames";
 import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
 import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
-import { groupBy } from "lodash";
 import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
-import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
-import React, { useMemo } from "react";
+import React from "react";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
 import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
-import { TaskGroup } from "../TaskGroup/TaskGroup";
-import { TaskHint } from "../TaskHint/TaskHint";
+import { TaskList } from "../TaskList/TaskList";
 import style from "./style.module.css";
 
 export const TaskBar = observer(() => {
@@ -70,45 +67,10 @@ export const TaskBar = observer(() => {
         );
     };
 
-    const createCloseApplicationContextMenuItem = (
-        appProcess: ApplicationProcess,
-    ) => [
-        new ContextMenuItemModel({
-            icon: <SVGIcon source={cross} color="white" />,
-            content: strings.application.actions.close,
-            onClick: () => handleKillProcess(appProcess),
-        }),
-    ];
-
-    const tasksGroups = useMemo(() => {
-        const groups = groupBy(
-            store.processManager.processes,
-            "window.viewport.id",
-        );
-
-        // TODO: optimize
-        const groupedProcessesByViewport = Object.entries(groups).map(
-            ([key, value]) => ({
-                key,
-                value,
-            }),
-        );
-
-        const sortedGroups = groupedProcessesByViewport.sort((a, b) => {
-            const firstIndex = a.value[0].window.viewport.index;
-            const secondIndex = b.value[0].window.viewport.index;
-            return firstIndex - secondIndex;
-        });
-        return sortedGroups;
-    }, [
-        store.processManager.processes.length,
-        store.virtualViewport.viewports.length,
-    ]);
-
     return (
         <div className={classNames(style.taskBar)}>
             <div className={style.container}>
-                <div className={style.tasks}>
+                <div className={style.controls}>
                     <TaskBarItem
                         onClick={() =>
                             handleShowAppsMenu(!store.panelManager.appMenuShow)
@@ -119,35 +81,19 @@ export const TaskBar = observer(() => {
                     <TaskBarItem onClick={() => handleShowVirtualHub()}>
                         <SVGIcon source={virtual} color="white" />
                     </TaskBarItem>
-
-                    {tasksGroups.map((group, groupIndex) => (
-                        <TaskGroup
-                            key={group.key}
-                            active={
-                                group.key ===
-                                store.virtualViewport.currentViewport.id
-                            }
-                        >
-                            {group.value.map((appProcess) => (
-                                <TaskBarItem
-                                    key={appProcess.id}
-                                    hint={<TaskHint title={appProcess.name} />}
-                                    focused={appProcess.window.isFocused}
-                                    onClick={() =>
-                                        handleFocusAppWindow(appProcess.window)
-                                    }
-                                    menu={createCloseApplicationContextMenuItem(
-                                        appProcess,
-                                    )}
-                                >
-                                    <SVGIcon
-                                        source={appProcess.app.icon}
-                                        color="white"
-                                    />
-                                </TaskBarItem>
-                            ))}
-                        </TaskGroup>
-                    ))}
+                </div>
+                <div className={style.tasks}>
+                    <TaskList
+                        processes={store.processManager.processes}
+                        processesCount={store.processManager.processes.length}
+                        viewports={store.virtualViewport.viewports}
+                        viewportsCount={store.virtualViewport.viewports.length}
+                        currentViewport={store.virtualViewport.currentViewport}
+                        onFocus={(appWindow) => handleFocusAppWindow(appWindow)}
+                        onKillProcess={(appProcess) =>
+                            handleKillProcess(appProcess)
+                        }
+                    />
                 </div>
 
                 <div className={style.actions}>

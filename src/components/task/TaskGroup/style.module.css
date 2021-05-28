@@ -1,11 +1,13 @@
 .taskGroup {
     display: flex;
     color: white;
+    scroll-snap-align: start;
 }
 
 .container {
     display: flex;
     position: relative;
+    flex-wrap: wrap;
 }
 
 .container:before {
