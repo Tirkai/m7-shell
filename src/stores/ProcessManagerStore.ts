@@ -66,16 +66,22 @@ export class ProcessManagerStore {
             );
 
             if (message.type) {
+                // #region Backward compatibility
+                const matchMessageWithAppByUrlPart = (
+                    item: ApplicationProcess,
+                ) => {
+                    const app = item.app as ExternalApplication;
+                    return app.url && app.url.includes(message.source ?? "-1");
+                };
+                // #endregion
+
                 const findedProcess = this.processes.find(
                     (item) =>
                         item.app.id === message.appId ||
                         // #region Required update m7-shell-emitter library in applications!
                         // Its important
                         // Remove this row after update
-                        (!message.appId &&
-                            (item.app as ExternalApplication).url.includes(
-                                message.source ?? "-1",
-                            )),
+                        matchMessageWithAppByUrlPart(item),
                     // #endregion
                 );
 
