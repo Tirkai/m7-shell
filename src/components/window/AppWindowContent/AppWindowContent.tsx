@@ -80,6 +80,7 @@ export const AppWindowContent = observer((props: IAppWindowProps) => {
                         width: "100%",
                         height: "100%",
                     }}
+                    tabIndex={-1}
                     frameBorder={0}
                 ></iframe>
             );
