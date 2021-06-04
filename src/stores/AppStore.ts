@@ -1,6 +1,7 @@
 import { ApplicationManagerStore } from "./ApplicationManagerStore";
 import { AudioStore } from "./AudioStore";
 import { AuthStore } from "./AuthStore";
+import { ConfigStore } from "./ConfigStore";
 import { ContextMenuStore } from "./ContextMenuStore";
 import { DateTimeStore } from "./DateTimeStore";
 import { DesktopStore } from "./DesktopStore";
@@ -44,6 +45,7 @@ export class AppStore {
     hotkey: HotkeyStore;
     display: DisplayManager;
     recovery: RecoveryStore;
+    config: ConfigStore;
     constructor() {
         this.sharedEventBus = new SharedEventBus(this);
         this.userDatabase = new UserDatabaseManager(this);
@@ -67,6 +69,7 @@ export class AppStore {
         this.hotkey = new HotkeyStore(this);
         this.auth = new AuthStore(this);
         this.recovery = new RecoveryStore(this);
+        this.config = new ConfigStore(this);
 
         console.warn("STORE", this);
 

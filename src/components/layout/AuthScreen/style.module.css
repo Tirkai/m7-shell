@@ -19,7 +19,6 @@
     align-items: center;
     background-color: rgba(0, 0, 0, 0.5);
     height: 100%;
-    animation: fadeIn 1s;
 }
 .logo {
     margin-bottom: 12px;

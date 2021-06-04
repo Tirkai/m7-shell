@@ -2,6 +2,8 @@ import { AuthScreen } from "components/layout/AuthScreen/AuthScreen";
 import { AwaitVerifyScreen } from "components/layout/AwaitVerifyScreen/AwaitVerifyScreen";
 import { ShellScreen } from "components/layout/ShellScreen/ShellScreen";
 import { MessageDialog } from "components/message/MessageDialog/MessageDialog";
+import { AutoLogin } from "components/utility/AutoLogin/AutoLogin";
+import { PlatformTitle } from "components/utility/PlatformTitle/PlatformTitle";
 import { PerformanceContext } from "contexts/PerformanceContext";
 import { PerformanceModeType } from "enum/PerformanceModeType";
 import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
@@ -34,9 +36,6 @@ export const AppContainer = observer(() => {
 
         // TODO: fix
         const urlParams = new URL(window.location.href).searchParams;
-        const enableAutoRun = urlParams.get("enableAutoLogin");
-        const autoLogin = urlParams.get("login");
-        const autoPassword = urlParams.get("password");
 
         const performanceMode = urlParams.get("performanceMode");
 
@@ -56,20 +55,16 @@ export const AppContainer = observer(() => {
                 setPerfMode(perf);
             }
         }
-
-        if (!!parseInt(enableAutoRun ?? "0")) {
-            if (autoLogin && autoPassword) {
-                store.auth.login(autoLogin, autoPassword);
-            } else {
-                console.warn("Invalid parameters for auto login");
-            }
-        }
     };
 
     useEffect(onMount, []);
 
+    const { config } = store.config;
+
     return (
         <PerformanceContext.Provider value={{ mode: perfMode }}>
+            <PlatformTitle title={config["platform.name"]} />
+            <AutoLogin />
             <Router history={history}>
                 <Switch>
                     <Route path="/" exact>

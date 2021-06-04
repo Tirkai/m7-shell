@@ -12,7 +12,7 @@
 }
 .container {
     display: grid;
-    grid-template-columns: 96px 1fr 164px;
+    grid-template-columns: auto 1fr 164px;
     width: 100%;
     justify-content: space-between;
     background: #000000cc;
@@ -30,6 +30,7 @@
 }
 .actions {
     display: flex;
+    justify-content: flex-end;
 }
 
 .show {

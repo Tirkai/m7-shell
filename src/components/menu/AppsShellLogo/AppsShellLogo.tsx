@@ -99,7 +99,7 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
             <AppsMenuSidebarListItem onClick={this.handleShowDropdown}>
                 <div className={style.appsShellLogo}>
                     <Avatar className={style.avatar}>
-                        {strings.global.systemName}
+                        {this.store.config.config["platform.alias"]}
                     </Avatar>
                 </div>
             </AppsMenuSidebarListItem>

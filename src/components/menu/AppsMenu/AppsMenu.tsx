@@ -1,6 +1,7 @@
 import { SVGIcon } from "@algont/m7-ui";
 import { search as searchIcon } from "assets/icons";
 import classNames from "classnames";
+import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { AppsMenuTileContainer } from "components/menu/AppsMenuTileContainer/AppsMenuTileContainer";
 import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
 import { ApplicationPlace } from "enum/ApplicationPlace";
@@ -76,6 +77,8 @@ export const AppsMenu: React.FC = observer(() => {
           )
     ).filter((app) => !app.isExistedAppInstance);
 
+    const { config } = store.config;
+
     return (
         <div
             className={classNames(style.appsMenu, {
@@ -83,16 +86,32 @@ export const AppsMenu: React.FC = observer(() => {
             })}
         >
             <div className={style.container}>
-                <div className={style.sidebar}>
-                    <div className={style.sidebarTop}>
-                        <AppsShellLogo apps={shellMenuApps} />
-                        <AppsMenuViewSwitcher />
+                <ConfigCondition condition={config["appsMenu.sidebar.enabled"]}>
+                    <div className={style.sidebar}>
+                        <div className={style.sidebarTop}>
+                            <ConfigCondition
+                                condition={
+                                    config[
+                                        "appsMenu.sidebar.platformMenu.enabled"
+                                    ]
+                                }
+                            >
+                                <AppsShellLogo apps={shellMenuApps} />
+                            </ConfigCondition>
+                            <AppsMenuViewSwitcher />
+                        </div>
+                        <div className={style.sidebarBottom}>
+                            <AppsSettings apps={settingsMenuApps} />
+                            <ConfigCondition
+                                condition={
+                                    config["appsMenu.sidebar.userMenu.enabled"]
+                                }
+                            >
+                                <AppsProfilePreview apps={userMenuApps} />
+                            </ConfigCondition>
+                        </div>
                     </div>
-                    <div className={style.sidebarBottom}>
-                        <AppsSettings apps={settingsMenuApps} />
-                        <AppsProfilePreview apps={userMenuApps} />
-                    </div>
-                </div>
+                </ConfigCondition>
                 <div className={style.content}>
                     <div className={style.search}>
                         <AppsMenuSearch

@@ -1,3 +1,4 @@
+import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { ShellContextMenu } from "components/contextMenu/ShellContextMenu/ShellContextMenu";
 import { ShellContextMenuOverlay } from "components/contextMenu/ShellContextMenuOverlay/ShellContextMenuOverlay";
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
@@ -135,6 +136,8 @@ export class ShellScreen extends Component<IStore> {
     };
 
     render() {
+        const { config } = this.store.config;
+
         return (
             <div className={style.shellScreen}>
                 <DesktopLayout
@@ -151,113 +154,158 @@ export class ShellScreen extends Component<IStore> {
                                                 viewport.id
                                             }
                                         >
-                                            <Suspense fallback="Loading">
-                                                <DesktopLayer
-                                                    enabled
-                                                    priority={1}
-                                                >
-                                                    <DesktopForeground
-                                                        onDesktopClick={
-                                                            this
-                                                                .handleClickDesktop
-                                                        }
-                                                    />
-                                                </DesktopLayer>
-                                            </Suspense>
-                                            <Suspense fallback="Loading">
-                                                <DesktopLayer
-                                                    enabled
-                                                    priority={2}
-                                                >
-                                                    <TileDesktopContainer
-                                                        viewport={viewport}
-                                                        preset={
-                                                            viewport.tilePreset
-                                                        }
-                                                    />
-                                                </DesktopLayer>
-                                            </Suspense>
-                                            <Suspense fallback="Loading">
-                                                <DesktopLayer
-                                                    enabled
-                                                    priority={1}
-                                                >
-                                                    <AppWindowArea
-                                                        viewport={viewport}
-                                                        disabled={
-                                                            this.store.desktop
-                                                                .isEditMode
-                                                        }
-                                                    />
-                                                </DesktopLayer>
-                                            </Suspense>
+                                            <ConfigCondition
+                                                condition={
+                                                    config["foreground.enabled"]
+                                                }
+                                            >
+                                                <Suspense fallback="Loading">
+                                                    <DesktopLayer
+                                                        enabled
+                                                        priority={1}
+                                                    >
+                                                        <DesktopForeground
+                                                            onDesktopClick={
+                                                                this
+                                                                    .handleClickDesktop
+                                                            }
+                                                        />
+                                                    </DesktopLayer>
+                                                </Suspense>
+                                            </ConfigCondition>
+
+                                            <ConfigCondition
+                                                condition={
+                                                    config["tileArea.enabled"]
+                                                }
+                                            >
+                                                <Suspense fallback="Loading">
+                                                    <DesktopLayer
+                                                        enabled
+                                                        priority={2}
+                                                    >
+                                                        <TileDesktopContainer
+                                                            viewport={viewport}
+                                                            preset={
+                                                                viewport.tilePreset
+                                                            }
+                                                        />
+                                                    </DesktopLayer>
+                                                </Suspense>
+                                            </ConfigCondition>
+
+                                            <ConfigCondition
+                                                condition={
+                                                    config["floatArea.enabled"]
+                                                }
+                                            >
+                                                <Suspense fallback="Loading">
+                                                    <DesktopLayer
+                                                        enabled
+                                                        priority={1}
+                                                    >
+                                                        <AppWindowArea
+                                                            viewport={viewport}
+                                                            disabled={
+                                                                this.store
+                                                                    .desktop
+                                                                    .isEditMode
+                                                            }
+                                                        />
+                                                    </DesktopLayer>
+                                                </Suspense>
+                                            </ConfigCondition>
                                         </VirtualFrame>
                                     ),
                                 )}
                             </VirtualViewport>
-                            <Suspense fallback="Loading">
-                                <DesktopLayer enabled priority={2}>
-                                    <VirtualDesktopHub />
-                                </DesktopLayer>
-                            </Suspense>
-                            <Suspense fallback="Loading">
-                                <DesktopLayer enabled priority={3}>
-                                    <AppsMenu />
-                                </DesktopLayer>
-                            </Suspense>
-                            <Suspense fallback="Loading">
-                                <DesktopLayer enabled priority={3}>
-                                    <NotificationToasts />
-                                    <NotificationHub />
-                                </DesktopLayer>
-                            </Suspense>
+                            <ConfigCondition
+                                condition={config["viewportHub.enabled"]}
+                            >
+                                <Suspense fallback="Loading">
+                                    <DesktopLayer enabled priority={2}>
+                                        <VirtualDesktopHub />
+                                    </DesktopLayer>
+                                </Suspense>
+                            </ConfigCondition>
+                            <ConfigCondition
+                                condition={config["appsMenu.enabled"]}
+                            >
+                                <Suspense fallback="Loading">
+                                    <DesktopLayer enabled priority={3}>
+                                        <AppsMenu />
+                                    </DesktopLayer>
+                                </Suspense>
+                            </ConfigCondition>
+                            <ConfigCondition
+                                condition={config["notifications.enabled"]}
+                            >
+                                <Suspense fallback="Loading">
+                                    <DesktopLayer enabled priority={3}>
+                                        <NotificationToasts />
+                                        <NotificationHub />
+                                    </DesktopLayer>
+                                </Suspense>
+                            </ConfigCondition>
+
                             <Suspense fallback="Loading">
                                 <DesktopLayer enabled={false} priority={3}>
                                     <AppWindowPinContainer />
                                 </DesktopLayer>
                             </Suspense>
-                            <Suspense fallback="Loading">
-                                <DesktopLayer enabled priority={3}>
-                                    <AudioContainer />
-                                    <AudioHub />
-                                </DesktopLayer>
-                            </Suspense>
+                            <ConfigCondition
+                                condition={config["audioHub.enabled"]}
+                            >
+                                <Suspense fallback="Loading">
+                                    <DesktopLayer enabled priority={3}>
+                                        <AudioContainer />
+                                        <AudioHub />
+                                    </DesktopLayer>
+                                </Suspense>
+                            </ConfigCondition>
 
                             <DesktopLayer enabled={false} priority={4}>
                                 <BuildVersion />
                             </DesktopLayer>
-
-                            <DesktopLayer enabled priority={4}>
-                                <RecoveryLayer />
-                                <RecoveryDialog
-                                    show={
-                                        this.store.recovery
-                                            .isDisplayRecoveryDialog
-                                    }
-                                    onRecovery={() => this.handleRecovery()}
-                                    onRestart={() =>
-                                        this.handleRecoveryFreezeSnapshot()
-                                    }
-                                    onCancel={() =>
-                                        this.store.recovery.setDisplayRecoveryDialog(
-                                            false,
-                                        )
-                                    }
-                                    processes={
-                                        this.store.recovery
-                                            .dynamicSessionSnapshot
-                                            ?.processSnapshot?.processes
-                                    }
-                                    viewports={
-                                        this.store.recovery
-                                            .dynamicSessionSnapshot
-                                            ?.viewportSnapshot?.viewports
-                                    }
-                                />
-                            </DesktopLayer>
+                            <ConfigCondition
+                                condition={config["recovery.enabled"]}
+                            >
+                                <DesktopLayer enabled priority={4}>
+                                    <RecoveryLayer />
+                                    <RecoveryDialog
+                                        show={
+                                            this.store.recovery
+                                                .isDisplayRecoveryDialog
+                                        }
+                                        onRecovery={() => this.handleRecovery()}
+                                        onRestart={() =>
+                                            this.handleRecoveryFreezeSnapshot()
+                                        }
+                                        onCancel={() =>
+                                            this.store.recovery.setDisplayRecoveryDialog(
+                                                false,
+                                            )
+                                        }
+                                        processes={
+                                            this.store.recovery
+                                                .dynamicSessionSnapshot
+                                                ?.processSnapshot?.processes
+                                        }
+                                        viewports={
+                                            this.store.recovery
+                                                .dynamicSessionSnapshot
+                                                ?.viewportSnapshot?.viewports
+                                        }
+                                    />
+                                </DesktopLayer>
+                            </ConfigCondition>
                         </DesktopContainer>
                     }
-                    taskBar={<TaskBar />}
+                    taskBar={
+                        <ConfigCondition condition={config["taskbar.enabled"]}>
+                            <TaskBar />
+                        </ConfigCondition>
+                    }
                 />
 
                 <ShellContextMenuOverlay />

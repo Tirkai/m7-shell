@@ -1,3 +1,4 @@
+import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
@@ -43,6 +44,8 @@ export const TileWindow = observer((props: ITileWindowProps) => {
         store.windowManager.focusWindow(tileWindow);
     };
 
+    const { config } = store.config;
+
     return (
         <Draggable
             handle=".appHeaderInfoBar"
@@ -58,14 +61,19 @@ export const TileWindow = observer((props: ITileWindowProps) => {
                 className={className}
                 style={{ ...gridStyle, zIndex: props.window.depthIndex }}
             >
-                <AppWindowHeader
-                    icon={props.process.app.icon}
-                    title={props.process.app.name}
-                    isFocused={props.isFocused}
-                    onFullscreen={props.onFullscreen}
-                    onClose={() => props.onClose(props.window)}
-                    visible
-                />
+                <ConfigCondition
+                    condition={config["windows.singleWindow.header.enabled"]}
+                >
+                    <AppWindowHeader
+                        icon={props.process.app.icon}
+                        title={props.process.app.name}
+                        isFocused={props.isFocused}
+                        onFullscreen={props.onFullscreen}
+                        onClose={() => props.onClose(props.window)}
+                        visible
+                    />
+                </ConfigCondition>
+
                 <AppLoader
                     icon={props.process.app.icon}
                     disabled={isAppReady}

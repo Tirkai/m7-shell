@@ -1,6 +1,7 @@
 import { SVGIcon } from "@algont/m7-ui";
 import { apps, virtual } from "assets/icons";
 import classNames from "classnames";
+import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
 import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellPanelType } from "enum/ShellPanelType";
@@ -67,20 +68,28 @@ export const TaskBar = observer(() => {
         );
     };
 
+    const { config } = store.config;
+
     return (
         <div className={classNames(style.taskBar)}>
             <div className={style.container}>
                 <div className={style.controls}>
-                    <TaskBarItem
-                        onClick={() =>
-                            handleShowAppsMenu(!store.panelManager.appMenuShow)
-                        }
-                    >
-                        <SVGIcon source={apps} color="white" />
-                    </TaskBarItem>
-                    <TaskBarItem onClick={() => handleShowVirtualHub()}>
-                        <SVGIcon source={virtual} color="white" />
-                    </TaskBarItem>
+                    <ConfigCondition condition={config["appsMenu.enabled"]}>
+                        <TaskBarItem
+                            onClick={() =>
+                                handleShowAppsMenu(
+                                    !store.panelManager.appMenuShow,
+                                )
+                            }
+                        >
+                            <SVGIcon source={apps} color="white" />
+                        </TaskBarItem>
+                    </ConfigCondition>
+                    <ConfigCondition condition={config["viewportHub.enabled"]}>
+                        <TaskBarItem onClick={() => handleShowVirtualHub()}>
+                            <SVGIcon source={virtual} color="white" />
+                        </TaskBarItem>
+                    </ConfigCondition>
                 </div>
                 <div className={style.tasks}>
                     <TaskList
@@ -97,41 +106,47 @@ export const TaskBar = observer(() => {
                 </div>
 
                 <div className={style.actions}>
-                    <TaskBarItem onClick={handleShowAudioHub}>
-                        <TaskBarSound
-                            volume={store.audio.volume}
-                            isMuted={store.audio.isMute}
-                        />
-                    </TaskBarItem>
+                    <ConfigCondition condition={config["audioHub.enabled"]}>
+                        <TaskBarItem onClick={handleShowAudioHub}>
+                            <TaskBarSound
+                                volume={store.audio.volume}
+                                isMuted={store.audio.isMute}
+                            />
+                        </TaskBarItem>
+                    </ConfigCondition>
                     <TaskBarItem autoWidth>
                         <TaskBarDateTime />
                     </TaskBarItem>
-
-                    <TaskBarItem
-                        badge={
-                            store.notification.status ===
-                            NotificationServiceConnectStatus.Connected
-                                ? store.notification.totalCount > 0
-                                    ? store.notification.totalCount.toString()
-                                    : undefined
-                                : undefined
-                        }
-                        onClick={() =>
-                            handleShowNotificationHub(
-                                !store.panelManager.notificationHubShow,
-                            )
-                        }
+                    <ConfigCondition
+                        condition={config["notifications.enabled"]}
                     >
-                        <NotificationTaskbarItem
-                            status={store.notification.status}
-                            exist={
+                        <TaskBarItem
+                            badge={
                                 store.notification.status ===
                                 NotificationServiceConnectStatus.Connected
-                                    ? store.notification.isExistNotifications
-                                    : false
+                                    ? store.notification.totalCount > 0
+                                        ? store.notification.totalCount.toString()
+                                        : undefined
+                                    : undefined
                             }
-                        />
-                    </TaskBarItem>
+                            onClick={() =>
+                                handleShowNotificationHub(
+                                    !store.panelManager.notificationHubShow,
+                                )
+                            }
+                        >
+                            <NotificationTaskbarItem
+                                status={store.notification.status}
+                                exist={
+                                    store.notification.status ===
+                                    NotificationServiceConnectStatus.Connected
+                                        ? store.notification
+                                              .isExistNotifications
+                                        : false
+                                }
+                            />
+                        </TaskBarItem>
+                    </ConfigCondition>
                 </div>
             </div>
         </div>

@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { useStore } from "hooks/useStore";
 import { ApplicationProcess } from "models/ApplicationProcess";
@@ -98,6 +99,8 @@ export const AppWindow = (props: IAppWindowProps) => {
     const bottomBound =
         window.innerHeight - props.height * boundsVisibilityPercentModifier;
 
+    const { config } = store.config;
+
     return (
         <Draggable
             handle=".appHeaderInfoBar"
@@ -144,19 +147,26 @@ export const AppWindow = (props: IAppWindowProps) => {
                         className={classNames(style.windowContainer)}
                         onMouseDown={handleFocus}
                     >
-                        <AppWindowHeader
-                            icon={props.process.app.icon}
-                            title={props.process.name}
-                            isFocused={props.isFocused}
-                            onClose={props.onClose}
-                            onDoubleClick={handleHeaderDoubleClick}
-                            hasBackward={false}
-                            hasReload={true}
-                            onBackward={() => true}
-                            onReload={() => handleReload()}
-                            onCollapse={() => handleCollapse()}
-                            onFullscreen={() => handleFullScreen()}
-                        />
+                        <ConfigCondition
+                            condition={
+                                config["windows.singleWindow.header.enabled"]
+                            }
+                        >
+                            <AppWindowHeader
+                                icon={props.process.app.icon}
+                                title={props.process.name}
+                                isFocused={props.isFocused}
+                                onClose={props.onClose}
+                                onDoubleClick={handleHeaderDoubleClick}
+                                hasBackward={false}
+                                hasReload={true}
+                                onBackward={() => true}
+                                onReload={() => handleReload()}
+                                onCollapse={() => handleCollapse()}
+                                onFullscreen={() => handleFullScreen()}
+                            />
+                        </ConfigCondition>
+
                         <AppLoader
                             icon={props.process.app.icon}
                             disabled={isAppReady}

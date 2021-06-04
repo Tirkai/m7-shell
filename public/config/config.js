@@ -1,6 +1,7 @@
-const config = {
-    platformName: "M7",
-    platformAlias: "M7",
-};
-
-window.shell = config;
+window.createConfig(
+    "default",
+    window.extendConfig("default", {
+        "platform.name": "Shell",
+        "platform.alias": "M7",
+    }),
+);

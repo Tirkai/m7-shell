@@ -33,6 +33,7 @@
 
 .content {
     display: block;
+    grid-column: 2;
 }
 
 .search {
