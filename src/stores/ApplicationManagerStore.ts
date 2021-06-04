@@ -5,6 +5,7 @@ import { IAppParams } from "interfaces/app/IAppParams";
 import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicationResponse";
 import { strings } from "locale";
 import { makeAutoObservable } from "mobx";
+import { ApplicationEventType } from "models/app/ApplicationEventType";
 import { Application } from "models/Application";
 import { ExternalApplication } from "models/ExternalApplication";
 import { registeredApps } from "registeredApps";
@@ -62,6 +63,11 @@ export class ApplicationManagerStore {
                 this.addApplicationsList(portalApplications);
             }
             this.addApplicationsList(registeredApps);
+
+            this.store.sharedEventBus.eventBus.dispatch(
+                ApplicationEventType.OnApplicationListLoaded,
+                this.applications,
+            );
         } catch (e) {
             if (e?.response?.status !== 401) {
                 this.store.message.showMessage(

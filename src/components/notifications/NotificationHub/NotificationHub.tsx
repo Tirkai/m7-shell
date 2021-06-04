@@ -18,8 +18,7 @@ import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { observer } from "mobx-react";
-import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationGroupModel } from "models/NotificationGroupModel";
 import { NotificationModel } from "models/NotificationModel";
@@ -69,10 +68,10 @@ export const NotificationHub = observer(() => {
     }, []);
 
     useEffect(() => {
-        if (store.shell.activePanel !== ShellPanelType.NotificationHub) {
+        if (store.panelManager.activePanel !== ShellPanelType.NotificationHub) {
             setShowClearGroupDialog({ isShow: false, group: null });
         }
-    }, [store.shell.activePanel]);
+    }, [store.panelManager.activePanel]);
 
     const handleDeleteNotifications = (
         group: NotificationGroupModel | null,
@@ -156,24 +155,10 @@ export const NotificationHub = observer(() => {
         const app = store.applicationManager.findById(appId);
 
         if (app instanceof ExternalApplication && url.length) {
-            store.shell.setActivePanel(ShellPanelType.None);
+            store.panelManager.setActivePanel(ShellPanelType.None);
 
-            if (!app.isExecuted) {
-                const appProcess = new ApplicationProcess({
-                    app,
-                    window: new ApplicationWindow(),
-                    url,
-                });
-                store.processManager.execute(appProcess);
-            } else {
-                const activeProcess = store.processManager.findProcessByApp(
-                    app,
-                );
-                if (activeProcess) {
-                    activeProcess.setUrl(url);
-                    store.windowManager.focusWindow(activeProcess.window);
-                }
-            }
+            const runner = new ApplicationRunner(store);
+            runner.run(app, { url, focusWindowAfterInstantiate: true });
         } else {
             console.warn("Try run application with empty URL");
         }
@@ -183,25 +168,14 @@ export const NotificationHub = observer(() => {
         const notificationApp = store.applicationManager.findById(
             NOTIFICATION_APP_GUID,
         );
+
+        const runner = new ApplicationRunner(store);
+
         if (notificationApp) {
-            if (!notificationApp.isExecuted) {
-                const appProcess = new ApplicationProcess({
-                    app: notificationApp,
-                    window: new ApplicationWindow(),
-                    params: new Map([["filterByAppId", group.id]]),
-                });
-                store.processManager.execute(appProcess);
-            } else {
-                const activeProcess = store.processManager.findProcessByApp(
-                    notificationApp,
-                );
-                if (activeProcess) {
-                    activeProcess.setParams(
-                        new Map([["filterByAppId", group.id]]),
-                    );
-                    store.windowManager.focusWindow(activeProcess.window);
-                }
-            }
+            runner.run(notificationApp, {
+                params: new Map([["filterByAppId", group.id]]),
+                focusWindowAfterInstantiate: true,
+            });
         }
     };
 
@@ -291,7 +265,7 @@ export const NotificationHub = observer(() => {
     return (
         <div
             className={classNames(style.notificationHub, {
-                [style.show]: store.shell.notificationHubShow,
+                [style.show]: store.panelManager.notificationHubShow,
             })}
         >
             <div className={style.container}>
@@ -366,3 +340,5 @@ export const NotificationHub = observer(() => {
         </div>
     );
 });
+
+export default NotificationHub;

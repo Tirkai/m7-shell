@@ -1,0 +1,83 @@
+.appsMenu {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    opacity: 0;
+    transform: translateY(calc(25%));
+    transition: transform ease 0.3s, opacity 0.3s;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 100;
+    max-height: calc(100vh - 48px);
+    background-size: cover;
+    background-attachment: fixed;
+    border-top-right-radius: 4px;
+    overflow: hidden;
+}
+
+.show {
+    opacity: 1;
+    transform: translateY(0);
+    padding: 0;
+    pointer-events: all;
+    animation: show 0.3s;
+}
+.container {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    box-sizing: border-box;
+    height: 100%;
+    background: #222222;
+    border-top-right-radius: 4px;
+}
+
+.content {
+    display: block;
+    grid-column: 2;
+}
+
+.search {
+    padding: 12px;
+}
+
+.appsListWrapper {
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.appsContainer {
+    height: 625px;
+    width: 330px;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 0 12px 12px 12px;
+    color: white;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 12px 0 0 0;
+}
+.logo {
+    cursor: pointer;
+}
+.notFoundApps {
+    grid-column: span 3;
+    color: white;
+}
+@keyframes show {
+    0% {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(50%);
+    }
+    100% {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0);
+    }
+}

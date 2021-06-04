@@ -1,16 +1,17 @@
+import React from "react";
 import { v4 } from "uuid";
 
 interface IContextMenuItemModelOptions {
-    icon?: string;
+    icon?: React.ReactNode;
     content: string;
     onClick: () => void;
 }
 
 export class ContextMenuItemModel {
     id: string;
-    icon?: string;
+    icon?: React.ReactNode;
     content: string;
-    onClick: () => void;
+    onClick: () => any;
 
     constructor(options: IContextMenuItemModelOptions) {
         this.id = v4();

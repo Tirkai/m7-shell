@@ -1,0 +1,23 @@
+.appsMenuApplicationIcon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transition: ease 0.3s;
+}
+.appsMenuApplicationIcon img[src*=".svg"] {
+    width: 16px;
+    height: 16px;
+}
+
+.appsMenuApplicationIcon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.appsMenuApplicationIcon img[src*=".png"] {
+    width: 32px;
+    height: 32px;
+}

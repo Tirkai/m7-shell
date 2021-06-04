@@ -6,12 +6,9 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow: hidden;
-    background: #fafafa;
+    background: #222;
     min-height: 100vh;
     user-select: none;
-    background: url("/wallpapers/wallpaper.jpg");
-    background-size: cover;
-    background-attachment: fixed;
 }
 
 .MuiFormLabel-root {
@@ -97,16 +94,17 @@ code {
 }
 
 div {
-    scrollbar-color: rgba(0, 0, 0, 0.2);
+    scrollbar-color: rgba(255, 255, 255, 0.4);
     scrollbar-width: thin;
 }
 
 div::-webkit-scrollbar {
     width: 5px;
+    height: 5px;
 }
 
 div::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.3);
     border-radius: 4px;
 }
 
@@ -117,4 +115,8 @@ div::-webkit-scrollbar-track {
 .no-animate * {
     transition-duration: 0s !important;
     animation-duration: 0s !important;
+}
+
+.react-draggable-transparent-selection .appWindow {
+    transition: none;
 }

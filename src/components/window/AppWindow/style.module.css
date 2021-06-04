@@ -3,14 +3,17 @@
     top: 0;
     left: 0;
     box-sizing: border-box;
+    transition: transform ease 0.15s, width ease 0.15s, height ease 0.15s;
 }
 .windowContainer {
-    display: block;
+    display: grid;
+    grid-template-rows: 30px 1fr;
     height: 100%;
     width: 100%;
     overflow: hidden;
     border-radius: 4px;
     box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+    grid-template-rows: 30px 1fr;
 }
 .content {
     height: 100%;
@@ -21,7 +24,7 @@
 }
 
 .withHeader {
-    height: calc(100% - 31px);
+    grid-row: span 2;
 }
 
 .collapsed {
@@ -30,4 +33,13 @@
 
 .fullScreen {
     border-radius: 0;
+}
+
+@keyframes entry {
+    0% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1);
+    }
 }

@@ -1,9 +1,9 @@
 {
     "name": "m7-shell",
-    "version": "0.27.0",
+    "version": "0.28.0",
     "private": true,
     "dependencies": {
-        "@algont/m7-shell-emitter": "^0.7.0",
+        "@algont/m7-shell-emitter": "^0.9.0",
         "@algont/m7-ui": "^0.9.1",
         "@algont/m7-utils": "^0.4.1",
         "@date-io/moment": "1.3.13",
@@ -22,8 +22,9 @@
         "eslint-config-prettier": "^6.11.0",
         "eslint-plugin-prettier": "^3.1.3",
         "history": "^4.10.1",
+        "html2canvas": "*",
         "js-base64": "^3.4.4",
-        "lodash": "^4.17.20",
+        "lodash": "^4.17.21",
         "mobx": "^6.0.1",
         "mobx-react": "^7.0.0",
         "mobx-undecorate": "^1.0.2",
@@ -86,10 +87,6 @@
         ]
     },
     "devDependencies": {
-        "@dump247/storybook-state": "^1.6.1",
-        "@storybook/addon-actions": "^5.3.18",
-        "@storybook/addon-viewport": "^5.3.18",
-        "@storybook/react": "^5.3.18",
         "@types/classnames": "^2.2.10",
         "@types/lodash": "^4.14.150",
         "@types/object-hash": "^1.3.1",
@@ -105,8 +102,6 @@
         "onchange": "^6.1.1",
         "prettier": "^1.19.1",
         "ssh2-sftp-client": "^5.3.1",
-        "storybook-addon-figma": "^0.1.0",
-        "storybook-readme": "^5.0.8",
         "ts-node": "^9.0.0",
         "tslint": "^5.20.0",
         "tslint-config-prettier": "^1.18.0",

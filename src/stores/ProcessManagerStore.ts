@@ -2,16 +2,20 @@ import {
     AppMessageType,
     EmitterMessage,
     invokeListeners,
+    ShellMessageType,
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
-import { AuthEventType } from "enum/AuthEventType";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { makeAutoObservable } from "mobx";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { Application } from "models/Application";
 import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
+import { AuthEventType } from "models/auth/AuthEventType";
 import { ExternalApplication } from "models/ExternalApplication";
+import { ProcessEventType } from "models/process/ProcessEventType";
+import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { portalEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
@@ -21,13 +25,38 @@ export class ProcessManagerStore {
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
-
+        const { eventBus } = this.store.sharedEventBus;
         makeAutoObservable(this);
 
-        this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
-            this.killAllProcesses(),
+        eventBus.add(
+            VirtualViewportEventType.OnRemoveViewportFrame,
+            (viewport: VirtualViewportModel) =>
+                this.onRemoveViewportFrame(viewport),
         );
 
+        eventBus.add(
+            VirtualViewportEventType.OnClearViewportFrame,
+            (viewport: VirtualViewportModel) =>
+                this.onRemoveViewportFrame(viewport),
+        );
+
+        eventBus.add(
+            ProcessEventType.OnChangeProcess,
+            (process: ApplicationProcess) => this.onChangeProcess(process),
+        );
+
+        eventBus.add(AuthEventType.OnLogout, () => this.onLogout());
+
+        eventBus.add(
+            AuthEventType.OnRenewToken,
+            (payload: { token: string; login: string }) =>
+                this.onRecieveToken(payload),
+        );
+
+        this.bindOnMessageHandler();
+    }
+
+    bindOnMessageHandler() {
         window.onmessage = (event: MessageEvent) => {
             const message: EmitterMessage<unknown> = event.data;
             let apps = [];
@@ -36,26 +65,78 @@ export class ProcessManagerStore {
                 (item) => item.id === message.appId,
             );
 
-            // #region Backward compatibility m7-shell-emitter@0.6
-            // Todo: Remove after update all projects
-            if (!message.appId && message.source) {
-                apps = this.store.applicationManager.applications.filter(
-                    (item) =>
-                        item instanceof ExternalApplication && message.source
-                            ? item.url.indexOf(message.source) > -1
-                            : false,
-                );
-            }
-            // #endregion
+            if (message.type) {
+                // #region Backward compatibility
+                const matchMessageWithAppByUrlPart = (
+                    item: ApplicationProcess,
+                ) => {
+                    const app = item.app as ExternalApplication;
+                    return app.url && app.url.includes(message.source ?? "-1");
+                };
+                // #endregion
 
-            this.processes.forEach((appProccess) => {
-                invokeListeners(message, appProccess.emitter.listeners);
-                return;
-            });
+                const findedProcess = this.processes.find(
+                    (item) =>
+                        item.app.id === message.appId ||
+                        // #region Required update m7-shell-emitter library in applications!
+                        // Its important
+                        // Remove this row after update
+                        matchMessageWithAppByUrlPart(item),
+                    // #endregion
+                );
+
+                if (findedProcess) {
+                    invokeListeners(message, findedProcess.emitter.listeners);
+                }
+            }
         };
     }
 
-    async execute(appProcess: ApplicationProcess) {
+    injectAuthTokenInProcess(
+        appProccess: ApplicationProcess,
+        token: string,
+        login: string,
+    ) {
+        try {
+            appProccess.emitter.emit(ShellMessageType.UpdateAuthToken, {
+                token,
+                login,
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onRecieveToken(payload: { token: string; login: string }) {
+        this.processes.forEach((appProcess) =>
+            this.injectAuthTokenInProcess(
+                appProcess,
+                payload.token,
+                payload.login,
+            ),
+        );
+    }
+
+    onLogout() {
+        this.destroyAllProcesses();
+    }
+
+    onChangeProcess(_process: ApplicationProcess) {
+        //
+    }
+
+    onRemoveViewportFrame(viewport: VirtualViewportModel) {
+        const findedProcesses = this.processes.filter(
+            (item) => item.window.viewport?.id === viewport.id,
+        );
+
+        findedProcesses.forEach((item) => this.killProcess(item));
+    }
+
+    async execute(
+        appProcess: ApplicationProcess,
+        options?: { noDispatch?: boolean },
+    ) {
         try {
             appProcess.app.setExecuted(true);
             const applicationParamsResponse = await Axios.post<
@@ -84,39 +165,23 @@ export class ProcessManagerStore {
                         ? this.store.applicationManager.findById(appId)
                         : this.store.applicationManager.findByUrlPart(url);
 
+                    const runner = new ApplicationRunner(this.store);
+
                     if (findedApp) {
-                        if (!findedApp.isExecuted) {
-                            const createdAppProcessInstance = new ApplicationProcess(
-                                {
-                                    app: findedApp,
-                                    window: new ApplicationWindow(),
-                                    url,
-                                },
-                            );
-                            this.execute(createdAppProcessInstance);
-                        } else {
-                            const activeProcess = this.findProcessByApp(
-                                findedApp,
-                            );
-                            if (activeProcess) {
-                                activeProcess.setUrl(url);
-                                this.store.windowManager.focusWindow(
-                                    activeProcess.window,
-                                );
-                            }
-                        }
+                        runner.run(findedApp, {
+                            url,
+                            focusWindowAfterInstantiate: true,
+                        });
                     } else {
                         const processUrl = new URL(url);
-                        const createdAppProcessInstance = new ApplicationProcess(
-                            {
-                                app: new ExternalApplication({
-                                    name: processUrl.host,
-                                    url,
-                                }),
-                                window: new ApplicationWindow(),
-                            },
+
+                        runner.run(
+                            new ExternalApplication({
+                                name: processUrl.host,
+                                url,
+                            }),
+                            { focusWindowAfterInstantiate: true },
                         );
-                        this.execute(createdAppProcessInstance);
                     }
                 },
             );
@@ -127,36 +192,64 @@ export class ProcessManagerStore {
                 }),
             );
 
-            this.startProcess(appProcess);
+            this.startProcess(appProcess, options);
         } catch (e) {
-            this.store.message.showMessage("[ph] Execute failed", "[ph]");
+            console.error(e);
             appProcess.app.setExecuted(false);
         }
     }
 
-    startProcess(appProcess: ApplicationProcess) {
+    startProcess(
+        appProcess: ApplicationProcess,
+        options?: { noDispatch?: boolean },
+    ) {
         this.processes.push(appProcess);
 
         appProcess.app.setExecuted(true);
 
-        this.store.windowManager.addWindow(appProcess.window);
+        if (options?.noDispatch) {
+            return;
+        }
+
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.OnInstantiateProcess,
+            appProcess,
+        );
+
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.OnChangeProcess,
+            appProcess,
+        );
     }
 
     killProcess(appProcess: ApplicationProcess) {
         const index = this.processes.indexOf(appProcess);
-
         appProcess.app.setExecuted(false);
 
-        this.store.windowManager.closeWindow(appProcess.window);
-
         this.processes.splice(index, 1);
+
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.OnKillProcess,
+            appProcess,
+        );
+
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.OnChangeProcess,
+            appProcess,
+        );
     }
 
     findProcessByApp(app: Application) {
         return this.processes.find((item) => item.app.id === app.id);
     }
 
-    killAllProcesses() {
+    destroyAllProcesses() {
+        const processesCopy = [...this.processes];
+
+        processesCopy.forEach((item) => {
+            this.killProcess(item);
+        });
+
         this.processes = [];
     }
 

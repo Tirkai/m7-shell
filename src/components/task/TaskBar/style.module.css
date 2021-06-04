@@ -1,29 +1,36 @@
 .taskBar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 48px;
+    height: 100%;
     width: 100%;
     display: flex;
     z-index: 100;
     background-size: cover;
     background-attachment: fixed;
-    transform: translateY(48px);
+    /* transform: translateY(48px); */
     transition: ease 0.3s;
-    pointer-events: none;
+    /* pointer-events: none; */
+    position: relative;
 }
 .container {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr 164px;
     width: 100%;
     justify-content: space-between;
     background: #000000cc;
 }
-.tasks {
+.controls {
     display: flex;
 }
+.tasks {
+    display: flex;
+    width: 100%;
+}
 
+.tasksContainer {
+    display: flex;
+}
 .actions {
     display: flex;
+    justify-content: flex-end;
 }
 
 .show {

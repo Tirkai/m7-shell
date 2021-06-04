@@ -140,7 +140,7 @@ export class NotificationStore {
 
             if (notificationsResponse.result) {
                 const notifications = notificationsResponse.result.map((item) =>
-                    NotificationFactory.createNotification(item),
+                    NotificationFactory.createNotificationFromRawData(item),
                 );
 
                 group.setNotifications(notifications);
@@ -281,7 +281,7 @@ export class NotificationStore {
                         "add_notification",
                         (response: INotificationResponse) =>
                             this.addNotification(
-                                NotificationFactory.createNotification(
+                                NotificationFactory.createNotificationFromRawData(
                                     response,
                                 ),
                             ),

@@ -1,0 +1,23 @@
+.virtualFrameActions {
+    display: flex;
+    align-items: center;
+    color: white;
+    background: #333;
+    padding: 0 8px;
+    box-sizing: border-box;
+    /* box-shadow: 0 0 5px #222; */
+    border-left: 1px solid #222;
+    z-index: 1;
+}
+
+.headerActions {
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.addAction svg {
+    width: 48px;
+    height: 48px;
+}

@@ -1,0 +1,42 @@
+.tileDesktopContainer {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* display: grid; */
+    /* width: 100%; */
+    /* height: 100%; */
+    /* grid-gap: 8px; */
+    /* box-sizing: border-box; */
+}
+
+.floatedArea {
+    position: absolute;
+    display: grid;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.appsArea {
+    position: absolute;
+    display: grid;
+    grid-gap: 8px;
+    padding: 4px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    transition: ease 0.3s;
+}
+
+.single {
+    padding: 0;
+}

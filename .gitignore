@@ -31,3 +31,4 @@ yarn-error.log*
 
 deb/debinstall/opt/
 deb/*.deb
+yarn.lock

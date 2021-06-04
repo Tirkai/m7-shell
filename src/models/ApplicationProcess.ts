@@ -2,8 +2,9 @@ import { ShellMessageEmitter } from "@algont/m7-shell-emitter";
 import { makeAutoObservable } from "mobx";
 import { v4 } from "uuid";
 import { Application } from "./Application";
-import { ApplicationWindow } from "./ApplicationWindow";
 import { ExternalApplication } from "./ExternalApplication";
+import { VirtualViewportModel } from "./virtual/VirtualViewportModel";
+import { ApplicationWindow } from "./window/ApplicationWindow";
 
 interface IApplicationProcessOptions {
     app: Application;
@@ -12,6 +13,7 @@ interface IApplicationProcessOptions {
     name?: string;
     params?: Map<string, string>;
     disableParams?: boolean;
+    viewport?: VirtualViewportModel;
 }
 
 export class ApplicationProcess {
@@ -24,6 +26,7 @@ export class ApplicationProcess {
     emitter: ShellMessageEmitter;
     hash: string;
     disableParams: boolean;
+    isReady: boolean;
 
     constructor(options: IApplicationProcessOptions) {
         makeAutoObservable(this);
@@ -36,6 +39,7 @@ export class ApplicationProcess {
         this.emitter = new ShellMessageEmitter(this.app.id);
         this.name = options.name ?? this.app.name;
         this.disableParams = options.disableParams ?? false;
+        this.isReady = false;
 
         if (this.app instanceof ExternalApplication) {
             this.url = options.url ?? this.app.url;
@@ -61,21 +65,34 @@ export class ApplicationProcess {
         this.params = value;
     }
 
+    setWindow(appWindow: ApplicationWindow) {
+        this.window = appWindow;
+    }
+
+    rerollHash() {
+        this.params.set("hash", v4());
+    }
+
     get modifiedUrl() {
-        if (this.app instanceof ExternalApplication) {
-            const url = new URL(this.url);
+        try {
+            if (this.app instanceof ExternalApplication) {
+                const url = new URL(this.url);
 
-            if (!this.disableParams) {
-                url.searchParams.set("hash", this.hash);
-                url.searchParams.set("appId", this.app.id);
+                if (!this.disableParams) {
+                    url.searchParams.set("hash", this.hash);
+                    url.searchParams.set("appId", this.app.id);
 
-                this.params.forEach((value, key) =>
-                    url.searchParams.set(key, value),
-                );
+                    this.params.forEach((value, key) =>
+                        url.searchParams.set(key, value),
+                    );
+                }
+
+                return url.toString();
             }
-
-            return url.toString();
+            return "";
+        } catch (e) {
+            console.error(e);
+            return "";
         }
-        return "";
     }
 }

@@ -59,6 +59,14 @@ export const NotificationCard = observer((props: INotificationCardProps) => {
                 <div className={style.date}>
                     <div className={style.text}>{localizedDate}</div>
                 </div>
+                {/* <div className={style.contextActions}>
+                    <Button color="secondary" variant="contained">
+                        Принять
+                    </Button>
+                    <Button color="secondary" variant="contained">
+                        Простить
+                    </Button>
+                </div> */}
             </div>
         </div>
     );

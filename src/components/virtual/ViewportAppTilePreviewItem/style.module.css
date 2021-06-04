@@ -1,0 +1,28 @@
+.viewportAppTileItemPreview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.icon {
+    display: flex;
+    justify-content: center;
+    /* margin-bottom: 8px; */
+}
+
+.title {
+    font-size: 12px;
+    text-align: center;
+    color: white;
+}

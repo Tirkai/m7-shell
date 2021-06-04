@@ -14,3 +14,5 @@ export class AudioContainer extends Component {
         );
     }
 }
+
+export default AudioContainer;

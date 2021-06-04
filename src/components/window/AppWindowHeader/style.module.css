@@ -1,12 +1,11 @@
 .appWindowHeader {
     height: 30px;
     background: #222;
-    display: none;
     width: 100%;
+    overflow: hidden;
+    position: relative;
 }
 .container {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
     height: 100%;
     width: 100%;
@@ -36,12 +35,17 @@
     align-items: center;
     color: white;
     line-height: 1em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .actions {
+    position: absolute;
+    top: 0;
+    right: 0;
     display: flex;
     height: 100%;
-    position: relative;
+    justify-content: flex-end;
     z-index: 5;
 }
 .focused {
