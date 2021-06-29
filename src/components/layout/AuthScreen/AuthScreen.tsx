@@ -2,6 +2,7 @@ import { Alert } from "@material-ui/lab";
 import logo from "assets/images/logo.svg";
 import classNames from "classnames";
 import { AuthForm } from "components/auth/AuthForm/AuthForm";
+import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { authErrorCodes } from "locale/errorCodes";
@@ -36,26 +37,30 @@ export const AuthScreen: React.FC = observer(() => {
         }
     };
 
+    const { config } = store.config;
+
     return (
         <div className={style.authScreen}>
-            <div className={classNames(style.overlay)}>
-                <div className={style.container}>
-                    <div className={style.logo}>
-                        <img src={logo} alt="Logo" />
-                    </div>
-                    <div className={style.description}>
-                        {strings.auth.description}
-                    </div>
-                    <div className={style.content}>
-                        <AuthForm onSubmit={handleLogin} />
-                        {isShowNotify && (
-                            <Alert variant="filled" severity="error">
-                                {notifyText}
-                            </Alert>
-                        )}
+            <ConfigCondition condition={!config["autoLogin.enabled"]}>
+                <div className={classNames(style.overlay)}>
+                    <div className={style.container}>
+                        <div className={style.logo}>
+                            <img src={logo} alt="Logo" />
+                        </div>
+                        <div className={style.description}>
+                            {strings.auth.description}
+                        </div>
+                        <div className={style.content}>
+                            <AuthForm onSubmit={handleLogin} />
+                            {isShowNotify && (
+                                <Alert variant="filled" severity="error">
+                                    {notifyText}
+                                </Alert>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
+            </ConfigCondition>
         </div>
     );
 });
