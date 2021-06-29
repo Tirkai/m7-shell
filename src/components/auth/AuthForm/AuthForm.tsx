@@ -39,7 +39,7 @@ export const AuthForm = (props: IAuthFormProps) => {
                         inputProps={{
                             ...createMemoizedMarker(
                                 MarkerType.Element,
-                                "AuthFormLoginInput",
+                                "AuthForm.LoginInput",
                             ),
                         }}
                         autoFocus
@@ -53,7 +53,7 @@ export const AuthForm = (props: IAuthFormProps) => {
                         inputProps={{
                             ...createMemoizedMarker(
                                 MarkerType.Element,
-                                "AuthFormPasswordInput",
+                                "AuthForm.PasswordInput",
                             ),
                         }}
                         onChange={handleChangePassword}
@@ -69,7 +69,7 @@ export const AuthForm = (props: IAuthFormProps) => {
                         color="primary"
                         {...createMemoizedMarker(
                             MarkerType.Element,
-                            "AuthFormSubmitButton",
+                            "AuthForm.SubmitButton",
                         )}
                     >
                         {strings.actions.login}
