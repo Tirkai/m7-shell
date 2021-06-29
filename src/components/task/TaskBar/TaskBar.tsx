@@ -1,8 +1,6 @@
-import { SVGIcon } from "@algont/m7-ui";
-import { apps, virtual } from "assets/icons";
 import classNames from "classnames";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
-import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
+import { TaskBarNotificationButton } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
 import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
@@ -11,9 +9,11 @@ import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React from "react";
+import { TaskBarAppsMenuButton } from "../TaskBarAppsMenuButton/TaskBarAppsMenuButton";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
-import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
+import { TaskBarSoundButton } from "../TaskBarSoundButton/TaskBarSoundButton";
+import { TaskBarViewportButton } from "../TaskBarViewportButton/TaskBarViewportButton";
 import { TaskList } from "../TaskList/TaskList";
 import style from "./style.module.css";
 
@@ -75,19 +75,21 @@ export const TaskBar = observer(() => {
             <div className={style.container}>
                 <div className={style.controls}>
                     <ConfigCondition condition={config["appsMenu.enabled"]}>
-                        <TaskBarItem
-                            onClick={() =>
-                                handleShowAppsMenu(
-                                    !store.panelManager.appMenuShow,
-                                )
-                            }
-                        >
-                            <SVGIcon source={apps} color="white" />
+                        <TaskBarItem>
+                            <TaskBarAppsMenuButton
+                                onClick={() =>
+                                    handleShowAppsMenu(
+                                        !store.panelManager.appMenuShow,
+                                    )
+                                }
+                            />
                         </TaskBarItem>
                     </ConfigCondition>
                     <ConfigCondition condition={config["viewportHub.enabled"]}>
-                        <TaskBarItem onClick={() => handleShowVirtualHub()}>
-                            <SVGIcon source={virtual} color="white" />
+                        <TaskBarItem>
+                            <TaskBarViewportButton
+                                onClick={handleShowVirtualHub}
+                            />
                         </TaskBarItem>
                     </ConfigCondition>
                 </div>
@@ -107,8 +109,9 @@ export const TaskBar = observer(() => {
 
                 <div className={style.actions}>
                     <ConfigCondition condition={config["audioHub.enabled"]}>
-                        <TaskBarItem onClick={handleShowAudioHub}>
-                            <TaskBarSound
+                        <TaskBarItem>
+                            <TaskBarSoundButton
+                                onClick={handleShowAudioHub}
                                 volume={store.audio.volume}
                                 isMuted={store.audio.isMute}
                             />
@@ -129,13 +132,8 @@ export const TaskBar = observer(() => {
                                         : undefined
                                     : undefined
                             }
-                            onClick={() =>
-                                handleShowNotificationHub(
-                                    !store.panelManager.notificationHubShow,
-                                )
-                            }
                         >
-                            <NotificationTaskbarItem
+                            <TaskBarNotificationButton
                                 status={store.notification.status}
                                 exist={
                                     store.notification.status ===
@@ -143,6 +141,11 @@ export const TaskBar = observer(() => {
                                         ? store.notification
                                               .isExistNotifications
                                         : false
+                                }
+                                onClick={() =>
+                                    handleShowNotificationHub(
+                                        !store.panelManager.notificationHubShow,
+                                    )
                                 }
                             />
                         </TaskBarItem>

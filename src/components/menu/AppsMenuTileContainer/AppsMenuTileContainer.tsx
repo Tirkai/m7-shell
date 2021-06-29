@@ -14,6 +14,7 @@ export const AppsMenuTileContainer = (props: IAppsMenuTileContainerProps) => (
     <div className={className}>
         {props.apps.map((app) => (
             <AppsMenuTileItem
+                id={app.id}
                 key={app.id}
                 icon={app.icon}
                 title={app.name}

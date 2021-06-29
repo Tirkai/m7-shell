@@ -1,66 +1,81 @@
+import { MarkerType, useMarker } from "@algont/m7-react-marker";
 import { Button, TextField } from "@material-ui/core";
 import { FormItem } from "components/formLayout/FormItem/FormItem";
 import { strings } from "locale";
-import React, { ChangeEvent, Component } from "react";
+import React, { ChangeEvent, useState } from "react";
 import style from "./style.module.css";
 
 interface IAuthFormProps {
     onSubmit: (form: { login: string; password: string }) => void;
 }
 
-export class AuthForm extends Component<IAuthFormProps> {
-    state = {
-        login: "",
-        password: "",
+export const AuthForm = (props: IAuthFormProps) => {
+    const [login, setLogin] = useState("");
+    const [password, setPassword] = useState("");
+
+    const { createMemoizedMarker } = useMarker();
+
+    const handleChangeLogin = (event: ChangeEvent<HTMLInputElement>) => {
+        setLogin(event.target.value);
     };
 
-    handleChangeLogin = (event: ChangeEvent<HTMLInputElement>) => {
-        this.setState({ login: event.target.value });
+    const handleChangePassword = (event: ChangeEvent<HTMLInputElement>) => {
+        setPassword(event.target.value);
     };
 
-    handleChangePassword = (event: ChangeEvent<HTMLInputElement>) => {
-        this.setState({ password: event.target.value });
-    };
-
-    handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        this.props.onSubmit({
-            login: this.state.login,
-            password: this.state.password,
+        props.onSubmit({
+            login,
+            password,
         });
     };
 
-    render() {
-        return (
-            <div className={style.authForm}>
-                <form onSubmit={this.handleSubmit}>
-                    <FormItem>
-                        <TextField
-                            autoFocus
-                            onChange={this.handleChangeLogin}
-                            value={this.state.login}
-                            label={strings.form.fields.login}
-                        />
-                    </FormItem>
-                    <FormItem>
-                        <TextField
-                            onChange={this.handleChangePassword}
-                            value={this.state.password}
-                            label={strings.form.fields.password}
-                            type="password"
-                        />
-                    </FormItem>
-                    <FormItem>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                        >
-                            {strings.actions.login}
-                        </Button>
-                    </FormItem>
-                </form>
-            </div>
-        );
-    }
-}
+    return (
+        <div className={style.authForm}>
+            <form onSubmit={handleSubmit}>
+                <FormItem>
+                    <TextField
+                        inputProps={{
+                            ...createMemoizedMarker(
+                                MarkerType.Element,
+                                "AuthFormLoginInput",
+                            ),
+                        }}
+                        autoFocus
+                        onChange={handleChangeLogin}
+                        value={login}
+                        label={strings.form.fields.login}
+                    />
+                </FormItem>
+                <FormItem>
+                    <TextField
+                        inputProps={{
+                            ...createMemoizedMarker(
+                                MarkerType.Element,
+                                "AuthFormPasswordInput",
+                            ),
+                        }}
+                        onChange={handleChangePassword}
+                        value={password}
+                        label={strings.form.fields.password}
+                        type="password"
+                    />
+                </FormItem>
+                <FormItem>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        {...createMemoizedMarker(
+                            MarkerType.Element,
+                            "AuthFormSubmitButton",
+                        )}
+                    >
+                        {strings.actions.login}
+                    </Button>
+                </FormItem>
+            </form>
+        </div>
+    );
+};

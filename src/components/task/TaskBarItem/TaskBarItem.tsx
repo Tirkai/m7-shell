@@ -1,3 +1,4 @@
+import { MarkerType, useMarker } from "@algont/m7-react-marker";
 import classNames from "classnames";
 import { Hint } from "components/hint/Hint/Hint";
 import { useStore } from "hooks/useStore";
@@ -26,6 +27,9 @@ export const TaskBarItem = observer((props: ITaskBarItemProps) => {
     const [isShowHint, setShowHint] = useState(false);
     const [position, setPosition] = useState(new Point2D(0, 0));
     const ref = useRef<HTMLDivElement | null>(null);
+
+    const { createMemoizedMarker } = useMarker();
+
     const handleShowContextMenu = (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     ) => {
@@ -64,6 +68,7 @@ export const TaskBarItem = observer((props: ITaskBarItemProps) => {
                     [style.autoWidth]: props.autoWidth,
                     [style.focused]: props.focused,
                 })}
+                {...createMemoizedMarker(MarkerType.Element, "TaskBarItem")}
                 onClick={props.onClick}
                 ref={ref}
             >

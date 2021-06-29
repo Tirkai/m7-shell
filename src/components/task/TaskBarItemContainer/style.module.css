@@ -1,0 +1,7 @@
+.taskBarItemContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    min-height: 48px;
+}

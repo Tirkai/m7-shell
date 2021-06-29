@@ -15,6 +15,7 @@ export const AppsMenuListContainer = (props: IAppsMenuListContainerProps) => (
         {props.apps.map((app) => (
             <AppsMenuListItem
                 key={app.id}
+                id={app.id}
                 icon={app.icon}
                 title={app.name}
                 isExecuted={app.isExecuted}

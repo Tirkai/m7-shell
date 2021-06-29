@@ -3,6 +3,7 @@
     "version": "0.28.0",
     "private": true,
     "dependencies": {
+        "@algont/m7-react-marker": "^0.1.1",
         "@algont/m7-shell-emitter": "^0.9.0",
         "@algont/m7-ui": "^0.9.1",
         "@algont/m7-utils": "^0.4.1",

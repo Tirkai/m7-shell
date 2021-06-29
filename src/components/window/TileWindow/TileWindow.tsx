@@ -1,3 +1,4 @@
+import { MarkerType, useMarker } from "@algont/m7-react-marker";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
@@ -31,6 +32,7 @@ const className = style.tileWindow;
 export const TileWindow = observer((props: ITileWindowProps) => {
     const [isAppReady, setAppReady] = useState(false);
     const store = useStore();
+    const { createMemoizedMarker } = useMarker();
 
     const handleAppReady = () => {
         setAppReady(true);
@@ -49,9 +51,9 @@ export const TileWindow = observer((props: ITileWindowProps) => {
     return (
         <Draggable
             handle=".appHeaderInfoBar"
-            onMouseDown={() => handleFocus(props.window)}
             onStart={() => props.onDragStart()}
             onStop={() => props.onDragEnd()}
+            onMouseDown={() => handleFocus(props.window)}
             position={{
                 x: props.x,
                 y: props.y,
@@ -60,6 +62,8 @@ export const TileWindow = observer((props: ITileWindowProps) => {
             <div
                 className={className}
                 style={{ ...gridStyle, zIndex: props.window.depthIndex }}
+                {...createMemoizedMarker(MarkerType.Element, "AppWindow")}
+                {...createMemoizedMarker(MarkerType.Id, props.process.app.id)}
             >
                 <ConfigCondition
                     condition={config["windows.singleWindow.header.enabled"]}

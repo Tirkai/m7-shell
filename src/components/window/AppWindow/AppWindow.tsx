@@ -1,3 +1,4 @@
+import { MarkerType, useMarker } from "@algont/m7-react-marker";
 import classNames from "classnames";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
@@ -36,6 +37,8 @@ export const AppWindow = (props: IAppWindowProps) => {
     const [isAppReady, setAppReady] = useState(false);
     const [frame, setFrame] = useState<HTMLIFrameElement | null>(null);
     const [url, setUrl] = useState(props.process.modifiedUrl);
+
+    const { createMemoizedMarker } = useMarker();
 
     const handleResizeStart = (
         event: React.SyntheticEvent,
@@ -123,6 +126,8 @@ export const AppWindow = (props: IAppWindowProps) => {
                 className={classNames(style.appWindow, "appWindow", {
                     [style.collapsed]: props.window.isCollapsed,
                 })}
+                {...createMemoizedMarker(MarkerType.Element, "AppWindow")}
+                {...createMemoizedMarker(MarkerType.Id, props.process.app.id)}
                 style={{
                     zIndex: props.window.depthIndex,
                     width: !props.window.isFullScreen
