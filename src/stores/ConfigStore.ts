@@ -11,7 +11,6 @@ export class ConfigStore {
     loadConfig(name: string) {
         const param = (window as any).shellConfig[name];
 
-        console.log({ param, window, name });
         return param;
     }
 

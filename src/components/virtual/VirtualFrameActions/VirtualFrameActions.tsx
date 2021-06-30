@@ -1,5 +1,5 @@
 import { IconButton } from "@material-ui/core";
-import { Add, Clear, MoreVert, Save } from "@material-ui/icons";
+import { Add, Clear, MoreVert, Restore, Save } from "@material-ui/icons";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
@@ -25,6 +25,13 @@ export const VirtualFrameActions = observer(
             store.recovery.saveSnapshot(UserDatabasePropKey.FreezedSession);
         };
 
+        const handleRestoreUserSession = () => {
+            const snapshot = store.recovery.freezedSessionSnapshot;
+            if (snapshot) {
+                store.recovery.startRecovery(snapshot);
+            }
+        };
+
         const handleClearAll = () => {
             store.processManager.destroyAllProcesses();
             store.virtualViewport.setViewports([]);
@@ -44,6 +51,11 @@ export const VirtualFrameActions = observer(
                     icon: <Save />,
                     content: "Сохранить сессию",
                     onClick: () => handleSaveUserSession(),
+                }),
+                new ContextMenuItemModel({
+                    icon: <Restore />,
+                    content: "Восстановить сессию",
+                    onClick: () => handleRestoreUserSession(),
                 }),
                 new ContextMenuItemModel({
                     icon: <Clear />,

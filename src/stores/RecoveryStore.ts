@@ -103,9 +103,12 @@ export class RecoveryStore {
         if (freezedResponse.status && freezedResponse.result) {
             this.store.sharedEventBus.eventBus.dispatch(
                 RecoveryEventType.OnFreezedSnapshotLoaded,
-                dynamicResponse.result,
+                freezedResponse.result,
             );
+
             this.startRecovery(freezedResponse.result);
+
+            this.setFreezedSessionSnapshot(freezedResponse.result);
         }
 
         this.isSnapshotInitialized = true;
@@ -179,6 +182,8 @@ export class RecoveryStore {
                     value: freezedSnapshot,
                 },
             ]);
+
+            this.setFreezedSessionSnapshot(freezedSnapshot);
         }
     }
 
@@ -199,8 +204,8 @@ export class RecoveryStore {
 
     async startRecovery(snapshot: ISessionRecovery) {
         this.store.processManager.destroyAllProcesses();
+        this.store.virtualViewport.setViewports([]);
 
-        this.store.virtualViewport.clearViewports();
         await this.recoveryViewports(snapshot.viewportSnapshot);
         await this.recoveryProcesses(snapshot.processSnapshot);
     }

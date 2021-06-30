@@ -31,11 +31,6 @@ export const VirtualDesktopHub = observer(() => {
             );
 
             store.virtualViewport.addViewport(viewport);
-        } else {
-            store.message.showMessage(
-                "Поздравляем! 🎉🎉🎉",
-                "Вашему упорству можно позавидовать! 🙀",
-            );
         }
     };
 

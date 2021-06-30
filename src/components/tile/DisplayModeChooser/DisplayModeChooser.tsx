@@ -21,6 +21,7 @@ interface IDisplayModeChooserProps {
 
     displayMode?: DisplayMode;
     presetAlias?: string;
+    hash?: string;
 
     onSelectFloatMode: (displayMode: DisplayMode) => void;
 }
@@ -102,7 +103,7 @@ export const DisplayModeChooser = observer(
                 return items;
             }
             return [];
-        }, []);
+        }, [props.hash]);
 
         const [activeItem, setActiveItem] = useState(
             props.displayMode?.type === DisplayModeType.Tile
@@ -125,6 +126,14 @@ export const DisplayModeChooser = observer(
             return () =>
                 document.removeEventListener("mousedown", handleClickAway);
         }, []);
+
+        useEffect(() => {
+            setActiveItem(
+                props.displayMode?.type === DisplayModeType.Tile
+                    ? props.presetAlias
+                    : "none",
+            );
+        }, [props.hash]);
 
         return (
             <div className={style.displayModeChooser} ref={ref}>

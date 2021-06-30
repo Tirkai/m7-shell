@@ -15,6 +15,7 @@ export class VirtualViewportModel {
     index: number;
     displayMode?: DisplayMode;
     counter: number = 0;
+    hash: string = v4();
 
     tilePreset?: TilePreset;
 

@@ -53,6 +53,8 @@ export const VirtualFramePreview = observer(
             if (viewport) {
                 store.display.setDefaultDisplayMode(displayMode);
 
+                console.log("APPLY_DISPLAY_MODE", displayMode, viewport);
+
                 store.display.applyDisplayModeToViewport(displayMode, viewport);
 
                 store.processManager.processes
@@ -78,6 +80,7 @@ export const VirtualFramePreview = observer(
                         <div className={style.header}>
                             <div className={style.indicator}>
                                 <DisplayModeChooser
+                                    hash={props.viewport?.hash}
                                     displayMode={props.viewport?.displayMode}
                                     presetAlias={
                                         props.viewport?.tilePreset?.alias
