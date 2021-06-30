@@ -65,7 +65,7 @@ export const TaskBarNotificationButton = (
                 </div>
             );
         }
-    }, [props.status]);
+    }, [props.status, props.exist]);
 
     return (
         <div
