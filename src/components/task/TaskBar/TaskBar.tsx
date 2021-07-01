@@ -8,6 +8,7 @@ import { strings } from "locale";
 import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
+import hash from "object-hash";
 import React from "react";
 import { TaskBarAppsMenuButton } from "../TaskBarAppsMenuButton/TaskBarAppsMenuButton";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
@@ -70,6 +71,13 @@ export const TaskBar = observer(() => {
 
     const { config } = store.config;
 
+    const processesHash = hash(
+        store.processManager.processes.map((item) => item.id),
+    );
+    const viewportsHash = hash(
+        store.virtualViewport.viewports.map((item) => item.id),
+    );
+
     return (
         <div className={classNames(style.taskBar)}>
             <div className={style.container}>
@@ -96,9 +104,9 @@ export const TaskBar = observer(() => {
                 <div className={style.tasks}>
                     <TaskList
                         processes={store.processManager.processes}
-                        processesCount={store.processManager.processes.length}
+                        processesHash={processesHash}
                         viewports={store.virtualViewport.viewports}
-                        viewportsCount={store.virtualViewport.viewports.length}
+                        viewportsHash={viewportsHash}
                         currentViewport={store.virtualViewport.currentViewport}
                         onFocus={(appWindow) => handleFocusAppWindow(appWindow)}
                         onKillProcess={(appProcess) =>

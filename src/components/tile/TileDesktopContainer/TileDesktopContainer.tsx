@@ -8,6 +8,7 @@ import { ApplicationProcess } from "models/ApplicationProcess";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { DisplayModeType } from "models/display/DisplayModeType";
 import { TileCell } from "models/tile/TileCell";
+import { TileEventType } from "models/tile/TileEventType";
 import { TilePreset } from "models/tile/TilePreset";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
@@ -109,11 +110,18 @@ export const TileDesktopContainer = observer(
                     store.virtualViewport.currentViewport,
                 );
 
+                const viewportFrom = appWindow.viewport;
+
                 store.tile.applyPresetToViewport(template, viewport);
 
                 store.virtualViewport.applyViewportToWindow(
                     viewport,
                     appWindow,
+                );
+
+                store.sharedEventBus.eventBus.dispatch(
+                    TileEventType.OnTileFullscreen,
+                    { appWindow, viewportFrom, viewportTo: viewport },
                 );
             }
         };

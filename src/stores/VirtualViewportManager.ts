@@ -10,6 +10,12 @@ import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import { AppStore } from "stores/AppStore";
+import { OffsetDirection } from "types/OffsetDirection";
+
+interface IEmptyViewportFrameEventPayload {
+    viewport: VirtualViewportModel;
+    direction: OffsetDirection;
+}
 
 export class VirtualViewportManager {
     private store: AppStore;
@@ -96,6 +102,11 @@ export class VirtualViewportManager {
                 type: AuthEventType.OnEntry,
                 handler: () => this.init(),
             },
+            {
+                type: VirtualViewportEventType.OnEmptyViewportFrame,
+                handler: (payload: IEmptyViewportFrameEventPayload) =>
+                    this.onEmptyViewport(payload.viewport, payload.direction),
+            },
         ];
 
         subscribes.forEach((item) =>
@@ -126,6 +137,32 @@ export class VirtualViewportManager {
 
     onLogout() {
         this.setViewports([]);
+    }
+
+    onEmptyViewport(
+        viewport: VirtualViewportModel,
+        direction: OffsetDirection,
+    ) {
+        const viewportIndex = this.viewports.indexOf(viewport);
+
+        let targetViewport: VirtualViewportModel | null = null;
+
+        if (viewportIndex > 0) {
+            targetViewport = this.viewports[viewportIndex + direction];
+        } else {
+            const nextViewport = this.viewports[viewportIndex + 1];
+            if (nextViewport) {
+                targetViewport = nextViewport;
+            }
+        }
+
+        if (targetViewport) {
+            this.setCurrentViewport(targetViewport);
+        }
+
+        if (this.viewports.length > 1) {
+            this.removeViewport(viewport);
+        }
     }
 
     onChangeViewport(viewport: VirtualViewportModel) {

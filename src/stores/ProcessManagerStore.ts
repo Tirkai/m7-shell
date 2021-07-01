@@ -53,7 +53,32 @@ export class ProcessManagerStore {
                 this.onRecieveToken(payload),
         );
 
+        eventBus.add(
+            ProcessEventType.OnKillProcess,
+            (process: ApplicationProcess) => this.onKillProcess(process),
+        );
+
         this.bindOnMessageHandler();
+    }
+
+    onKillProcess(process: ApplicationProcess) {
+        const viewport = process.window.viewport;
+
+        if (viewport) {
+            const viewportProcesses = this.processes.filter(
+                (item) => item.window.viewport.id === viewport.id,
+            );
+
+            if (
+                viewportProcesses.length <= 0 &&
+                viewport.displayMode?.enableTileAttach
+            ) {
+                this.store.sharedEventBus.eventBus.dispatch(
+                    VirtualViewportEventType.OnEmptyViewportFrame,
+                    { viewport, direction: -1 },
+                );
+            }
+        }
     }
 
     bindOnMessageHandler() {

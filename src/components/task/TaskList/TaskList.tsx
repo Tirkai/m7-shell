@@ -20,10 +20,11 @@ interface ITaskListOverflowState {
 
 interface ITaskListProps {
     processes: ApplicationProcess[];
-    processesCount: number;
+    // processesCount: number;
     viewports: VirtualViewportModel[];
-    viewportsCount: number;
-
+    // viewportsCount: number;
+    viewportsHash: string;
+    processesHash: string;
     currentViewport: VirtualViewportModel;
     onFocus: (appWindow: ApplicationWindow) => void;
     onKillProcess: (appProcess: ApplicationProcess) => void;
@@ -105,7 +106,7 @@ export const TaskList = observer((props: ITaskListProps) => {
             },
         );
         return sortedGroups;
-    }, [props.processesCount, props.viewportsCount]);
+    }, [props.processesHash, props.viewportsHash]);
 
     // const handleShowOverflowMenu = (e: React.MouseEvent) => {
     //     console.log(props.processes, sliceCount);

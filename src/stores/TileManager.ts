@@ -17,6 +17,12 @@ import { TileWindowModel } from "models/window/TileWindowModel";
 import { registeredTileTemplates } from "registeredTilePresets";
 import { AppStore } from "stores/AppStore";
 
+interface ITileFullscreenEventPayload {
+    appWindow: ApplicationWindow;
+    viewportFrom: VirtualViewportModel;
+    viewportTo: VirtualViewportModel;
+}
+
 export class TileManager {
     private store: AppStore;
     constructor(store: AppStore) {
@@ -29,44 +35,50 @@ export class TileManager {
 
         this.defaultTileTemplate = firstTemplate;
 
-        this.store.sharedEventBus.eventBus.add(
+        const { eventBus } = this.store.sharedEventBus;
+
+        eventBus.add(
             ProcessEventType.OnInstantiateProcess,
             (appProcess: ApplicationProcess) => {
                 this.onProcessStart(appProcess);
             },
         );
 
-        this.store.sharedEventBus.eventBus.add(
+        eventBus.add(
             VirtualViewportEventType.OnAddViewportFrame,
             (viewport: VirtualViewportModel) => {
                 this.onAddViewportFrame(viewport);
             },
         );
 
-        this.store.sharedEventBus.eventBus.add(
+        eventBus.add(
             ApplicationWindowEventType.OnDragStart,
             (tileWindow: TileWindowModel) => {
                 //
             },
         );
 
-        this.store.sharedEventBus.eventBus.add(
+        eventBus.add(
             ApplicationWindowEventType.OnDragStop,
             (tileWindow: ApplicationWindow) => this.onDragStop(tileWindow),
         );
 
-        this.store.sharedEventBus.eventBus.add(
+        eventBus.add(
             ApplicationWindowEventType.OnClose,
             (appWindow: ApplicationWindow) => this.onWindowClose(appWindow),
         );
 
-        this.store.sharedEventBus.eventBus.add(
+        eventBus.add(
             DisplayModeEventType.OnDisplayModeChange,
             (displayMode: DisplayMode) => this.onDisplayModeChange(displayMode),
         );
 
-        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () =>
-            this.onLogout(),
+        eventBus.add(AuthEventType.OnLogout, () => this.onLogout());
+
+        eventBus.add(
+            TileEventType.OnTileFullscreen,
+            (payload: ITileFullscreenEventPayload) =>
+                this.onTileFullscreen(payload),
         );
     }
 
@@ -78,6 +90,23 @@ export class TileManager {
 
     setActiveCell(tileCell: TileCell) {
         this.activeCell = tileCell;
+    }
+
+    onTileFullscreen(payload: ITileFullscreenEventPayload) {
+        const processes = this.store.processManager.processes.filter(
+            (process) => process.window.viewport.id === payload.viewportFrom.id,
+        );
+
+        if (processes.length <= 0) {
+            const viewport = this.store.virtualViewport.viewports.find(
+                (item) => item.id === payload.viewportFrom.id,
+            );
+
+            this.store.sharedEventBus.eventBus.dispatch(
+                VirtualViewportEventType.OnEmptyViewportFrame,
+                { viewport, direction: 1 },
+            );
+        }
     }
 
     onDisplayModeChange(displayMode: DisplayMode) {
@@ -238,7 +267,10 @@ export class TileManager {
         if (template) {
             this.store.sharedEventBus.eventBus.dispatch(
                 TileEventType.OnChangePreset,
-                { template, viewport },
+                {
+                    template,
+                    viewport,
+                },
             );
         }
     }
@@ -250,7 +282,10 @@ export class TileManager {
         tileCell?.setAttachedAppWindow(null);
         this.store.sharedEventBus.eventBus.dispatch(
             TileEventType.OnDetachWindow,
-            { appWindow, tileCell },
+            {
+                appWindow,
+                tileCell,
+            },
         );
     }
 
@@ -267,7 +302,10 @@ export class TileManager {
 
                 this.store.sharedEventBus.eventBus.dispatch(
                     TileEventType.OnAttachWindow,
-                    { appWindow, tileCell },
+                    {
+                        appWindow,
+                        tileCell,
+                    },
                 );
             }
         }
@@ -279,7 +317,10 @@ export class TileManager {
         tileCell.setAttachedAppWindow(null);
         this.store.sharedEventBus.eventBus.dispatch(
             TileEventType.OnDetachWindow,
-            { appWindow, tileCell },
+            {
+                appWindow,
+                tileCell,
+            },
         );
     }
 

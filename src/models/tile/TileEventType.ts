@@ -7,4 +7,5 @@ export enum TileEventType {
     OnTileViewportSplit = "OnTileViewportSplit",
     OnTileViewportSpread = "OnTileViewportSpread",
     OnTileReattach = "OnTileReattach",
+    OnTileFullscreen = "OnTileFullscreen",
 }
