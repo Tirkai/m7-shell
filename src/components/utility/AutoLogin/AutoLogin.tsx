@@ -1,38 +1,69 @@
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+} from "@material-ui/core";
+import { Refresh } from "@material-ui/icons";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 export const AutoLogin = observer(() => {
     const store = useStore();
     const { config } = store.config;
 
-    useEffect(() => {
-        const autoLoginEnabled = config["autoLogin.enabled"];
-
-        if (autoLoginEnabled) {
-            store.auth.login(
-                config["autoLogin.login"],
-                config["autoLogin.password"],
-            );
-        }
-    }, []);
+    const [isShowNotify, setShowNotify] = useState(false);
 
     useEffect(() => {
         const urlParams = new URL(window.location.href).searchParams;
 
-        const enableAutoLogin = urlParams.get("enableAutoLogin");
+        const autoLoginEnabled =
+            config["autoLogin.enabled"] ||
+            urlParams.get("enableAutoLogin") === "1";
 
-        const autoLogin = urlParams.get("login");
-        const autoPassword = urlParams.get("password");
+        const loginUrlParam = urlParams.get("login");
+        const passwordUrlParam = urlParams.get("password");
 
-        if (!!parseInt(enableAutoLogin ?? "0")) {
-            if (autoLogin && autoPassword) {
-                store.auth.login(autoLogin, autoPassword);
-            } else {
-                console.warn("Invalid parameters for auto login");
+        if (autoLoginEnabled) {
+            if (loginUrlParam && passwordUrlParam) {
+                store.auth.login(loginUrlParam, passwordUrlParam);
+                return;
+            }
+
+            if (config["autoLogin.login"] && config["autoLogin.password"]) {
+                store.auth.login(
+                    config["autoLogin.login"],
+                    config["autoLogin.password"],
+                );
             }
         }
     }, []);
 
-    return <></>;
+    const handleReload = () => window.location.reload();
+
+    useEffect(() => {
+        const timeout = setTimeout(() => setShowNotify(true), 3000);
+        return () => clearTimeout(timeout);
+    }, []);
+
+    return isShowNotify ? (
+        <Dialog open={true} fullWidth>
+            <DialogContent>
+                Для повторного входа в систему обновите сессию
+            </DialogContent>
+            <DialogActions>
+                <Button
+                    startIcon={<Refresh />}
+                    color="primary"
+                    variant="contained"
+                    onClick={handleReload}
+                >
+                    Обновить
+                </Button>
+            </DialogActions>
+        </Dialog>
+    ) : (
+        <></>
+    );
 });

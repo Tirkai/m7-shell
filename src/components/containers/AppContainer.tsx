@@ -2,7 +2,6 @@ import { AuthScreen } from "components/layout/AuthScreen/AuthScreen";
 import { AwaitVerifyScreen } from "components/layout/AwaitVerifyScreen/AwaitVerifyScreen";
 import { ShellScreen } from "components/layout/ShellScreen/ShellScreen";
 import { MessageDialog } from "components/message/MessageDialog/MessageDialog";
-import { AutoLogin } from "components/utility/AutoLogin/AutoLogin";
 import { PlatformTitle } from "components/utility/PlatformTitle/PlatformTitle";
 import { PerformanceContext } from "contexts/PerformanceContext";
 import { PerformanceModeType } from "enum/PerformanceModeType";
@@ -64,7 +63,6 @@ export const AppContainer = observer(() => {
     return (
         <PerformanceContext.Provider value={{ mode: perfMode }}>
             <PlatformTitle title={config["platform.name"]} />
-            <AutoLogin />
             <Router history={history}>
                 <Switch>
                     <Route path="/" exact>

@@ -3,6 +3,7 @@ import logo from "assets/images/logo.svg";
 import classNames from "classnames";
 import { AuthForm } from "components/auth/AuthForm/AuthForm";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
+import { AutoLogin } from "components/utility/AutoLogin/AutoLogin";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { authErrorCodes } from "locale/errorCodes";
@@ -39,9 +40,17 @@ export const AuthScreen: React.FC = observer(() => {
 
     const { config } = store.config;
 
+    const urlParams = new URL(window.location.href).searchParams;
+    const enableAutoLoginUrlParam = urlParams.get("enableAutoLogin");
+
     return (
         <div className={style.authScreen}>
-            <ConfigCondition condition={!config["autoLogin.enabled"]}>
+            <ConfigCondition
+                condition={
+                    !config["autoLogin.enabled"] &&
+                    !enableAutoLoginUrlParam?.length
+                }
+            >
                 <div className={classNames(style.overlay)}>
                     <div className={style.container}>
                         <div className={style.logo}>
@@ -60,6 +69,14 @@ export const AuthScreen: React.FC = observer(() => {
                         </div>
                     </div>
                 </div>
+            </ConfigCondition>
+            <ConfigCondition
+                condition={
+                    !!config["autoLogin.enabled"] ||
+                    !!enableAutoLoginUrlParam?.length
+                }
+            >
+                <AutoLogin />
             </ConfigCondition>
         </div>
     );
