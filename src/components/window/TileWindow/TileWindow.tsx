@@ -71,7 +71,7 @@ export const TileWindow = observer((props: ITileWindowProps) => {
                     <AppWindowHeader
                         icon={props.process.app.icon}
                         title={props.process.app.name}
-                        isFocused={props.isFocused}
+                        isFocused={true}
                         onFullscreen={props.onFullscreen}
                         onClose={() => props.onClose(props.window)}
                         visible
@@ -89,10 +89,7 @@ export const TileWindow = observer((props: ITileWindowProps) => {
                     onReady={() => handleAppReady()}
                 />
                 <AppWindowUnfocusedOverlay
-                    visible={
-                        store.windowManager.hasDraggedWindow ||
-                        !props.window.isFocused
-                    }
+                    visible={store.windowManager.hasDraggedWindow}
                 />
             </div>
         </Draggable>
