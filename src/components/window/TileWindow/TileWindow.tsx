@@ -46,6 +46,10 @@ export const TileWindow = observer((props: ITileWindowProps) => {
         store.windowManager.focusWindow(tileWindow);
     };
 
+    const handleReload = () => {
+        props.process.rerollHash();
+    };
+
     const { config } = store.config;
 
     return (
@@ -74,6 +78,7 @@ export const TileWindow = observer((props: ITileWindowProps) => {
                         isFocused={true}
                         onFullscreen={props.onFullscreen}
                         onClose={() => props.onClose(props.window)}
+                        onReload={handleReload}
                         visible
                     />
                 </ConfigCondition>

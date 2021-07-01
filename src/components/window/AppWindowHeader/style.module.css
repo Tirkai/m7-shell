@@ -37,6 +37,7 @@
     line-height: 1em;
     white-space: nowrap;
     text-overflow: ellipsis;
+    flex-grow: 1;
 }
 
 .actions {

@@ -57,7 +57,7 @@ export const AppWindowHeader = observer((props: IAppWindowHeaderProps) => {
             onDoubleClick={props.onDoubleClick}
         >
             <div className={style.container}>
-                <div className={classNames("appHeaderInfoBar", style.info)}>
+                <div className={classNames(style.info)}>
                     <div className={style.icon} onClick={handleShowContextMenu}>
                         <SVGIcon
                             source={props.icon}
@@ -65,7 +65,11 @@ export const AppWindowHeader = observer((props: IAppWindowHeaderProps) => {
                             color="#ffffff"
                         />
                     </div>
-                    <div className={style.title}>{props.title}</div>
+                    <div
+                        className={classNames("appHeaderInfoBar", style.title)}
+                    >
+                        {props.title}
+                    </div>
                 </div>
                 <div className={style.actions}>
                     {props.onCollapse && (
