@@ -67,7 +67,7 @@ export class UserDatabaseManager {
                     UserDatabaseEventType.OnSaveProperty,
                     response.data.result,
                 );
-                return new JsonRpcSuccess();
+                return new JsonRpcSuccess(response.data.result);
             }
             return new JsonRpcFailure();
         } catch (e) {
