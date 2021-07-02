@@ -67,12 +67,6 @@ export class PanelManager {
             this.onLogout(),
         );
 
-        // TODO: Think about it
-        // this.store.sharedEventBus.eventBus.add(
-        //     RecoveryEventType.OnDynamicSnapshotLoaded,
-        //     () => this.onDynamicSnapshotLoaded(),
-        // );
-
         const storagedDevMode = JSON.parse(
             localStorage.getItem(this.localStorageDevModeKey) ?? "{}",
         ) as DevModeModel;

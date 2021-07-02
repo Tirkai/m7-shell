@@ -37,25 +37,9 @@ export class RecoveryStore {
 
         const { eventBus } = this.store.sharedEventBus;
 
-        // eventBus.add(TileEventType.OnChangePreset, () => {
-        //     this.saveSnapshot(UserDatabasePropKey.DynamicSession);
-        // });
-
         eventBus.add(ApplicationEventType.OnApplicationListLoaded, () => {
             this.onApplicationListLoaded();
         });
-
-        // eventBus.add(VirtualViewportEventType.OnSelectViewportFrame, () => {
-        //     this.saveSnapshot(UserDatabasePropKey.DynamicSession);
-        // });
-
-        // eventBus.add(ProcessEventType.OnChangeProcess, () => {
-        //     this.saveSnapshot(UserDatabasePropKey.DynamicSession);
-        // });
-
-        // eventBus.add(TileEventType.OnTileReattach, () => {
-        //     this.saveSnapshot(UserDatabasePropKey.DynamicSession);
-        // });
 
         eventBus.add(AuthEventType.OnLogout, () => {
             this.onLogout();
@@ -72,11 +56,6 @@ export class RecoveryStore {
     }
 
     onApplicationListLoaded() {
-        // TODO: Think about it
-        // this.interval = setInterval(() => {
-        //     this.saveSnapshot(UserDatabasePropKey.DynamicSession);
-        // }, 10000);
-
         this.loadSnapshots();
     }
 

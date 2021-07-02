@@ -5,7 +5,6 @@ import { MessageDialog } from "components/message/MessageDialog/MessageDialog";
 import { PlatformTitle } from "components/utility/PlatformTitle/PlatformTitle";
 import { PerformanceContext } from "contexts/PerformanceContext";
 import { PerformanceModeType } from "enum/PerformanceModeType";
-import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
 import { createBrowserHistory } from "history";
 import { useStore } from "hooks/useStore";
 import { IPerformanceMode } from "interfaces/performance/IPerformanceMode";
@@ -33,7 +32,6 @@ export const AppContainer = observer(() => {
 
         window.onbeforeunload = () => getCloseBrowserWindowDenied();
 
-        // TODO: fix
         const urlParams = new URL(window.location.href).searchParams;
 
         const performanceMode = urlParams.get("performanceMode");
@@ -75,11 +73,6 @@ export const AppContainer = observer(() => {
                         ) : (
                             <AuthScreen />
                         )}
-                    </Route>
-                    <Route path="/internalApps/">
-                        <Route path="/internalApps/CustomExecutor">
-                            <CustomExecutor />
-                        </Route>
                     </Route>
                 </Switch>
             </Router>

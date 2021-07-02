@@ -238,11 +238,6 @@ export class ApplicationWindow implements IApplicationWindow {
         if (this.type === ApplicationWindowType.Float) {
             this.width = params.width ?? this.width;
             this.height = params.height ?? this.height;
-
-            // const [x, y] = this.calculatePosition();
-
-            // this.x = x;
-            // this.y = y;
         }
     }
 

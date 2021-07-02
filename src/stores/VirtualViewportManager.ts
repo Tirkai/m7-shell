@@ -344,8 +344,6 @@ export class VirtualViewportManager {
         const index = this.viewports.indexOf(viewport);
         this.viewports.splice(index, 1);
 
-        alert(index);
-
         this.store.sharedEventBus.eventBus.dispatch(
             VirtualViewportEventType.OnRemoveViewportFrame,
             viewport,

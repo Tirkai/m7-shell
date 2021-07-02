@@ -13,16 +13,9 @@ import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
 import { TaskGroup } from "../TaskGroup/TaskGroup";
 import style from "./style.module.css";
 
-interface ITaskListOverflowState {
-    isOverflow: boolean;
-    sliceCount: number;
-}
-
 interface ITaskListProps {
     processes: ApplicationProcess[];
-    // processesCount: number;
     viewports: VirtualViewportModel[];
-    // viewportsCount: number;
     viewportsHash: string;
     processesHash: string;
     currentViewport: VirtualViewportModel;
@@ -35,15 +28,6 @@ const className = style.taskList;
 export const TaskList = observer((props: ITaskListProps) => {
     const store = useStore();
 
-    // const [isOverflow, setOverflow] = useState(false);
-
-    // const [sliceCount, setSliceCount] = useState(0);
-
-    // const [listOverflow, setListOverflow] = useState<ITaskListOverflowState>({
-    //     isOverflow: false,
-    //     sliceCount: 0,
-    // });
-
     const createCloseApplicationContextMenuItem = (
         appProcess: ApplicationProcess,
     ) => [
@@ -54,43 +38,9 @@ export const TaskList = observer((props: ITaskListProps) => {
         }),
     ];
 
-    // const rootRef = useRef<HTMLDivElement | null>(null);
-    // const containerRef = useRef<HTMLDivElement | null>(null);
-
-    // useEffect(() => {
-    //     if (rootRef && containerRef) {
-    //         const rootRect = rootRef.current?.getBoundingClientRect();
-    //         const containerRect = containerRef.current?.getBoundingClientRect();
-
-    //         const rootWidth = rootRect?.width ?? 0;
-    //         const containerWidth = containerRect?.width ?? 0;
-    //         console.log({ rootWidth, containerWidth });
-
-    //         const taskGroupWidth = 100;
-    //         const taskItemWidth = 48;
-
-    //         const isOverflowWidth =
-    //             rootWidth - taskGroupWidth <= containerWidth;
-
-    //         if (isOverflowWidth && !isOverflow) {
-    //             setOverflow(true);
-    //             setSliceCount(props.processesCount);
-    //         }
-
-    //         if (!isOverflowWidth) {
-    //             setOverflow(false);
-    //         }
-    //     }
-    // }, [props.processesCount, props.viewportsCount]);
-
     const tasksGroups = useMemo(() => {
-        // const slicedProcesses = isOverflow
-        //     ? props.processes.slice(0, sliceCount)
-        //     : props.processes;
-
         const groups = groupBy(props.processes, "window.viewport.id");
 
-        // TODO: optimize
         const groupedProcessesByViewport = Object.entries(groups).map(
             ([key, value]) => ({
                 key,
@@ -107,30 +57,6 @@ export const TaskList = observer((props: ITaskListProps) => {
         );
         return sortedGroups;
     }, [props.processesHash, props.viewportsHash]);
-
-    // const handleShowOverflowMenu = (e: React.MouseEvent) => {
-    //     console.log(props.processes, sliceCount);
-
-    //     const sliceProcesses = props.processes.slice(sliceCount);
-
-    //     store.contextMenu.showContextMenu(
-    //         new Point2D(e.pageX, e.pageY),
-    //         sliceProcesses.map(
-    //             (item) =>
-    //                 new ContextMenuItemModel({
-    //                     icon: (
-    //                         <SVGIcon
-    //                             source={item.app.icon}
-    //                             size={{ width: "16px", height: "16px" }}
-    //                             color="white"
-    //                         />
-    //                     ),
-    //                     content: item.app.name,
-    //                     onClick: () => props.onFocus(item.window),
-    //                 }),
-    //         ),
-    //     );
-    // };
 
     return (
         <div className={className}>
