@@ -1,8 +1,8 @@
 import { TileFactory } from "factories/TileFactory";
 import { makeAutoObservable } from "mobx";
-import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { TileEventType } from "models/tile/TileEventType";
 import { TileTemplate } from "models/tile/TileTemplate";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";

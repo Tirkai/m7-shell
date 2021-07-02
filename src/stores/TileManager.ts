@@ -1,8 +1,8 @@
 import { makeAutoObservable } from "mobx";
-import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { DisplayMode } from "models/display/DisplayMode";
 import { DisplayModeEventType } from "models/display/DisplayModeEventType";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { TileCell } from "models/tile/TileCell";
 import { TileEventType } from "models/tile/TileEventType";

@@ -1,12 +1,12 @@
 import classNames from "classnames";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { TaskBarNotificationButton } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
-import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
-import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { observer } from "mobx-react";
-import { ApplicationProcess } from "models/ApplicationProcess";
+import { NotificationServiceConnectStatus } from "models/notification/NotificationServiceConnectStatus";
+import { ShellPanelType } from "models/panel/ShellPanelType";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import hash from "object-hash";
 import React from "react";

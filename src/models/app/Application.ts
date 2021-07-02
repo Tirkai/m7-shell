@@ -1,7 +1,7 @@
 import { unknownApp } from "assets/icons";
-import { ApplicationPlace } from "enum/ApplicationPlace";
 import { IApplicationOptions } from "interfaces/options/IApplicationOptions";
 import { action, makeObservable, observable } from "mobx";
+import { ApplicationPlace } from "models/app/ApplicationPlace";
 import { v4 } from "uuid";
 
 export class Application {

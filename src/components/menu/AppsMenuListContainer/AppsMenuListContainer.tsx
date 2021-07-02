@@ -1,4 +1,4 @@
-import { Application } from "models/Application";
+import { Application } from "models/app/Application";
 import React from "react";
 import { AppsMenuListItem } from "../AppsMenuListItem/AppsMenuListItem";
 import style from "./style.module.css";

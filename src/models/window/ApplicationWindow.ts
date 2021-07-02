@@ -5,11 +5,11 @@ import {
     MIN_WINDOW_WIDTH,
     TASKBAR_HEIGHT,
 } from "constants/config";
-import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { IApplicationWindowOptions } from "interfaces/window/IApplicationWindowOptions";
 import { makeAutoObservable } from "mobx";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
+import { ResizeHandleDirection } from "models/window/ResizeHandleDirection";
 import { ResizeHandle } from "react-resizable";
 import { v4 } from "uuid";
 import { ApplicationWindowType } from "./ApplicationWindowType";

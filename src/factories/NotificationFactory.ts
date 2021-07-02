@@ -1,5 +1,5 @@
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
-import { NotificationModel } from "models/NotificationModel";
+import { NotificationModel } from "models/notification/NotificationModel";
 import moment from "moment";
 import { v4 } from "uuid";
 

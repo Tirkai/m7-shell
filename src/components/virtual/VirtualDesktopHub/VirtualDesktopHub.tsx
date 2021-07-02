@@ -1,8 +1,8 @@
 import { BaseHub } from "components/hub/BaseHub/BaseHub";
-import { ShellPanelType } from "enum/ShellPanelType";
 import { TileFactory } from "factories/TileFactory";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
+import { ShellPanelType } from "models/panel/ShellPanelType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import React from "react";
 import { VirtualFrameActions } from "../VirtualFrameActions/VirtualFrameActions";

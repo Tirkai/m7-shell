@@ -1,4 +1,4 @@
-import { Point2D } from "models/Point2D";
+import { Point2D } from "models/shape/Point2D";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import style from "./style.module.css";

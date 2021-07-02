@@ -4,8 +4,8 @@ import { Hint } from "components/hint/Hint/Hint";
 import { useStore } from "hooks/useStore";
 import { IStore } from "interfaces/common/IStore";
 import { observer } from "mobx-react";
-import { ContextMenuItemModel } from "models/ContextMenuItemModel";
-import { Point2D } from "models/Point2D";
+import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
+import { Point2D } from "models/shape/Point2D";
 import React, { useRef, useState } from "react";
 import style from "./style.module.css";
 

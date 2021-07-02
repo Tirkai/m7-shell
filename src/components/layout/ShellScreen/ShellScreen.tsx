@@ -15,9 +15,9 @@ import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
+import { ExternalApplication } from "models/app/ExternalApplication";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
-import { ExternalApplication } from "models/ExternalApplication";
 import React, { Component, lazy, Suspense } from "react";
 import { v4 } from "uuid";
 import { DesktopLayout } from "../DesktopLayout/DesktopLayout";
@@ -206,11 +206,6 @@ export class ShellScreen extends Component<IStore> {
                                                     >
                                                         <AppWindowArea
                                                             viewport={viewport}
-                                                            disabled={
-                                                                this.store
-                                                                    .desktop
-                                                                    .isEditMode
-                                                            }
                                                         />
                                                     </DesktopLayer>
                                                 </Suspense>

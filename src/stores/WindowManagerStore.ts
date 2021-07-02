@@ -1,10 +1,10 @@
-import { ShellEvents } from "enum/ShellEvents";
 import { max, min } from "lodash";
 import { makeAutoObservable } from "mobx";
-import { ApplicationProcess } from "models/ApplicationProcess";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { PanelEventType } from "models/panel/PanelEventType";
+import { ShellEvents } from "models/panel/ShellEvents";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";

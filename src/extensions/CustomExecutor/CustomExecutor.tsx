@@ -2,7 +2,7 @@ import { Button, TextField } from "@material-ui/core";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
-import { ExternalApplication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/app/ExternalApplication";
 import React, { useState } from "react";
 import { v4 } from "uuid";
 import style from "./style.module.css";

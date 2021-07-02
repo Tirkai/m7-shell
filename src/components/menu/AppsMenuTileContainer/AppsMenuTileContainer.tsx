@@ -1,5 +1,5 @@
 import { AppsMenuTileItem } from "components/menu/AppsMenuTileItem/AppsMenuTileItem";
-import { Application } from "models/Application";
+import { Application } from "models/app/Application";
 import React from "react";
 import style from "./style.module.css";
 

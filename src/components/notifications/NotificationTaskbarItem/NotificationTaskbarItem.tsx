@@ -3,7 +3,7 @@ import { SVGIcon } from "@algont/m7-ui";
 import { error, notifications, notificationsNone } from "assets/icons";
 import classNames from "classnames";
 import { TaskBarItemContainer } from "components/task/TaskBarItemContainer/TaskBarItemContainer";
-import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
+import { NotificationServiceConnectStatus } from "models/notification/NotificationServiceConnectStatus";
 import React, { useMemo } from "react";
 import style from "./style.module.css";
 

@@ -1,11 +1,11 @@
-import { ShellPanelType } from "enum/ShellPanelType";
 import { makeAutoObservable } from "mobx";
 import { AuthEventType } from "models/auth/AuthEventType";
+import { DevModeModel } from "models/debug/DevModeModel";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
-import { DevModeModel } from "models/DevModeModel";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { AppsMenuViewMode } from "models/menu/AppsMenuViewMode";
 import { PanelEventType } from "models/panel/PanelEventType";
+import { ShellPanelType } from "models/panel/ShellPanelType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import moment from "moment";

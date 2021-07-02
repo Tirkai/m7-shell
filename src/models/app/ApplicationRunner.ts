@@ -1,7 +1,7 @@
 import { WindowFactory } from "factories/WindowFactory";
-import { Application } from "models/Application";
-import { ApplicationProcess } from "models/ApplicationProcess";
-import { ExternalApplication } from "models/ExternalApplication";
+import { Application } from "models/app/Application";
+import { ExternalApplication } from "models/app/ExternalApplication";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { AppStore } from "stores/AppStore";

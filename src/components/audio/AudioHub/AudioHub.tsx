@@ -3,9 +3,9 @@ import { Slider } from "@material-ui/core";
 import { mute, sound, soundLow, soundMiddle } from "assets/icons";
 import { BaseHub } from "components/hub/BaseHub/BaseHub";
 import { HubBackdrop } from "components/hub/HubBackdrop/HubBackdrop";
-import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
+import { ShellPanelType } from "models/panel/ShellPanelType";
 import React from "react";
 import style from "./style.module.css";
 

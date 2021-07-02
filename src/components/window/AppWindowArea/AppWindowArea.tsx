@@ -1,12 +1,12 @@
 import classNames from "classnames";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
-import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowType } from "models/window/ApplicationWindowType";
+import { ResizeHandleDirection } from "models/window/ResizeHandleDirection";
 import React from "react";
 import { DraggableData, DraggableEvent } from "react-draggable";
 import { ResizeCallbackData } from "react-resizable";

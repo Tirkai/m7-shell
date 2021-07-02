@@ -4,12 +4,10 @@ import { AuthStore } from "./AuthStore";
 import { ConfigStore } from "./ConfigStore";
 import { ContextMenuStore } from "./ContextMenuStore";
 import { DateTimeStore } from "./DateTimeStore";
-import { DesktopStore } from "./DesktopStore";
 import { DisplayManager } from "./DisplayManager";
 import { HotkeyStore } from "./HotkeyStore";
 import { LocaleStore } from "./LocaleStore";
 import { MessageStore } from "./MessageStore";
-import { NetworkStore } from "./NetworkStore";
 import { NotificationStore } from "./NotificationStore";
 import { PanelManager } from "./PanelManager";
 import { PinManager } from "./PinManager";
@@ -37,8 +35,6 @@ export class AppStore {
     audio: AudioStore;
     contextMenu: ContextMenuStore;
     user: UserStore;
-    network: NetworkStore;
-    desktop: DesktopStore;
     tile: TileManager;
     pin: PinManager;
     virtualViewport: VirtualViewportManager;
@@ -61,8 +57,6 @@ export class AppStore {
         this.audio = new AudioStore(this);
         this.contextMenu = new ContextMenuStore(this);
         this.user = new UserStore(this);
-        this.network = new NetworkStore(this);
-        this.desktop = new DesktopStore(this);
         this.tile = new TileManager(this);
         this.pin = new PinManager(this);
         this.virtualViewport = new VirtualViewportManager(this);
@@ -70,8 +64,6 @@ export class AppStore {
         this.auth = new AuthStore(this);
         this.recovery = new RecoveryStore(this);
         this.config = new ConfigStore(this);
-
-        console.warn("STORE", this);
 
         (window as any).store = this;
     }

@@ -1,10 +1,10 @@
 import { ShellMessageEmitter } from "@algont/m7-shell-emitter";
 import { makeAutoObservable } from "mobx";
 import { v4 } from "uuid";
-import { Application } from "./Application";
-import { ExternalApplication } from "./ExternalApplication";
-import { VirtualViewportModel } from "./virtual/VirtualViewportModel";
-import { ApplicationWindow } from "./window/ApplicationWindow";
+import { Application } from "../app/Application";
+import { ExternalApplication } from "../app/ExternalApplication";
+import { VirtualViewportModel } from "../virtual/VirtualViewportModel";
+import { ApplicationWindow } from "../window/ApplicationWindow";
 
 interface IApplicationProcessOptions {
     app: Application;

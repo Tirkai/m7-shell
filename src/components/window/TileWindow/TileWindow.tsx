@@ -1,9 +1,9 @@
 import { MarkerType, useMarker } from "@algont/m7-react-marker";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
-import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import { ApplicationProcess } from "models/ApplicationProcess";
+import { ShellPanelType } from "models/panel/ShellPanelType";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";

@@ -1,7 +1,7 @@
 import { SVGIcon } from "@algont/m7-ui";
 import classNames from "classnames";
 import { ViewportAppTilePreviewItem } from "components/virtual/ViewportAppTilePreviewItem/ViewportAppTilePreviewItem";
-import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
 import React, { useEffect, useState } from "react";
 import { v4 } from "uuid";
 import style from "./style.module.css";

@@ -13,14 +13,14 @@ import { PanelInformerActions } from "components/informer/PanelInformerActions/P
 import { PanelInformerContent } from "components/informer/PanelInformerText/PanelInformerText";
 import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
 import { NOTIFICATION_APP_GUID } from "constants/config";
-import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
-import { ExternalApplication } from "models/ExternalApplication";
-import { NotificationGroupModel } from "models/NotificationGroupModel";
-import { NotificationModel } from "models/NotificationModel";
+import { ExternalApplication } from "models/app/ExternalApplication";
+import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
+import { NotificationModel } from "models/notification/NotificationModel";
+import { ShellPanelType } from "models/panel/ShellPanelType";
 import React, { useEffect, useState } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import { NotificationClearDialogContainer } from "../NotificationClearDialogContainer/NotificationClearDialogContainer";

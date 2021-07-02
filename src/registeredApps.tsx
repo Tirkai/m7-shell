@@ -1,8 +1,8 @@
 import { terminal } from "assets/icons";
 import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
 import { strings } from "locale";
-import { Application } from "models/Application";
-import { ShellApplication } from "models/ShellApplication";
+import { Application } from "models/app/Application";
+import { ShellApplication } from "models/app/ShellApplication";
 import React from "react";
 import { v4 } from "uuid";
 

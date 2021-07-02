@@ -3,10 +3,10 @@ import { settings } from "assets/icons";
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
+import { Application } from "models/app/Application";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
-import { Application } from "models/Application";
-import { ContextMenuItemModel } from "models/ContextMenuItemModel";
-import { Point2D } from "models/Point2D";
+import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
+import { Point2D } from "models/shape/Point2D";
 import React, { Component } from "react";
 import { AppsMenuSidebarListItem } from "../../menu/AppsMenuSidebarListItem/AppsMenuSidebarListItem";
 

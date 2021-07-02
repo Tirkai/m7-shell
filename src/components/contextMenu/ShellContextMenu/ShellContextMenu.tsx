@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import { ContextMenuItemModel } from "models/ContextMenuItemModel";
+import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
 import React, { useEffect, useRef, useState } from "react";
 import { ShellContextMenuItem } from "../ShellContextMenuItem/ShellContextMenuItem";
 import style from "./style.module.css";

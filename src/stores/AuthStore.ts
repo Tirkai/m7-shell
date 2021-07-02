@@ -1,19 +1,19 @@
 import {
     IJsonRpcResponse,
     JsonRpcPayload,
-    JsonRpcResult
+    JsonRpcResult,
 } from "@algont/m7-utils";
 import Axios from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
-import { AccessTokenVerifyStatus } from "enum/AccessTokenVerifyStatus";
-import { RoleType } from "enum/RoleType";
 import { IAccessTokenMetadata } from "interfaces/auth/IAccessTokenMetadata";
 import { IRefreshTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
 import { Base64 } from "js-base64";
 import { strings } from "locale";
 import { makeAutoObservable } from "mobx";
+import { AccessTokenVerifyStatus } from "models/auth/AccessTokenVerifyStatus";
 import { AuthEventType } from "models/auth/AuthEventType";
+import { RoleType } from "models/role/RoleType";
 import moment, { Moment } from "moment";
 import { authEndpoint, meEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";

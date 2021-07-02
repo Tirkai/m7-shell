@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { useStore } from "hooks/useStore";
-import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import React, { useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";

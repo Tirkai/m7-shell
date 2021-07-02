@@ -1,4 +1,4 @@
-import { ApplicationProcess } from "models/ApplicationProcess";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
 import React from "react";
 import { ViewportAppWindowPreviewItem } from "../ViewportAppWindowPreviewItem/ViewportAppWindowPreviewItem";
 import style from "./style.module.css";

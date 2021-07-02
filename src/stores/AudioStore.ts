@@ -1,6 +1,6 @@
 import { isEmpty } from "lodash";
 import { makeAutoObservable } from "mobx";
-import { AudioModel } from "models/AudioModel";
+import { AudioModel } from "models/audio/AudioModel";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
 import { AppStore } from "stores/AppStore";
