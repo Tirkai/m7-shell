@@ -147,21 +147,25 @@ export class VirtualViewportManager {
 
         let targetViewport: VirtualViewportModel | null = null;
 
-        if (viewportIndex > 0) {
-            targetViewport = this.viewports[viewportIndex + direction];
-        } else {
-            const nextViewport = this.viewports[viewportIndex + 1];
-            if (nextViewport) {
-                targetViewport = nextViewport;
+        // Check that viewport is exist
+        if (viewportIndex > -1) {
+            // Check this viewport is not the first on the list
+            if (viewportIndex > 0) {
+                targetViewport = this.viewports[viewportIndex + direction];
+            } else {
+                const nextViewport = this.viewports[viewportIndex - direction];
+                if (nextViewport) {
+                    targetViewport = nextViewport;
+                }
             }
-        }
 
-        if (targetViewport) {
-            this.setCurrentViewport(targetViewport);
-        }
+            if (targetViewport) {
+                this.setCurrentViewport(targetViewport);
+            }
 
-        if (this.viewports.length > 1) {
-            this.removeViewport(viewport);
+            if (this.viewports.length > 1) {
+                this.removeViewport(viewport);
+            }
         }
     }
 
@@ -339,6 +343,8 @@ export class VirtualViewportManager {
     removeViewport(viewport: VirtualViewportModel) {
         const index = this.viewports.indexOf(viewport);
         this.viewports.splice(index, 1);
+
+        alert(index);
 
         this.store.sharedEventBus.eventBus.dispatch(
             VirtualViewportEventType.OnRemoveViewportFrame,
