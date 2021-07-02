@@ -35,7 +35,7 @@ export const TileDesktopContainer = observer(
         const currentViewportPreset =
             store.virtualViewport.currentViewport.tilePreset;
 
-        useEffect(() => {
+        const onChangePreset = () => {
             const preset = props.preset;
             if (preset) {
                 const sw = store.processManager.processes
@@ -57,7 +57,7 @@ export const TileDesktopContainer = observer(
                     }
                 });
             }
-        }, [props.preset]);
+        };
 
         const handleClose = (process: ApplicationProcess) => {
             store.processManager.killProcess(process);
@@ -138,6 +138,8 @@ export const TileDesktopContainer = observer(
                 (process.window.viewport.id === props.viewport?.id ?? true) &&
                 process.window.type === ApplicationWindowType.Tile,
         );
+
+        useEffect(onChangePreset, [props.preset]);
 
         return currentViewportPreset ? (
             <div className={className}>

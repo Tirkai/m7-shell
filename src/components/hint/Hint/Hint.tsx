@@ -13,12 +13,14 @@ const className = style.hint;
 export const Hint = (props: IHintProps) => {
     const [container] = useState(document.createElement("div"));
 
-    useEffect(() => {
+    const onMount = () => {
         document.body.appendChild(container);
         return () => {
             document.body.removeChild(container);
         };
-    }, []);
+    };
+
+    useEffect(onMount, []);
 
     return ReactDOM.createPortal(
         <div

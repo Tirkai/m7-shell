@@ -1,9 +1,7 @@
 import { SVGIcon } from "@algont/m7-ui";
 import { cross } from "assets/icons";
-import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { groupBy } from "lodash";
-import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
@@ -25,9 +23,7 @@ interface ITaskListProps {
 
 const className = style.taskList;
 
-export const TaskList = observer((props: ITaskListProps) => {
-    const store = useStore();
-
+export const TaskList = (props: ITaskListProps) => {
     const createCloseApplicationContextMenuItem = (
         appProcess: ApplicationProcess,
     ) => [
@@ -38,7 +34,7 @@ export const TaskList = observer((props: ITaskListProps) => {
         }),
     ];
 
-    const tasksGroups = useMemo(() => {
+    const memoTasksGroup = () => {
         const groups = groupBy(props.processes, "window.viewport.id");
 
         const groupedProcessesByViewport = Object.entries(groups).map(
@@ -56,7 +52,13 @@ export const TaskList = observer((props: ITaskListProps) => {
             },
         );
         return sortedGroups;
-    }, [props.processesHash, props.viewportsHash]);
+    };
+
+    const tasksGroups = useMemo(memoTasksGroup, [
+        props.processesHash,
+        props.viewportsHash,
+        props.processes,
+    ]);
 
     return (
         <div className={className}>
@@ -88,4 +90,4 @@ export const TaskList = observer((props: ITaskListProps) => {
             </div>
         </div>
     );
-});
+};

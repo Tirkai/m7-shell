@@ -10,8 +10,6 @@ import { VirtualFrameList } from "../VirtualFrameList/VirtualFrameList";
 import { VirtualFramePreview } from "../VirtualFramePreview/VirtualFramePreview";
 import style from "./style.module.css";
 
-const className = style.virtualDesktopHub;
-
 export const VirtualDesktopHub = observer(() => {
     const store = useStore();
 

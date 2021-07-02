@@ -8,7 +8,6 @@ import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import React from "react";
 import style from "./style.module.css";
-const className = style.audioHub;
 
 export const AudioHub = observer(() => {
     const store = useStore();

@@ -20,7 +20,7 @@ export const ShellContextMenu: React.FC = observer(() => {
 
     const ref = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
+    const onShowContextMenu = () => {
         if (ref.current && store.contextMenu.isShow) {
             const bounds = ref.current.getBoundingClientRect();
 
@@ -35,7 +35,9 @@ export const ShellContextMenu: React.FC = observer(() => {
                 setY(window.innerHeight - bounds.height);
             } else setY(currentY);
         }
-    }, [store.contextMenu.isShow]);
+    };
+
+    useEffect(onShowContextMenu, [store.contextMenu.isShow]);
 
     return (
         <div

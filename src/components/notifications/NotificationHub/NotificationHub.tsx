@@ -13,7 +13,6 @@ import { PanelInformerActions } from "components/informer/PanelInformerActions/P
 import { PanelInformerContent } from "components/informer/PanelInformerText/PanelInformerText";
 import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
 import { NOTIFICATION_APP_GUID } from "constants/config";
-import { PerformanceContext } from "contexts/PerformanceContext";
 import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
@@ -22,7 +21,7 @@ import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/ExternalApplication";
 import { NotificationGroupModel } from "models/NotificationGroupModel";
 import { NotificationModel } from "models/NotificationModel";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import { NotificationClearDialogContainer } from "../NotificationClearDialogContainer/NotificationClearDialogContainer";
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
@@ -35,7 +34,6 @@ enum NotificationDeletionType {
 
 export const NotificationHub = observer(() => {
     const store = useStore();
-    const performanceMode = useContext(PerformanceContext);
     const [isScrolled, setScrolled] = useState(false);
 
     const [showClearGroupDialog, setShowClearGroupDialog] = useState<{
@@ -62,16 +60,16 @@ export const NotificationHub = observer(() => {
         store.notification.disconnectFromNotificationsSocket();
     };
 
-    useEffect(() => {
+    const onMount = () => {
         connectNotifications();
         return () => disconnectNotifications();
-    }, []);
+    };
 
-    useEffect(() => {
+    const onChangeActivePanel = () => {
         if (store.panelManager.activePanel !== ShellPanelType.NotificationHub) {
             setShowClearGroupDialog({ isShow: false, group: null });
         }
-    }, [store.panelManager.activePanel]);
+    };
 
     const handleDeleteNotifications = (
         group: NotificationGroupModel | null,
@@ -261,6 +259,9 @@ export const NotificationHub = observer(() => {
 
         return null;
     };
+
+    useEffect(onMount, []);
+    useEffect(onChangeActivePanel, [store.panelManager.activePanel]);
 
     return (
         <div

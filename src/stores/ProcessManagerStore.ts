@@ -84,11 +84,6 @@ export class ProcessManagerStore {
     bindOnMessageHandler() {
         window.onmessage = (event: MessageEvent) => {
             const message: EmitterMessage<unknown> = event.data;
-            let apps = [];
-
-            apps = this.store.applicationManager.applications.filter(
-                (item) => item.id === message.appId,
-            );
 
             if (message.type) {
                 // #region Backward compatibility

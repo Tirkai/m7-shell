@@ -11,8 +11,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { TileChooserItem } from "../TileChooserItem/TileChooserItem";
 import style from "./style.module.css";
 
-const className = style.displayModeChooser;
-
 interface IDisplayModeChooserProps {
     onSelectTileMode: (
         displayMode: DisplayMode,
@@ -40,15 +38,15 @@ export const DisplayModeChooser = observer(
 
         const ref = useRef<HTMLDivElement | null>(null);
 
-        const floatDisplayMode = useMemo(
-            () => store.display.findDisplayModeByType(DisplayModeType.Float),
-            [],
-        );
+        const memoFloatDisplayMode = () =>
+            store.display.findDisplayModeByType(DisplayModeType.Float);
 
-        const tileDisplayMode = useMemo(
-            () => store.display.findDisplayModeByType(DisplayModeType.Tile),
-            [],
-        );
+        const floatDisplayMode = useMemo(memoFloatDisplayMode, []);
+
+        const memoTileDisplayMode = () =>
+            store.display.findDisplayModeByType(DisplayModeType.Tile);
+
+        const tileDisplayMode = useMemo(memoTileDisplayMode, []);
 
         const handleSelectTileMode = (
             alias: string,
@@ -65,7 +63,7 @@ export const DisplayModeChooser = observer(
             setShow(false);
         };
 
-        const displayModeNaviagationItems: IDisplayModeNavigationItem[] = useMemo(() => {
+        const memoDisplayModeNaviationItems = () => {
             const getTileView = (template: TileTemplate) => (
                 <TileChooserItem
                     template={template}
@@ -103,7 +101,12 @@ export const DisplayModeChooser = observer(
                 return items;
             }
             return [];
-        }, [props.hash]);
+        };
+
+        const displayModeNaviagationItems: IDisplayModeNavigationItem[] = useMemo(
+            memoDisplayModeNaviationItems,
+            [props.hash],
+        );
 
         const [activeItem, setActiveItem] = useState(
             props.displayMode?.type === DisplayModeType.Tile
@@ -120,20 +123,24 @@ export const DisplayModeChooser = observer(
             setShow(false);
         };
 
-        useEffect(() => {
+        const onMount = () => {
             document.addEventListener("mousedown", handleClickAway);
 
             return () =>
                 document.removeEventListener("mousedown", handleClickAway);
-        }, []);
+        };
 
-        useEffect(() => {
+        const onHashChange = () => {
             setActiveItem(
                 props.displayMode?.type === DisplayModeType.Tile
                     ? props.presetAlias
                     : "none",
             );
-        }, [props.hash]);
+        };
+
+        useEffect(onMount, []);
+
+        useEffect(onHashChange, [props.hash]);
 
         return (
             <div className={style.displayModeChooser} ref={ref}>

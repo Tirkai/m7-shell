@@ -5,7 +5,7 @@ import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { useStore } from "hooks/useStore";
 import { ApplicationProcess } from "models/ApplicationProcess";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import { Resizable, ResizeCallbackData, ResizeHandle } from "react-resizable";
 import AppLoader from "../AppLoader/AppLoader";
@@ -35,8 +35,6 @@ interface IAppWindowProps {
 export const AppWindow = (props: IAppWindowProps) => {
     const store = useStore();
     const [isAppReady, setAppReady] = useState(false);
-    const [frame, setFrame] = useState<HTMLIFrameElement | null>(null);
-    const [url, setUrl] = useState(props.process.modifiedUrl);
 
     const { createMemoizedMarker } = useMarker();
 
@@ -56,7 +54,6 @@ export const AppWindow = (props: IAppWindowProps) => {
         eventData: ResizeCallbackData,
     ) => {
         const data = eventData;
-        const nativeEvent = (event as unknown) as MouseEvent;
 
         props.onResize((event as unknown) as MouseEvent, data);
     };
@@ -85,10 +82,6 @@ export const AppWindow = (props: IAppWindowProps) => {
     const handleAppReady = () => {
         setAppReady(true);
     };
-
-    useEffect(() => {
-        setUrl(props.process.modifiedUrl);
-    }, [props.process.modifiedUrl]);
 
     const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
 

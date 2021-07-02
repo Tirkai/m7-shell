@@ -19,7 +19,7 @@ export const AuthScreen: React.FC = observer(() => {
     const [isShowNotify, setShowNotify] = useState(false);
     const [notifyText, setNotifyText] = useState("");
 
-    useEffect(() => () => clearTimeout(timeout), []);
+    const onMount = () => () => clearTimeout(timeout);
 
     const handleLogin = async (form: { login: string; password: string }) => {
         const data = await store.auth.login(form.login, form.password);
@@ -42,6 +42,8 @@ export const AuthScreen: React.FC = observer(() => {
 
     const urlParams = new URL(window.location.href).searchParams;
     const enableAutoLoginUrlParam = urlParams.get("enableAutoLogin");
+
+    useEffect(onMount, []);
 
     return (
         <div className={style.authScreen}>

@@ -24,7 +24,7 @@ export const RecoveryLayer = observer(() => {
         }
     };
 
-    useEffect(() => {
+    const onShowRecoveryPanel = () => {
         const showTimeout = 30000;
 
         if (store.panelManager.isShowRecoveryPanel) {
@@ -33,7 +33,9 @@ export const RecoveryLayer = observer(() => {
             }, showTimeout);
             return () => clearTimeout(timer);
         }
-    }, [store.panelManager.isShowRecoveryPanel]);
+    };
+
+    useEffect(onShowRecoveryPanel, [store.panelManager.isShowRecoveryPanel]);
 
     return store.panelManager.isShowRecoveryPanel ? (
         <div className={className}>

@@ -42,7 +42,7 @@ export const TaskBarSoundButton = (props: ITaskBarSoundButtonProps) => {
         } else {
             return <SVGIcon source={mute} key="soundDisable" color="white" />;
         }
-    }, [props.volume]);
+    }, [props.volume, props.isMuted]);
 
     return (
         <div

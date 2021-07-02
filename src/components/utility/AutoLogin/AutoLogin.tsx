@@ -15,7 +15,7 @@ export const AutoLogin = observer(() => {
 
     const [isShowNotify, setShowNotify] = useState(false);
 
-    useEffect(() => {
+    const onMount = () => {
         const urlParams = new URL(window.location.href).searchParams;
 
         const autoLoginEnabled =
@@ -38,14 +38,14 @@ export const AutoLogin = observer(() => {
                 );
             }
         }
-    }, []);
+
+        const timeout = setTimeout(() => setShowNotify(true), 3000);
+        return () => clearTimeout(timeout);
+    };
 
     const handleReload = () => window.location.reload();
 
-    useEffect(() => {
-        const timeout = setTimeout(() => setShowNotify(true), 3000);
-        return () => clearTimeout(timeout);
-    }, []);
+    useEffect(onMount, []);
 
     return isShowNotify ? (
         <Dialog open={true} fullWidth>

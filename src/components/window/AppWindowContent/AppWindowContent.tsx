@@ -7,7 +7,7 @@ import { ApplicationProcess } from "models/ApplicationProcess";
 import { ExternalApplication } from "models/ExternalApplication";
 import { ShellApplication } from "models/ShellApplication";
 import { IApplicationWindow } from "models/window/IApplicationWindow";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import style from "./style.module.css";
 
 interface IAppWindowProps extends IStore {
@@ -20,8 +20,6 @@ interface IAppWindowProps extends IStore {
 export const AppWindowContent = observer((props: IAppWindowProps) => {
     const store = useStore();
     const [isAppReady, setAppReady] = useState(false);
-    const [frame, setFrame] = useState<HTMLIFrameElement | null>(null);
-    const [url, setUrl] = useState(props.process.modifiedUrl);
 
     const handleAppReady = () => {
         setAppReady(true);
@@ -33,8 +31,6 @@ export const AppWindowContent = observer((props: IAppWindowProps) => {
     const handleFrameLoaded = (frameRef: HTMLIFrameElement) => {
         const context = frameRef?.contentWindow;
         if (context) {
-            setFrame(frameRef);
-
             if (!isAppReady) {
                 handleBindingEmitterEvents(props.process);
             }
@@ -64,11 +60,7 @@ export const AppWindowContent = observer((props: IAppWindowProps) => {
         );
     };
 
-    useEffect(() => {
-        setUrl(props.process.modifiedUrl);
-    }, [props.process.modifiedUrl]);
-
-    const appComponent = useMemo(() => {
+    const memoAppComponent = () => {
         if (props.process.app instanceof ExternalApplication) {
             return (
                 <iframe
@@ -90,7 +82,9 @@ export const AppWindowContent = observer((props: IAppWindowProps) => {
             return props.process.app.Component;
         }
         return <div>Unknown component</div>;
-    }, [props.process.modifiedUrl]);
+    };
+
+    const appComponent = useMemo(memoAppComponent, [props.process.modifiedUrl]);
 
     return (
         <div className={classNames(style.appWindowContent)}>{appComponent}</div>

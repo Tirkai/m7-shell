@@ -14,7 +14,7 @@ export const VirtualFrameList = (props: IVirtualFrameListProps) => {
 
     const [lastCount, setLastCount] = useState(props.count);
 
-    useEffect(() => {
+    const onCountChange = () => {
         if (lastCount < props.count) {
             const scrollTarget = scrollRef.current;
             const containerTarget = containerRef.current;
@@ -29,7 +29,9 @@ export const VirtualFrameList = (props: IVirtualFrameListProps) => {
             }
         }
         setLastCount(props.count);
-    }, [props.count]);
+    };
+
+    useEffect(onCountChange, [props.count]);
 
     return (
         <div className={className} ref={scrollRef}>

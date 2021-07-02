@@ -9,9 +9,6 @@ import { ContextMenuItemModel } from "models/ContextMenuItemModel";
 import { Point2D } from "models/Point2D";
 import React, { Component } from "react";
 import { AppsMenuSidebarListItem } from "../../menu/AppsMenuSidebarListItem/AppsMenuSidebarListItem";
-import style from "./style.module.css";
-
-const className = style.appsSettings;
 
 interface IAppsSettingsProps extends IStore {
     apps: Application[];
