@@ -1,5 +1,6 @@
 import { MarkerType, useMarker } from "@algont/m7-react-marker";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
+import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ApplicationProcess } from "models/ApplicationProcess";
@@ -94,7 +95,10 @@ export const TileWindow = observer((props: ITileWindowProps) => {
                     onReady={() => handleAppReady()}
                 />
                 <AppWindowUnfocusedOverlay
-                    visible={store.windowManager.hasDraggedWindow}
+                    visible={
+                        store.windowManager.hasDraggedWindow ||
+                        store.panelManager.activePanel !== ShellPanelType.None
+                    }
                 />
             </div>
         </Draggable>
