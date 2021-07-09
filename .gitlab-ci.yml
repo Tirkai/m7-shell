@@ -1,14 +1,29 @@
 stages:
-  - build
-  - package
-  - release
+    - build
+    - package
+    - release
+
+astra_16_build_npm:
+    stage: build
+    tags:
+        - m7-astra1.6
+    allow_failure: false
+    script:
+        - echo "Start building app"
+        - npm ci
+        - CI=false npm run build
+        - echo "Build success"
+    artifacts:
+        paths:
+            - build
+        expire_in: 1 hour
+    except:
+        - tags
 
 include:
-  - project: "m7/ci/m7-ci-template"
-    ref: master
-    file:
-      - "/front-simple/astra-16-build.yml"
-      - "/front-simple/astra-16-deb.yml"
-      - "/front-simple/astra-16-upload-deb-to-nexus.yml"
-      - "/front-simple/astra-16-gitlab-tag.yml"
-
+    - project: "m7/ci/m7-ci-template"
+      ref: master
+      file:
+          - "/front-simple/astra-16-deb.yml"
+          - "/front-simple/astra-16-upload-deb-to-nexus.yml"
+          - "/front-simple/astra-16-gitlab-tag.yml"
