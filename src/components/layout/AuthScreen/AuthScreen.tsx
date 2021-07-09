@@ -46,7 +46,10 @@ export const AuthScreen: React.FC = observer(() => {
     useEffect(onMount, []);
 
     return (
-        <div className={style.authScreen}>
+        <div
+            className={style.authScreen}
+            style={{ backgroundImage: `url("/wallpapers/wallpaper.jpg")` }}
+        >
             <ConfigCondition
                 condition={
                     !config["autoLogin.enabled"] &&

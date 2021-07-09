@@ -1,6 +1,6 @@
 .authScreen {
     height: 100vh;
-    background: url("/wallpapers/wallpaper.jpg");
+    /* background: url("/wallpapers/wallpaper.jpg"); */
     background-size: cover;
 }
 

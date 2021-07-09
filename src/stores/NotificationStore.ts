@@ -74,7 +74,7 @@ export class NotificationStore {
         this.toasts = toasts;
     }
 
-    async loadCountByFilter(payload: object) {
+    async loadCountByFilter(payload: Record<string, unknown>) {
         try {
             const response = await Axios.post<IJsonRpcResponse<number>>(
                 notificationsEndpoint.url,

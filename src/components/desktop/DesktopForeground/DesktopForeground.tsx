@@ -8,7 +8,11 @@ interface IDesktopForegroundProps {
 const className = style.desktopForeground;
 
 export const DesktopForeground = (props: IDesktopForegroundProps) => (
-    <div className={className} onClick={props.onDesktopClick}></div>
+    <div
+        className={className}
+        style={{ backgroundImage: `url("/wallpapers/wallpaper.jpg")` }}
+        onClick={props.onDesktopClick}
+    ></div>
 );
 
 export default DesktopForeground;
