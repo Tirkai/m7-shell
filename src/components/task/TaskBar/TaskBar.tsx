@@ -58,7 +58,7 @@ export const TaskBar = observer(() => {
     };
 
     const handleKillProcess = (appProcess: ApplicationProcess) => {
-        store.processManager.killProcess(appProcess);
+        store.processManager.closeProcess(appProcess);
     };
 
     const handleShowVirtualHub = () => {

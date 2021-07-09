@@ -14,13 +14,11 @@ import { AppWindowPinContainer } from "components/window/AppWindowPinContainer/A
 import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
-import { ApplicationRunner } from "models/app/ApplicationRunner";
-import { ExternalApplication } from "models/app/ExternalApplication";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
 import React, { Component, lazy, Suspense } from "react";
-import { v4 } from "uuid";
 import { DesktopLayout } from "../DesktopLayout/DesktopLayout";
+import { TransparentWindowLayer } from "../TransparentWindowLayer/TransparentWindowLayer";
 import style from "./style.module.css";
 
 const DesktopForeground = lazy(
@@ -78,36 +76,6 @@ export class ShellScreen extends Component<IStore> {
         await this.store.user.fetchUsername();
         await this.store.applicationManager.fetchApplications();
 
-        const urlParams = new URL(window.location.href).searchParams;
-        const enableAutoRun = urlParams.get("enableAutoRun");
-        const autoRunApp = urlParams.get("autoRunApp");
-        const autoRunUrl = urlParams.get("autoRunUrl");
-        const autoRunFullscreen = urlParams.get("autoRunFullscreen");
-
-        if (!!parseInt(enableAutoRun ?? "0")) {
-            const isAutorunFullscreen = !!parseInt(autoRunFullscreen ?? "0");
-
-            const runner = new ApplicationRunner(this.store);
-            if (autoRunApp) {
-                const app = this.store.applicationManager.findByKey(autoRunApp);
-
-                if (app instanceof ExternalApplication) {
-                    runner.run(app);
-                }
-            }
-
-            if (autoRunUrl) {
-                const app = new ExternalApplication({
-                    id: v4(),
-                    name: autoRunUrl,
-                    url: autoRunUrl,
-                    isFullscreen: isAutorunFullscreen,
-                    isVisibleInStartMenu: false,
-                });
-
-                runner.run(app);
-            }
-        }
         this.store.recovery.fetchLastUserSession();
 
         this.store.sharedEventBus.eventBus.dispatch(AuthEventType.OnEntry);
@@ -209,6 +177,20 @@ export class ShellScreen extends Component<IStore> {
                                                         />
                                                     </DesktopLayer>
                                                 </Suspense>
+                                            </ConfigCondition>
+                                            <ConfigCondition
+                                                condition={
+                                                    config["dashboard.enabled"]
+                                                }
+                                            >
+                                                <DesktopLayer
+                                                    enabled
+                                                    priority={1}
+                                                >
+                                                    <TransparentWindowLayer
+                                                        viewport={viewport}
+                                                    />
+                                                </DesktopLayer>
                                             </ConfigCondition>
                                         </VirtualFrame>
                                     ),

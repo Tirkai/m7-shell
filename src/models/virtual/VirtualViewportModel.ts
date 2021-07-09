@@ -2,12 +2,16 @@ import { makeAutoObservable } from "mobx";
 import { DisplayMode } from "models/display/DisplayMode";
 import { TilePreset } from "models/tile/TilePreset";
 import { v4 } from "uuid";
+import { IVirtualViewportState } from "./IVirtualViewportState";
+import { ViewportDefaultState } from "./ViewportDefaultState";
 
 interface IVirtualViewportOptions {
     id?: string;
     index?: number;
     tilePreset?: TilePreset;
     displayMode?: DisplayMode;
+    state?: IVirtualViewportState;
+    key?: string;
 }
 
 export class VirtualViewportModel {
@@ -16,6 +20,8 @@ export class VirtualViewportModel {
     displayMode?: DisplayMode;
     counter: number = 0;
     hash: string = v4();
+    state: IVirtualViewportState;
+    key: string;
 
     tilePreset?: TilePreset;
 
@@ -23,6 +29,8 @@ export class VirtualViewportModel {
         this.id = options?.id ?? v4();
         this.index = options?.index ?? 0;
         this.tilePreset = options?.tilePreset;
+        this.state = options?.state ?? new ViewportDefaultState();
+        this.key = options?.key ?? v4();
         makeAutoObservable(this);
 
         this.displayMode = options?.displayMode;

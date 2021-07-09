@@ -5,7 +5,6 @@ import { observer } from "mobx-react";
 import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
 import { Point2D } from "models/shape/Point2D";
 import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
-import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import React from "react";
 import { VirtualFramePreviewBase } from "../VirtualFramePreviewBase/VirtualFramePreviewBase";
 import { VirtualFramePreviewLayout } from "../VirtualFramePreviewLayout/VirtualFramePreviewLayout";
@@ -33,13 +32,8 @@ export const VirtualFrameActions = observer(
         };
 
         const handleClearAll = () => {
-            store.processManager.destroyAllProcesses();
-            store.virtualViewport.setViewports([]);
-            store.virtualViewport.addViewport(
-                new VirtualViewportModel({
-                    displayMode: store.display.defaultDisplayMode,
-                }),
-            );
+            store.processManager.resetProcesses();
+            store.virtualViewport.resetViewports({ atLeastOne: true });
         };
 
         const handleShowMenu = (e: React.MouseEvent) => {

@@ -71,6 +71,7 @@ export const AppWindowContent = observer((props: IAppWindowProps) => {
                     style={{
                         width: "100%",
                         height: "100%",
+                        background: "transparent",
                     }}
                     tabIndex={-1}
                     frameBorder={0}

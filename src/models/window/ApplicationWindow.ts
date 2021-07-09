@@ -59,7 +59,7 @@ export class ApplicationWindow implements IApplicationWindow {
         makeAutoObservable(this);
 
         this.id = options?.id ?? v4();
-        this.type = options.type;
+        this.type = options.type ?? ApplicationWindowType.Unknown;
         const [width, height] = this.getSizeWithBounds(
             options?.width ?? BASE_WINDOW_WIDTH,
             options?.height ?? BASE_WINDOW_HEIGHT,
@@ -84,7 +84,7 @@ export class ApplicationWindow implements IApplicationWindow {
 
         this.area = options.area ?? "auto";
 
-        this.viewport = options?.viewport;
+        this.viewport = options?.viewport ?? new VirtualViewportModel();
     }
 
     initialize(options: IApplicationWindowOptions) {

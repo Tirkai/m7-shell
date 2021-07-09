@@ -56,9 +56,11 @@ export const VirtualDesktopHub = observer(() => {
                             <VirtualFrameList
                                 count={store.virtualViewport.viewports.length}
                             >
-                                {store.virtualViewport.viewports.map(
-                                    (item, index) => (
+                                {store.virtualViewport.viewports
+                                    .filter((item) => item.state.displayable)
+                                    .map((item, index) => (
                                         <VirtualFramePreview
+                                            state={item.state}
                                             displayMode={item.displayMode}
                                             processes={getProcessesByViewport(
                                                 item,
@@ -81,8 +83,7 @@ export const VirtualDesktopHub = observer(() => {
                                             hasControls
                                             viewport={item}
                                         />
-                                    ),
-                                )}
+                                    ))}
                             </VirtualFrameList>
                             <VirtualFrameActions onAdd={handleCreateViewport} />
                         </div>

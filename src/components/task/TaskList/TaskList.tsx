@@ -66,7 +66,7 @@ export const TaskList = (props: ITaskListProps) => {
                 {tasksGroups.map((group, groupIndex) => (
                     <TaskGroup
                         key={group.key}
-                        active={group.key === props.currentViewport.id}
+                        active={group.key === props.currentViewport?.id}
                     >
                         {group.value.map((appProcess) => (
                             <TaskBarItem

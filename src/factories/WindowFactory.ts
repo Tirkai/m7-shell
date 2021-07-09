@@ -6,9 +6,11 @@ export class WindowFactory {
     static createWindow(options: IApplicationWindowOptions, store?: AppStore) {
         const viewport = options.viewport;
 
-        viewport.setCounter(viewport.counter + 1);
-
-        const offsetIndex = viewport.counter;
+        let offsetIndex = 0;
+        if (viewport) {
+            viewport.setCounter(viewport.counter + 1);
+            offsetIndex = viewport.counter;
+        }
 
         return new ApplicationWindow({
             ...options,

@@ -156,7 +156,10 @@ export const NotificationHub = observer(() => {
             store.panelManager.setActivePanel(ShellPanelType.None);
 
             const runner = new ApplicationRunner(store);
-            runner.run(app, { url, focusWindowAfterInstantiate: true });
+            runner.run(app, {
+                url,
+                focusWindowAfterInstantiate: true,
+            });
         } else {
             console.warn("Try run application with empty URL");
         }

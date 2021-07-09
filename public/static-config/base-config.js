@@ -42,4 +42,7 @@ window.createConfig("default", {
 
     // Recovery
     "recovery.enabled": true,
+
+    // Dashboard
+    "dashboard.enabled": false,
 });

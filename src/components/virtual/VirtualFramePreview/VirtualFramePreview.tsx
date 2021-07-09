@@ -8,6 +8,7 @@ import { DisplayMode } from "models/display/DisplayMode";
 import { DisplayModeType } from "models/display/DisplayModeType";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { TileTemplate } from "models/tile/TileTemplate";
+import { IVirtualViewportState } from "models/virtual/IVirtualViewportState";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import React from "react";
 import { ViewportAppTilePreview } from "../ViewportAppTilePreview/ViewportAppTilePreview";
@@ -25,6 +26,7 @@ interface IVirtualFramePreviewProps {
     hasControls?: boolean;
     processes: ApplicationProcess[];
     index?: number;
+    state: IVirtualViewportState;
 }
 
 const className = style.virtualFramePreview;
@@ -53,8 +55,6 @@ export const VirtualFramePreview = observer(
             if (viewport) {
                 store.display.setDefaultDisplayMode(displayMode);
 
-                console.log("APPLY_DISPLAY_MODE", displayMode, viewport);
-
                 store.display.applyDisplayModeToViewport(displayMode, viewport);
 
                 store.processManager.processes
@@ -78,40 +78,51 @@ export const VirtualFramePreview = observer(
                 <VirtualFramePreviewLayout
                     header={
                         <div className={style.header}>
-                            <div className={style.indicator}>
-                                <DisplayModeChooser
-                                    hash={props.viewport?.hash}
-                                    displayMode={props.viewport?.displayMode}
-                                    presetAlias={
-                                        props.viewport?.tilePreset?.alias
-                                    }
-                                    onSelectFloatMode={(displayMode) =>
-                                        handleApplyDisplayMode(displayMode)
-                                    }
-                                    onSelectTileMode={(
-                                        displayMode,
-                                        template,
-                                    ) => {
-                                        handleApplyDisplayMode(displayMode);
-                                        handleApplyPreset(template);
-                                    }}
-                                />
-                            </div>
-                            {props.index && (
-                                <div className={style.title}>
-                                    Рабочий стол {props.index}
-                                </div>
-                            )}
-                            {props.onDelete && (
-                                <div className={style.actions}>
-                                    <IconButton
-                                        size="small"
-                                        color="secondary"
-                                        onClick={handleDelete}
-                                    >
-                                        <Clear />
-                                    </IconButton>
-                                </div>
+                            {props.state.controlable && (
+                                <>
+                                    <div className={style.indicator}>
+                                        <DisplayModeChooser
+                                            hash={props.viewport?.hash}
+                                            displayMode={
+                                                props.viewport?.displayMode
+                                            }
+                                            presetAlias={
+                                                props.viewport?.tilePreset
+                                                    ?.alias
+                                            }
+                                            onSelectFloatMode={(displayMode) =>
+                                                handleApplyDisplayMode(
+                                                    displayMode,
+                                                )
+                                            }
+                                            onSelectTileMode={(
+                                                displayMode,
+                                                template,
+                                            ) => {
+                                                handleApplyDisplayMode(
+                                                    displayMode,
+                                                );
+                                                handleApplyPreset(template);
+                                            }}
+                                        />
+                                    </div>
+                                    {props.index && (
+                                        <div className={style.title}>
+                                            Рабочий стол {props.index}
+                                        </div>
+                                    )}
+                                    {props.onDelete && props.state.closable && (
+                                        <div className={style.actions}>
+                                            <IconButton
+                                                size="small"
+                                                color="secondary"
+                                                onClick={handleDelete}
+                                            >
+                                                <Clear />
+                                            </IconButton>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                     }

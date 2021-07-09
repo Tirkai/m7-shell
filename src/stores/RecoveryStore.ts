@@ -109,13 +109,16 @@ export class RecoveryStore {
         const snapshot: IVirtualViewportSnapshot = {
             currentViewportId: this.store.virtualViewport.currentViewport.id,
             activeTilePresetAlias: this.store.tile.defaultTileTemplate.alias,
-            viewports: this.store.virtualViewport.viewports.map((item) => ({
-                viewportId: item.id,
-                templateAlias: item.tilePreset?.alias ?? "1x1",
-                // TODO: Remove default display mode
-                displayModeType: item.displayMode?.type ?? DisplayModeType.Tile,
-                index: item.index,
-            })),
+            viewports: this.store.virtualViewport.viewports
+                .filter((item) => item.state.savable)
+                .map((item) => ({
+                    viewportId: item.id,
+                    templateAlias: item.tilePreset?.alias ?? "1x1",
+                    // TODO: Remove default display mode
+                    displayModeType:
+                        item.displayMode?.type ?? DisplayModeType.Tile,
+                    index: item.index,
+                })),
         };
 
         return snapshot;
@@ -124,15 +127,18 @@ export class RecoveryStore {
     createProcessesSnapshot() {
         const snapshot: IProcessesSnapshot = {
             hasActiveSession: !!this.store.processManager.processes.length,
-            processes: this.store.processManager.processes.map((item) => ({
-                // TODO Think about this
-                app: item.app as ExternalApplication,
-                url: item.url,
-                name: item.name,
-                viewportId: item.window.viewport.id,
-                position: { x: item.window.x, y: item.window.y },
-                area: item.window.area,
-            })),
+            processes: this.store.processManager.processes
+                .filter((item) => item.state.savable)
+                .map((item) => ({
+                    // TODO Think about this
+                    app: item.app as ExternalApplication,
+                    url: item.url,
+                    name: item.name,
+                    type: item.window.type,
+                    viewportId: item.window.viewport.id,
+                    position: { x: item.window.x, y: item.window.y },
+                    area: item.window.area,
+                })),
         };
         return snapshot;
     }
@@ -182,10 +188,13 @@ export class RecoveryStore {
     }
 
     async startRecovery(snapshot: ISessionRecovery) {
-        this.store.processManager.destroyAllProcesses();
-        this.store.virtualViewport.setViewports([]);
+        this.store.processManager.resetProcesses();
 
-        await this.recoveryViewports(snapshot.viewportSnapshot);
+        if (snapshot.viewportSnapshot.viewports.length > 0) {
+            this.store.virtualViewport.resetViewports();
+            await this.recoveryViewports(snapshot.viewportSnapshot);
+        }
+
         await this.recoveryProcesses(snapshot.processSnapshot);
     }
 
@@ -208,11 +217,17 @@ export class RecoveryStore {
                     (v) => v.id === item.viewportId,
                 );
 
-                runner.run(app, {
-                    viewport,
-                    windowArea: item.area,
-                    windowPosition: item.position,
-                });
+                if (viewport) {
+                    runner.run(app, {
+                        windowOptions: {
+                            type: item.type,
+                            viewport,
+                            area: item.area,
+                            x: item.position.x,
+                            y: item.position.y,
+                        },
+                    });
+                }
             });
             resolve({});
         });
@@ -220,6 +235,11 @@ export class RecoveryStore {
 
     async recoveryViewports(snapshot: IVirtualViewportSnapshot) {
         return new Promise((resolve) => {
+            if (snapshot.viewports.length <= 0) {
+                resolve({});
+                return;
+            }
+
             const viewports = snapshot.viewports.map((item) => {
                 const template =
                     this.store.tile.templates.find(
@@ -251,8 +271,8 @@ export class RecoveryStore {
                 this.store.tile.setDefaultTileTemplate(defaultTileTemplate);
             }
 
-            const [first] = viewports;
-            this.store.virtualViewport.setViewports(viewports);
+            const [first] = this.store.virtualViewport.viewports;
+            this.store.virtualViewport.addViewports(viewports);
 
             const currentViewport = this.store.virtualViewport.viewports.find(
                 (item) => item.id === snapshot.currentViewportId,

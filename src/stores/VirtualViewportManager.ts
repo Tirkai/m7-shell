@@ -1,14 +1,21 @@
 import { TileFactory } from "factories/TileFactory";
 import { makeAutoObservable } from "mobx";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { AuthEventType } from "models/auth/AuthEventType";
+import { DisplayModeType } from "models/display/DisplayModeType";
 import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
+import { ApplicationProcessStandState } from "models/process/ApplicationProcessStandState";
 import { TileEventType } from "models/tile/TileEventType";
 import { TileTemplate } from "models/tile/TileTemplate";
+import { IResetViewportsOptions } from "models/virtual/IResetViewportsOptions";
+import { ViewportStandState } from "models/virtual/ViewportStandState";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
+import { ApplicationWindowType } from "models/window/ApplicationWindowType";
+import { registeredApps } from "registeredApps";
 import { AppStore } from "stores/AppStore";
 import { OffsetDirection } from "types/OffsetDirection";
 
@@ -100,7 +107,7 @@ export class VirtualViewportManager {
             },
             {
                 type: AuthEventType.OnEntry,
-                handler: () => this.init(),
+                handler: () => this.onEntry(),
             },
             {
                 type: VirtualViewportEventType.OnEmptyViewportFrame,
@@ -116,27 +123,99 @@ export class VirtualViewportManager {
             ),
         );
 
+        // this.init();
+
         makeAutoObservable(this);
     }
 
-    init() {
-        const initialViewport = new VirtualViewportModel({
-            displayMode: this.store.display.defaultDisplayMode,
-        });
+    // init() {
+    //     const dashboardViewport = new VirtualViewportModel({
+    //         state: new ViewportStandState(),
+    //         key: "DashboardViewport",
+    //         displayMode: this.store.display.findDisplayModeByType(
+    //             DisplayModeType.Tile,
+    //         ),
+    //     });
+    //     this.addViewport(dashboardViewport);
+    // }
 
-        this.addViewport(initialViewport);
+    onEntry() {
+        const { config } = this.store.config;
+        // #region Default init
+        // const initialViewport = new VirtualViewportModel({
+        //     displayMode: this.store.display.defaultDisplayMode,
+        // });
+        // this.addViewport(initialViewport);
+        // #endregion
+
+        if (config["dashboard.enabled"]) {
+            const dashboardViewport = new VirtualViewportModel({
+                state: new ViewportStandState(),
+                key: "DashboardViewport",
+                displayMode: this.store.display.findDisplayModeByType(
+                    DisplayModeType.Tile,
+                ),
+            });
+            this.addViewport(dashboardViewport);
+
+            if (dashboardViewport) {
+                const app = registeredApps.find(
+                    (item) => item.key === "app.dashboard",
+                );
+
+                if (app) {
+                    const runner = new ApplicationRunner(this.store);
+                    runner.run(app, {
+                        windowOptions: {
+                            type: ApplicationWindowType.Transparent,
+                            viewport: dashboardViewport,
+                        },
+                        state: new ApplicationProcessStandState(),
+                    });
+                }
+            }
+        } else {
+            const initialViewport = new VirtualViewportModel({
+                displayMode: this.store.display.defaultDisplayMode,
+            });
+            this.addViewport(initialViewport);
+        }
+
+        // TODO: !!!
+        // const viewport = this.viewports.find(
+        //     (item) => item.key === "DashboardViewport",
+        // );
+
+        // console.log({ viewport });
     }
 
     setViewports(viewports: VirtualViewportModel[]) {
         this.viewports = viewports;
     }
 
-    clearViewports() {
-        this.setViewports([]);
+    addViewports(viewports: VirtualViewportModel[]) {
+        this.viewports = [...this.viewports, ...viewports];
+    }
+
+    resetViewports(options?: IResetViewportsOptions) {
+        let viewports: VirtualViewportModel[] = [];
+
+        if (!options?.hardReset) {
+            viewports = this.viewports.filter((item) => item.state.closable);
+            if (options?.atLeastOne) {
+                viewports = viewports.slice(1, viewports.length);
+            }
+        } else {
+            viewports = this.viewports;
+        }
+
+        viewports.forEach((item) => {
+            this.removeViewport(item);
+        });
     }
 
     onLogout() {
-        this.setViewports([]);
+        this.resetViewports({ hardReset: true });
     }
 
     onEmptyViewport(
@@ -307,6 +386,8 @@ export class VirtualViewportManager {
             VirtualViewportEventType.OnAddViewportFrame,
             viewport,
         );
+
+        return viewport;
     }
 
     insertViewport(

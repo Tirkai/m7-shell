@@ -1,18 +1,21 @@
 import { WindowFactory } from "factories/WindowFactory";
+import { IApplicationWindowOptions } from "interfaces/window/IApplicationWindowOptions";
 import { Application } from "models/app/Application";
 import { ExternalApplication } from "models/app/ExternalApplication";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
-import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
+import { IApplicationProcessState } from "models/process/IApplicationProcessState";
 import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { AppStore } from "stores/AppStore";
 
 interface IApplicationRunnerOptions {
     url?: string;
     params?: Map<string, string>;
-    viewport?: VirtualViewportModel;
+    // viewport?: VirtualViewportModel;
     focusWindowAfterInstantiate?: boolean;
-    windowPosition?: { x: number; y: number };
-    windowArea?: string;
+    windowOptions?: IApplicationWindowOptions;
+    // windowPosition?: { x: number; y: number };
+    // windowArea?: string;
+    state?: IApplicationProcessState;
 }
 
 export class ApplicationRunner {
@@ -34,24 +37,28 @@ export class ApplicationRunner {
 
         if (!app.isExecuted) {
             const viewport =
-                options?.viewport ?? this.store.virtualViewport.currentViewport;
+                options?.windowOptions?.viewport ??
+                this.store.virtualViewport.currentViewport;
+
+            const currentViewport = this.store.virtualViewport.currentViewport;
 
             const appWindow = WindowFactory.createWindow(
                 {
                     type:
-                        viewport.displayMode?.windowType ??
+                        options?.windowOptions?.type ??
+                        currentViewport.displayMode?.windowType ??
                         ApplicationWindowType.Unknown,
                     viewport,
                     focusAfterInstantiate:
                         options?.focusWindowAfterInstantiate ?? false,
-                    area: options?.windowArea,
-                    x: options?.windowPosition?.x,
-                    y: options?.windowPosition?.y,
+                    area: options?.windowOptions?.area,
+                    x: options?.windowOptions?.x,
+                    y: options?.windowOptions?.y,
                 },
                 this.store,
             );
 
-            if (appWindow.type === ApplicationWindowType.Unknown) {
+            if (appWindow?.type === ApplicationWindowType.Unknown) {
                 alert("Unknown application window type");
             }
 
@@ -60,6 +67,7 @@ export class ApplicationRunner {
                 window: appWindow,
                 url,
                 params: options?.params ?? new Map<string, string>(),
+                state: options?.state,
             });
 
             this.store.processManager.execute(appProcess);

@@ -73,7 +73,7 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
     };
 
     const handleCloseWindow = (appProcess: ApplicationProcess) => {
-        store.processManager.killProcess(appProcess);
+        store.processManager.closeProcess(appProcess);
     };
 
     const handleDrag = (

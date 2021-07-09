@@ -73,10 +73,12 @@ export class ProcessManagerStore {
                 viewportProcesses.length <= 0 &&
                 viewport.displayMode?.enableTileAttach
             ) {
-                this.store.sharedEventBus.eventBus.dispatch(
-                    VirtualViewportEventType.OnEmptyViewportFrame,
-                    { viewport, direction: -1 },
-                );
+                if (viewport.state.closable) {
+                    this.store.sharedEventBus.eventBus.dispatch(
+                        VirtualViewportEventType.OnEmptyViewportFrame,
+                        { viewport, direction: -1 },
+                    );
+                }
             }
         }
     }
@@ -138,7 +140,7 @@ export class ProcessManagerStore {
     }
 
     onLogout() {
-        this.destroyAllProcesses();
+        this.resetProcesses({ hardReset: true });
     }
 
     onChangeProcess(_process: ApplicationProcess) {
@@ -242,6 +244,12 @@ export class ProcessManagerStore {
         );
     }
 
+    closeProcess(appProcess: ApplicationProcess) {
+        if (appProcess.state.closable) {
+            this.killProcess(appProcess);
+        }
+    }
+
     killProcess(appProcess: ApplicationProcess) {
         const index = this.processes.indexOf(appProcess);
         appProcess.app.setExecuted(false);
@@ -263,14 +271,19 @@ export class ProcessManagerStore {
         return this.processes.find((item) => item.app.id === app.id);
     }
 
-    destroyAllProcesses() {
-        const processesCopy = [...this.processes];
+    resetProcesses(options?: { hardReset: boolean }) {
+        let processes;
+        if (!options?.hardReset) {
+            processes = this.processes.filter((item) => item.state.closable);
+        } else {
+            processes = this.processes;
+        }
+
+        const processesCopy = [...processes];
 
         processesCopy.forEach((item) => {
             this.killProcess(item);
         });
-
-        this.processes = [];
     }
 
     // TODO: Implement checkout exist process method

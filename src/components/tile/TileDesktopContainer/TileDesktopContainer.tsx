@@ -60,7 +60,7 @@ export const TileDesktopContainer = observer(
         };
 
         const handleClose = (process: ApplicationProcess) => {
-            store.processManager.killProcess(process);
+            store.processManager.closeProcess(process);
         };
 
         const handleDragStart = (tileWindow: IApplicationWindow) => {

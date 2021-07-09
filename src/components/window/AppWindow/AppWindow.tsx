@@ -169,12 +169,14 @@ export const AppWindow = (props: IAppWindowProps) => {
                             icon={props.process.app.icon}
                             disabled={isAppReady}
                         />
-                        <AppWindowContent
-                            process={props.process}
-                            window={props.window}
-                            url={props.url}
-                            onReady={() => handleAppReady()}
-                        />
+                        <div className={style.content}>
+                            <AppWindowContent
+                                process={props.process}
+                                window={props.window}
+                                url={props.url}
+                                onReady={() => handleAppReady()}
+                            />
+                        </div>
                         <AppWindowUnfocusedOverlay
                             visible={
                                 store.windowManager.hasDraggedWindow ||

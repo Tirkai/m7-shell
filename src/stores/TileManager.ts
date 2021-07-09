@@ -12,7 +12,6 @@ import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventTyp
 import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
-import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { TileWindowModel } from "models/window/TileWindowModel";
 import { registeredTileTemplates } from "registeredTilePresets";
 import { AppStore } from "stores/AppStore";
@@ -294,20 +293,18 @@ export class TileManager {
         preset: TilePreset,
         tileCell: TileCell,
     ) {
-        if (appWindow.type === ApplicationWindowType.Tile) {
-            if (preset.hasFreeCells) {
-                tileCell.setAttachedAppWindow(appWindow);
+        if (preset.hasFreeCells) {
+            tileCell.setAttachedAppWindow(appWindow);
 
-                appWindow.setArea(tileCell.area);
+            appWindow.setArea(tileCell.area);
 
-                this.store.sharedEventBus.eventBus.dispatch(
-                    TileEventType.OnAttachWindow,
-                    {
-                        appWindow,
-                        tileCell,
-                    },
-                );
-            }
+            this.store.sharedEventBus.eventBus.dispatch(
+                TileEventType.OnAttachWindow,
+                {
+                    appWindow,
+                    tileCell,
+                },
+            );
         }
     }
 

@@ -26,4 +26,6 @@ export interface IConfig {
     "notifications.enabled": boolean;
     "audioHub.enabled": boolean;
     "recovery.enabled": boolean;
+
+    "dashboard.enabled": boolean;
 }

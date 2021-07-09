@@ -5,6 +5,8 @@ import { Application } from "../app/Application";
 import { ExternalApplication } from "../app/ExternalApplication";
 import { VirtualViewportModel } from "../virtual/VirtualViewportModel";
 import { ApplicationWindow } from "../window/ApplicationWindow";
+import { ApplicationProcessDefaultState } from "./ApplicationProcessDefaultState";
+import { IApplicationProcessState } from "./IApplicationProcessState";
 
 interface IApplicationProcessOptions {
     app: Application;
@@ -14,6 +16,7 @@ interface IApplicationProcessOptions {
     params?: Map<string, string>;
     disableParams?: boolean;
     viewport?: VirtualViewportModel;
+    state?: IApplicationProcessState;
 }
 
 export class ApplicationProcess {
@@ -27,6 +30,7 @@ export class ApplicationProcess {
     hash: string;
     disableParams: boolean;
     isReady: boolean;
+    state: IApplicationProcessState;
 
     constructor(options: IApplicationProcessOptions) {
         makeAutoObservable(this);
@@ -40,6 +44,7 @@ export class ApplicationProcess {
         this.name = options.name ?? this.app.name;
         this.disableParams = options.disableParams ?? false;
         this.isReady = false;
+        this.state = options.state ?? new ApplicationProcessDefaultState();
 
         if (this.app instanceof ExternalApplication) {
             this.url = options.url ?? this.app.url;
