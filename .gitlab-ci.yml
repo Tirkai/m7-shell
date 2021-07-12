@@ -10,7 +10,7 @@ astra_16_build_npm:
     allow_failure: false
     script:
         - echo "Start building app"
-        - npm ci
+        - npm i --force
         - CI=false npm run build
         - echo "Build success"
     artifacts:
