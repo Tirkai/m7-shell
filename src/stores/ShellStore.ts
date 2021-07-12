@@ -4,14 +4,10 @@ import { ShellPanelType } from "enum/ShellPanelType";
 import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { action, makeAutoObservable, reaction } from "mobx";
 import { DefaultDisplayMode } from "models/DefaultDisplayMode";
-import { DevModeModel } from "models/DevModeModel";
 import { EmbedDisplayMode } from "models/EmbedDisplayMode";
-import moment from "moment";
 import { AppStore } from "./AppStore";
 
 export class ShellStore {
-    localStorageDevModeKey = "DEV_MODE";
-
     get appMenuShow() {
         return this.activePanel === ShellPanelType.StartMenu;
     }
@@ -24,7 +20,7 @@ export class ShellStore {
         return this.activePanel === ShellPanelType.AudioHub;
     }
 
-    enabledDevMode: boolean = process.env.NODE_ENV === "development";
+    enabledDevMode: boolean = false;
 
     activePanel: ShellPanelType = ShellPanelType.None;
 
@@ -72,16 +68,6 @@ export class ShellStore {
             }),
         );
 
-        const storagedDevMode = JSON.parse(
-            localStorage.getItem(this.localStorageDevModeKey) ?? "{}",
-        ) as DevModeModel;
-
-        if (storagedDevMode) {
-            if (moment(storagedDevMode.expire).diff(moment()) > 0) {
-                this.setDevMode(storagedDevMode.enabled);
-            }
-        }
-
         reaction(
             () => this.displayMode,
             (mode) => this.store.windowManager.onChangeDisplayMode(mode),
@@ -115,11 +101,6 @@ export class ShellStore {
 
     setDevMode(value: boolean) {
         this.enabledDevMode = value;
-
-        localStorage.setItem(
-            this.localStorageDevModeKey,
-            JSON.stringify(new DevModeModel(value, moment().add(1, "hour"))),
-        );
     }
 
     setDisplayMode(value: DisplayModeType) {
