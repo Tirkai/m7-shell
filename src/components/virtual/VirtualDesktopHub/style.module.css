@@ -1,0 +1,27 @@
+.virtualDesktopHub {
+    height: 100%;
+}
+
+.container {
+    /* display: grid; */
+    /* grid-template-rows: calc(100% - 230px) 230px; */
+    /* height: 100%;/ */
+    /* background: rgba(0, 0, 0, 0.5); */
+}
+
+.frames {
+    box-sizing: border-box;
+    width: 100vw;
+}
+
+.framesContainer {
+    background: #222;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 64px;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+}

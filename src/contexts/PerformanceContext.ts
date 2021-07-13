@@ -1,5 +1,5 @@
 import { IPerformanceMode } from "interfaces/performance/IPerformanceMode";
-import { DefaultPerformanceMode } from "models/DefaultPerformanceMode";
+import { DefaultPerformanceMode } from "models/performance/DefaultPerformanceMode";
 import React from "react";
 
 interface IPerformanceContextOptions {

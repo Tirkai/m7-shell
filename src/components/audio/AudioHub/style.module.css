@@ -1,6 +1,6 @@
 .audioHub {
     position: absolute;
-    bottom: 48px;
+    bottom: 0;
     right: 0;
     width: 300px;
     background-attachment: fixed;
@@ -14,9 +14,12 @@
 }
 
 .container {
-    background: #222222e9;
-    padding: 16px;
+    background: #222222;
     height: 100%;
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    grid-template-rows: 32px;
+    grid-gap: 12px;
 }
 
 .content {

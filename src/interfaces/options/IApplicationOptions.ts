@@ -1,4 +1,4 @@
-import { ApplicationPlace } from "enum/ApplicationPlace";
+import { ApplicationPlace } from "models/app/ApplicationPlace";
 
 export interface IApplicationOptions {
     id?: string;

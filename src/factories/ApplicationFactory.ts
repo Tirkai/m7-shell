@@ -1,7 +1,7 @@
 import { IAppParams } from "interfaces/app/IAppParams";
 import { INotificationAppRelationResponse } from "interfaces/response/INotificationAppRelationResponse";
 import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicationResponse";
-import { ExternalApplication } from "models/ExternalApplication";
+import { ExternalApplication } from "models/app/ExternalApplication";
 
 export class ApplicationFactory {
     static createExternalApplication(

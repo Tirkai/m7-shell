@@ -13,17 +13,15 @@ import { PanelInformerActions } from "components/informer/PanelInformerActions/P
 import { PanelInformerContent } from "components/informer/PanelInformerText/PanelInformerText";
 import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
 import { NOTIFICATION_APP_GUID } from "constants/config";
-import { PerformanceContext } from "contexts/PerformanceContext";
-import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { observer } from "mobx-react";
-import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
-import { ExternalApplication } from "models/ExternalApplication";
-import { NotificationGroupModel } from "models/NotificationGroupModel";
-import { NotificationModel } from "models/NotificationModel";
-import React, { useContext, useEffect, useState } from "react";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
+import { ExternalApplication } from "models/app/ExternalApplication";
+import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
+import { NotificationModel } from "models/notification/NotificationModel";
+import { ShellPanelType } from "models/panel/ShellPanelType";
+import React, { useEffect, useState } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import { NotificationClearDialogContainer } from "../NotificationClearDialogContainer/NotificationClearDialogContainer";
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
@@ -36,7 +34,6 @@ enum NotificationDeletionType {
 
 export const NotificationHub = observer(() => {
     const store = useStore();
-    const performanceMode = useContext(PerformanceContext);
     const [isScrolled, setScrolled] = useState(false);
 
     const [showClearGroupDialog, setShowClearGroupDialog] = useState<{
@@ -63,16 +60,16 @@ export const NotificationHub = observer(() => {
         store.notification.disconnectFromNotificationsSocket();
     };
 
-    useEffect(() => {
+    const onMount = () => {
         connectNotifications();
         return () => disconnectNotifications();
-    }, []);
+    };
 
-    useEffect(() => {
-        if (store.shell.activePanel !== ShellPanelType.NotificationHub) {
+    const onChangeActivePanel = () => {
+        if (store.panelManager.activePanel !== ShellPanelType.NotificationHub) {
             setShowClearGroupDialog({ isShow: false, group: null });
         }
-    }, [store.shell.activePanel]);
+    };
 
     const handleDeleteNotifications = (
         group: NotificationGroupModel | null,
@@ -156,24 +153,13 @@ export const NotificationHub = observer(() => {
         const app = store.applicationManager.findById(appId);
 
         if (app instanceof ExternalApplication && url.length) {
-            store.shell.setActivePanel(ShellPanelType.None);
+            store.panelManager.setActivePanel(ShellPanelType.None);
 
-            if (!app.isExecuted) {
-                const appProcess = new ApplicationProcess({
-                    app,
-                    window: new ApplicationWindow(),
-                    url,
-                });
-                store.processManager.execute(appProcess);
-            } else {
-                const activeProcess = store.processManager.findProcessByApp(
-                    app,
-                );
-                if (activeProcess) {
-                    activeProcess.setUrl(url);
-                    store.windowManager.focusWindow(activeProcess.window);
-                }
-            }
+            const runner = new ApplicationRunner(store);
+            runner.run(app, {
+                url,
+                focusWindowAfterInstantiate: true,
+            });
         } else {
             console.warn("Try run application with empty URL");
         }
@@ -183,25 +169,14 @@ export const NotificationHub = observer(() => {
         const notificationApp = store.applicationManager.findById(
             NOTIFICATION_APP_GUID,
         );
+
+        const runner = new ApplicationRunner(store);
+
         if (notificationApp) {
-            if (!notificationApp.isExecuted) {
-                const appProcess = new ApplicationProcess({
-                    app: notificationApp,
-                    window: new ApplicationWindow(),
-                    params: new Map([["filterByAppId", group.id]]),
-                });
-                store.processManager.execute(appProcess);
-            } else {
-                const activeProcess = store.processManager.findProcessByApp(
-                    notificationApp,
-                );
-                if (activeProcess) {
-                    activeProcess.setParams(
-                        new Map([["filterByAppId", group.id]]),
-                    );
-                    store.windowManager.focusWindow(activeProcess.window);
-                }
-            }
+            runner.run(notificationApp, {
+                params: new Map([["filterByAppId", group.id]]),
+                focusWindowAfterInstantiate: true,
+            });
         }
     };
 
@@ -288,10 +263,13 @@ export const NotificationHub = observer(() => {
         return null;
     };
 
+    useEffect(onMount, []);
+    useEffect(onChangeActivePanel, [store.panelManager.activePanel]);
+
     return (
         <div
             className={classNames(style.notificationHub, {
-                [style.show]: store.shell.notificationHubShow,
+                [style.show]: store.panelManager.notificationHubShow,
             })}
         >
             <div className={style.container}>
@@ -366,3 +344,5 @@ export const NotificationHub = observer(() => {
         </div>
     );
 });
+
+export default NotificationHub;

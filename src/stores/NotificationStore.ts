@@ -11,19 +11,19 @@ import {
     AUTH_TOKEN_HEADER,
     NOTIFICATIONS_WEBSOCKET_URL,
 } from "constants/config";
-import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
-import { ShellEvents } from "enum/ShellEvents";
 import { ApplicationFactory } from "factories/ApplicationFactory";
 import { NotificationFactory } from "factories/NotificationFactory";
 import { INotificationAppRelationResponse } from "interfaces/response/INotificationAppRelationResponse";
 import { INotificationCountResponse } from "interfaces/response/INotificationCountResponse";
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
 import { makeAutoObservable } from "mobx";
-import { AudioModel } from "models/AudioModel";
-import { ExternalApplication } from "models/ExternalApplication";
-import { NotificationGroupModel } from "models/NotificationGroupModel";
-import { NotificationModel } from "models/NotificationModel";
-import { ToastNotification } from "models/ToastNotification";
+import { ExternalApplication } from "models/app/ExternalApplication";
+import { AudioModel } from "models/audio/AudioModel";
+import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
+import { NotificationModel } from "models/notification/NotificationModel";
+import { NotificationServiceConnectStatus } from "models/notification/NotificationServiceConnectStatus";
+import { ToastNotification } from "models/notification/ToastNotification";
+import { ShellEvents } from "models/panel/ShellEvents";
 import io from "socket.io-client";
 import {
     notificationsAppsEndpoint,
@@ -74,7 +74,7 @@ export class NotificationStore {
         this.toasts = toasts;
     }
 
-    async loadCountByFilter(payload: object) {
+    async loadCountByFilter(payload: Record<string, unknown>) {
         try {
             const response = await Axios.post<IJsonRpcResponse<number>>(
                 notificationsEndpoint.url,
@@ -140,7 +140,7 @@ export class NotificationStore {
 
             if (notificationsResponse.result) {
                 const notifications = notificationsResponse.result.map((item) =>
-                    NotificationFactory.createNotification(item),
+                    NotificationFactory.createNotificationFromRawData(item),
                 );
 
                 group.setNotifications(notifications);
@@ -281,7 +281,7 @@ export class NotificationStore {
                         "add_notification",
                         (response: INotificationResponse) =>
                             this.addNotification(
-                                NotificationFactory.createNotification(
+                                NotificationFactory.createNotificationFromRawData(
                                     response,
                                 ),
                             ),

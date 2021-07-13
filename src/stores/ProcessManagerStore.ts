@@ -2,16 +2,20 @@ import {
     AppMessageType,
     EmitterMessage,
     invokeListeners,
+    ShellMessageType,
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios from "axios";
-import { AuthEventType } from "enum/AuthEventType";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { makeAutoObservable } from "mobx";
-import { Application } from "models/Application";
-import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
-import { ExternalApplication } from "models/ExternalApplication";
+import { Application } from "models/app/Application";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
+import { ExternalApplication } from "models/app/ExternalApplication";
+import { AuthEventType } from "models/auth/AuthEventType";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
+import { ProcessEventType } from "models/process/ProcessEventType";
+import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
 import { portalEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
@@ -21,41 +25,140 @@ export class ProcessManagerStore {
     private store: AppStore;
     constructor(store: AppStore) {
         this.store = store;
-
+        const { eventBus } = this.store.sharedEventBus;
         makeAutoObservable(this);
 
-        this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
-            this.killAllProcesses(),
+        eventBus.add(
+            VirtualViewportEventType.OnRemoveViewportFrame,
+            (viewport: VirtualViewportModel) =>
+                this.onRemoveViewportFrame(viewport),
         );
 
-        window.onmessage = (event: MessageEvent) => {
-            const message: EmitterMessage<unknown> = event.data;
-            let apps = [];
+        eventBus.add(
+            VirtualViewportEventType.OnClearViewportFrame,
+            (viewport: VirtualViewportModel) =>
+                this.onRemoveViewportFrame(viewport),
+        );
 
-            apps = this.store.applicationManager.applications.filter(
-                (item) => item.id === message.appId,
+        eventBus.add(
+            ProcessEventType.OnChangeProcess,
+            (process: ApplicationProcess) => this.onChangeProcess(process),
+        );
+
+        eventBus.add(AuthEventType.OnLogout, () => this.onLogout());
+
+        eventBus.add(
+            AuthEventType.OnRenewToken,
+            (payload: { token: string; login: string }) =>
+                this.onRecieveToken(payload),
+        );
+
+        eventBus.add(
+            ProcessEventType.OnKillProcess,
+            (process: ApplicationProcess) => this.onKillProcess(process),
+        );
+
+        this.bindOnMessageHandler();
+    }
+
+    onKillProcess(process: ApplicationProcess) {
+        const viewport = process.window.viewport;
+
+        if (viewport) {
+            const viewportProcesses = this.processes.filter(
+                (item) => item.window.viewport.id === viewport.id,
             );
 
-            // #region Backward compatibility m7-shell-emitter@0.6
-            // Todo: Remove after update all projects
-            if (!message.appId && message.source) {
-                apps = this.store.applicationManager.applications.filter(
-                    (item) =>
-                        item instanceof ExternalApplication && message.source
-                            ? item.url.indexOf(message.source) > -1
-                            : false,
-                );
+            if (
+                viewportProcesses.length <= 0 &&
+                viewport.displayMode?.enableTileAttach
+            ) {
+                if (viewport.state.closable) {
+                    this.store.sharedEventBus.eventBus.dispatch(
+                        VirtualViewportEventType.OnEmptyViewportFrame,
+                        { viewport, direction: -1 },
+                    );
+                }
             }
-            // #endregion
+        }
+    }
 
-            this.processes.forEach((appProccess) => {
-                invokeListeners(message, appProccess.emitter.listeners);
-                return;
-            });
+    bindOnMessageHandler() {
+        window.onmessage = (event: MessageEvent) => {
+            const message: EmitterMessage<unknown> = event.data;
+
+            if (message.type) {
+                // #region Backward compatibility
+                const matchMessageWithAppByUrlPart = (
+                    item: ApplicationProcess,
+                ) => {
+                    const app = item.app as ExternalApplication;
+                    return app.url && app.url.includes(message.source ?? "-1");
+                };
+                // #endregion
+
+                const findedProcess = this.processes.find(
+                    (item) =>
+                        item.app.id === message.appId ||
+                        // #region Required update m7-shell-emitter library in applications!
+                        // Its important
+                        // Remove this row after update
+                        matchMessageWithAppByUrlPart(item),
+                    // #endregion
+                );
+
+                if (findedProcess) {
+                    invokeListeners(message, findedProcess.emitter.listeners);
+                }
+            }
         };
     }
 
-    async execute(appProcess: ApplicationProcess) {
+    injectAuthTokenInProcess(
+        appProccess: ApplicationProcess,
+        token: string,
+        login: string,
+    ) {
+        try {
+            appProccess.emitter.emit(ShellMessageType.UpdateAuthToken, {
+                token,
+                login,
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    onRecieveToken(payload: { token: string; login: string }) {
+        this.processes.forEach((appProcess) =>
+            this.injectAuthTokenInProcess(
+                appProcess,
+                payload.token,
+                payload.login,
+            ),
+        );
+    }
+
+    onLogout() {
+        this.resetProcesses({ hardReset: true });
+    }
+
+    onChangeProcess(_process: ApplicationProcess) {
+        //
+    }
+
+    onRemoveViewportFrame(viewport: VirtualViewportModel) {
+        const findedProcesses = this.processes.filter(
+            (item) => item.window.viewport?.id === viewport.id,
+        );
+
+        findedProcesses.forEach((item) => this.killProcess(item));
+    }
+
+    async execute(
+        appProcess: ApplicationProcess,
+        options?: { noDispatch?: boolean },
+    ) {
         try {
             appProcess.app.setExecuted(true);
             const applicationParamsResponse = await Axios.post<
@@ -84,39 +187,23 @@ export class ProcessManagerStore {
                         ? this.store.applicationManager.findById(appId)
                         : this.store.applicationManager.findByUrlPart(url);
 
+                    const runner = new ApplicationRunner(this.store);
+
                     if (findedApp) {
-                        if (!findedApp.isExecuted) {
-                            const createdAppProcessInstance = new ApplicationProcess(
-                                {
-                                    app: findedApp,
-                                    window: new ApplicationWindow(),
-                                    url,
-                                },
-                            );
-                            this.execute(createdAppProcessInstance);
-                        } else {
-                            const activeProcess = this.findProcessByApp(
-                                findedApp,
-                            );
-                            if (activeProcess) {
-                                activeProcess.setUrl(url);
-                                this.store.windowManager.focusWindow(
-                                    activeProcess.window,
-                                );
-                            }
-                        }
+                        runner.run(findedApp, {
+                            url,
+                            focusWindowAfterInstantiate: true,
+                        });
                     } else {
                         const processUrl = new URL(url);
-                        const createdAppProcessInstance = new ApplicationProcess(
-                            {
-                                app: new ExternalApplication({
-                                    name: processUrl.host,
-                                    url,
-                                }),
-                                window: new ApplicationWindow(),
-                            },
+
+                        runner.run(
+                            new ExternalApplication({
+                                name: processUrl.host,
+                                url,
+                            }),
+                            { focusWindowAfterInstantiate: true },
                         );
-                        this.execute(createdAppProcessInstance);
                     }
                 },
             );
@@ -127,37 +214,76 @@ export class ProcessManagerStore {
                 }),
             );
 
-            this.startProcess(appProcess);
+            this.startProcess(appProcess, options);
         } catch (e) {
-            this.store.message.showMessage("[ph] Execute failed", "[ph]");
+            console.error(e);
             appProcess.app.setExecuted(false);
         }
     }
 
-    startProcess(appProcess: ApplicationProcess) {
+    startProcess(
+        appProcess: ApplicationProcess,
+        options?: { noDispatch?: boolean },
+    ) {
         this.processes.push(appProcess);
 
         appProcess.app.setExecuted(true);
 
-        this.store.windowManager.addWindow(appProcess.window);
+        if (options?.noDispatch) {
+            return;
+        }
+
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.OnInstantiateProcess,
+            appProcess,
+        );
+
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.OnChangeProcess,
+            appProcess,
+        );
+    }
+
+    closeProcess(appProcess: ApplicationProcess) {
+        if (appProcess.state.closable) {
+            this.killProcess(appProcess);
+        }
     }
 
     killProcess(appProcess: ApplicationProcess) {
         const index = this.processes.indexOf(appProcess);
-
         appProcess.app.setExecuted(false);
 
-        this.store.windowManager.closeWindow(appProcess.window);
-
         this.processes.splice(index, 1);
+
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.OnKillProcess,
+            appProcess,
+        );
+
+        this.store.sharedEventBus.eventBus.dispatch<ApplicationProcess>(
+            ProcessEventType.OnChangeProcess,
+            appProcess,
+        );
     }
 
     findProcessByApp(app: Application) {
         return this.processes.find((item) => item.app.id === app.id);
     }
 
-    killAllProcesses() {
-        this.processes = [];
+    resetProcesses(options?: { hardReset: boolean }) {
+        let processes;
+        if (!options?.hardReset) {
+            processes = this.processes.filter((item) => item.state.closable);
+        } else {
+            processes = this.processes;
+        }
+
+        const processesCopy = [...processes];
+
+        processesCopy.forEach((item) => {
+            this.killProcess(item);
+        });
     }
 
     // TODO: Implement checkout exist process method

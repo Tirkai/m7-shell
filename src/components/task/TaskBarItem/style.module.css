@@ -47,15 +47,16 @@
     background: #096dd9;
     font-size: 12px;
     z-index: 1;
+    pointer-events: none;
 }
 
-.content {
+/* .content {
     display: flex;
     align-items: center;
     justify-content: center;
     min-width: 48px;
     min-height: 48px;
-}
+} */
 
 .smallBadge {
     font-size: 8px;

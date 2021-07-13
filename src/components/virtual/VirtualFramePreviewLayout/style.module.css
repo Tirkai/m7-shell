@@ -1,0 +1,13 @@
+.virtualFramePreviewLayout {
+    display: grid;
+    grid-template-rows: 48px 1fr;
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
+
+.header {
+}
+
+.content {
+}

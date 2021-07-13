@@ -1,214 +1,165 @@
-import { SVGIcon } from "@algont/m7-ui";
-import { apps, cross } from "assets/icons";
 import classNames from "classnames";
-import { BackdropWrapper } from "components/layout/BackdropWrapper/BackdropWrapper";
-import { NotificationTaskbarItem } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
-import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
-import { ShellPanelType } from "enum/ShellPanelType";
-import { IStore } from "interfaces/common/IStore";
+import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
+import { TaskBarNotificationButton } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
+import { useStore } from "hooks/useStore";
 import { strings } from "locale";
-import { computed, reaction } from "mobx";
-import { inject, observer } from "mobx-react";
-import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
-import { ContextMenuItemModel } from "models/ContextMenuItemModel";
-import React, { Component } from "react";
+import { observer } from "mobx-react";
+import { NotificationServiceConnectStatus } from "models/notification/NotificationServiceConnectStatus";
+import { ShellPanelType } from "models/panel/ShellPanelType";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
+import hash from "object-hash";
+import React from "react";
+import { TaskBarAppsMenuButton } from "../TaskBarAppsMenuButton/TaskBarAppsMenuButton";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
-import { TaskBarSound } from "../TaskBarSound/TaskBarSound";
-import { TaskHint } from "../TaskHint/TaskHint";
+import { TaskBarSoundButton } from "../TaskBarSoundButton/TaskBarSoundButton";
+import { TaskBarViewportButton } from "../TaskBarViewportButton/TaskBarViewportButton";
+import { TaskList } from "../TaskList/TaskList";
 import style from "./style.module.css";
 
-@inject("store")
-@observer
-export class TaskBar extends Component<IStore> {
-    @computed
-    get store() {
-        return this.props.store!;
-    }
+export const TaskBar = observer(() => {
+    const store = useStore();
 
-    state = {
-        isShow: false,
-    };
-
-    handleShowAppsMenu = (value: boolean) => {
-        if (this.store.applicationManager.applications.length) {
-            this.store.shell.setActivePanel(
+    const handleShowAppsMenu = (value: boolean) => {
+        if (store.applicationManager.applications.length) {
+            store.panelManager.setActivePanel(
                 value ? ShellPanelType.StartMenu : ShellPanelType.None,
             );
         } else {
-            this.store.message.showMessage(
+            store.message.showMessage(
                 strings.error.noAvailableApplications,
                 strings.error.failedGetAvailableApplications,
             );
         }
     };
 
-    handleFocusAppWindow = (appWindow: ApplicationWindow) => {
-        this.store.windowManager.focusWindow(appWindow);
-        if (appWindow.isCollapsed) {
-            this.store.windowManager.expandWindow(appWindow);
+    const handleFocusAppWindow = (appWindow: ApplicationWindow) => {
+        store.windowManager.focusWindow(appWindow);
+        if (appWindow instanceof ApplicationWindow) {
+            if (appWindow.isCollapsed) {
+                store.windowManager.expandWindow(appWindow);
+            }
         }
     };
 
-    handleShowNotificationHub = (value: boolean) => {
-        this.store.shell.setActivePanel(
+    const handleShowNotificationHub = (value: boolean) => {
+        store.panelManager.setActivePanel(
             value ? ShellPanelType.NotificationHub : ShellPanelType.None,
         );
     };
 
-    handleShowAudioHub = (value: boolean) => {
-        this.store.shell.setActivePanel(
-            value ? ShellPanelType.AudioHub : ShellPanelType.None,
+    const handleShowAudioHub = () => {
+        store.panelManager.setActivePanel(
+            store.panelManager.activePanel !== ShellPanelType.AudioHub
+                ? ShellPanelType.AudioHub
+                : ShellPanelType.None,
         );
     };
 
-    handleKillProcess = (appProcess: ApplicationProcess) => {
-        this.store.processManager.killProcess(appProcess);
+    const handleKillProcess = (appProcess: ApplicationProcess) => {
+        store.processManager.closeProcess(appProcess);
     };
 
-    handleShowNetworkTroubleMessage = () => {
-        this.store.message.showMessage("[ph] Network trouble", "[ph]");
-    };
-
-    handleShowDesktopLayoutConfig = () => {
-        this.store.desktop.setEditMode(!this.store.desktop.isEditMode);
-    };
-
-    componentDidMount() {
-        this.setState({
-            isShow: this.store.shell.displayMode.taskbarVisible,
-        });
-
-        reaction(
-            () => this.store.shell.displayMode,
-            () => {
-                this.setState({
-                    isShow: this.store.shell.displayMode.taskbarVisible,
-                });
-            },
+    const handleShowVirtualHub = () => {
+        store.panelManager.setActivePanel(
+            store.panelManager.activePanel !== ShellPanelType.Virtual
+                ? ShellPanelType.Virtual
+                : ShellPanelType.None,
         );
-    }
+    };
 
-    createCloseApplicationContextMenuItem = (appProcess: ApplicationProcess) =>
-        new ContextMenuItemModel({
-            icon: cross,
-            content: strings.application.actions.close,
-            onClick: () => this.handleKillProcess(appProcess),
-        });
+    const { config } = store.config;
 
-    render() {
-        return (
-            <>
-                <div
-                    className={classNames(style.taskBar, {
-                        [style.show]: this.state.isShow,
-                    })}
-                >
-                    <BackdropWrapper active>
-                        <div className={style.container}>
-                            <div className={style.tasks}>
-                                <TaskBarItem
-                                    onClick={() =>
-                                        this.handleShowAppsMenu(
-                                            !this.props.store?.shell
-                                                .appMenuShow,
-                                        )
-                                    }
-                                >
-                                    <SVGIcon source={apps} color="white" />
-                                </TaskBarItem>
-                                {this.store.processManager.processes.map(
-                                    (appProcess) => (
-                                        <TaskBarItem
-                                            key={appProcess.id}
-                                            executed
-                                            hint={
-                                                <TaskHint
-                                                    title={appProcess.name}
-                                                />
-                                            }
-                                            focused={
-                                                appProcess.window.isFocused
-                                            }
-                                            onClick={() =>
-                                                this.handleFocusAppWindow(
-                                                    appProcess.window,
-                                                )
-                                            }
-                                            menu={[
-                                                this.createCloseApplicationContextMenuItem(
-                                                    appProcess,
-                                                ),
-                                            ]}
-                                        >
-                                            <SVGIcon
-                                                source={appProcess.app.icon}
-                                                color="white"
-                                            />
-                                        </TaskBarItem>
-                                    ),
-                                )}
-                            </div>
+    const processesHash = hash(
+        store.processManager.processes.map((item) => item.id),
+    );
+    const viewportsHash = hash(
+        store.virtualViewport.viewports.map((item) => item.id),
+    );
 
-                            <div className={style.actions}>
-                                {/* TODO: Secret feature
-                                <TaskBarItem
-                                    onClick={() =>
-                                        this.handleShowDesktopLayoutConfig()
-                                    }
-                                >
-                                    <SVGIcon source={layout} color="white" />
-                                </TaskBarItem> */}
-                                <TaskBarItem
-                                    onClick={() =>
-                                        this.handleShowAudioHub(
-                                            !this.store.shell.audioHubShow,
-                                        )
-                                    }
-                                >
-                                    <TaskBarSound
-                                        volume={this.store.audio.volume}
-                                        isMuted={this.store.audio.isMute}
-                                    />
-                                </TaskBarItem>
-                                <TaskBarItem autoWidth>
-                                    <TaskBarDateTime />
-                                </TaskBarItem>
-
-                                <TaskBarItem
-                                    badge={
-                                        this.store.notification.status ===
-                                        NotificationServiceConnectStatus.Connected
-                                            ? this.store.notification
-                                                  .totalCount > 0
-                                                ? this.store.notification.totalCount.toString()
-                                                : undefined
-                                            : undefined
-                                    }
-                                    onClick={() =>
-                                        this.handleShowNotificationHub(
-                                            !this.store.shell
-                                                .notificationHubShow,
-                                        )
-                                    }
-                                >
-                                    <NotificationTaskbarItem
-                                        status={this.store.notification.status}
-                                        exist={
-                                            this.store.notification.status ===
-                                            NotificationServiceConnectStatus.Connected
-                                                ? this.store.notification
-                                                      .isExistNotifications
-                                                : false
-                                        }
-                                    />
-                                </TaskBarItem>
-                            </div>
-                        </div>
-                    </BackdropWrapper>
+    return (
+        <div className={classNames(style.taskBar)}>
+            <div className={style.container}>
+                <div className={style.controls}>
+                    <ConfigCondition condition={config["appsMenu.enabled"]}>
+                        <TaskBarItem>
+                            <TaskBarAppsMenuButton
+                                onClick={() =>
+                                    handleShowAppsMenu(
+                                        !store.panelManager.appMenuShow,
+                                    )
+                                }
+                            />
+                        </TaskBarItem>
+                    </ConfigCondition>
+                    <ConfigCondition condition={config["viewportHub.enabled"]}>
+                        <TaskBarItem>
+                            <TaskBarViewportButton
+                                onClick={handleShowVirtualHub}
+                            />
+                        </TaskBarItem>
+                    </ConfigCondition>
                 </div>
-            </>
-        );
-    }
-}
+                <div className={style.tasks}>
+                    <TaskList
+                        processes={store.processManager.processes}
+                        processesHash={processesHash}
+                        viewports={store.virtualViewport.viewports}
+                        viewportsHash={viewportsHash}
+                        currentViewport={store.virtualViewport.currentViewport}
+                        onFocus={(appWindow) => handleFocusAppWindow(appWindow)}
+                        onKillProcess={(appProcess) =>
+                            handleKillProcess(appProcess)
+                        }
+                    />
+                </div>
+
+                <div className={style.actions}>
+                    <ConfigCondition condition={config["audioHub.enabled"]}>
+                        <TaskBarItem>
+                            <TaskBarSoundButton
+                                onClick={handleShowAudioHub}
+                                volume={store.audio.volume}
+                                isMuted={store.audio.isMute}
+                            />
+                        </TaskBarItem>
+                    </ConfigCondition>
+                    <TaskBarItem autoWidth>
+                        <TaskBarDateTime />
+                    </TaskBarItem>
+                    <ConfigCondition
+                        condition={config["notifications.enabled"]}
+                    >
+                        <TaskBarItem
+                            badge={
+                                store.notification.status ===
+                                NotificationServiceConnectStatus.Connected
+                                    ? store.notification.totalCount > 0
+                                        ? store.notification.totalCount.toString()
+                                        : undefined
+                                    : undefined
+                            }
+                        >
+                            <TaskBarNotificationButton
+                                status={store.notification.status}
+                                exist={
+                                    store.notification.status ===
+                                    NotificationServiceConnectStatus.Connected
+                                        ? store.notification
+                                              .isExistNotifications
+                                        : false
+                                }
+                                onClick={() =>
+                                    handleShowNotificationHub(
+                                        !store.panelManager.notificationHubShow,
+                                    )
+                                }
+                            />
+                        </TaskBarItem>
+                    </ConfigCondition>
+                </div>
+            </div>
+        </div>
+    );
+});

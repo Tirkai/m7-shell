@@ -1,21 +1,20 @@
-import { AppMessageType, ShellMessageType } from "@algont/m7-shell-emitter";
+import { MarkerType, useMarker } from "@algont/m7-react-marker";
 import classNames from "classnames";
+import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { useStore } from "hooks/useStore";
-import { IStore } from "interfaces/common/IStore";
-import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
-import { ExternalApplication } from "models/ExternalApplication";
-import { ShellApplication } from "models/ShellApplication";
-import React, { useEffect, useMemo, useState } from "react";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
+import React, { useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import { Resizable, ResizeCallbackData, ResizeHandle } from "react-resizable";
 import AppLoader from "../AppLoader/AppLoader";
+import { AppWindowContent } from "../AppWindowContent/AppWindowContent";
 import { AppWindowHeader } from "../AppWindowHeader/AppWindowHeader";
 import { AppWindowUnfocusedOverlay } from "../AppWindowUnfocusedOverlay/AppWindowUnfocusedOverlay";
 import style from "./style.module.css";
 
-interface IAppWindowProps extends IStore {
+interface IAppWindowProps {
     process: ApplicationProcess;
     window: ApplicationWindow;
     width: number;
@@ -24,8 +23,6 @@ interface IAppWindowProps extends IStore {
     isDragging: boolean;
     isFocused: boolean;
     url: string;
-    x: number;
-    y: number;
     onResizeStart: (event: MouseEvent, data: ResizeCallbackData) => void;
     onResizeStop: () => void;
     onResize: (event: MouseEvent, data: ResizeCallbackData) => void;
@@ -38,8 +35,8 @@ interface IAppWindowProps extends IStore {
 export const AppWindow = (props: IAppWindowProps) => {
     const store = useStore();
     const [isAppReady, setAppReady] = useState(false);
-    const [frame, setFrame] = useState<HTMLIFrameElement | null>(null);
-    const [url, setUrl] = useState(props.process.modifiedUrl);
+
+    const { createMemoizedMarker } = useMarker();
 
     const handleResizeStart = (
         event: React.SyntheticEvent,
@@ -52,42 +49,11 @@ export const AppWindow = (props: IAppWindowProps) => {
         props.onResizeStop();
     };
 
-    const handleFrameLoaded = (frameRef: HTMLIFrameElement) => {
-        const context = frameRef?.contentWindow;
-        if (context) {
-            setFrame(frameRef);
-
-            if (!isAppReady) {
-                handleBindingEmitterEvents(props.process);
-            }
-
-            props.process.setEmitterContext(context);
-            handleAppReady();
-        }
-    };
-
-    const handleBindingEmitterEvents = (appProcess: ApplicationProcess) => {
-        appProcess.emitter.on(AppMessageType.Connected, () => {
-            handleAppReady();
-
-            store.auth.injectAuthTokenInProcess(appProcess);
-        });
-
-        appProcess.emitter.on(AppMessageType.ForceRecieveToken, () =>
-            store.auth.injectAuthTokenInProcess(appProcess),
-        );
-    };
-
-    const handleAppReady = () => {
-        setAppReady(true);
-    };
-
     const handleResize = (
         event: React.SyntheticEvent,
         eventData: ResizeCallbackData,
     ) => {
         const data = eventData;
-        const nativeEvent = (event as unknown) as MouseEvent;
 
         props.onResize((event as unknown) as MouseEvent, data);
     };
@@ -97,57 +63,25 @@ export const AppWindow = (props: IAppWindowProps) => {
     };
 
     const handleFullScreen = () => {
-        props.window.setFullScreen(!props.window.isFullScreen);
+        store.windowManager.applyFullscreenToWindow(
+            props.window,
+            !props.window.isFullScreen,
+        );
     };
 
     const handleCollapse = () => {
-        props.window.setCollapsed(true);
+        store.windowManager.applyCollapseToWindow(props.window, true);
     };
 
-    const handleHeaderDoubleClick = () => {
-        const appWindow = props.window;
-        appWindow.setFullScreen(!appWindow.isFullScreen);
-    };
+    const handleHeaderDoubleClick = () => handleFullScreen();
 
     const handleReload = () => {
-        props.process.emitter.emit(ShellMessageType.ReloadPage, {});
-
-        // const iFrame = (frame as unknown) as HTMLIFrameElement;
-        // if (iFrame) {
-        //     iFrame.setAttribute("src", iFrame.getAttribute("src") ?? "");
-        // }
+        props.process.rerollHash();
     };
 
-    useEffect(() => {
-        setUrl(props.process.modifiedUrl);
-    }, [props.process.modifiedUrl]);
-
-    const appComponent = useMemo(() => {
-        if (props.process.app instanceof ExternalApplication) {
-            return (
-                <iframe
-                    onLoad={handleAppReady}
-                    src={props.url}
-                    ref={handleFrameLoaded}
-                    title={props.process.name}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        pointerEvents:
-                            props.isResizing || props.isDragging
-                                ? "none"
-                                : "all",
-                    }}
-                    frameBorder={0}
-                ></iframe>
-            );
-        }
-        if (props.process.app instanceof ShellApplication) {
-            handleAppReady();
-            return props.process.app.Component;
-        }
-        return <div>Unknown component</div>;
-    }, [props.process.modifiedUrl]);
+    const handleAppReady = () => {
+        setAppReady(true);
+    };
 
     const resizeDirections = ["sw", "se", "nw", "ne", "w", "e", "n", "s"];
 
@@ -160,6 +94,8 @@ export const AppWindow = (props: IAppWindowProps) => {
         window.innerWidth - props.width * boundsVisibilityPercentModifier;
     const bottomBound =
         window.innerHeight - props.height * boundsVisibilityPercentModifier;
+
+    const { config } = store.config;
 
     return (
         <Draggable
@@ -180,9 +116,11 @@ export const AppWindow = (props: IAppWindowProps) => {
             }}
         >
             <div
-                className={classNames(style.appWindow, {
+                className={classNames(style.appWindow, "appWindow", {
                     [style.collapsed]: props.window.isCollapsed,
                 })}
+                {...createMemoizedMarker(MarkerType.Element, "AppWindow")}
+                {...createMemoizedMarker(MarkerType.Id, props.process.app.id)}
                 style={{
                     zIndex: props.window.depthIndex,
                     width: !props.window.isFullScreen
@@ -206,42 +144,38 @@ export const AppWindow = (props: IAppWindowProps) => {
                     <div
                         className={classNames(style.windowContainer)}
                         onMouseDown={handleFocus}
-                        // style={{
-                        //     width: !props.window.isFullScreen
-                        //         ? props.window.width
-                        //         : "100%",
-                        //     height: !props.window.isFullScreen
-                        //         ? props.window.height
-                        //         : "100%",
-                        // }}
                     >
-                        <AppWindowHeader
-                            icon={props.process.app.icon}
-                            title={props.process.name}
-                            isFocused={props.isFocused}
-                            onClose={props.onClose}
-                            onDoubleClick={handleHeaderDoubleClick}
-                            hasBackward={false}
-                            hasReload={true}
-                            onBackward={() => true}
-                            onReload={handleReload}
-                            onCollapse={() => handleCollapse()}
-                            onFullscreen={() => handleFullScreen()}
-                            visible={
-                                store.shell.displayMode.showAppWindowHeader
+                        <ConfigCondition
+                            condition={
+                                config["windows.singleWindow.header.enabled"]
                             }
-                        />
+                        >
+                            <AppWindowHeader
+                                icon={props.process.app.icon}
+                                title={props.process.name}
+                                isFocused={props.isFocused}
+                                onClose={props.onClose}
+                                onDoubleClick={handleHeaderDoubleClick}
+                                hasBackward={false}
+                                hasReload={true}
+                                onBackward={() => true}
+                                onReload={() => handleReload()}
+                                onCollapse={() => handleCollapse()}
+                                onFullscreen={() => handleFullScreen()}
+                            />
+                        </ConfigCondition>
+
                         <AppLoader
                             icon={props.process.app.icon}
                             disabled={isAppReady}
                         />
-                        <div
-                            className={classNames(style.content, {
-                                [style.withHeader]:
-                                    store.shell.displayMode.showAppWindowHeader,
-                            })}
-                        >
-                            {appComponent}
+                        <div className={style.content}>
+                            <AppWindowContent
+                                process={props.process}
+                                window={props.window}
+                                url={props.url}
+                                onReady={() => handleAppReady()}
+                            />
                         </div>
                         <AppWindowUnfocusedOverlay
                             visible={

@@ -1,0 +1,19 @@
+.displayModeChooseItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    color: white;
+    border-radius: 4px;
+    background: #444;
+    cursor: pointer;
+    width: 100%;
+    height: 32px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.active {
+    background: #00519c;
+}

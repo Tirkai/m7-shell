@@ -1,18 +1,52 @@
+import { isEmpty } from "lodash";
 import { makeAutoObservable } from "mobx";
-import { AudioModel } from "models/AudioModel";
+import { AudioModel } from "models/audio/AudioModel";
+import { AuthEventType } from "models/auth/AuthEventType";
+import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
 import { AppStore } from "stores/AppStore";
+
+interface IStoragedAudioData {
+    [UserDatabasePropKey.Audio]: {
+        volume: number;
+        isMute: boolean;
+    };
+}
+
 export class AudioStore {
     private store: AppStore;
-    private localStorageVolumeKey = "VOLUME";
-    private localStorageMuteKey = "MUTE";
 
     constructor(store: AppStore) {
         this.store = store;
 
+        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () =>
+            this.onLogout(),
+        );
+
+        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogin, () =>
+            this.onLogin(),
+        );
+
         makeAutoObservable(this);
     }
 
-    audioPlayer: HTMLAudioElement | null = null;
+    onLogin() {
+        this.store.userDatabase
+            .load<IStoragedAudioData>([UserDatabasePropKey.Audio])
+            .then(({ result }) => {
+                if (result && !isEmpty(result)) {
+                    const data = result[UserDatabasePropKey.Audio];
+                    this.setVolume(data.volume);
+                    this.setMute(data.isMute);
+                }
+            });
+    }
+
+    onLogout() {
+        this.setVolume(1);
+        this.setMute(false);
+    }
+
+    audioPlayer: HTMLAudioElement = new Audio();
 
     queue: AudioModel[] = [];
 
@@ -29,24 +63,6 @@ export class AudioStore {
             if (audio) {
                 this.audioPlayer = audio;
                 this.audioPlayer.onended = () => this.rewindQueue();
-
-                const volume = parseFloat(
-                    localStorage.getItem(this.localStorageVolumeKey) ?? "1",
-                );
-
-                const mute = parseInt(
-                    localStorage.getItem(this.localStorageMuteKey) ?? "0",
-                );
-
-                if (!isNaN(volume)) {
-                    this.setVolume(volume);
-                }
-
-                if (!isNaN(mute)) {
-                    this.setMute(!!mute);
-                }
-            } else {
-                this.audioPlayer = null;
             }
         } catch (e) {
             console.error(e);
@@ -99,14 +115,21 @@ export class AudioStore {
             }
 
             this.setMute(this.volume <= 0);
-
-            localStorage.setItem(
-                this.localStorageVolumeKey,
-                this.volume.toString(),
-            );
         } catch (e) {
             console.error(e);
         }
+    }
+
+    saveUserAudio() {
+        this.store.userDatabase.save([
+            {
+                name: UserDatabasePropKey.Audio,
+                value: {
+                    volume: this.volume,
+                    isMute: this.isMute,
+                },
+            },
+        ]);
     }
 
     setMute(value: boolean) {
@@ -116,13 +139,6 @@ export class AudioStore {
             if (this.volume <= 0) {
                 this.volume = 0.01;
             }
-
-            const localStorageSavedValue = (this.isMute ? 1 : 0).toString();
-
-            localStorage.setItem(
-                this.localStorageMuteKey,
-                localStorageSavedValue,
-            );
         } catch (e) {
             console.error(e);
         }

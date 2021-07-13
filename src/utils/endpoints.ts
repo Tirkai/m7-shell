@@ -24,3 +24,7 @@ export const notificationsEndpoint = new JsonRpcEndpoint(
 export const notificationsAppsEndpoint = new JsonRpcEndpoint(
     `http://notifications.${UPPER_LEVEL_DOMAIN}/jsonrpc/apps/v1`,
 );
+
+export const userDataEndpoint = new JsonRpcEndpoint(
+    `http://user-data.${UPPER_LEVEL_DOMAIN}/jsonrpc/user-data`,
+);

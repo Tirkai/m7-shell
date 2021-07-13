@@ -7,9 +7,11 @@ import dotsMenu from "./dots-menu.svg";
 import empty from "./empty.svg";
 import error from "./error.svg";
 import exit from "./exit.svg";
+import floatWindowMode from "./float-window-mode.svg";
 import fullscreen from "./fullscreen.svg";
 import layout from "./layout.svg";
 import listMenu from "./list-menu.svg";
+import list from "./list.svg";
 import mute from "./mute.svg";
 import notificationsNone from "./notifications-none.svg";
 import notifications from "./notifications.svg";
@@ -21,8 +23,10 @@ import soundLow from "./sound-low.svg";
 import soundMiddle from "./sound-middle.svg";
 import sound from "./sound.svg";
 import terminal from "./terminal.svg";
+import tiles from "./tiles.svg";
 import unknownApp from "./unknown.svg";
 import videocam from "./video.svg";
+import virtual from "./virtual.svg";
 import warning from "./warning.svg";
 
 export {
@@ -52,4 +56,8 @@ export {
     search,
     disconnect,
     layout,
+    tiles,
+    virtual,
+    floatWindowMode,
+    list,
 };

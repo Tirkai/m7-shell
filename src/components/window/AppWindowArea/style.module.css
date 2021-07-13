@@ -3,7 +3,12 @@
     width: 100%;
     top: 0;
     left: 0;
-    height: calc(100% - 48px);
+    height: 100%;
+    pointer-events: none;
+}
+
+.appWindowArea > * {
+    pointer-events: all;
 }
 
 .disabled {

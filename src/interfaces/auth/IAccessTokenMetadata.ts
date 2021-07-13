@@ -1,4 +1,4 @@
-import { RoleType } from "enum/RoleType";
+import { RoleType } from "models/role/RoleType";
 
 export interface IAccessTokenMetadata {
     roles: RoleType[];

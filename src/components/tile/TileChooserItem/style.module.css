@@ -1,0 +1,27 @@
+.tileChooserItem {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.container {
+    display: grid;
+    grid-gap: 4px;
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+}
+
+.gridItem {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 2px;
+}
+
+.active {
+    background: #00519c;
+}

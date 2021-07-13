@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
-import { ContextMenuItemModel } from "models/ContextMenuItemModel";
-import { Point2D } from "models/Point2D";
+import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
+import { Point2D } from "models/shape/Point2D";
 import { AppStore } from "stores/AppStore";
 
 const ITEM_HEIGHT = 40;

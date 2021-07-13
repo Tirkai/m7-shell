@@ -1,0 +1,5 @@
+.appWindowContent {
+    display: block;
+    height: 100%;
+    grid-row: span 2;
+}
