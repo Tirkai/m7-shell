@@ -4,7 +4,7 @@
     "private": true,
     "dependencies": {
         "@algont/m7-react-marker": "^0.1.1",
-        "@algont/m7-shell-emitter": "^0.9.0",
+        "@algont/m7-shell-emitter": "^0.10.0",
         "@algont/m7-ui": "^0.11.12",
         "@algont/m7-utils": "^0.4.2",
         "@date-io/moment": "1.3.13",

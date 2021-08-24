@@ -1,3 +1,8 @@
+.appsMenuSearch {
+    position: relative;
+    width: 100%;
+}
+
 .input {
     height: 40px;
     width: 100%;
@@ -10,4 +15,31 @@
 }
 .input:focus {
     outline: none;
+}
+
+.actions {
+    top: 0;
+    right: 0;
+    position: absolute;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    padding: 0 8px;
+    pointer-events: none;
+    opacity: 0;
+    transition: ease 0.3s;
+}
+
+.isVisible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.icon {
+    color: rgba(255, 255, 255, 0.4);
+    transition: ease 0.3s;
+}
+
+.icon:hover {
+    color: rgba(255, 255, 255, 1);
 }

@@ -2,6 +2,7 @@ import { max, min } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
+import { InterceptEventType } from "models/intercept/InterceptEventType";
 import { PanelEventType } from "models/panel/PanelEventType";
 import { ShellEvents } from "models/panel/ShellEvents";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
@@ -60,6 +61,11 @@ export class WindowManagerStore {
         );
 
         eventBus.add(AuthEventType.OnLogout, () => this.closeAllWindows());
+
+        eventBus.add(
+            InterceptEventType.OnInterceptClick,
+            (process: ApplicationProcess) => this.focusWindow(process.window),
+        );
     }
 
     focusedWindow: ApplicationWindow | null = null;

@@ -12,6 +12,7 @@ import { Application } from "models/app/Application";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/app/ExternalApplication";
 import { AuthEventType } from "models/auth/AuthEventType";
+import { InterceptEventType } from "models/intercept/InterceptEventType";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
@@ -180,33 +181,21 @@ export class ProcessManagerStore {
 
             appProcess.emitter.on(
                 AppMessageType.CreateWindowInstance,
-                (payload: { url: string; appId: string }) => {
-                    const { url, appId } = payload;
-
-                    const findedApp = appId
-                        ? this.store.applicationManager.findById(appId)
-                        : this.store.applicationManager.findByUrlPart(url);
-
-                    const runner = new ApplicationRunner(this.store);
-
-                    if (findedApp) {
-                        runner.run(findedApp, {
-                            url,
-                            focusWindowAfterInstantiate: true,
-                        });
-                    } else {
-                        const processUrl = new URL(url);
-
-                        runner.run(
-                            new ExternalApplication({
-                                name: processUrl.host,
-                                url,
-                            }),
-                            { focusWindowAfterInstantiate: true },
-                        );
-                    }
-                },
+                (payload: { url: string; appId: string }) =>
+                    this.onCreateWindowInstance(payload),
             );
+
+            appProcess.emitter.on(
+                AppMessageType.EnableNativeEventInterception,
+                () => this.onEnableNativeEventInterception(appProcess),
+            );
+
+            appProcess.emitter.on(
+                AppMessageType.HistoryLocationChange,
+                (payload: { url: string }) =>
+                    this.onHistoryLocationChange(appProcess, payload.url),
+            );
+
             Axios.post<IJsonRpcResponse>(
                 portalEndpoint.url,
                 new JsonRpcPayload("menuClick", {
@@ -219,6 +208,56 @@ export class ProcessManagerStore {
             console.error(e);
             appProcess.app.setExecuted(false);
         }
+    }
+
+    onCreateWindowInstance(payload: { url: string; appId: string }) {
+        const { url, appId } = payload;
+
+        const findedApp = appId
+            ? this.store.applicationManager.findById(appId)
+            : this.store.applicationManager.findByUrlPart(url);
+
+        const runner = new ApplicationRunner(this.store);
+
+        if (findedApp) {
+            runner.run(findedApp, {
+                url,
+                focusWindowAfterInstantiate: true,
+            });
+        } else {
+            const processUrl = new URL(url);
+
+            runner.run(
+                new ExternalApplication({
+                    name: processUrl.host,
+                    url,
+                }),
+                { focusWindowAfterInstantiate: true },
+            );
+        }
+    }
+
+    onEnableNativeEventInterception(process: ApplicationProcess) {
+        process.setAutoFocusSupport(true);
+
+        process.emitter.on(AppMessageType.InterceptClick, async () =>
+            this.store.sharedEventBus.eventBus.dispatch(
+                InterceptEventType.OnInterceptClick,
+                process,
+            ),
+        );
+
+        process.emitter.on(AppMessageType.InterceptKeyPress, async () =>
+            this.store.sharedEventBus.eventBus.dispatch(
+                InterceptEventType.OnInterceptKeypress,
+                process,
+            ),
+        );
+    }
+
+    onHistoryLocationChange(process: ApplicationProcess, url: string) {
+        process.setLockedUrl(url);
+        //
     }
 
     startProcess(

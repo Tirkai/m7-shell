@@ -26,7 +26,6 @@ export class ApplicationRunner {
 
     run(app: Application, options?: IApplicationRunnerOptions) {
         let url = "";
-
         if (app instanceof ExternalApplication && !options?.url) {
             url = app.url;
         }
@@ -77,6 +76,7 @@ export class ApplicationRunner {
             );
             if (activeProcess) {
                 if (options?.url) {
+                    activeProcess.setLockedUrl("");
                     activeProcess.setUrl(options.url);
                     activeProcess.rerollHash();
                 }

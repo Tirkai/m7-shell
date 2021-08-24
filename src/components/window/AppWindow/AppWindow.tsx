@@ -181,7 +181,9 @@ export const AppWindow = (props: IAppWindowProps) => {
                             visible={
                                 store.windowManager.hasDraggedWindow ||
                                 store.windowManager.hasResizedWindow ||
-                                !props.isFocused
+                                (!props.process.isAutoFocusSupport
+                                    ? !props.isFocused
+                                    : false)
                             }
                         />
                     </div>
