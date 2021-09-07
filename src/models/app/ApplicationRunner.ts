@@ -2,20 +2,18 @@ import { WindowFactory } from "factories/WindowFactory";
 import { IApplicationWindowOptions } from "interfaces/window/IApplicationWindowOptions";
 import { Application } from "models/app/Application";
 import { ExternalApplication } from "models/app/ExternalApplication";
-import { ApplicationProcess } from "models/process/ApplicationProcess";
-import { IApplicationProcessState } from "models/process/IApplicationProcessState";
+import {
+    ApplicationProcess,
+    IApplicationProcessOptionalOptions,
+} from "models/process/ApplicationProcess";
 import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { AppStore } from "stores/AppStore";
 
 interface IApplicationRunnerOptions {
-    url?: string;
-    params?: Map<string, string>;
-    // viewport?: VirtualViewportModel;
+    // url?: string;
     focusWindowAfterInstantiate?: boolean;
     windowOptions?: IApplicationWindowOptions;
-    // windowPosition?: { x: number; y: number };
-    // windowArea?: string;
-    state?: IApplicationProcessState;
+    processOptions?: IApplicationProcessOptionalOptions;
 }
 
 export class ApplicationRunner {
@@ -26,12 +24,13 @@ export class ApplicationRunner {
 
     run(app: Application, options?: IApplicationRunnerOptions) {
         let url = "";
-        if (app instanceof ExternalApplication && !options?.url) {
-            url = app.url;
-        }
 
-        if (options?.url) {
-            url = options.url;
+        if (options?.processOptions?.url) {
+            url = options.processOptions.url;
+        } else {
+            if (app instanceof ExternalApplication) {
+                url = app.url;
+            }
         }
 
         if (!app.isExecuted) {
@@ -61,12 +60,12 @@ export class ApplicationRunner {
                 alert("Unknown application window type");
             }
 
+            const processOptions = { ...options?.processOptions };
             const appProcess = new ApplicationProcess({
                 app,
                 window: appWindow,
                 url,
-                params: options?.params ?? new Map<string, string>(),
-                state: options?.state,
+                ...processOptions,
             });
 
             this.store.processManager.execute(appProcess);
@@ -75,13 +74,13 @@ export class ApplicationRunner {
                 app,
             );
             if (activeProcess) {
-                if (options?.url) {
+                if (options?.processOptions?.url) {
                     activeProcess.setLockedUrl("");
-                    activeProcess.setUrl(options.url);
+                    activeProcess.setUrl(options.processOptions.url);
                     activeProcess.rerollHash();
                 }
-                if (options?.params) {
-                    activeProcess.setParams(options.params);
+                if (options?.processOptions?.params) {
+                    activeProcess.setParams(options.processOptions.params);
                 }
                 if (options?.focusWindowAfterInstantiate) {
                     this.store.windowManager.focusWindow(activeProcess.window);

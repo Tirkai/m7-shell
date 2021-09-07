@@ -8,15 +8,20 @@ import { ApplicationWindow } from "../window/ApplicationWindow";
 import { ApplicationProcessDefaultState } from "./ApplicationProcessDefaultState";
 import { IApplicationProcessState } from "./IApplicationProcessState";
 
-interface IApplicationProcessOptions {
-    app: Application;
-    window: ApplicationWindow;
+export interface IApplicationProcessOptionalOptions {
     url?: string;
     name?: string;
     params?: Map<string, string>;
     disableParams?: boolean;
     viewport?: VirtualViewportModel;
     state?: IApplicationProcessState;
+    refererProcess?: ApplicationProcess;
+}
+
+export interface IApplicationProcessOptions
+    extends IApplicationProcessOptionalOptions {
+    app: Application;
+    window: ApplicationWindow;
 }
 
 export class ApplicationProcess {
@@ -33,6 +38,7 @@ export class ApplicationProcess {
     state: IApplicationProcessState;
     lockedUrl: string;
     isAutoFocusSupport: boolean;
+    refererProcess?: ApplicationProcess;
 
     constructor(options: IApplicationProcessOptions) {
         makeAutoObservable(this);
@@ -49,6 +55,7 @@ export class ApplicationProcess {
         this.state = options.state ?? new ApplicationProcessDefaultState();
         this.lockedUrl = "";
         this.isAutoFocusSupport = false;
+        this.refererProcess = options.refererProcess;
 
         if (this.app instanceof ExternalApplication) {
             this.url = options.url ?? this.app.url;
@@ -88,6 +95,10 @@ export class ApplicationProcess {
 
     rerollHash() {
         this.params.set("hash", v4());
+    }
+
+    setRefererProcess(appProcess: ApplicationProcess) {
+        this.refererProcess = appProcess;
     }
 
     get modifiedUrl() {

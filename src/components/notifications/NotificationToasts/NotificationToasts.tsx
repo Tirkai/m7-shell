@@ -22,7 +22,9 @@ export const NotificationToasts = observer(() => {
             const runner = new ApplicationRunner(store);
 
             runner.run(app, {
-                url: toast.notification.url,
+                processOptions: {
+                    url: toast.notification.url,
+                },
                 focusWindowAfterInstantiate: true,
             });
         }

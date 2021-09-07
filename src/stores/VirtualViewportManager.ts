@@ -170,7 +170,9 @@ export class VirtualViewportManager {
                             type: ApplicationWindowType.Transparent,
                             viewport: dashboardViewport,
                         },
-                        state: new ApplicationProcessStandState(),
+                        processOptions: {
+                            state: new ApplicationProcessStandState(),
+                        },
                     });
                 }
             }

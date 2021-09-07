@@ -2,10 +2,13 @@ import { MarkerType, useMarker } from "@algont/m7-react-marker";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
+import { NavigationReferer } from "models/navigation/NavigationReferer";
+import { NavigationRefererEventType } from "models/navigation/NavigationRefererEventType";
+import { NavigationRefererFactory } from "models/navigation/NavigationRefererFactory";
 import { ShellPanelType } from "models/panel/ShellPanelType";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import AppLoader from "../AppLoader/AppLoader";
 import { AppWindowContent } from "../AppWindowContent/AppWindowContent";
@@ -53,6 +56,22 @@ export const TileWindow = observer((props: ITileWindowProps) => {
 
     const { config } = store.config;
 
+    const navigationReferer = useMemo(
+        () =>
+            NavigationRefererFactory.createReferer(
+                props.process,
+                props.process.refererProcess,
+            ),
+        [props.process.refererProcess],
+    );
+
+    const handleNavigateToReferer = (referer: NavigationReferer) => {
+        store.sharedEventBus.eventBus.dispatch(
+            NavigationRefererEventType.OnNavigateToReferer,
+            referer,
+        );
+    };
+
     return (
         <Draggable
             handle=".appHeaderInfoBar"
@@ -77,9 +96,11 @@ export const TileWindow = observer((props: ITileWindowProps) => {
                         icon={props.process.app.icon}
                         title={props.process.app.name}
                         isFocused={true}
+                        referer={navigationReferer}
                         onFullscreen={props.onFullscreen}
                         onClose={() => props.onClose(props.window)}
                         onReload={handleReload}
+                        onNavigateToReferer={handleNavigateToReferer}
                         visible
                     />
                 </ConfigCondition>

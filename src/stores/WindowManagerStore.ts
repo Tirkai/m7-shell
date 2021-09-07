@@ -3,6 +3,8 @@ import { makeAutoObservable } from "mobx";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
 import { InterceptEventType } from "models/intercept/InterceptEventType";
+import { NavigationReferer } from "models/navigation/NavigationReferer";
+import { NavigationRefererEventType } from "models/navigation/NavigationRefererEventType";
 import { PanelEventType } from "models/panel/PanelEventType";
 import { ShellEvents } from "models/panel/ShellEvents";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
@@ -10,11 +12,10 @@ import { ProcessEventType } from "models/process/ProcessEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import { ApplicationWindowType } from "models/window/ApplicationWindowType";
-import { IApplicationWindow } from "models/window/IApplicationWindow";
 import { AppStore } from "./AppStore";
 
 export class WindowManagerStore {
-    windows: IApplicationWindow[] = [];
+    windows: ApplicationWindow[] = [];
 
     private store: AppStore;
     constructor(store: AppStore) {
@@ -66,6 +67,12 @@ export class WindowManagerStore {
             InterceptEventType.OnInterceptClick,
             (process: ApplicationProcess) => this.focusWindow(process.window),
         );
+
+        eventBus.add(
+            NavigationRefererEventType.OnNavigateToReferer,
+            (referer: NavigationReferer) =>
+                this.onNavigateToRefererProcess(referer),
+        );
     }
 
     focusedWindow: ApplicationWindow | null = null;
@@ -116,6 +123,15 @@ export class WindowManagerStore {
         this.clearFocus();
     }
 
+    onNavigateToRefererProcess(referer: NavigationReferer) {
+        const window = this.windows.find(
+            (item) => item.id === referer.refererWindowId,
+        );
+        if (window) {
+            this.focusWindow(window);
+        }
+    }
+
     focusWindow(appWindow: ApplicationWindow) {
         try {
             this.store.sharedEventBus.eventBus.dispatch(
@@ -161,7 +177,7 @@ export class WindowManagerStore {
         }
     }
 
-    startDragWindow(appWindow: IApplicationWindow) {
+    startDragWindow(appWindow: ApplicationWindow) {
         appWindow.setDragging(true);
         this.store.sharedEventBus.eventBus.dispatch(
             ApplicationWindowEventType.OnDragStart,
@@ -169,7 +185,7 @@ export class WindowManagerStore {
         );
     }
 
-    stopDragWindow(appWindow: IApplicationWindow) {
+    stopDragWindow(appWindow: ApplicationWindow) {
         appWindow.setDragging(false);
 
         this.store.sharedEventBus.eventBus.dispatch(
@@ -178,7 +194,7 @@ export class WindowManagerStore {
         );
     }
 
-    closeWindow(appWindow: IApplicationWindow) {
+    closeWindow(appWindow: ApplicationWindow) {
         try {
             this.store.sharedEventBus.eventBus.dispatch(
                 ApplicationWindowEventType.OnClose,

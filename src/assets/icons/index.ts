@@ -1,4 +1,5 @@
 import apps from "./apps.svg";
+import arrowBack from './arrowBack.svg';
 import backward from "./backward.svg";
 import collapse from "./collapse.svg";
 import cross from "./cross.svg";
@@ -60,4 +61,6 @@ export {
     virtual,
     floatWindowMode,
     list,
+    arrowBack
 };
+

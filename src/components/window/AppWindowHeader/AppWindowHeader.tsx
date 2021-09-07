@@ -7,9 +7,12 @@ import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { observer } from "mobx-react";
 import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
+import { NavigationReferer } from "models/navigation/NavigationReferer";
 import { Point2D } from "models/shape/Point2D";
 import React from "react";
 import { AppWindowHeaderAction } from "../AppWindowHeaderAction/AppWindowHeaderAction";
+import { AppWindowHeaderReferer } from "../AppWindowHeaderReferer/AppWindowHeaderReferer";
+import { AppWindowHeaderTitle } from "../AppWindowHeaderTitle/AppWindowHeaderTitle";
 import style from "./style.module.css";
 
 interface IAppWindowHeaderProps extends IStore {
@@ -23,8 +26,10 @@ interface IAppWindowHeaderProps extends IStore {
     onFullscreen?: () => void;
     onCollapse?: () => void;
     onBackward?: () => void;
+    onNavigateToReferer: (referer: NavigationReferer) => void;
     onReload?: () => void;
     visible?: boolean;
+    referer?: NavigationReferer;
 }
 
 export const AppWindowHeader = observer((props: IAppWindowHeaderProps) => {
@@ -45,6 +50,12 @@ export const AppWindowHeader = observer((props: IAppWindowHeaderProps) => {
         }
     };
 
+    const handleNavigateToReferer = () => {
+        if (props.referer) {
+            props.onNavigateToReferer(props.referer);
+        }
+    };
+
     return (
         <div
             className={classNames(
@@ -58,18 +69,18 @@ export const AppWindowHeader = observer((props: IAppWindowHeaderProps) => {
         >
             <div className={style.container}>
                 <div className={classNames(style.info)}>
-                    <div className={style.icon} onClick={handleShowContextMenu}>
-                        <SVGIcon
-                            source={props.icon}
-                            size={{ width: "16px", height: "16px" }}
-                            color="#ffffff"
+                    {props.referer && (
+                        <AppWindowHeaderReferer
+                            title={props.referer.refererName}
+                            onBack={handleNavigateToReferer}
                         />
-                    </div>
-                    <div
-                        className={classNames("appHeaderInfoBar", style.title)}
-                    >
-                        {props.title}
-                    </div>
+                    )}
+
+                    <AppWindowHeaderTitle
+                        title={props.title}
+                        icon={props.icon}
+                        onIconClick={handleShowContextMenu}
+                    />
                 </div>
                 <div className={style.actions}>
                     {props.onCollapse && (

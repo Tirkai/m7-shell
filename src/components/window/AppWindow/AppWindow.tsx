@@ -3,9 +3,12 @@ import classNames from "classnames";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { useStore } from "hooks/useStore";
+import { NavigationReferer } from "models/navigation/NavigationReferer";
+import { NavigationRefererEventType } from "models/navigation/NavigationRefererEventType";
+import { NavigationRefererFactory } from "models/navigation/NavigationRefererFactory";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import { Resizable, ResizeCallbackData, ResizeHandle } from "react-resizable";
 import AppLoader from "../AppLoader/AppLoader";
@@ -97,6 +100,22 @@ export const AppWindow = (props: IAppWindowProps) => {
 
     const { config } = store.config;
 
+    const navigationReferer = useMemo(
+        () =>
+            NavigationRefererFactory.createReferer(
+                props.process,
+                props.process.refererProcess,
+            ),
+        [props.process.refererProcess],
+    );
+
+    const handleNavigateToReferer = (referer: NavigationReferer) => {
+        store.sharedEventBus.eventBus.dispatch(
+            NavigationRefererEventType.OnNavigateToReferer,
+            referer,
+        );
+    };
+
     return (
         <Draggable
             handle=".appHeaderInfoBar"
@@ -158,7 +177,9 @@ export const AppWindow = (props: IAppWindowProps) => {
                                 onDoubleClick={handleHeaderDoubleClick}
                                 hasBackward={false}
                                 hasReload={true}
+                                referer={navigationReferer}
                                 onBackward={() => true}
+                                onNavigateToReferer={handleNavigateToReferer}
                                 onReload={() => handleReload()}
                                 onCollapse={() => handleCollapse()}
                                 onFullscreen={() => handleFullScreen()}

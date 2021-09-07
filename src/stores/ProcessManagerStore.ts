@@ -13,6 +13,8 @@ import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/app/ExternalApplication";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { InterceptEventType } from "models/intercept/InterceptEventType";
+import { NavigationReferer } from "models/navigation/NavigationReferer";
+import { NavigationRefererEventType } from "models/navigation/NavigationRefererEventType";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
@@ -59,7 +61,22 @@ export class ProcessManagerStore {
             (process: ApplicationProcess) => this.onKillProcess(process),
         );
 
+        eventBus.add(
+            NavigationRefererEventType.OnNavigateToReferer,
+            (referer: NavigationReferer) =>
+                this.onNavigateToRefererProcess(referer),
+        );
+
         this.bindOnMessageHandler();
+    }
+
+    onNavigateToRefererProcess(referer: NavigationReferer) {
+        const process = this.processes.find(
+            (item) => item.id === referer.currentProcessId,
+        );
+        if (process) {
+            this.killProcess(process);
+        }
     }
 
     onKillProcess(process: ApplicationProcess) {
@@ -181,8 +198,9 @@ export class ProcessManagerStore {
 
             appProcess.emitter.on(
                 AppMessageType.CreateWindowInstance,
-                (payload: { url: string; appId: string }) =>
-                    this.onCreateWindowInstance(payload),
+                (payload: { url: string }) => {
+                    this.onCreateWindowInstance(payload, appProcess);
+                },
             );
 
             appProcess.emitter.on(
@@ -210,18 +228,19 @@ export class ProcessManagerStore {
         }
     }
 
-    onCreateWindowInstance(payload: { url: string; appId: string }) {
-        const { url, appId } = payload;
+    onCreateWindowInstance(
+        payload: { url: string },
+        refererProcess: ApplicationProcess,
+    ) {
+        const { url } = payload;
 
-        const findedApp = appId
-            ? this.store.applicationManager.findById(appId)
-            : this.store.applicationManager.findByUrlPart(url);
+        const findedApp = this.store.applicationManager.findByUrlPart(url);
 
         const runner = new ApplicationRunner(this.store);
 
         if (findedApp) {
             runner.run(findedApp, {
-                url,
+                processOptions: { url, refererProcess },
                 focusWindowAfterInstantiate: true,
             });
         } else {
@@ -232,7 +251,10 @@ export class ProcessManagerStore {
                     name: processUrl.host,
                     url,
                 }),
-                { focusWindowAfterInstantiate: true },
+                {
+                    processOptions: { refererProcess },
+                    focusWindowAfterInstantiate: true,
+                },
             );
         }
     }
