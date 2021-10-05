@@ -24,7 +24,6 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
     const handleWindowResizeStart = (
         appWindow: ApplicationWindow,
         event: MouseEvent,
-        data: ResizeCallbackData,
     ) => {
         appWindow.setResizing(true);
         appWindow.setResizeOriginPoint(event.clientX, event.clientY);
@@ -107,8 +106,8 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
                             url={process.modifiedUrl}
                             {...process.window}
                             window={appWindow}
-                            onResizeStart={(event, data) =>
-                                handleWindowResizeStart(appWindow, event, data)
+                            onResizeStart={(event) =>
+                                handleWindowResizeStart(appWindow, event)
                             }
                             onResizeStop={() => appWindow.setResizing(false)}
                             onResize={(event, data) =>

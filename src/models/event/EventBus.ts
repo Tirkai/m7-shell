@@ -1,9 +1,5 @@
 import { v4 } from "uuid";
 
-interface IEventBusOptions {
-    once?: boolean;
-}
-
 interface IEventBusListener<T = any> {
     id: string;
     type: string;

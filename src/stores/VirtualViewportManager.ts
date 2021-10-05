@@ -250,7 +250,7 @@ export class VirtualViewportManager {
         }
     }
 
-    onChangeViewport(viewport: VirtualViewportModel) {
+    onChangeViewport(_viewport: VirtualViewportModel) {
         this.viewports.forEach((item, index) => {
             item.setIndex(index);
         });

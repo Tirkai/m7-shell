@@ -40,21 +40,18 @@ export class ApplicationRunner {
 
             const currentViewport = this.store.virtualViewport.currentViewport;
 
-            const appWindow = WindowFactory.createWindow(
-                {
-                    type:
-                        options?.windowOptions?.type ??
-                        currentViewport.displayMode?.windowType ??
-                        ApplicationWindowType.Unknown,
-                    viewport,
-                    focusAfterInstantiate:
-                        options?.focusWindowAfterInstantiate ?? false,
-                    area: options?.windowOptions?.area,
-                    x: options?.windowOptions?.x,
-                    y: options?.windowOptions?.y,
-                },
-                this.store,
-            );
+            const appWindow = WindowFactory.createWindow({
+                type:
+                    options?.windowOptions?.type ??
+                    currentViewport.displayMode?.windowType ??
+                    ApplicationWindowType.Unknown,
+                viewport,
+                focusAfterInstantiate:
+                    options?.focusWindowAfterInstantiate ?? false,
+                area: options?.windowOptions?.area,
+                x: options?.windowOptions?.x,
+                y: options?.windowOptions?.y,
+            });
 
             if (appWindow?.type === ApplicationWindowType.Unknown) {
                 alert("Unknown application window type");
@@ -70,9 +67,8 @@ export class ApplicationRunner {
 
             this.store.processManager.execute(appProcess);
         } else {
-            const activeProcess = this.store.processManager.findProcessByApp(
-                app,
-            );
+            const activeProcess =
+                this.store.processManager.findProcessByApp(app);
             if (activeProcess) {
                 if (options?.processOptions?.url) {
                     activeProcess.setLockedUrl("");

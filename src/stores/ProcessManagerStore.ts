@@ -5,7 +5,7 @@ import {
     ShellMessageType,
 } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
-import Axios from "axios";
+import Axios, { AxiosResponse } from "axios";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/app/Application";
@@ -180,7 +180,8 @@ export class ProcessManagerStore {
         try {
             appProcess.app.setExecuted(true);
             const applicationParamsResponse = await Axios.post<
-                IJsonRpcResponse<IAppParams>
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<IAppParams>>
             >(
                 portalEndpoint.url,
                 new JsonRpcPayload("getComponentShellParams", {
@@ -214,7 +215,7 @@ export class ProcessManagerStore {
                     this.onHistoryLocationChange(appProcess, payload.url),
             );
 
-            Axios.post<IJsonRpcResponse>(
+            Axios.post<JsonRpcPayload, AxiosResponse<IJsonRpcResponse>>(
                 portalEndpoint.url,
                 new JsonRpcPayload("menuClick", {
                     component_id: appProcess.app.id,

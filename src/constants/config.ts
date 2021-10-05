@@ -4,7 +4,7 @@ const developmentDomain = "zab";
 
 const [, upperLevelDomain] = window.location.hostname.split(".");
 
-export const AUTH_TOKEN_HEADER = "X-M7-Authorization-Token";
+export const AUTH_TOKEN_HEADER: string = "X-M7-Authorization-Token";
 
 export const TASKBAR_HEIGHT = 48;
 

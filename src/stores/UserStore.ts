@@ -1,5 +1,5 @@
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
-import Axios from "axios";
+import Axios, { AxiosResponse } from "axios";
 import { makeAutoObservable } from "mobx";
 import { AppStore } from "stores/AppStore";
 import { meEndpoint } from "utils/endpoints";
@@ -20,7 +20,8 @@ export class UserStore {
     async fetchUsername() {
         try {
             const userNameResponse = await Axios.post<
-                IJsonRpcResponse<{ name: string }>
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<{ name: string }>>
             >(meEndpoint.url, new JsonRpcPayload("get_me"));
             if (!userNameResponse.data.error) {
                 const user = userNameResponse.data.result;

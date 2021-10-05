@@ -17,9 +17,9 @@
     grid-row: span / 3;
 }
 
-.virtualFramePreview .content svg {
-    width: 64px;
-    height: 64px;
+.virtualFramePreview .content {
+    --svgIconInjectedWidth: 64px;
+    --svgIconInjectedHeight: 64px;
 }
 
 .title {
