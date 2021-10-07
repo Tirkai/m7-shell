@@ -47,7 +47,9 @@ export const AuthScreen: React.FC = observer(() => {
     return (
         <div
             className={style.authScreen}
-            style={{ backgroundImage: `url("/wallpapers/wallpaper.jpg")` }}
+            style={{
+                backgroundImage: `url("${config.properties.layers.authScreen.wallpaper.url}")`,
+            }}
         >
             <ConfigCondition
                 condition={
@@ -60,7 +62,7 @@ export const AuthScreen: React.FC = observer(() => {
                         <div className={style.logo}>
                             <img
                                 src={
-                                    config.properties.layers.authScreen.logoUrl
+                                    config.properties.layers.authScreen.logo.url
                                 }
                                 alt="Logo"
                             />

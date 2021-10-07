@@ -87,13 +87,11 @@ export const AppsMenu: React.FC = observer(() => {
             })}
         >
             <div className={style.container}>
-                <ConfigCondition condition={appsMenuConfig.sidebar.enabled}>
+                <ConfigCondition condition={appsMenuConfig.enabled}>
                     <div className={style.sidebar}>
                         <div className={style.sidebarTop}>
                             <ConfigCondition
-                                condition={
-                                    appsMenuConfig.sidebar.platformMenu.enabled
-                                }
+                                condition={appsMenuConfig.platformMenu.enabled}
                             >
                                 <AppsShellLogo apps={shellMenuApps} />
                             </ConfigCondition>
@@ -102,9 +100,7 @@ export const AppsMenu: React.FC = observer(() => {
                         <div className={style.sidebarBottom}>
                             <AppsSettings apps={settingsMenuApps} />
                             <ConfigCondition
-                                condition={
-                                    appsMenuConfig.sidebar.userMenu.enabled
-                                }
+                                condition={appsMenuConfig.userMenu.enabled}
                             >
                                 <AppsProfilePreview apps={userMenuApps} />
                             </ConfigCondition>

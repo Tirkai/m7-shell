@@ -95,11 +95,17 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
     };
 
     render() {
+        const { config } = this.store.config;
         return (
             <AppsMenuSidebarListItem onClick={this.handleShowDropdown}>
                 <div className={style.appsShellLogo}>
                     <Avatar className={style.avatar}>
-                        {this.store.config.config.properties.platform.alias}
+                        <img
+                            src={
+                                config.properties.layers.appsMenu.platformMenu
+                                    .logo.url
+                            }
+                        />
                     </Avatar>
                 </div>
             </AppsMenuSidebarListItem>

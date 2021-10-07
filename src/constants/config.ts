@@ -1,5 +1,6 @@
 import { strings } from "locale";
 import { IConfig } from "models/config/IConfig";
+import { PerformanceModeType } from "models/performance/PerformanceModeType";
 
 const nodeEnv = process.env.NODE_ENV;
 
@@ -29,6 +30,7 @@ export const defaultConfig: IConfig = {
         platform: {
             name: "M7",
             alias: "M7",
+            favicon: { url: "/favicon.ico" },
         },
         autoLogin: {
             enabled: false,
@@ -42,10 +44,14 @@ export const defaultConfig: IConfig = {
                 },
             },
         },
+        performance: {
+            mode: PerformanceModeType.Default,
+        },
         layers: {
             authScreen: {
                 enabled: true,
-                logoUrl: "/logo.svg",
+                logo: { url: "/logo.svg" },
+                wallpaper: { url: "/wallpapers/wallpaper.jpg" },
                 description: strings.auth.description,
             },
             taskbar: {
@@ -54,6 +60,9 @@ export const defaultConfig: IConfig = {
 
             foreground: {
                 enabled: true,
+                wallpaper: {
+                    url: "/wallpapers/wallpaper.jpg",
+                },
             },
             tileArea: {
                 enabled: true,
@@ -66,21 +75,20 @@ export const defaultConfig: IConfig = {
             },
             appsMenu: {
                 enabled: true,
-                sidebar: {
+                platformMenu: {
                     enabled: true,
-                    platformMenu: {
+                    logo: { url: "/favicon.svg" },
+                },
+                userMenu: {
+                    enabled: true,
+                },
+                profileMenu: {
+                    enabled: true,
+                    profile: {
                         enabled: true,
                     },
-                    userMenu: {
+                    logout: {
                         enabled: true,
-                    },
-                    profileMenu: {
-                        profile: {
-                            enabled: true,
-                        },
-                        logout: {
-                            enabled: true,
-                        },
                     },
                 },
             },

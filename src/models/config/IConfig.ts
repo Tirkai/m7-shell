@@ -1,9 +1,15 @@
+import { PerformanceModeType } from "models/performance/PerformanceModeType";
+
 export interface IConfig {
     name: string;
+    extend?: string;
     properties: {
         platform: {
             name: string;
             alias: string;
+            favicon: {
+                url: string;
+            };
         };
         autoLogin: {
             enabled: boolean;
@@ -19,10 +25,19 @@ export interface IConfig {
             };
         };
 
+        performance: {
+            mode: PerformanceModeType;
+        };
+
         layers: {
             authScreen: {
                 enabled: boolean;
-                logoUrl: string;
+                logo: {
+                    url: string;
+                };
+                wallpaper: {
+                    url: string;
+                };
                 description: string;
             };
             taskbar: {
@@ -30,6 +45,9 @@ export interface IConfig {
             };
             foreground: {
                 enabled: boolean;
+                wallpaper: {
+                    url: string;
+                };
             };
             tileArea: {
                 enabled: boolean;
@@ -42,21 +60,22 @@ export interface IConfig {
             };
             appsMenu: {
                 enabled: boolean;
-                sidebar: {
+                platformMenu: {
                     enabled: boolean;
-                    platformMenu: {
+                    logo: {
+                        url: string;
+                    };
+                };
+                userMenu: {
+                    enabled: boolean;
+                };
+                profileMenu: {
+                    enabled: boolean;
+                    profile: {
                         enabled: boolean;
                     };
-                    userMenu: {
+                    logout: {
                         enabled: boolean;
-                    };
-                    profileMenu: {
-                        profile: {
-                            enabled: boolean;
-                        };
-                        logout: {
-                            enabled: boolean;
-                        };
                     };
                 };
             };

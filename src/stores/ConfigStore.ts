@@ -49,9 +49,23 @@ export class ConfigStore {
         );
 
         if (findedConfig) {
-            const mergedConfig = merge(defaultConfig, findedConfig);
+            const extendedConfig = configurations.find((item) =>
+                item.name === findedConfig.extend
+                    ? findedConfig.extend
+                    : "default",
+            );
 
-            this.setConfig(mergedConfig);
+            if (extendedConfig?.name !== findedConfig.name) {
+                const mergedConfig = merge(
+                    merge(defaultConfig, extendedConfig),
+                    findedConfig,
+                );
+                this.setConfig(mergedConfig);
+            } else {
+                const mergedConfig = merge(defaultConfig, findedConfig);
+
+                this.setConfig(mergedConfig);
+            }
         }
 
         this.setLoaded(true);
