@@ -1,5 +1,4 @@
 import { Alert } from "@material-ui/lab";
-import logo from "assets/images/logo.svg";
 import classNames from "classnames";
 import { AuthForm } from "components/auth/AuthForm/AuthForm";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
@@ -59,10 +58,15 @@ export const AuthScreen: React.FC = observer(() => {
                 <div className={classNames(style.overlay)}>
                     <div className={style.container}>
                         <div className={style.logo}>
-                            <img src={logo} alt="Logo" />
+                            <img
+                                src={
+                                    config.properties.layers.authScreen.logoUrl
+                                }
+                                alt="Logo"
+                            />
                         </div>
                         <div className={style.description}>
-                            {strings.auth.description}
+                            {config.properties.layers.authScreen.description}
                         </div>
                         <div className={style.content}>
                             <AuthForm onSubmit={handleLogin} />

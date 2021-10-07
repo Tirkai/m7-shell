@@ -1,3 +1,4 @@
+import { strings } from "locale";
 import { IConfig } from "models/config/IConfig";
 
 const nodeEnv = process.env.NODE_ENV;
@@ -42,6 +43,11 @@ export const defaultConfig: IConfig = {
             },
         },
         layers: {
+            authScreen: {
+                enabled: true,
+                logoUrl: "/logo.svg",
+                description: strings.auth.description,
+            },
             taskbar: {
                 enabled: true,
             },

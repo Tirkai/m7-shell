@@ -20,6 +20,11 @@ export interface IConfig {
         };
 
         layers: {
+            authScreen: {
+                enabled: boolean;
+                logoUrl: string;
+                description: string;
+            };
             taskbar: {
                 enabled: boolean;
             };
