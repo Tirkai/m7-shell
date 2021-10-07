@@ -1,3 +1,4 @@
+import { LinearProgress } from "@material-ui/core";
 import { AuthScreen } from "components/layout/AuthScreen/AuthScreen";
 import { AwaitVerifyScreen } from "components/layout/AwaitVerifyScreen/AwaitVerifyScreen";
 import { ShellScreen } from "components/layout/ShellScreen/ShellScreen";
@@ -12,7 +13,7 @@ import { DefaultPerformanceMode } from "models/performance/DefaultPerformanceMod
 import { PerformanceModeType } from "models/performance/PerformanceModeType";
 import { PotatoPerformanceMode } from "models/performance/PotatoPerformanceMode";
 import "moment/locale/ru";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Route, Router, Switch } from "react-router-dom";
 
 const history = createBrowserHistory();
@@ -24,6 +25,8 @@ export const AppContainer = observer(() => {
     );
 
     const onMount = () => {
+        store.config.fetchConfigurations();
+
         window.addEventListener("contextmenu", (event) =>
             event.preventDefault(),
         );
@@ -60,22 +63,30 @@ export const AppContainer = observer(() => {
 
     return (
         <PerformanceContext.Provider value={{ mode: perfMode }}>
-            <PlatformTitle title={config["platform.name"]} />
-            <Router history={history}>
-                <Switch>
-                    <Route path="/" exact>
-                        {store.auth.isAuthorized ? (
-                            store.auth.checkedAfterStart ? (
-                                <ShellScreen />
-                            ) : (
-                                <AwaitVerifyScreen />
-                            )
-                        ) : (
-                            <AuthScreen />
-                        )}
-                    </Route>
-                </Switch>
-            </Router>
+            {store.config.isLoaded ? (
+                <Fragment>
+                    <PlatformTitle title={config.properties.platform.name} />
+                    <Router history={history}>
+                        <Switch>
+                            <Route path="/" exact>
+                                {store.auth.isAuthorized ? (
+                                    store.auth.checkedAfterStart ? (
+                                        <ShellScreen />
+                                    ) : (
+                                        <AwaitVerifyScreen />
+                                    )
+                                ) : (
+                                    <AuthScreen />
+                                )}
+                            </Route>
+                        </Switch>
+                    </Router>
+                </Fragment>
+            ) : (
+                <Fragment>
+                    <LinearProgress />
+                </Fragment>
+            )}
 
             <MessageDialog />
         </PerformanceContext.Provider>

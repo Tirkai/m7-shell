@@ -1,31 +1,72 @@
 export interface IConfig {
-    "platform.name": string;
-    "platform.alias": string;
+    name: string;
+    properties: {
+        platform: {
+            name: string;
+            alias: string;
+        };
+        autoLogin: {
+            enabled: boolean;
+            login: string;
+            password: string;
+        };
 
-    "autoLogin.enabled": string;
-    "autoLogin.login": string;
-    "autoLogin.password": string;
+        windows: {
+            singleWindow: {
+                header: {
+                    enabled: boolean;
+                };
+            };
+        };
 
-    "taskbar.enabled": boolean;
-
-    "windows.singleWindow.header.enabled": boolean;
-
-    "foreground.enabled": boolean;
-    "tileArea.enabled": boolean;
-    "floatArea.enabled": boolean;
-    "viewportHub.enabled": boolean;
-
-    // Apps Menu
-    "appsMenu.enabled": boolean;
-    "appsMenu.sidebar.enabled": boolean;
-    "appsMenu.sidebar.platformMenu.enabled": boolean;
-    "appsMenu.sidebar.userMenu.enabled": boolean;
-    "appsMenu.sidebar.userMenu.profile.enabled": boolean;
-    "appsMenu.sidebar.userMenu.logout.enabled": boolean;
-
-    "notifications.enabled": boolean;
-    "audioHub.enabled": boolean;
-    "recovery.enabled": boolean;
-
-    "dashboard.enabled": boolean;
+        layers: {
+            taskbar: {
+                enabled: boolean;
+            };
+            foreground: {
+                enabled: boolean;
+            };
+            tileArea: {
+                enabled: boolean;
+            };
+            floatArea: {
+                enabled: boolean;
+            };
+            viewportHub: {
+                enabled: boolean;
+            };
+            appsMenu: {
+                enabled: boolean;
+                sidebar: {
+                    enabled: boolean;
+                    platformMenu: {
+                        enabled: boolean;
+                    };
+                    userMenu: {
+                        enabled: boolean;
+                    };
+                    profileMenu: {
+                        profile: {
+                            enabled: boolean;
+                        };
+                        logout: {
+                            enabled: boolean;
+                        };
+                    };
+                };
+            };
+            notifications: {
+                enabled: boolean;
+            };
+            audioHub: {
+                enabled: boolean;
+            };
+            recovery: {
+                enabled: boolean;
+            };
+            dashboard: {
+                enabled: boolean;
+            };
+        };
+    };
 }

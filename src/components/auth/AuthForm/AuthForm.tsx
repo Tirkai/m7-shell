@@ -79,6 +79,7 @@ export const AuthForm = (props: IAuthFormProps) => {
                     <KeyboardWrapper
                         value={password}
                         onChange={(value) => setPassword(value)}
+                        inputType="password"
                     >
                         {(context) => (
                             <TextField

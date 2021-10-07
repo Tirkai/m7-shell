@@ -78,11 +78,13 @@ export const TaskBar = observer(() => {
         store.virtualViewport.viewports.map((item) => item.id),
     );
 
+    const layersConfig = config.properties.layers;
+
     return (
         <div className={classNames(style.taskBar)}>
             <div className={style.container}>
                 <div className={style.controls}>
-                    <ConfigCondition condition={config["appsMenu.enabled"]}>
+                    <ConfigCondition condition={layersConfig.appsMenu.enabled}>
                         <TaskBarItem>
                             <TaskBarAppsMenuButton
                                 onClick={() =>
@@ -93,7 +95,9 @@ export const TaskBar = observer(() => {
                             />
                         </TaskBarItem>
                     </ConfigCondition>
-                    <ConfigCondition condition={config["viewportHub.enabled"]}>
+                    <ConfigCondition
+                        condition={layersConfig.viewportHub.enabled}
+                    >
                         <TaskBarItem>
                             <TaskBarViewportButton
                                 onClick={handleShowVirtualHub}
@@ -116,7 +120,7 @@ export const TaskBar = observer(() => {
                 </div>
 
                 <div className={style.actions}>
-                    <ConfigCondition condition={config["audioHub.enabled"]}>
+                    <ConfigCondition condition={layersConfig.audioHub.enabled}>
                         <TaskBarItem>
                             <TaskBarSoundButton
                                 onClick={handleShowAudioHub}
@@ -129,7 +133,7 @@ export const TaskBar = observer(() => {
                         <TaskBarDateTime />
                     </TaskBarItem>
                     <ConfigCondition
-                        condition={config["notifications.enabled"]}
+                        condition={layersConfig.notifications.enabled}
                     >
                         <TaskBarItem
                             badge={

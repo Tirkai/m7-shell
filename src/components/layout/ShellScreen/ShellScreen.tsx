@@ -124,7 +124,8 @@ export class ShellScreen extends Component<IStore> {
                                         >
                                             <ConfigCondition
                                                 condition={
-                                                    config["foreground.enabled"]
+                                                    config.properties.layers
+                                                        .foreground.enabled
                                                 }
                                             >
                                                 <Suspense fallback="Loading">
@@ -144,7 +145,8 @@ export class ShellScreen extends Component<IStore> {
 
                                             <ConfigCondition
                                                 condition={
-                                                    config["tileArea.enabled"]
+                                                    config.properties.layers
+                                                        .tileArea.enabled
                                                 }
                                             >
                                                 <Suspense fallback="Loading">
@@ -164,7 +166,8 @@ export class ShellScreen extends Component<IStore> {
 
                                             <ConfigCondition
                                                 condition={
-                                                    config["floatArea.enabled"]
+                                                    config.properties.layers
+                                                        .floatArea.enabled
                                                 }
                                             >
                                                 <Suspense fallback="Loading">
@@ -180,7 +183,8 @@ export class ShellScreen extends Component<IStore> {
                                             </ConfigCondition>
                                             <ConfigCondition
                                                 condition={
-                                                    config["dashboard.enabled"]
+                                                    config.properties.layers
+                                                        .dashboard.enabled
                                                 }
                                             >
                                                 <DesktopLayer
@@ -197,7 +201,9 @@ export class ShellScreen extends Component<IStore> {
                                 )}
                             </VirtualViewport>
                             <ConfigCondition
-                                condition={config["viewportHub.enabled"]}
+                                condition={
+                                    config.properties.layers.viewportHub.enabled
+                                }
                             >
                                 <Suspense fallback="Loading">
                                     <DesktopLayer enabled priority={2}>
@@ -206,7 +212,9 @@ export class ShellScreen extends Component<IStore> {
                                 </Suspense>
                             </ConfigCondition>
                             <ConfigCondition
-                                condition={config["appsMenu.enabled"]}
+                                condition={
+                                    config.properties.layers.appsMenu.enabled
+                                }
                             >
                                 <Suspense fallback="Loading">
                                     <DesktopLayer enabled priority={3}>
@@ -215,7 +223,10 @@ export class ShellScreen extends Component<IStore> {
                                 </Suspense>
                             </ConfigCondition>
                             <ConfigCondition
-                                condition={config["notifications.enabled"]}
+                                condition={
+                                    config.properties.layers.notifications
+                                        .enabled
+                                }
                             >
                                 <Suspense fallback="Loading">
                                     <DesktopLayer enabled priority={3}>
@@ -231,7 +242,9 @@ export class ShellScreen extends Component<IStore> {
                                 </DesktopLayer>
                             </Suspense>
                             <ConfigCondition
-                                condition={config["audioHub.enabled"]}
+                                condition={
+                                    config.properties.layers.audioHub.enabled
+                                }
                             >
                                 <Suspense fallback="Loading">
                                     <DesktopLayer enabled priority={3}>
@@ -245,7 +258,9 @@ export class ShellScreen extends Component<IStore> {
                                 <BuildVersion />
                             </DesktopLayer>
                             <ConfigCondition
-                                condition={config["recovery.enabled"]}
+                                condition={
+                                    config.properties.layers.recovery.enabled
+                                }
                             >
                                 <DesktopLayer enabled priority={4}>
                                     <RecoveryLayer />
@@ -279,7 +294,9 @@ export class ShellScreen extends Component<IStore> {
                         </DesktopContainer>
                     }
                     taskBar={
-                        <ConfigCondition condition={config["taskbar.enabled"]}>
+                        <ConfigCondition
+                            condition={config.properties.layers.taskbar.enabled}
+                        >
                             <TaskBar />
                         </ConfigCondition>
                     }

@@ -90,7 +90,9 @@ export const TileWindow = observer((props: ITileWindowProps) => {
                 {...createMemoizedMarker(MarkerType.Id, props.process.app.id)}
             >
                 <ConfigCondition
-                    condition={config["windows.singleWindow.header.enabled"]}
+                    condition={
+                        config.properties.windows.singleWindow.header.enabled
+                    }
                 >
                     <AppWindowHeader
                         icon={props.process.app.icon}

@@ -52,7 +52,7 @@ export const AuthScreen: React.FC = observer(() => {
         >
             <ConfigCondition
                 condition={
-                    !config["autoLogin.enabled"] &&
+                    !config.properties.autoLogin.enabled &&
                     !enableAutoLoginUrlParam?.length
                 }
             >
@@ -77,7 +77,7 @@ export const AuthScreen: React.FC = observer(() => {
             </ConfigCondition>
             <ConfigCondition
                 condition={
-                    !!config["autoLogin.enabled"] ||
+                    !!config.properties.autoLogin.enabled ||
                     !!enableAutoLoginUrlParam?.length
                 }
             >

@@ -148,7 +148,7 @@ export class VirtualViewportManager {
         // this.addViewport(initialViewport);
         // #endregion
 
-        if (config["dashboard.enabled"]) {
+        if (config.properties.layers.dashboard.enabled) {
             const dashboardViewport = new VirtualViewportModel({
                 state: new ViewportStandState(),
                 key: "DashboardViewport",

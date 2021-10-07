@@ -1,3 +1,5 @@
+import { IConfig } from "models/config/IConfig";
+
 const nodeEnv = process.env.NODE_ENV;
 
 const developmentDomain = "zab";
@@ -19,3 +21,75 @@ export const UPPER_LEVEL_DOMAIN =
 export const NOTIFICATIONS_WEBSOCKET_URL = `http://notifications.${UPPER_LEVEL_DOMAIN}/socket.io`;
 
 export const NOTIFICATION_APP_GUID = "be02305e-a748-4b9f-806f-ae95c1cbed0e";
+
+export const defaultConfig: IConfig = {
+    name: "default",
+    properties: {
+        platform: {
+            name: "M7",
+            alias: "M7",
+        },
+        autoLogin: {
+            enabled: false,
+            login: "",
+            password: "",
+        },
+        windows: {
+            singleWindow: {
+                header: {
+                    enabled: true,
+                },
+            },
+        },
+        layers: {
+            taskbar: {
+                enabled: true,
+            },
+
+            foreground: {
+                enabled: true,
+            },
+            tileArea: {
+                enabled: true,
+            },
+            floatArea: {
+                enabled: true,
+            },
+            viewportHub: {
+                enabled: true,
+            },
+            appsMenu: {
+                enabled: true,
+                sidebar: {
+                    enabled: true,
+                    platformMenu: {
+                        enabled: true,
+                    },
+                    userMenu: {
+                        enabled: true,
+                    },
+                    profileMenu: {
+                        profile: {
+                            enabled: true,
+                        },
+                        logout: {
+                            enabled: true,
+                        },
+                    },
+                },
+            },
+            notifications: {
+                enabled: true,
+            },
+            audioHub: {
+                enabled: true,
+            },
+            recovery: {
+                enabled: true,
+            },
+            dashboard: {
+                enabled: false,
+            },
+        },
+    },
+};

@@ -45,7 +45,7 @@ export const AppWindow = (props: IAppWindowProps) => {
         event: React.SyntheticEvent,
         data: ResizeCallbackData,
     ) => {
-        props.onResizeStart((event as unknown) as MouseEvent, data);
+        props.onResizeStart(event as unknown as MouseEvent, data);
     };
 
     const handleResizeEnd = () => {
@@ -58,7 +58,7 @@ export const AppWindow = (props: IAppWindowProps) => {
     ) => {
         const data = eventData;
 
-        props.onResize((event as unknown) as MouseEvent, data);
+        props.onResize(event as unknown as MouseEvent, data);
     };
 
     const handleFocus = () => {
@@ -166,7 +166,8 @@ export const AppWindow = (props: IAppWindowProps) => {
                     >
                         <ConfigCondition
                             condition={
-                                config["windows.singleWindow.header.enabled"]
+                                config.properties.windows.singleWindow.header
+                                    .enabled
                             }
                         >
                             <AppWindowHeader
