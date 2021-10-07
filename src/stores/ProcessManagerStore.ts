@@ -1,9 +1,4 @@
-import {
-    AppMessageType,
-    EmitterMessage,
-    invokeListeners,
-    ShellMessageType,
-} from "@algont/m7-shell-emitter";
+import { AppMessageType, ShellMessageType } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios, { AxiosResponse } from "axios";
 import { IAppParams } from "interfaces/app/IAppParams";
@@ -67,7 +62,7 @@ export class ProcessManagerStore {
                 this.onNavigateToRefererProcess(referer),
         );
 
-        this.bindOnMessageHandler();
+        // this.bindOnMessageHandler();
     }
 
     onNavigateToRefererProcess(referer: NavigationReferer) {
@@ -101,36 +96,36 @@ export class ProcessManagerStore {
         }
     }
 
-    bindOnMessageHandler() {
-        window.onmessage = (event: MessageEvent) => {
-            const message: EmitterMessage<unknown> = event.data;
+    // bindOnMessageHandler() {
+    //     window.onmessage = (event: MessageEvent) => {
+    //         const message: EmitterMessage<unknown> = event.data;
 
-            if (message.type) {
-                // #region Backward compatibility
-                const matchMessageWithAppByUrlPart = (
-                    item: ApplicationProcess,
-                ) => {
-                    const app = item.app as ExternalApplication;
-                    return app.url && app.url.includes(message.source ?? "-1");
-                };
-                // #endregion
+    //         if (message.type) {
+    //             // #region Backward compatibility
+    //             const matchMessageWithAppByUrlPart = (
+    //                 item: ApplicationProcess,
+    //             ) => {
+    //                 const app = item.app as ExternalApplication;
+    //                 return app.url && app.url.includes(message.source ?? "-1");
+    //             };
+    //             // #endregion
 
-                const findedProcess = this.processes.find(
-                    (item) =>
-                        item.app.id === message.appId ||
-                        // #region Required update m7-shell-emitter library in applications!
-                        // Its important
-                        // Remove this row after update
-                        matchMessageWithAppByUrlPart(item),
-                    // #endregion
-                );
+    //             const findedProcess = this.processes.find(
+    //                 (item) =>
+    //                     item.app.id === message.appId ||
+    //                     // #region Required update m7-shell-emitter library in applications!
+    //                     // Its important
+    //                     // Remove this row after update
+    //                     matchMessageWithAppByUrlPart(item),
+    //                 // #endregion
+    //             );
 
-                if (findedProcess) {
-                    invokeListeners(message, findedProcess.emitter.listeners);
-                }
-            }
-        };
-    }
+    //             if (findedProcess) {
+    //                 invokeListeners(message, findedProcess.emitter.listeners);
+    //             }
+    //         }
+    //     };
+    // }
 
     injectAuthTokenInProcess(
         appProccess: ApplicationProcess,

@@ -5,6 +5,7 @@ import {
 } from "@algont/m7-utils";
 import Axios, { AxiosResponse } from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
+import { ExternalEventType } from "external/ExternalEventType";
 import { IAccessTokenMetadata } from "interfaces/auth/IAccessTokenMetadata";
 import { IRefreshTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
@@ -106,6 +107,11 @@ export class AuthStore {
         if (this.isAuthorized) {
             this.verifyToken();
         }
+
+        this.store.sharedEventBus.eventBus.add(
+            ExternalEventType.OnLogoutExternalMessage,
+            () => this.logout(),
+        );
     }
 
     checkoutRemainingTime() {

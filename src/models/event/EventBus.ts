@@ -16,8 +16,6 @@ export class EventBus {
     }
 
     async dispatch<T = any>(type: string, payload?: T) {
-        console.debug("Dispatch event", type, payload);
-
         return new Promise<null>((resolve) => {
             this.listeners
                 .filter((item) => item.type === type)
