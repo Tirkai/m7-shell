@@ -48,9 +48,7 @@ export class ApplicationRunner {
                 viewport,
                 focusAfterInstantiate:
                     options?.focusWindowAfterInstantiate ?? false,
-                area: options?.windowOptions?.area,
-                x: options?.windowOptions?.x,
-                y: options?.windowOptions?.y,
+                ...options?.windowOptions,
             });
 
             if (appWindow?.type === ApplicationWindowType.Unknown) {

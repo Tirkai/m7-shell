@@ -6,6 +6,8 @@ import { KeyboardEventType } from "models/hotkey/KeyboardEventType";
 import { AppsMenuViewMode } from "models/menu/AppsMenuViewMode";
 import { PanelEventType } from "models/panel/PanelEventType";
 import { ShellPanelType } from "models/panel/ShellPanelType";
+import { ISessionRecovery } from "models/recovery/ISessionRecovery";
+import { RecoveryEventType } from "models/recovery/RecoveryEventType";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
 import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
 import moment from "moment";
@@ -40,32 +42,34 @@ export class PanelManager {
 
         makeAutoObservable(this);
 
-        this.store.sharedEventBus.eventBus.add(
-            DesktopEventType.OnDesktopClick,
-            () => {
-                this.setActivePanel(ShellPanelType.None);
+        const { eventBus } = this.store.sharedEventBus;
+
+        eventBus.add(
+            RecoveryEventType.OnDynamicSnapshotLoaded,
+            (payload: ISessionRecovery) => {
+                this.onDynamicSnapshotLoaded(payload);
             },
         );
 
-        this.store.sharedEventBus.eventBus.add(
+        eventBus.add(DesktopEventType.OnDesktopClick, () => {
+            this.setActivePanel(ShellPanelType.None);
+        });
+
+        eventBus.add(
             ApplicationWindowEventType.OnFocusWindow,
             (_appWindow: ApplicationWindow) =>
                 this.setActivePanel(ShellPanelType.None),
         );
 
-        this.store.sharedEventBus.eventBus.add(
-            KeyboardEventType.ArrowUpWithControl,
-            () => this.onKeyboardArrowUpWithControl(),
+        eventBus.add(KeyboardEventType.ArrowUpWithControl, () =>
+            this.onKeyboardArrowUpWithControl(),
         );
 
-        this.store.sharedEventBus.eventBus.add(
-            KeyboardEventType.ArrowDownWithControl,
-            () => this.onKeyboardArrowDownWithControl(),
+        eventBus.add(KeyboardEventType.ArrowDownWithControl, () =>
+            this.onKeyboardArrowDownWithControl(),
         );
 
-        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () =>
-            this.onLogout(),
-        );
+        eventBus.add(AuthEventType.OnLogout, () => this.onLogout());
 
         const storagedDevMode = JSON.parse(
             localStorage.getItem(this.localStorageDevModeKey) ?? "{}",
@@ -92,8 +96,10 @@ export class PanelManager {
     }
 
     // TODO: Think about it
-    onDynamicSnapshotLoaded() {
-        this.setShowRecoveryPanel(true);
+    onDynamicSnapshotLoaded(snapshot: ISessionRecovery) {
+        if (snapshot.processSnapshot.hasActiveSession) {
+            this.setShowRecoveryPanel(true);
+        }
     }
 
     setActivePanel(panel: ShellPanelType) {

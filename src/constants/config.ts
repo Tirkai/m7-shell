@@ -44,6 +44,12 @@ export const defaultConfig: IConfig = {
                 },
             },
         },
+        auth: {
+            preventUserLogin: {
+                users: [],
+                message: "",
+            },
+        },
         performance: {
             mode: PerformanceModeType.Default,
         },
@@ -79,9 +85,7 @@ export const defaultConfig: IConfig = {
                     enabled: true,
                     logo: { url: "/favicon.svg" },
                 },
-                userMenu: {
-                    enabled: true,
-                },
+
                 profileMenu: {
                     enabled: true,
                     profile: {
@@ -100,6 +104,9 @@ export const defaultConfig: IConfig = {
             },
             recovery: {
                 enabled: true,
+                dialog: {
+                    delayBeforeClose: 10000,
+                },
             },
             dashboard: {
                 enabled: false,

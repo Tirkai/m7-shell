@@ -45,7 +45,8 @@
         "prettier-watch": "onchange 'src/**/*.{ts,tsx,css}' -- prettier --write {{changed}}",
         "lint": "eslint ./src/**/*.{ts,tsx}",
         "fix": "eslint ./src/**/*.{ts,tsx} --fix",
-        "nexus": "npm publish ./build"
+        "nexus": "npm publish ./build",
+        "doc": "typedoc"
     },
     "eslintConfig": {
         "extends": "react-app"

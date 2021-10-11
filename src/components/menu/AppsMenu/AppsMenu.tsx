@@ -100,7 +100,7 @@ export const AppsMenu: React.FC = observer(() => {
                         <div className={style.sidebarBottom}>
                             <AppsSettings apps={settingsMenuApps} />
                             <ConfigCondition
-                                condition={appsMenuConfig.userMenu.enabled}
+                                condition={appsMenuConfig.profileMenu.enabled}
                             >
                                 <AppsProfilePreview apps={userMenuApps} />
                             </ConfigCondition>

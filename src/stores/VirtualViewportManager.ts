@@ -404,11 +404,11 @@ export class VirtualViewportManager {
 
         this.viewports.splice(index + 1, 0, viewport);
 
-        this.setCurrentViewport(viewport);
-
         viewport.setTilePreset(
             TileFactory.createTilePreset(defaultTileTemplate),
         );
+
+        this.setCurrentViewport(viewport);
 
         this.store.sharedEventBus.eventBus.dispatch(
             VirtualViewportEventType.OnAddViewportFrame,

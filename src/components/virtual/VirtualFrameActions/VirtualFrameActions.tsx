@@ -4,7 +4,6 @@ import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
 import { Point2D } from "models/shape/Point2D";
-import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
 import React from "react";
 import { VirtualFramePreviewBase } from "../VirtualFramePreviewBase/VirtualFramePreviewBase";
 import { VirtualFramePreviewLayout } from "../VirtualFramePreviewLayout/VirtualFramePreviewLayout";
@@ -21,7 +20,7 @@ export const VirtualFrameActions = observer(
         const store = useStore();
 
         const handleSaveUserSession = () => {
-            store.recovery.saveSnapshot(UserDatabasePropKey.FreezedSession);
+            store.recovery.saveFreezeSnapshot();
         };
 
         const handleRestoreUserSession = () => {

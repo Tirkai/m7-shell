@@ -23,5 +23,9 @@
         "noFallthroughCasesInSwitch": true,
         "useUnknownInCatchVariables": false
     },
+    "typedocOptions": {
+        "entryPoints": ["./src/index.tsx"],
+        "out": "docs"
+    },
     "include": ["src", "scripts", "build.ts", "public"]
 }

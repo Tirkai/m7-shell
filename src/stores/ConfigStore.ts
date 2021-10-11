@@ -16,7 +16,7 @@ export class ConfigStore {
     async fetchConfigurations() {
         try {
             const response = await Axios.get<null, AxiosResponse<IConfigRoot>>(
-                "/config/root.json",
+                "/assets/config/root.json",
             );
 
             const promises = response.data.properties.files.map((item) => {

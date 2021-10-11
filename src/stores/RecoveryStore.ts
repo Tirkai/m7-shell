@@ -2,12 +2,12 @@ import { JsonRpcFailure, JsonRpcSuccess } from "@algont/m7-utils";
 import { TileFactory } from "factories/TileFactory";
 import { isEmpty } from "lodash";
 import { makeAutoObservable } from "mobx";
-import { ApplicationEventType } from "models/app/ApplicationEventType";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/app/ExternalApplication";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { DisplayModeType } from "models/display/DisplayModeType";
 import { IProcessesSnapshot } from "models/process/IProcessesSnapshot";
+import { ISnapshotApplicationProcess } from "models/process/ISnapshotApplicationProcess";
 import { ISessionRecovery } from "models/recovery/ISessionRecovery";
 import { RecoveryEventType } from "models/recovery/RecoveryEventType";
 import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
@@ -25,9 +25,8 @@ export class RecoveryStore {
     interval: NodeJS.Timeout | null = null;
 
     dynamicSessionSnapshot: ISessionRecovery | null = null;
+    lastSnapshot: ISessionRecovery | null = null;
     freezedSessionSnapshot: ISessionRecovery | null = null;
-
-    isDisplayRecoveryDialog: boolean = false;
 
     isSnapshotInitialized: boolean = false;
 
@@ -37,13 +36,62 @@ export class RecoveryStore {
 
         const { eventBus } = this.store.sharedEventBus;
 
-        eventBus.add(ApplicationEventType.OnApplicationListLoaded, () => {
-            this.onApplicationListLoaded();
+        eventBus.add(AuthEventType.OnEntry, () => {
+            this.onEntry();
         });
 
         eventBus.add(AuthEventType.OnLogout, () => {
             this.onLogout();
         });
+    }
+
+    async saveDynamicSnapshot() {
+        const processSnapshot = this.createProcessesSnapshot();
+        const viewportSnapshot = this.createViewportSnapshot();
+
+        const snapshot: ISessionRecovery = {
+            processSnapshot,
+            viewportSnapshot,
+        };
+
+        const stringifiedCurrentSnapshot = JSON.stringify(snapshot);
+        const stringifiedLastSnapshot = JSON.stringify(this.lastSnapshot);
+
+        if (stringifiedCurrentSnapshot !== stringifiedLastSnapshot) {
+            this.setLastSnapshot(snapshot);
+
+            await this.store.userDatabase.save<ISessionRecovery>([
+                {
+                    name: UserDatabasePropKey.DynamicSession,
+                    value: snapshot,
+                },
+            ]);
+        }
+    }
+
+    async saveFreezeSnapshot() {
+        const processSnapshot = this.createProcessesSnapshot();
+        const viewportSnapshot = this.createViewportSnapshot();
+
+        const snapshot: ISessionRecovery = {
+            processSnapshot,
+            viewportSnapshot,
+        };
+
+        await this.store.userDatabase.save<ISessionRecovery>([
+            {
+                name: UserDatabasePropKey.FreezedSession,
+                value: snapshot,
+            },
+        ]);
+    }
+
+    onEntry() {
+        this.interval = setInterval(() => {
+            this.saveDynamicSnapshot();
+        }, 3000);
+
+        this.loadSnapshots();
     }
 
     onLogout() {
@@ -68,14 +116,12 @@ export class RecoveryStore {
             UserDatabasePropKey.DynamicSession,
         );
 
-        if (
-            dynamicResponse.status &&
-            dynamicResponse.result?.processSnapshot.hasActiveSession
-        ) {
+        if (dynamicResponse.status && dynamicResponse.result) {
             this.store.sharedEventBus.eventBus.dispatch(
                 RecoveryEventType.OnDynamicSnapshotLoaded,
                 dynamicResponse.result,
             );
+
             this.setDynamicSessionSnapshot(dynamicResponse.result);
         }
 
@@ -86,7 +132,6 @@ export class RecoveryStore {
             );
 
             this.startRecovery(freezedResponse.result);
-
             this.setFreezedSessionSnapshot(freezedResponse.result);
         }
 
@@ -129,16 +174,33 @@ export class RecoveryStore {
             hasActiveSession: !!this.store.processManager.processes.length,
             processes: this.store.processManager.processes
                 .filter((item) => item.state.savable)
-                .map((item) => ({
-                    // TODO Think about this
-                    app: item.app as ExternalApplication,
-                    url: item.url,
-                    name: item.name,
-                    type: item.window.type,
-                    viewportId: item.window.viewport.id,
-                    position: { x: item.window.x, y: item.window.y },
-                    area: item.window.area,
-                })),
+                .map((item) => {
+                    const snapshot: ISnapshotApplicationProcess = {
+                        // TODO Think about this
+                        app: item.app as ExternalApplication,
+                        process: {
+                            name: item.name,
+                            url:
+                                item.lockedUrl.length > 0
+                                    ? item.lockedUrl
+                                    : item.url,
+                        },
+                        window: {
+                            type: item.window.type,
+                            position: { x: item.window.x, y: item.window.y },
+                            area: item.window.area,
+                            size: {
+                                width: item.window.width,
+                                height: item.window.height,
+                            },
+                        },
+                        viewport: {
+                            viewportId: item.window.viewport.id,
+                        },
+                    };
+
+                    return snapshot;
+                }),
         };
         return snapshot;
     }
@@ -151,40 +213,14 @@ export class RecoveryStore {
         this.dynamicSessionSnapshot = snapshot;
     }
 
-    async saveSnapshot(propKey: UserDatabasePropKey) {
-        if (this.isSnapshotInitialized) {
-            const processSnapshot = this.createProcessesSnapshot();
-            const viewportSnapshot = this.createViewportSnapshot();
-
-            const freezedSnapshot: ISessionRecovery = {
-                processSnapshot,
-                viewportSnapshot,
-            };
-
-            await this.store.userDatabase.save<ISessionRecovery>([
-                {
-                    name: propKey,
-                    value: freezedSnapshot,
-                },
-            ]);
-
-            this.setFreezedSessionSnapshot(freezedSnapshot);
-        }
-    }
-
     async loadSnapshot(propKey: UserDatabasePropKey) {
-        const { result } = await this.store.userDatabase.load<
-            IUserSessionSnapshot
-        >([propKey]);
+        const { result } =
+            await this.store.userDatabase.load<IUserSessionSnapshot>([propKey]);
 
         if (result && !isEmpty(result)) {
             return new JsonRpcSuccess(result[propKey]);
         }
         return new JsonRpcFailure();
-    }
-
-    setDisplayRecoveryDialog(value: boolean) {
-        this.isDisplayRecoveryDialog = value;
     }
 
     async startRecovery(snapshot: ISessionRecovery) {
@@ -203,33 +239,43 @@ export class RecoveryStore {
     }
 
     async recoveryProcesses(snapshot: IProcessesSnapshot) {
-        return new Promise((resolve) => {
-            const runner = new ApplicationRunner(this.store);
+        return new Promise((resolve, reject) => {
+            try {
+                const runner = new ApplicationRunner(this.store);
 
-            snapshot.processes.forEach((item) => {
-                const app =
-                    this.store.applicationManager.findById(item.app.id) ??
-                    new ExternalApplication({
-                        ...item.app,
-                    });
+                snapshot.processes.forEach((item) => {
+                    const app =
+                        this.store.applicationManager.findById(item.app.id) ??
+                        new ExternalApplication({
+                            ...item.app,
+                        });
 
-                const viewport = this.store.virtualViewport.viewports.find(
-                    (v) => v.id === item.viewportId,
-                );
+                    const viewport = this.store.virtualViewport.viewports.find(
+                        (v) => v.id === item.viewport.viewportId,
+                    );
 
-                if (viewport) {
-                    runner.run(app, {
-                        windowOptions: {
-                            type: item.type,
-                            viewport,
-                            area: item.area,
-                            x: item.position.x,
-                            y: item.position.y,
-                        },
-                    });
-                }
-            });
-            resolve({});
+                    if (viewport) {
+                        runner.run(app, {
+                            processOptions: {
+                                url: item.process.url,
+                            },
+                            windowOptions: {
+                                type: item.window.type,
+                                viewport,
+                                area: item.window.area,
+                                x: item.window.position.x,
+                                y: item.window.position.y,
+                                width: item.window.size.width,
+                                height: item.window.size.height,
+                            },
+                        });
+                    }
+                });
+                resolve({});
+            } catch (e) {
+                console.log(e);
+                reject({});
+            }
         });
     }
 
@@ -282,9 +328,11 @@ export class RecoveryStore {
             } else {
                 this.store.virtualViewport.setCurrentViewport(first);
             }
-            setTimeout(() => {
-                resolve({});
-            }, 1000);
+            resolve({});
         });
+    }
+
+    setLastSnapshot(snapshot: ISessionRecovery) {
+        this.lastSnapshot = snapshot;
     }
 }

@@ -17,6 +17,7 @@
     padding: 16px;
     box-sizing: border-box;
     width: 350px;
+    overflow: hidden;
 }
 
 .header {
@@ -28,4 +29,15 @@
 }
 .header svg {
     color: white;
+}
+
+.progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+.progressBar {
+    background: transparent;
 }

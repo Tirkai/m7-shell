@@ -25,6 +25,13 @@ export interface IConfig {
             };
         };
 
+        auth: {
+            preventUserLogin: {
+                users: string[];
+                message: string;
+            };
+        };
+
         performance: {
             mode: PerformanceModeType;
         };
@@ -66,9 +73,7 @@ export interface IConfig {
                         url: string;
                     };
                 };
-                userMenu: {
-                    enabled: boolean;
-                };
+
                 profileMenu: {
                     enabled: boolean;
                     profile: {
@@ -87,6 +92,9 @@ export interface IConfig {
             };
             recovery: {
                 enabled: boolean;
+                dialog: {
+                    delayBeforeClose: number;
+                };
             };
             dashboard: {
                 enabled: boolean;
