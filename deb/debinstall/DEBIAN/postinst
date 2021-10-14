@@ -4,6 +4,9 @@ VIRTUAL_DOMAIN="shell"
 DOMAIN="$(hostname --domain)"
 HOSTNAME="$(hostname)"
 
+mkdir -p /opt/algont/m7/cdn/m7-shell-assets/config
+mkdir -p /opt/algont/m7/cdn/m7-shell-assets/media
+
 # Set up NGINX
 SERVER_NAME_VARIABLE="SERVER_NAME"
 SERVER_NAME="$VIRTUAL_DOMAIN.$DOMAIN $VIRTUAL_DOMAIN.$HOSTNAME.$DOMAIN"
