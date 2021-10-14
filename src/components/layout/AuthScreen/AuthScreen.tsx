@@ -12,6 +12,7 @@ import style from "./style.module.css";
 
 export const AuthScreen: React.FC = observer(() => {
     const store = useStore();
+    const { config } = store.config;
 
     let timeout: NodeJS.Timeout;
 
@@ -36,8 +37,6 @@ export const AuthScreen: React.FC = observer(() => {
             timeout = setTimeout(() => setShowNotify(false), 3000);
         }
     };
-
-    const { config } = store.config;
 
     const urlParams = new URL(window.location.href).searchParams;
     const enableAutoLoginUrlParam = urlParams.get("enableAutoLogin");

@@ -44,12 +44,7 @@ export const defaultConfig: IConfig = {
                 },
             },
         },
-        auth: {
-            preventUserLogin: {
-                users: [],
-                message: "",
-            },
-        },
+
         performance: {
             mode: PerformanceModeType.Default,
         },

@@ -25,13 +25,6 @@ export interface IConfig {
             };
         };
 
-        auth: {
-            preventUserLogin: {
-                users: string[];
-                message: string;
-            };
-        };
-
         performance: {
             mode: PerformanceModeType;
         };
