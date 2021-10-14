@@ -69,16 +69,17 @@ export const AppsMenu: React.FC = observer(() => {
         ApplicationPlace.M7Menu,
     );
 
-    const displayedApps = (!isSearching
-        ? applicationsList
-        : applicationsList.filter(
-              (app) =>
-                  app.name.toLowerCase().indexOf(search.toLowerCase()) > -1,
-          )
+    const displayedApps = (
+        !isSearching
+            ? applicationsList
+            : applicationsList.filter(
+                  (app) =>
+                      app.name.toLowerCase().indexOf(search.toLowerCase()) > -1,
+              )
     ).filter((app) => !app.isExistedAppInstance);
 
     const { config } = store.config;
-
+    const appsMenuConfig = config.properties.layers.appsMenu;
     return (
         <div
             className={classNames(style.appsMenu, {
@@ -86,15 +87,11 @@ export const AppsMenu: React.FC = observer(() => {
             })}
         >
             <div className={style.container}>
-                <ConfigCondition condition={config["appsMenu.sidebar.enabled"]}>
+                <ConfigCondition condition={appsMenuConfig.enabled}>
                     <div className={style.sidebar}>
                         <div className={style.sidebarTop}>
                             <ConfigCondition
-                                condition={
-                                    config[
-                                        "appsMenu.sidebar.platformMenu.enabled"
-                                    ]
-                                }
+                                condition={appsMenuConfig.platformMenu.enabled}
                             >
                                 <AppsShellLogo apps={shellMenuApps} />
                             </ConfigCondition>
@@ -103,9 +100,7 @@ export const AppsMenu: React.FC = observer(() => {
                         <div className={style.sidebarBottom}>
                             <AppsSettings apps={settingsMenuApps} />
                             <ConfigCondition
-                                condition={
-                                    config["appsMenu.sidebar.userMenu.enabled"]
-                                }
+                                condition={appsMenuConfig.profileMenu.enabled}
                             >
                                 <AppsProfilePreview apps={userMenuApps} />
                             </ConfigCondition>

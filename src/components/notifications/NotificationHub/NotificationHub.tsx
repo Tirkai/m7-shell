@@ -157,7 +157,7 @@ export const NotificationHub = observer(() => {
 
             const runner = new ApplicationRunner(store);
             runner.run(app, {
-                url,
+                processOptions: { url },
                 focusWindowAfterInstantiate: true,
             });
         } else {
@@ -174,7 +174,9 @@ export const NotificationHub = observer(() => {
 
         if (notificationApp) {
             runner.run(notificationApp, {
-                params: new Map([["filterByAppId", group.id]]),
+                processOptions: {
+                    params: new Map([["filterByAppId", group.id]]),
+                },
                 focusWindowAfterInstantiate: true,
             });
         }

@@ -38,12 +38,9 @@
 
 .icon {
     cursor: pointer;
-}
-
-.icon svg {
-    width: 32px;
-    height: 32px;
-    fill: white;
+    --svgIconInjectedWidth: 32px;
+    --svgIconInjectedHeight: 32px;
+    --svgIconInjectedColor: white;
 }
 
 .slider {

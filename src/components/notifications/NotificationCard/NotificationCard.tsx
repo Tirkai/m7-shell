@@ -15,9 +15,7 @@ interface INotificationCardProps {
 }
 
 export const NotificationCard = observer((props: INotificationCardProps) => {
-    const handleClick = (
-        _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    ) => {
+    const handleClick = () => {
         props.onClick();
         props.onClose();
     };

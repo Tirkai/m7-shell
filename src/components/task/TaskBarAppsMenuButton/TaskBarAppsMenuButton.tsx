@@ -11,6 +11,8 @@ interface ITaskbarAppsMenuButtonProps {
     onClick: () => void;
 }
 
+const svgIconSize = { width: "20px", height: "20px" };
+
 export const TaskBarAppsMenuButton = (props: ITaskbarAppsMenuButtonProps) => {
     const { createMemoizedMarker } = useMarker();
 
@@ -24,7 +26,7 @@ export const TaskBarAppsMenuButton = (props: ITaskbarAppsMenuButtonProps) => {
             )}
         >
             <TaskBarItemContainer>
-                <SVGIcon source={apps} color="white" />
+                <SVGIcon source={apps} size={svgIconSize} color="white" />
             </TaskBarItemContainer>
         </div>
     );

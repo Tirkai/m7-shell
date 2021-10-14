@@ -1,0 +1,44 @@
+.appWindowHeaderReferer {
+    display: flex;
+    height: 30px;
+    cursor: pointer;
+    position: relative;
+    margin-right: 8px;
+}
+
+.appWindowHeaderReferer:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.text {
+    display: flex;
+    align-items: center;
+    color: white;
+    padding: 0 16px 0 8px;
+    line-height: 1em;
+}
+
+.separator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 1px;
+    display: flex;
+    align-items: center;
+}
+
+.separator:before {
+    content: "";
+    width: 1px;
+    height: 50%;
+    background: rgba(255, 255, 255, 0.5);
+}

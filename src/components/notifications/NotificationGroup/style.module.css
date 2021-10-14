@@ -56,10 +56,10 @@
     width: 16px;
     height: 16px;
     cursor: pointer;
+    --svgIconInjectedWidth: 12px;
+    --svgIconInjectedHeight: 12px;
 }
-.actionItem svg {
-    width: 12px;
-}
+
 .count {
     display: flex;
     align-items: center;

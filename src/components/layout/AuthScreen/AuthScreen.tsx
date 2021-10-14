@@ -1,5 +1,4 @@
 import { Alert } from "@material-ui/lab";
-import logo from "assets/images/logo.svg";
 import classNames from "classnames";
 import { AuthForm } from "components/auth/AuthForm/AuthForm";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
@@ -13,6 +12,7 @@ import style from "./style.module.css";
 
 export const AuthScreen: React.FC = observer(() => {
     const store = useStore();
+    const { config } = store.config;
 
     let timeout: NodeJS.Timeout;
 
@@ -38,8 +38,6 @@ export const AuthScreen: React.FC = observer(() => {
         }
     };
 
-    const { config } = store.config;
-
     const urlParams = new URL(window.location.href).searchParams;
     const enableAutoLoginUrlParam = urlParams.get("enableAutoLogin");
 
@@ -48,21 +46,28 @@ export const AuthScreen: React.FC = observer(() => {
     return (
         <div
             className={style.authScreen}
-            style={{ backgroundImage: `url("/wallpapers/wallpaper.jpg")` }}
+            style={{
+                backgroundImage: `url("${config.properties.layers.authScreen.wallpaper.url}")`,
+            }}
         >
             <ConfigCondition
                 condition={
-                    !config["autoLogin.enabled"] &&
+                    !config.properties.autoLogin.enabled &&
                     !enableAutoLoginUrlParam?.length
                 }
             >
                 <div className={classNames(style.overlay)}>
                     <div className={style.container}>
                         <div className={style.logo}>
-                            <img src={logo} alt="Logo" />
+                            <img
+                                src={
+                                    config.properties.layers.authScreen.logo.url
+                                }
+                                alt="Logo"
+                            />
                         </div>
                         <div className={style.description}>
-                            {strings.auth.description}
+                            {config.properties.layers.authScreen.description}
                         </div>
                         <div className={style.content}>
                             <AuthForm onSubmit={handleLogin} />
@@ -77,7 +82,7 @@ export const AuthScreen: React.FC = observer(() => {
             </ConfigCondition>
             <ConfigCondition
                 condition={
-                    !!config["autoLogin.enabled"] ||
+                    !!config.properties.autoLogin.enabled ||
                     !!enableAutoLoginUrlParam?.length
                 }
             >

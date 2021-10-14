@@ -5,7 +5,7 @@ import {
     JsonRpcSuccess,
     NullableJsonRpcResult,
 } from "@algont/m7-utils";
-import Axios from "axios";
+import Axios, { AxiosResponse } from "axios";
 import { makeAutoObservable } from "mobx";
 import { UserDatabaseEventType } from "models/userDatabase/UserDatabaseEventType";
 import { UserDatabasePropKey } from "models/userDatabase/UserDatabasePropKey";
@@ -28,7 +28,10 @@ export class UserDatabaseManager {
         names: UserDatabasePropKey[],
     ): Promise<NullableJsonRpcResult<T>> {
         try {
-            const response = await Axios.post<IJsonRpcResponse<T>>(
+            const response = await Axios.post<
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<T>>
+            >(
                 userDataEndpoint.url,
                 new JsonRpcPayload("get_values", { names }),
             );
@@ -55,7 +58,10 @@ export class UserDatabaseManager {
                 payload.map((item) => [item.name, item.value]),
             );
 
-            const response = await Axios.post<IJsonRpcResponse<T>>(
+            const response = await Axios.post<
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<T>>
+            >(
                 userDataEndpoint.url,
                 new JsonRpcPayload("set_values", {
                     values: body,

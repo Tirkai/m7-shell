@@ -19,7 +19,7 @@ export const AutoLogin = observer(() => {
         const urlParams = new URL(window.location.href).searchParams;
 
         const autoLoginEnabled =
-            config["autoLogin.enabled"] ||
+            config.properties.autoLogin.enabled ||
             urlParams.get("enableAutoLogin") === "1";
 
         const loginUrlParam = urlParams.get("login");
@@ -31,10 +31,13 @@ export const AutoLogin = observer(() => {
                 return;
             }
 
-            if (config["autoLogin.login"] && config["autoLogin.password"]) {
+            if (
+                config.properties.autoLogin.login &&
+                config.properties.autoLogin.password
+            ) {
                 store.auth.login(
-                    config["autoLogin.login"],
-                    config["autoLogin.password"],
+                    config.properties.autoLogin.login,
+                    config.properties.autoLogin.password,
                 );
             }
         }

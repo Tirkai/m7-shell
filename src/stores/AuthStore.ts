@@ -3,8 +3,9 @@ import {
     JsonRpcPayload,
     JsonRpcResult,
 } from "@algont/m7-utils";
-import Axios from "axios";
+import Axios, { AxiosResponse } from "axios";
 import { AUTH_TOKEN_HEADER } from "constants/config";
+import { ExternalEventType } from "external/ExternalEventType";
 import { IAccessTokenMetadata } from "interfaces/auth/IAccessTokenMetadata";
 import { IRefreshTokenMetadata } from "interfaces/auth/IRefreshTokenMetadata";
 import { IAuthResponse } from "interfaces/response/IAuthResponse";
@@ -62,9 +63,9 @@ export class AuthStore {
         const [, tokenPayload] = token.split(".");
 
         if (tokenPayload) {
-            const decodedData = (JSON.parse(
+            const decodedData = JSON.parse(
                 Base64.decode(tokenPayload),
-            ) as unknown) as T;
+            ) as unknown as T;
             return decodedData;
         } else {
             return null;
@@ -106,6 +107,11 @@ export class AuthStore {
         if (this.isAuthorized) {
             this.verifyToken();
         }
+
+        this.store.sharedEventBus.eventBus.add(
+            ExternalEventType.OnLogoutExternalMessage,
+            () => this.logout(),
+        );
     }
 
     checkoutRemainingTime() {
@@ -134,7 +140,8 @@ export class AuthStore {
         const { eventBus } = this.store.sharedEventBus;
         try {
             const response = await Axios.post<
-                IJsonRpcResponse<AccessTokenVerifyStatus>
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<AccessTokenVerifyStatus>>
             >(
                 authEndpoint.url,
                 new JsonRpcPayload("verify", {
@@ -189,13 +196,11 @@ export class AuthStore {
             this.accessToken = accessToken;
             this.refreshToken = refreshToken;
 
-            const refreshTokenData = this.decodeToken<IRefreshTokenMetadata>(
-                refreshToken,
-            );
+            const refreshTokenData =
+                this.decodeToken<IRefreshTokenMetadata>(refreshToken);
 
-            const accessTokenData = this.decodeToken<IAccessTokenMetadata>(
-                accessToken,
-            );
+            const accessTokenData =
+                this.decodeToken<IAccessTokenMetadata>(accessToken);
 
             eventBus.dispatch(AuthEventType.OnRecieveToken, {
                 token: this.accessToken,
@@ -232,7 +237,11 @@ export class AuthStore {
                 this.sessionStorageRefreshTokenKey,
                 this.refreshToken,
             );
-            Axios.defaults.headers.common[AUTH_TOKEN_HEADER] = this.accessToken;
+
+            if (Axios.defaults?.headers?.common) {
+                // const t = AUTH_TOKEN_HEADER;
+                Axios.defaults.headers[AUTH_TOKEN_HEADER] = this.accessToken;
+            }
         } catch (e) {
             console.error(e);
         }
@@ -243,7 +252,10 @@ export class AuthStore {
         try {
             this.isUpdateTokenProcessActive = true;
 
-            const response = await Axios.post<IJsonRpcResponse<IAuthResponse>>(
+            const response = await Axios.post<
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<IAuthResponse>>
+            >(
                 authEndpoint.url,
                 new JsonRpcPayload("renew", {
                     token: this.refreshToken,
@@ -280,7 +292,10 @@ export class AuthStore {
 
     async login(login: string, password: string) {
         try {
-            const response = await Axios.post<IJsonRpcResponse<IAuthResponse>>(
+            const response = await Axios.post<
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<IAuthResponse>>
+            >(
                 authEndpoint.url,
                 new JsonRpcPayload("login", {
                     login,
@@ -319,7 +334,8 @@ export class AuthStore {
     async fetchUsername() {
         try {
             const userNameResponse = await Axios.post<
-                IJsonRpcResponse<{ name: string }>
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<{ name: string }>>
             >(meEndpoint.url, new JsonRpcPayload("get_me"));
             if (!userNameResponse.data.error) {
                 const user = userNameResponse.data.result;
@@ -333,7 +349,10 @@ export class AuthStore {
     async logout() {
         const { eventBus } = this.store.sharedEventBus;
         try {
-            const response = await Axios.post<IJsonRpcResponse<unknown>>(
+            const response = await Axios.post<
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<unknown>>
+            >(
                 authEndpoint.url,
                 new JsonRpcPayload("logout", {
                     token: this.accessToken,

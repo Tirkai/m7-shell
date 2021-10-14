@@ -1,31 +1,97 @@
+import { PerformanceModeType } from "models/performance/PerformanceModeType";
+
 export interface IConfig {
-    "platform.name": string;
-    "platform.alias": string;
+    name: string;
+    extend?: string;
+    properties: {
+        platform: {
+            name: string;
+            alias: string;
+            favicon: {
+                url: string;
+            };
+        };
+        autoLogin: {
+            enabled: boolean;
+            login: string;
+            password: string;
+        };
 
-    "autoLogin.enabled": string;
-    "autoLogin.login": string;
-    "autoLogin.password": string;
+        windows: {
+            singleWindow: {
+                header: {
+                    enabled: boolean;
+                };
+            };
+        };
 
-    "taskbar.enabled": boolean;
+        performance: {
+            mode: PerformanceModeType;
+        };
 
-    "windows.singleWindow.header.enabled": boolean;
+        layers: {
+            authScreen: {
+                enabled: boolean;
+                logo: {
+                    url: string;
+                };
+                wallpaper: {
+                    url: string;
+                };
+                description: string;
+            };
+            taskbar: {
+                enabled: boolean;
+            };
+            foreground: {
+                enabled: boolean;
+                wallpaper: {
+                    url: string;
+                };
+            };
+            tileArea: {
+                enabled: boolean;
+            };
+            floatArea: {
+                enabled: boolean;
+            };
+            viewportHub: {
+                enabled: boolean;
+            };
+            appsMenu: {
+                enabled: boolean;
+                platformMenu: {
+                    enabled: boolean;
+                    logo: {
+                        url: string;
+                    };
+                };
 
-    "foreground.enabled": boolean;
-    "tileArea.enabled": boolean;
-    "floatArea.enabled": boolean;
-    "viewportHub.enabled": boolean;
-
-    // Apps Menu
-    "appsMenu.enabled": boolean;
-    "appsMenu.sidebar.enabled": boolean;
-    "appsMenu.sidebar.platformMenu.enabled": boolean;
-    "appsMenu.sidebar.userMenu.enabled": boolean;
-    "appsMenu.sidebar.userMenu.profile.enabled": boolean;
-    "appsMenu.sidebar.userMenu.logout.enabled": boolean;
-
-    "notifications.enabled": boolean;
-    "audioHub.enabled": boolean;
-    "recovery.enabled": boolean;
-
-    "dashboard.enabled": boolean;
+                profileMenu: {
+                    enabled: boolean;
+                    profile: {
+                        enabled: boolean;
+                    };
+                    logout: {
+                        enabled: boolean;
+                    };
+                };
+            };
+            notifications: {
+                enabled: boolean;
+            };
+            audioHub: {
+                enabled: boolean;
+            };
+            recovery: {
+                enabled: boolean;
+                dialog: {
+                    delayBeforeClose: number;
+                };
+            };
+            dashboard: {
+                enabled: boolean;
+            };
+        };
+    };
 }

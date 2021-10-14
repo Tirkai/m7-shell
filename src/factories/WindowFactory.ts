@@ -1,9 +1,8 @@
 import { IApplicationWindowOptions } from "interfaces/window/IApplicationWindowOptions";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
-import { AppStore } from "stores/AppStore";
 
 export class WindowFactory {
-    static createWindow(options: IApplicationWindowOptions, store?: AppStore) {
+    static createWindow(options: IApplicationWindowOptions) {
         const viewport = options.viewport;
 
         let offsetIndex = 0;

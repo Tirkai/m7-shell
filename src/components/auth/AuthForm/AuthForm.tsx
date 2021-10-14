@@ -1,12 +1,19 @@
+import { KeyboardWrapper } from "@algont/m7-keyboard";
 import { MarkerType, useMarker } from "@algont/m7-react-marker";
-import { Button, TextField } from "@material-ui/core";
+import { Button, IconButton, TextField } from "@material-ui/core";
+import { Keyboard as KeyboardIcon } from "@material-ui/icons";
 import { FormItem } from "components/formLayout/FormItem/FormItem";
 import { strings } from "locale";
 import React, { ChangeEvent, useState } from "react";
 import style from "./style.module.css";
 
+interface IAuthFormSubmitOptions {
+    login: string;
+    password: string;
+}
+
 interface IAuthFormProps {
-    onSubmit: (form: { login: string; password: string }) => void;
+    onSubmit: (options: IAuthFormSubmitOptions) => void;
 }
 
 export const AuthForm = (props: IAuthFormProps) => {
@@ -35,32 +42,73 @@ export const AuthForm = (props: IAuthFormProps) => {
         <div className={style.authForm}>
             <form onSubmit={handleSubmit}>
                 <FormItem>
-                    <TextField
-                        inputProps={{
-                            ...createMemoizedMarker(
-                                MarkerType.Element,
-                                "AuthForm.LoginInput",
-                            ),
-                        }}
-                        autoFocus
-                        onChange={handleChangeLogin}
+                    <KeyboardWrapper
                         value={login}
-                        label={strings.form.fields.login}
-                    />
+                        onChange={(value) => setLogin(value)}
+                    >
+                        {(context) => (
+                            <TextField
+                                inputProps={{
+                                    ...createMemoizedMarker(
+                                        MarkerType.Element,
+                                        "AuthForm.LoginInput",
+                                    ),
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <IconButton
+                                            tabIndex={-1}
+                                            size="small"
+                                            onClick={() =>
+                                                context.setShowKeyboard(true)
+                                            }
+                                        >
+                                            <KeyboardIcon />
+                                        </IconButton>
+                                    ),
+                                }}
+                                autoFocus
+                                onChange={handleChangeLogin}
+                                value={login}
+                                label={strings.form.fields.login}
+                            />
+                        )}
+                    </KeyboardWrapper>
                 </FormItem>
                 <FormItem>
-                    <TextField
-                        inputProps={{
-                            ...createMemoizedMarker(
-                                MarkerType.Element,
-                                "AuthForm.PasswordInput",
-                            ),
-                        }}
-                        onChange={handleChangePassword}
+                    <KeyboardWrapper
                         value={password}
-                        label={strings.form.fields.password}
-                        type="password"
-                    />
+                        onChange={(value) => setPassword(value)}
+                        inputType="password"
+                    >
+                        {(context) => (
+                            <TextField
+                                inputProps={{
+                                    ...createMemoizedMarker(
+                                        MarkerType.Element,
+                                        "AuthForm.PasswordInput",
+                                    ),
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <IconButton
+                                            tabIndex={-1}
+                                            size="small"
+                                            onClick={() =>
+                                                context.setShowKeyboard(true)
+                                            }
+                                        >
+                                            <KeyboardIcon />
+                                        </IconButton>
+                                    ),
+                                }}
+                                onChange={handleChangePassword}
+                                value={password}
+                                label={strings.form.fields.password}
+                                type="password"
+                            />
+                        )}
+                    </KeyboardWrapper>
                 </FormItem>
                 <FormItem>
                     <Button

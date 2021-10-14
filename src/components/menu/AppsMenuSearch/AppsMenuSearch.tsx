@@ -1,3 +1,6 @@
+import { IconButton } from "@material-ui/core";
+import { Clear } from "@material-ui/icons";
+import classNames from "classnames";
 import { strings } from "locale";
 import React, { Component } from "react";
 import style from "./style.module.css";
@@ -14,13 +17,27 @@ export class AppsMenuSearch extends Component<IAppsMenuSearch> {
 
     render() {
         return (
-            <input
-                className={style.input}
-                onChange={this.handleChange}
-                value={this.props.value}
-                placeholder={strings.startMenu.search}
-                maxLength={100}
-            />
+            <div className={style.appsMenuSearch}>
+                <input
+                    className={style.input}
+                    onChange={this.handleChange}
+                    value={this.props.value}
+                    placeholder={strings.startMenu.search}
+                    maxLength={100}
+                />
+                <div
+                    className={classNames(style.actions, {
+                        [style.isVisible]: this.props.value.length > 0,
+                    })}
+                >
+                    <IconButton size="small">
+                        <Clear
+                            className={style.icon}
+                            onClick={() => this.props.onChange("")}
+                        />
+                    </IconButton>
+                </div>
+            </div>
         );
     }
 }

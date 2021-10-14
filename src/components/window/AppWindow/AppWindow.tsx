@@ -3,9 +3,12 @@ import classNames from "classnames";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
 import { useStore } from "hooks/useStore";
+import { NavigationReferer } from "models/navigation/NavigationReferer";
+import { NavigationRefererEventType } from "models/navigation/NavigationRefererEventType";
+import { NavigationRefererFactory } from "models/navigation/NavigationRefererFactory";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ApplicationWindow } from "models/window/ApplicationWindow";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import { Resizable, ResizeCallbackData, ResizeHandle } from "react-resizable";
 import AppLoader from "../AppLoader/AppLoader";
@@ -42,7 +45,7 @@ export const AppWindow = (props: IAppWindowProps) => {
         event: React.SyntheticEvent,
         data: ResizeCallbackData,
     ) => {
-        props.onResizeStart((event as unknown) as MouseEvent, data);
+        props.onResizeStart(event as unknown as MouseEvent, data);
     };
 
     const handleResizeEnd = () => {
@@ -55,7 +58,7 @@ export const AppWindow = (props: IAppWindowProps) => {
     ) => {
         const data = eventData;
 
-        props.onResize((event as unknown) as MouseEvent, data);
+        props.onResize(event as unknown as MouseEvent, data);
     };
 
     const handleFocus = () => {
@@ -96,6 +99,22 @@ export const AppWindow = (props: IAppWindowProps) => {
         window.innerHeight - props.height * boundsVisibilityPercentModifier;
 
     const { config } = store.config;
+
+    const navigationReferer = useMemo(
+        () =>
+            NavigationRefererFactory.createReferer(
+                props.process,
+                props.process.refererProcess,
+            ),
+        [props.process.refererProcess],
+    );
+
+    const handleNavigateToReferer = (referer: NavigationReferer) => {
+        store.sharedEventBus.eventBus.dispatch(
+            NavigationRefererEventType.OnNavigateToReferer,
+            referer,
+        );
+    };
 
     return (
         <Draggable
@@ -147,7 +166,8 @@ export const AppWindow = (props: IAppWindowProps) => {
                     >
                         <ConfigCondition
                             condition={
-                                config["windows.singleWindow.header.enabled"]
+                                config.properties.windows.singleWindow.header
+                                    .enabled
                             }
                         >
                             <AppWindowHeader
@@ -158,7 +178,9 @@ export const AppWindow = (props: IAppWindowProps) => {
                                 onDoubleClick={handleHeaderDoubleClick}
                                 hasBackward={false}
                                 hasReload={true}
+                                referer={navigationReferer}
                                 onBackward={() => true}
+                                onNavigateToReferer={handleNavigateToReferer}
                                 onReload={() => handleReload()}
                                 onCollapse={() => handleCollapse()}
                                 onFullscreen={() => handleFullScreen()}
@@ -181,7 +203,9 @@ export const AppWindow = (props: IAppWindowProps) => {
                             visible={
                                 store.windowManager.hasDraggedWindow ||
                                 store.windowManager.hasResizedWindow ||
-                                !props.isFocused
+                                (!props.process.isAutoFocusSupport
+                                    ? !props.isFocused
+                                    : false)
                             }
                         />
                     </div>

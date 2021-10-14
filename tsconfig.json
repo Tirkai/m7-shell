@@ -1,35 +1,31 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "sourceMap": true,
-    "experimentalDecorators": true,
-    "baseUrl": "src",
-    "removeComments": true,
-    "module": "esnext",
-    "isolatedModules": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "include": [
-    "src",
-    "scripts",
-    "build.ts",
-    "public"
-  ]
+    "compilerOptions": {
+        "target": "es5",
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "allowJs": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "baseUrl": "src",
+        "removeComments": true,
+        "module": "esnext",
+        "isolatedModules": true,
+        "noFallthroughCasesInSwitch": true,
+        "useUnknownInCatchVariables": false
+    },
+    "typedocOptions": {
+        "entryPoints": ["./src/index.tsx"],
+        "out": "docs"
+    },
+    "include": ["src", "scripts", "build.ts", "public"]
 }

@@ -1,9 +1,5 @@
 import { v4 } from "uuid";
 
-interface IEventBusOptions {
-    once?: boolean;
-}
-
 interface IEventBusListener<T = any> {
     id: string;
     type: string;
@@ -20,8 +16,6 @@ export class EventBus {
     }
 
     async dispatch<T = any>(type: string, payload?: T) {
-        console.debug("Dispatch event", type, payload);
-
         return new Promise<null>((resolve) => {
             this.listeners
                 .filter((item) => item.type === type)

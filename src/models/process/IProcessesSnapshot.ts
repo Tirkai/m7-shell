@@ -1,6 +1,6 @@
-import { IApplicationProcess } from "./IApplicationProcess";
+import { ISnapshotApplicationProcess } from "./ISnapshotApplicationProcess";
 
 export interface IProcessesSnapshot {
     hasActiveSession: boolean;
-    processes: IApplicationProcess[];
+    processes: ISnapshotApplicationProcess[];
 }

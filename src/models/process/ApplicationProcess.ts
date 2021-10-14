@@ -8,15 +8,20 @@ import { ApplicationWindow } from "../window/ApplicationWindow";
 import { ApplicationProcessDefaultState } from "./ApplicationProcessDefaultState";
 import { IApplicationProcessState } from "./IApplicationProcessState";
 
-interface IApplicationProcessOptions {
-    app: Application;
-    window: ApplicationWindow;
+export interface IApplicationProcessOptionalOptions {
     url?: string;
     name?: string;
     params?: Map<string, string>;
     disableParams?: boolean;
     viewport?: VirtualViewportModel;
     state?: IApplicationProcessState;
+    refererProcess?: ApplicationProcess;
+}
+
+export interface IApplicationProcessOptions
+    extends IApplicationProcessOptionalOptions {
+    app: Application;
+    window: ApplicationWindow;
 }
 
 export class ApplicationProcess {
@@ -31,6 +36,9 @@ export class ApplicationProcess {
     disableParams: boolean;
     isReady: boolean;
     state: IApplicationProcessState;
+    lockedUrl: string;
+    isAutoFocusSupport: boolean;
+    refererProcess?: ApplicationProcess;
 
     constructor(options: IApplicationProcessOptions) {
         makeAutoObservable(this);
@@ -45,6 +53,9 @@ export class ApplicationProcess {
         this.disableParams = options.disableParams ?? false;
         this.isReady = false;
         this.state = options.state ?? new ApplicationProcessDefaultState();
+        this.lockedUrl = "";
+        this.isAutoFocusSupport = false;
+        this.refererProcess = options.refererProcess;
 
         if (this.app instanceof ExternalApplication) {
             this.url = options.url ?? this.app.url;
@@ -74,14 +85,29 @@ export class ApplicationProcess {
         this.window = appWindow;
     }
 
+    setLockedUrl(value: string) {
+        this.lockedUrl = value;
+    }
+
+    setAutoFocusSupport(value: boolean) {
+        this.isAutoFocusSupport = value;
+    }
+
     rerollHash() {
         this.params.set("hash", v4());
+    }
+
+    setRefererProcess(appProcess: ApplicationProcess) {
+        this.refererProcess = appProcess;
     }
 
     get modifiedUrl() {
         try {
             if (this.app instanceof ExternalApplication) {
-                const url = new URL(this.url);
+                let url = new URL(this.url);
+                if (this.lockedUrl.length) {
+                    url = new URL(this.lockedUrl);
+                }
 
                 if (!this.disableParams) {
                     url.searchParams.set("hash", this.hash);

@@ -1,50 +1,86 @@
+import Axios, { AxiosResponse } from "axios";
+import { defaultConfig } from "constants/config";
+import { merge } from "lodash";
 import { makeAutoObservable } from "mobx";
 import { IConfig } from "models/config/IConfig";
+import { IConfigRoot } from "models/config/IConfigRoot";
 import { AppStore } from "stores/AppStore";
-
-const defaultConfigName = "default";
 
 export class ConfigStore {
     private store: AppStore;
-    config: IConfig = this.loadConfig(defaultConfigName);
 
-    loadConfig(name: string) {
-        const param = (window as any).shellConfig[name];
+    isLoaded: boolean = false;
 
-        return param;
+    config: IConfig = defaultConfig;
+
+    async fetchConfigurations() {
+        try {
+            const response = await Axios.get<null, AxiosResponse<IConfigRoot>>(
+                "/assets/config/root.json",
+            );
+
+            const promises = response.data.properties.files.map((item) => {
+                return Axios.get<null, AxiosResponse<IConfig>>(item);
+            });
+
+            const responses = await Promise.allSettled(promises);
+
+            const result: IConfig[] = [];
+
+            responses.forEach((item) => {
+                if (item.status === "fulfilled") {
+                    result.push(item.value.data);
+                }
+            });
+
+            this.applyConfig(result);
+        } catch (e) {
+            console.error(e);
+            this.setLoaded(true);
+        }
+    }
+
+    applyConfig(configurations: IConfig[]) {
+        const url = new URL(window.location.href);
+        const configName = url.searchParams.get("config") ?? "default";
+
+        const findedConfig = configurations.find(
+            (item) => item.name === configName,
+        );
+
+        if (findedConfig) {
+            const extendedConfig = configurations.find((item) =>
+                item.name === findedConfig.extend
+                    ? findedConfig.extend
+                    : "default",
+            );
+
+            if (extendedConfig?.name !== findedConfig.name) {
+                const mergedConfig = merge(
+                    merge(defaultConfig, extendedConfig),
+                    findedConfig,
+                );
+                this.setConfig(mergedConfig);
+            } else {
+                const mergedConfig = merge(defaultConfig, findedConfig);
+
+                this.setConfig(mergedConfig);
+            }
+        }
+
+        this.setLoaded(true);
     }
 
     constructor(store: AppStore) {
         this.store = store;
         makeAutoObservable(this);
-
-        let configPath = defaultConfigName;
-
-        const url = new URL(window.location.href);
-
-        const paramName = url.searchParams.get("config");
-
-        if (paramName) {
-            configPath = paramName;
-        }
-
-        const cfg = this.loadConfig(configPath);
-
-        if (cfg) {
-            this.config = cfg;
-        } else {
-            alert("Не удалось загрузить конфигурацию");
-            this.setConfig(this.loadConfig(defaultConfigName));
-        }
     }
 
     setConfig(config: IConfig) {
         this.config = config;
     }
 
-    overrideConfigParam(key: string, value: any) {
-        const cfg = { ...this.config, ...{ [key]: value } };
-
-        this.setConfig(cfg);
+    setLoaded(value: boolean) {
+        this.isLoaded = value;
     }
 }

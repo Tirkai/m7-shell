@@ -1,17 +1,15 @@
-import {
-    AppMessageType,
-    EmitterMessage,
-    invokeListeners,
-    ShellMessageType,
-} from "@algont/m7-shell-emitter";
+import { AppMessageType, ShellMessageType } from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
-import Axios from "axios";
+import Axios, { AxiosResponse } from "axios";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { makeAutoObservable } from "mobx";
 import { Application } from "models/app/Application";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/app/ExternalApplication";
 import { AuthEventType } from "models/auth/AuthEventType";
+import { InterceptEventType } from "models/intercept/InterceptEventType";
+import { NavigationReferer } from "models/navigation/NavigationReferer";
+import { NavigationRefererEventType } from "models/navigation/NavigationRefererEventType";
 import { ApplicationProcess } from "models/process/ApplicationProcess";
 import { ProcessEventType } from "models/process/ProcessEventType";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
@@ -58,7 +56,22 @@ export class ProcessManagerStore {
             (process: ApplicationProcess) => this.onKillProcess(process),
         );
 
-        this.bindOnMessageHandler();
+        eventBus.add(
+            NavigationRefererEventType.OnNavigateToReferer,
+            (referer: NavigationReferer) =>
+                this.onNavigateToRefererProcess(referer),
+        );
+
+        // this.bindOnMessageHandler();
+    }
+
+    onNavigateToRefererProcess(referer: NavigationReferer) {
+        const process = this.processes.find(
+            (item) => item.id === referer.currentProcessId,
+        );
+        if (process) {
+            this.killProcess(process);
+        }
     }
 
     onKillProcess(process: ApplicationProcess) {
@@ -83,36 +96,36 @@ export class ProcessManagerStore {
         }
     }
 
-    bindOnMessageHandler() {
-        window.onmessage = (event: MessageEvent) => {
-            const message: EmitterMessage<unknown> = event.data;
+    // bindOnMessageHandler() {
+    //     window.onmessage = (event: MessageEvent) => {
+    //         const message: EmitterMessage<unknown> = event.data;
 
-            if (message.type) {
-                // #region Backward compatibility
-                const matchMessageWithAppByUrlPart = (
-                    item: ApplicationProcess,
-                ) => {
-                    const app = item.app as ExternalApplication;
-                    return app.url && app.url.includes(message.source ?? "-1");
-                };
-                // #endregion
+    //         if (message.type) {
+    //             // #region Backward compatibility
+    //             const matchMessageWithAppByUrlPart = (
+    //                 item: ApplicationProcess,
+    //             ) => {
+    //                 const app = item.app as ExternalApplication;
+    //                 return app.url && app.url.includes(message.source ?? "-1");
+    //             };
+    //             // #endregion
 
-                const findedProcess = this.processes.find(
-                    (item) =>
-                        item.app.id === message.appId ||
-                        // #region Required update m7-shell-emitter library in applications!
-                        // Its important
-                        // Remove this row after update
-                        matchMessageWithAppByUrlPart(item),
-                    // #endregion
-                );
+    //             const findedProcess = this.processes.find(
+    //                 (item) =>
+    //                     item.app.id === message.appId ||
+    //                     // #region Required update m7-shell-emitter library in applications!
+    //                     // Its important
+    //                     // Remove this row after update
+    //                     matchMessageWithAppByUrlPart(item),
+    //                 // #endregion
+    //             );
 
-                if (findedProcess) {
-                    invokeListeners(message, findedProcess.emitter.listeners);
-                }
-            }
-        };
-    }
+    //             if (findedProcess) {
+    //                 invokeListeners(message, findedProcess.emitter.listeners);
+    //             }
+    //         }
+    //     };
+    // }
 
     injectAuthTokenInProcess(
         appProccess: ApplicationProcess,
@@ -162,7 +175,8 @@ export class ProcessManagerStore {
         try {
             appProcess.app.setExecuted(true);
             const applicationParamsResponse = await Axios.post<
-                IJsonRpcResponse<IAppParams>
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<IAppParams>>
             >(
                 portalEndpoint.url,
                 new JsonRpcPayload("getComponentShellParams", {
@@ -180,34 +194,23 @@ export class ProcessManagerStore {
 
             appProcess.emitter.on(
                 AppMessageType.CreateWindowInstance,
-                (payload: { url: string; appId: string }) => {
-                    const { url, appId } = payload;
-
-                    const findedApp = appId
-                        ? this.store.applicationManager.findById(appId)
-                        : this.store.applicationManager.findByUrlPart(url);
-
-                    const runner = new ApplicationRunner(this.store);
-
-                    if (findedApp) {
-                        runner.run(findedApp, {
-                            url,
-                            focusWindowAfterInstantiate: true,
-                        });
-                    } else {
-                        const processUrl = new URL(url);
-
-                        runner.run(
-                            new ExternalApplication({
-                                name: processUrl.host,
-                                url,
-                            }),
-                            { focusWindowAfterInstantiate: true },
-                        );
-                    }
+                (payload: { url: string }) => {
+                    this.onCreateWindowInstance(payload, appProcess);
                 },
             );
-            Axios.post<IJsonRpcResponse>(
+
+            appProcess.emitter.on(
+                AppMessageType.EnableNativeEventInterception,
+                () => this.onEnableNativeEventInterception(appProcess),
+            );
+
+            appProcess.emitter.on(
+                AppMessageType.HistoryLocationChange,
+                (payload: { url: string }) =>
+                    this.onHistoryLocationChange(appProcess, payload.url),
+            );
+
+            Axios.post<JsonRpcPayload, AxiosResponse<IJsonRpcResponse>>(
                 portalEndpoint.url,
                 new JsonRpcPayload("menuClick", {
                     component_id: appProcess.app.id,
@@ -219,6 +222,60 @@ export class ProcessManagerStore {
             console.error(e);
             appProcess.app.setExecuted(false);
         }
+    }
+
+    onCreateWindowInstance(
+        payload: { url: string },
+        refererProcess: ApplicationProcess,
+    ) {
+        const { url } = payload;
+
+        const findedApp = this.store.applicationManager.findByUrlPart(url);
+
+        const runner = new ApplicationRunner(this.store);
+
+        if (findedApp) {
+            runner.run(findedApp, {
+                processOptions: { url, refererProcess },
+                focusWindowAfterInstantiate: true,
+            });
+        } else {
+            const processUrl = new URL(url);
+
+            runner.run(
+                new ExternalApplication({
+                    name: processUrl.host,
+                    url,
+                }),
+                {
+                    processOptions: { refererProcess },
+                    focusWindowAfterInstantiate: true,
+                },
+            );
+        }
+    }
+
+    onEnableNativeEventInterception(process: ApplicationProcess) {
+        process.setAutoFocusSupport(true);
+
+        process.emitter.on(AppMessageType.InterceptClick, async () =>
+            this.store.sharedEventBus.eventBus.dispatch(
+                InterceptEventType.OnInterceptClick,
+                process,
+            ),
+        );
+
+        process.emitter.on(AppMessageType.InterceptKeyPress, async () =>
+            this.store.sharedEventBus.eventBus.dispatch(
+                InterceptEventType.OnInterceptKeypress,
+                process,
+            ),
+        );
+    }
+
+    onHistoryLocationChange(process: ApplicationProcess, url: string) {
+        process.setLockedUrl(url);
+        //
     }
 
     startProcess(

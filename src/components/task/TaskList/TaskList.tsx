@@ -63,7 +63,7 @@ export const TaskList = (props: ITaskListProps) => {
     return (
         <div className={className}>
             <div className={style.container}>
-                {tasksGroups.map((group, groupIndex) => (
+                {tasksGroups.map((group) => (
                     <TaskGroup
                         key={group.key}
                         active={group.key === props.currentViewport?.id}

@@ -1,0 +1,5 @@
+{
+    "properties": {
+        "files": ["/assets/config/default.json", "/assets/config/test.json"]
+    }
+}

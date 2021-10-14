@@ -1,5 +1,5 @@
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
-import Axios from "axios";
+import Axios, { AxiosResponse } from "axios";
 import { ApplicationFactory } from "factories/ApplicationFactory";
 import { IAppParams } from "interfaces/app/IAppParams";
 import { IPortalApplicationResponse } from "interfaces/response/IPortalApplicationResponse";
@@ -48,7 +48,10 @@ export class ApplicationManagerStore {
             this.applications = [];
 
             const response = await Axios.post<
-                IJsonRpcResponse<IPortalApplicationResponse<IAppParams>[]>
+                JsonRpcPayload,
+                AxiosResponse<
+                    IJsonRpcResponse<IPortalApplicationResponse<IAppParams>[]>
+                >
             >(
                 portalEndpoint.url,
                 new JsonRpcPayload("getComponents", {

@@ -148,7 +148,7 @@ export class VirtualViewportManager {
         // this.addViewport(initialViewport);
         // #endregion
 
-        if (config["dashboard.enabled"]) {
+        if (config.properties.layers.dashboard.enabled) {
             const dashboardViewport = new VirtualViewportModel({
                 state: new ViewportStandState(),
                 key: "DashboardViewport",
@@ -170,7 +170,9 @@ export class VirtualViewportManager {
                             type: ApplicationWindowType.Transparent,
                             viewport: dashboardViewport,
                         },
-                        state: new ApplicationProcessStandState(),
+                        processOptions: {
+                            state: new ApplicationProcessStandState(),
+                        },
                     });
                 }
             }
@@ -248,7 +250,7 @@ export class VirtualViewportManager {
         }
     }
 
-    onChangeViewport(viewport: VirtualViewportModel) {
+    onChangeViewport(_viewport: VirtualViewportModel) {
         this.viewports.forEach((item, index) => {
             item.setIndex(index);
         });
@@ -402,11 +404,11 @@ export class VirtualViewportManager {
 
         this.viewports.splice(index + 1, 0, viewport);
 
-        this.setCurrentViewport(viewport);
-
         viewport.setTilePreset(
             TileFactory.createTilePreset(defaultTileTemplate),
         );
+
+        this.setCurrentViewport(viewport);
 
         this.store.sharedEventBus.eventBus.dispatch(
             VirtualViewportEventType.OnAddViewportFrame,

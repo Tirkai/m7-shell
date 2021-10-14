@@ -4,10 +4,7 @@ import { IStore } from "interfaces/common/IStore";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import React, { Component } from "react";
-import { DevModeStore } from "./DevModeStore";
 import style from "./style.module.css";
-
-const store = new DevModeStore();
 
 @inject("store")
 @observer
