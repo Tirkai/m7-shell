@@ -35,7 +35,6 @@ export class IncommingEventHandlerStore {
     bindOnMessageHandler() {
         window.onmessage = (event: MessageEvent) => {
             const message: EmitterMessage<unknown> = event.data;
-            console.log("Message", message);
             if (message.type) {
                 // #region Backward compatibility
                 const matchMessageWithAppByUrlPart = (

@@ -44,7 +44,18 @@ export const defaultConfig: IConfig = {
                 },
             },
         },
-
+        kiosk: {
+            enabled: false,
+            process: {
+                options: {},
+            },
+            window: {
+                options: {},
+            },
+        },
+        cursor: {
+            enabled: true,
+        },
         performance: {
             mode: PerformanceModeType.Default,
         },

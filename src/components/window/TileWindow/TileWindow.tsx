@@ -91,7 +91,8 @@ export const TileWindow = observer((props: ITileWindowProps) => {
             >
                 <ConfigCondition
                     condition={
-                        config.properties.windows.singleWindow.header.enabled
+                        config.properties.windows.singleWindow.header.enabled &&
+                        !config.properties.kiosk.enabled
                     }
                 >
                     <AppWindowHeader

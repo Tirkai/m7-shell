@@ -167,7 +167,7 @@ export const AppWindow = (props: IAppWindowProps) => {
                         <ConfigCondition
                             condition={
                                 config.properties.windows.singleWindow.header
-                                    .enabled
+                                    .enabled && !config.properties.kiosk.enabled
                             }
                         >
                             <AppWindowHeader

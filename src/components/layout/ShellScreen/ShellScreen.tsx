@@ -224,7 +224,8 @@ export class ShellScreen extends Component<IStore> {
                             <ConfigCondition
                                 condition={
                                     config.properties.layers.notifications
-                                        .enabled
+                                        .enabled &&
+                                    !config.properties.kiosk.enabled
                                 }
                             >
                                 <Suspense fallback="Loading">
@@ -258,7 +259,8 @@ export class ShellScreen extends Component<IStore> {
                             </DesktopLayer>
                             <ConfigCondition
                                 condition={
-                                    config.properties.layers.recovery.enabled
+                                    config.properties.layers.recovery.enabled &&
+                                    !config.properties.kiosk.enabled
                                 }
                             >
                                 <DesktopLayer enabled priority={4}>
@@ -269,7 +271,10 @@ export class ShellScreen extends Component<IStore> {
                     }
                     taskBar={
                         <ConfigCondition
-                            condition={config.properties.layers.taskbar.enabled}
+                            condition={
+                                config.properties.layers.taskbar.enabled &&
+                                !config.properties.kiosk.enabled
+                            }
                         >
                             <TaskBar />
                         </ConfigCondition>
