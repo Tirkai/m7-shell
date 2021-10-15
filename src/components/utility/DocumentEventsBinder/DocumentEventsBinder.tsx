@@ -14,21 +14,6 @@ export const DocumentEventsBinder = () => {
         );
 
         document.addEventListener(
-            "mousewheel",
-            (event) => {
-                event.preventDefault();
-            },
-            { passive: false },
-        );
-        document.addEventListener(
-            "wheel",
-            (event) => {
-                event.preventDefault();
-            },
-            { passive: false },
-        );
-
-        document.addEventListener(
             "contextmenu",
             (event) => {
                 event.preventDefault();
