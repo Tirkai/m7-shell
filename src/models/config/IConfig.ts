@@ -1,4 +1,6 @@
+import { IApplicationWindowOptions } from "interfaces/window/IApplicationWindowOptions";
 import { PerformanceModeType } from "models/performance/PerformanceModeType";
+import { IApplicationProcessOptionalOptions } from "models/process/ApplicationProcess";
 
 export interface IConfig {
     name: string;
@@ -17,12 +19,26 @@ export interface IConfig {
             password: string;
         };
 
+        kiosk: {
+            enabled: boolean;
+            process: {
+                options: IApplicationProcessOptionalOptions;
+            };
+            window: {
+                options: IApplicationWindowOptions;
+            };
+        };
+
         windows: {
             singleWindow: {
                 header: {
                     enabled: boolean;
                 };
             };
+        };
+
+        cursor: {
+            enabled: boolean;
         };
 
         performance: {
