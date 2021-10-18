@@ -1,4 +1,8 @@
-import { AppMessageType, ShellMessageType } from "@algont/m7-shell-emitter";
+import {
+    AppMessageType,
+    EmitterMessage,
+    ShellMessageType,
+} from "@algont/m7-shell-emitter";
 import { IJsonRpcResponse, JsonRpcPayload } from "@algont/m7-utils";
 import Axios, { AxiosResponse } from "axios";
 import { IAppParams } from "interfaces/app/IAppParams";
@@ -194,20 +198,26 @@ export class ProcessManagerStore {
 
             appProcess.emitter.on(
                 AppMessageType.CreateWindowInstance,
-                (payload: { url: string }) => {
-                    this.onCreateWindowInstance(payload, appProcess);
+                (message: EmitterMessage<{ url: string }>) => {
+                    this.onCreateWindowInstance(message.payload, appProcess);
                 },
             );
 
             appProcess.emitter.on(
                 AppMessageType.EnableNativeEventInterception,
-                () => this.onEnableNativeEventInterception(appProcess),
+                (message: EmitterMessage<boolean>) =>
+                    this.onEnableNativeEventInterception(message, appProcess),
             );
 
             appProcess.emitter.on(
                 AppMessageType.HistoryLocationChange,
-                (payload: { url: string }) =>
-                    this.onHistoryLocationChange(appProcess, payload.url),
+                (message: EmitterMessage<{ url: string }>) => {
+                    this.onHistoryLocationChange(
+                        message,
+                        appProcess,
+                        message.payload.url,
+                    );
+                },
             );
 
             Axios.post<JsonRpcPayload, AxiosResponse<IJsonRpcResponse>>(
@@ -255,7 +265,13 @@ export class ProcessManagerStore {
         }
     }
 
-    onEnableNativeEventInterception(process: ApplicationProcess) {
+    onEnableNativeEventInterception(
+        message: EmitterMessage<boolean>,
+        process: ApplicationProcess,
+    ) {
+        if (message.isNested) {
+            return;
+        }
         process.setAutoFocusSupport(true);
 
         process.emitter.on(AppMessageType.InterceptClick, async () =>
@@ -273,9 +289,15 @@ export class ProcessManagerStore {
         );
     }
 
-    onHistoryLocationChange(process: ApplicationProcess, url: string) {
+    onHistoryLocationChange(
+        message: EmitterMessage<{ url: string }>,
+        process: ApplicationProcess,
+        url: string,
+    ) {
+        if (message.isNested) {
+            return;
+        }
         process.setLockedUrl(url);
-        //
     }
 
     startProcess(

@@ -1,4 +1,4 @@
-import { AppMessageType } from "@algont/m7-shell-emitter";
+import { AppMessageType, EmitterMessage } from "@algont/m7-shell-emitter";
 import classNames from "classnames";
 import { useStore } from "hooks/useStore";
 import { IStore } from "interfaces/common/IStore";
@@ -41,15 +41,21 @@ export const AppWindowContent = observer((props: IAppWindowProps) => {
     };
 
     const handleBindingEmitterEvents = (appProcess: ApplicationProcess) => {
-        appProcess.emitter.on(AppMessageType.Connected, () => {
-            handleAppReady();
+        appProcess.emitter.on(
+            AppMessageType.Connected,
+            (message: EmitterMessage<void>) => {
+                if (message.isNested) {
+                    return;
+                }
+                handleAppReady();
 
-            store.processManager.injectAuthTokenInProcess(
-                appProcess,
-                store.auth.accessToken,
-                store.auth.userLogin,
-            );
-        });
+                store.processManager.injectAuthTokenInProcess(
+                    appProcess,
+                    store.auth.accessToken,
+                    store.auth.userLogin,
+                );
+            },
+        );
 
         appProcess.emitter.on(AppMessageType.ForceRecieveToken, () =>
             store.processManager.injectAuthTokenInProcess(

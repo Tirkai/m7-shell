@@ -65,7 +65,7 @@ export class WindowManagerStore {
 
         eventBus.add(
             InterceptEventType.OnInterceptClick,
-            (process: ApplicationProcess) => this.focusWindow(process.window),
+            (process: ApplicationProcess) => this.onInterceptClick(process),
         );
 
         eventBus.add(
@@ -105,6 +105,14 @@ export class WindowManagerStore {
         if (appWindow.focusAfterInstantiate) {
             this.focusWindow(appWindow);
         }
+    }
+
+    onInterceptClick(process: ApplicationProcess) {
+        if (process.window.isFocused) {
+            return;
+        }
+
+        this.focusWindow(process.window);
     }
 
     onProcessStart(appProcess: ApplicationProcess) {
