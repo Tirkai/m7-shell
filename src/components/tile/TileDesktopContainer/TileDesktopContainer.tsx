@@ -127,8 +127,9 @@ export const TileDesktopContainer = observer(
         };
 
         const gridStyles = {
-            gridTemplateColumns: `repeat(${currentViewportPreset?.columns ??
-                0},1fr)`,
+            gridTemplateColumns: `repeat(${
+                currentViewportPreset?.columns ?? 0
+            },1fr)`,
             gridTemplateRows: `repeat(${props.preset?.rows ?? 0},1fr)`,
             gridTemplateAreas: props.preset?.areas,
         };
