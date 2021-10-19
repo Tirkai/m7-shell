@@ -7,6 +7,7 @@ import { DateTimeStore } from "./DateTimeStore";
 import { DisplayManager } from "./DisplayManager";
 import { HotkeyStore } from "./HotkeyStore";
 import { IncommingEventHandlerStore } from "./IncommingEventHandlerStore";
+import { KioskStore } from "./KioskStore";
 import { LocaleStore } from "./LocaleStore";
 import { MessageStore } from "./MessageStore";
 import { NotificationStore } from "./NotificationStore";
@@ -44,6 +45,7 @@ export class AppStore {
     recovery: RecoveryStore;
     config: ConfigStore;
     incommingEventHandler: IncommingEventHandlerStore;
+    kiosk: KioskStore;
     constructor() {
         this.sharedEventBus = new SharedEventBus(this);
         this.userDatabase = new UserDatabaseManager(this);
@@ -67,6 +69,7 @@ export class AppStore {
         this.recovery = new RecoveryStore(this);
         this.config = new ConfigStore(this);
         this.incommingEventHandler = new IncommingEventHandlerStore(this);
+        this.kiosk = new KioskStore(this);
 
         (window as any).store = this;
     }

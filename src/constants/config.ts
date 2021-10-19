@@ -4,7 +4,7 @@ import { PerformanceModeType } from "models/performance/PerformanceModeType";
 
 const nodeEnv = process.env.NODE_ENV;
 
-const developmentDomain = "zab";
+export const developmentDomain = "zab";
 
 const [, upperLevelDomain] = window.location.hostname.split(".");
 
