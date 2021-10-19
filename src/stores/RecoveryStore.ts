@@ -87,11 +87,14 @@ export class RecoveryStore {
     }
 
     onEntry() {
-        this.interval = setInterval(() => {
-            this.saveDynamicSnapshot();
-        }, 3000);
+        // TODO: Move to component
+        if (!this.store.config.config.properties.kiosk.enabled) {
+            this.interval = setInterval(() => {
+                this.saveDynamicSnapshot();
+            }, 3000);
 
-        this.loadSnapshots();
+            this.loadSnapshots();
+        }
     }
 
     onLogout() {
