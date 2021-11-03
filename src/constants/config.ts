@@ -118,5 +118,9 @@ export const defaultConfig: IConfig = {
                 enabled: false,
             },
         },
+        devMode: {
+            enabled: false,
+            allowedRoles: ["ROLE_ADMIN"],
+        },
     },
 };

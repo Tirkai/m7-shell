@@ -2,6 +2,7 @@ import { ConfigCondition } from "components/config/ConfigCondition/ConfigConditi
 import { ShellContextMenu } from "components/contextMenu/ShellContextMenu/ShellContextMenu";
 import { ShellContextMenuOverlay } from "components/contextMenu/ShellContextMenuOverlay/ShellContextMenuOverlay";
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
+import { DevModeHub } from "components/debug/DevModeHub/DevModeHub";
 import { DesktopContainer } from "components/desktop/DesktopContainer/DesktopContainer";
 import { DesktopLayer } from "components/layer/DesktopLayer/DesktopLayer";
 import { AppsMenu } from "components/menu/AppsMenu/AppsMenu";
@@ -15,7 +16,7 @@ import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { DesktopEventType } from "models/desktop/DesktopEventType";
-import React, { Component, lazy, Suspense } from "react";
+import React, { Component, Fragment, lazy, Suspense } from "react";
 import { DesktopLayout } from "../DesktopLayout/DesktopLayout";
 import { TransparentWindowLayer } from "../TransparentWindowLayer/TransparentWindowLayer";
 import style from "./style.module.css";
@@ -127,7 +128,9 @@ export class ShellScreen extends Component<IStore> {
                                                         .foreground.enabled
                                                 }
                                             >
-                                                <Suspense fallback="Loading">
+                                                <Suspense
+                                                    fallback={<Fragment />}
+                                                >
                                                     <DesktopLayer
                                                         enabled
                                                         priority={1}
@@ -148,7 +151,9 @@ export class ShellScreen extends Component<IStore> {
                                                         .tileArea.enabled
                                                 }
                                             >
-                                                <Suspense fallback="Loading">
+                                                <Suspense
+                                                    fallback={<Fragment />}
+                                                >
                                                     <DesktopLayer
                                                         enabled
                                                         priority={2}
@@ -169,7 +174,9 @@ export class ShellScreen extends Component<IStore> {
                                                         .floatArea.enabled
                                                 }
                                             >
-                                                <Suspense fallback="Loading">
+                                                <Suspense
+                                                    fallback={<Fragment />}
+                                                >
                                                     <DesktopLayer
                                                         enabled
                                                         priority={1}
@@ -204,7 +211,7 @@ export class ShellScreen extends Component<IStore> {
                                     config.properties.layers.viewportHub.enabled
                                 }
                             >
-                                <Suspense fallback="Loading">
+                                <Suspense fallback={<Fragment />}>
                                     <DesktopLayer enabled priority={2}>
                                         <VirtualDesktopHub />
                                     </DesktopLayer>
@@ -215,7 +222,7 @@ export class ShellScreen extends Component<IStore> {
                                     config.properties.layers.appsMenu.enabled
                                 }
                             >
-                                <Suspense fallback="Loading">
+                                <Suspense fallback={<Fragment />}>
                                     <DesktopLayer enabled priority={3}>
                                         <AppsMenu />
                                     </DesktopLayer>
@@ -228,7 +235,7 @@ export class ShellScreen extends Component<IStore> {
                                     !config.properties.kiosk.enabled
                                 }
                             >
-                                <Suspense fallback="Loading">
+                                <Suspense fallback={<Fragment />}>
                                     <DesktopLayer enabled priority={3}>
                                         <NotificationToasts />
                                         <NotificationHub />
@@ -236,7 +243,7 @@ export class ShellScreen extends Component<IStore> {
                                 </Suspense>
                             </ConfigCondition>
 
-                            <Suspense fallback="Loading">
+                            <Suspense fallback={<Fragment />}>
                                 <DesktopLayer enabled={false} priority={3}>
                                     <AppWindowPinContainer />
                                 </DesktopLayer>
@@ -246,7 +253,7 @@ export class ShellScreen extends Component<IStore> {
                                     config.properties.layers.audioHub.enabled
                                 }
                             >
-                                <Suspense fallback="Loading">
+                                <Suspense fallback={<Fragment />}>
                                     <DesktopLayer enabled priority={3}>
                                         <AudioContainer />
                                         <AudioHub />
@@ -265,6 +272,16 @@ export class ShellScreen extends Component<IStore> {
                             >
                                 <DesktopLayer enabled priority={4}>
                                     <RecoveryLayer />
+                                </DesktopLayer>
+                            </ConfigCondition>
+                            <ConfigCondition
+                                condition={
+                                    config.properties.devMode.enabled &&
+                                    this.store.auth.isAdmin
+                                }
+                            >
+                                <DesktopLayer enabled priority={4}>
+                                    <DevModeHub />
                                 </DesktopLayer>
                             </ConfigCondition>
                         </DesktopContainer>

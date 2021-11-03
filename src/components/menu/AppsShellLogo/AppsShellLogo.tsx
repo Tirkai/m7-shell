@@ -1,6 +1,6 @@
 import { SVGIcon } from "@algont/m7-ui";
 import { Avatar } from "@material-ui/core";
-import { list, settings, tiles } from "assets/icons";
+import { settings } from "assets/icons";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
 import { computed } from "mobx";
@@ -8,7 +8,6 @@ import { inject, observer } from "mobx-react";
 import { Application } from "models/app/Application";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
-import { AppsMenuViewMode } from "models/menu/AppsMenuViewMode";
 import { Point2D } from "models/shape/Point2D";
 import React, { Component } from "react";
 import { AppsMenuSidebarListItem } from "../AppsMenuSidebarListItem/AppsMenuSidebarListItem";
@@ -43,45 +42,18 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
                         onClick: () => this.handleExecuteApp(app),
                     }),
             );
+        // TODO: Remove
         if (this.store.auth.isAdmin) {
             menu.push(
                 new ContextMenuItemModel({
                     icon: <SVGIcon source={settings} color="white" />,
                     content: strings.startMenu.devMode,
-                    onClick: () =>
-                        this.store.panelManager.setDevMode(
-                            !this.store.panelManager.enabledDevMode,
-                        ),
-                }),
-            );
-        }
-
-        if (
-            this.store.panelManager.appsMenuViewMode === AppsMenuViewMode.Grid
-        ) {
-            menu.push(
-                new ContextMenuItemModel({
-                    icon: <SVGIcon source={tiles} color="white" />,
-                    content: "Режим отображения: Cетка",
-                    onClick: () =>
-                        this.store.panelManager.setAppsMenuViewMode(
-                            AppsMenuViewMode.List,
-                        ),
-                }),
-            );
-        }
-
-        if (
-            this.store.panelManager.appsMenuViewMode === AppsMenuViewMode.List
-        ) {
-            menu.push(
-                new ContextMenuItemModel({
-                    icon: <SVGIcon source={list} color="white" />,
-                    content: "Режим отображения: Список",
-                    onClick: () =>
-                        this.store.panelManager.setAppsMenuViewMode(
-                            AppsMenuViewMode.Grid,
-                        ),
+                    onClick: () => {
+                        this.store.message.showMessage(
+                            "Внимание!",
+                            "Режим отладки переехал на панель задач. В дальнейшем данный пункт будет удален из меню.",
+                        );
+                    },
                 }),
             );
         }
