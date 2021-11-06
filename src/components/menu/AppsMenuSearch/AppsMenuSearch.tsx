@@ -8,6 +8,7 @@ import style from "./style.module.css";
 interface IAppsMenuSearch {
     value: string;
     onChange: (value: string) => void;
+    onRefInput: (ref: HTMLInputElement | null) => void;
 }
 
 export class AppsMenuSearch extends Component<IAppsMenuSearch> {
@@ -24,6 +25,7 @@ export class AppsMenuSearch extends Component<IAppsMenuSearch> {
                     value={this.props.value}
                     placeholder={strings.startMenu.search}
                     maxLength={100}
+                    ref={(ref) => this.props.onRefInput(ref)}
                 />
                 <div
                     className={classNames(style.actions, {
