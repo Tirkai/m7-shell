@@ -1,0 +1,9 @@
+.transparentWindowLayer {
+    display: block;
+    height: 100%;
+    pointer-events: none;
+}
+
+.transparentWindowLayer > * {
+    pointer-events: all;
+}

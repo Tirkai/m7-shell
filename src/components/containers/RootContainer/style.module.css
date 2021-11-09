@@ -1,0 +1,7 @@
+.rootContainer {
+    box-sizing: border-box;
+}
+
+.disableCursor {
+    cursor: none;
+}

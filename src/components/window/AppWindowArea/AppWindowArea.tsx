@@ -1,10 +1,12 @@
 import classNames from "classnames";
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "constants/config";
-import { ResizeHandleDirection } from "enum/ResizeHandleDirection";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
+import { VirtualViewportModel } from "models/virtual/VirtualViewportModel";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
+import { ApplicationWindowType } from "models/window/ApplicationWindowType";
+import { ResizeHandleDirection } from "models/window/ResizeHandleDirection";
 import React from "react";
 import { DraggableData, DraggableEvent } from "react-draggable";
 import { ResizeCallbackData } from "react-resizable";
@@ -13,6 +15,7 @@ import style from "./style.module.css";
 
 interface IAppWindowAreaProps {
     disabled?: boolean;
+    viewport?: VirtualViewportModel;
 }
 
 export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
@@ -21,7 +24,6 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
     const handleWindowResizeStart = (
         appWindow: ApplicationWindow,
         event: MouseEvent,
-        data: ResizeCallbackData,
     ) => {
         appWindow.setResizing(true);
         appWindow.setResizeOriginPoint(event.clientX, event.clientY);
@@ -70,7 +72,7 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
     };
 
     const handleCloseWindow = (appProcess: ApplicationProcess) => {
-        store.processManager.killProcess(appProcess);
+        store.processManager.closeProcess(appProcess);
     };
 
     const handleDrag = (
@@ -87,30 +89,45 @@ export const AppWindowArea = observer((props: IAppWindowAreaProps) => {
                 [style.disabled]: props.disabled,
             })}
         >
-            {store.processManager.processes.map(
-                (process: ApplicationProcess) => (
-                    <AppWindow
-                        key={process.window.id}
-                        process={process}
-                        url={process.modifiedUrl}
-                        {...process.window}
-                        window={process.window}
-                        onResizeStart={(event, data) =>
-                            handleWindowResizeStart(process.window, event, data)
-                        }
-                        onResizeStop={() => process.window.setResizing(false)}
-                        onResize={(event, data) =>
-                            handleWindowResize(process.window, event, data)
-                        }
-                        onDragStart={() => process.window.setDragging(true)}
-                        onDragStop={() => process.window.setDragging(false)}
-                        onDrag={(event, data) =>
-                            handleDrag(process.window, event, data)
-                        }
-                        onClose={() => handleCloseWindow(process)}
-                    />
-                ),
-            )}
+            {store.processManager.processes
+                .filter(
+                    (process) =>
+                        (process.window.viewport.id === props.viewport?.id ??
+                            true) &&
+                        process.window.type === ApplicationWindowType.Float,
+                )
+                .map((process: ApplicationProcess) => {
+                    const appWindow = process.window as ApplicationWindow;
+
+                    return (
+                        <AppWindow
+                            key={process.window.id}
+                            process={process}
+                            url={process.modifiedUrl}
+                            {...process.window}
+                            window={appWindow}
+                            onResizeStart={(event) =>
+                                handleWindowResizeStart(appWindow, event)
+                            }
+                            onResizeStop={() => appWindow.setResizing(false)}
+                            onResize={(event, data) =>
+                                handleWindowResize(appWindow, event, data)
+                            }
+                            onDragStart={() => appWindow.setDragging(true)}
+                            onDragStop={() => appWindow.setDragging(false)}
+                            onDrag={(event, data) =>
+                                handleDrag(appWindow, event, data)
+                            }
+                            onClose={() => handleCloseWindow(process)}
+                            isResizing={appWindow.isResizing}
+                            isDragging={appWindow.isDragging}
+                            width={appWindow.width}
+                            height={appWindow.height}
+                        />
+                    );
+                })}
         </div>
     );
 });
+
+export default AppWindowArea;

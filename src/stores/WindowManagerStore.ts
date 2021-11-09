@@ -1,9 +1,17 @@
-import { AuthEventType } from "enum/AuthEventType";
-import { ShellEvents } from "enum/ShellEvents";
-import { IDisplayMode } from "interfaces/display/IDisplayMode";
 import { max, min } from "lodash";
 import { makeAutoObservable } from "mobx";
-import { ApplicationWindow } from "models/ApplicationWindow";
+import { AuthEventType } from "models/auth/AuthEventType";
+import { DesktopEventType } from "models/desktop/DesktopEventType";
+import { InterceptEventType } from "models/intercept/InterceptEventType";
+import { NavigationReferer } from "models/navigation/NavigationReferer";
+import { NavigationRefererEventType } from "models/navigation/NavigationRefererEventType";
+import { PanelEventType } from "models/panel/PanelEventType";
+import { ShellEvents } from "models/panel/ShellEvents";
+import { ApplicationProcess } from "models/process/ApplicationProcess";
+import { ProcessEventType } from "models/process/ProcessEventType";
+import { ApplicationWindow } from "models/window/ApplicationWindow";
+import { ApplicationWindowEventType } from "models/window/ApplicationWindowEventType";
+import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { AppStore } from "./AppStore";
 
 export class WindowManagerStore {
@@ -13,11 +21,8 @@ export class WindowManagerStore {
     constructor(store: AppStore) {
         this.store = store;
 
+        const { eventBus } = store.sharedEventBus;
         makeAutoObservable(this);
-
-        this.store.auth.eventBus.addEventListener(AuthEventType.Logout, () =>
-            this.closeAllWindows(),
-        );
 
         window.addEventListener(ShellEvents.FocusShellControls, () =>
             this.clearFocus(),
@@ -25,11 +30,49 @@ export class WindowManagerStore {
 
         window.addEventListener(ShellEvents.Resize, () => {
             this.windows
-                .filter((item) => item.isFullScreen)
+                .filter((item) => {
+                    if (item instanceof ApplicationWindow) {
+                        return item.isFullScreen;
+                    }
+                    return false;
+                })
                 .forEach((item) => {
-                    item.recalculateFullScreenSize();
+                    if (item instanceof ApplicationWindow) {
+                        item.recalculateFullScreenSize();
+                    }
                 });
         });
+
+        eventBus.add(
+            ProcessEventType.OnInstantiateProcess,
+            (appProcess: ApplicationProcess) => this.onProcessStart(appProcess),
+        );
+
+        eventBus.add(
+            ProcessEventType.OnKillProcess,
+            (appProcess: ApplicationProcess) => this.onProcessKill(appProcess),
+        );
+
+        eventBus.add(DesktopEventType.OnDesktopClick, () =>
+            this.onDesktopClick(),
+        );
+
+        eventBus.add(PanelEventType.OnShowAnyPanel, () =>
+            this.onShowAnyPanel(),
+        );
+
+        eventBus.add(AuthEventType.OnLogout, () => this.closeAllWindows());
+
+        eventBus.add(
+            InterceptEventType.OnInterceptClick,
+            (process: ApplicationProcess) => this.onInterceptClick(process),
+        );
+
+        eventBus.add(
+            NavigationRefererEventType.OnNavigateToReferer,
+            (referer: NavigationReferer) =>
+                this.onNavigateToRefererProcess(referer),
+        );
     }
 
     focusedWindow: ApplicationWindow | null = null;
@@ -43,7 +86,9 @@ export class WindowManagerStore {
     }
 
     get resizedWindow() {
-        return this.windows.find((item) => item.isResizing);
+        return this.windows.find(
+            (item) => item instanceof ApplicationWindow && item.isResizing,
+        );
     }
 
     get hasResizedWindow() {
@@ -54,24 +99,53 @@ export class WindowManagerStore {
         return document.activeElement;
     }
 
-    onChangeDisplayMode(mode: IDisplayMode) {
-        try {
-            this.windows.forEach((item) => {
-                item.setDispayMode(mode);
-            });
-        } catch (e) {
-            console.error(e);
+    addWindow(appWindow: ApplicationWindow) {
+        this.windows.push(appWindow);
+
+        if (appWindow.focusAfterInstantiate) {
+            this.focusWindow(appWindow);
         }
     }
 
-    addWindow(appWindow: ApplicationWindow) {
-        this.windows.push(appWindow);
-        this.focusWindow(appWindow);
+    onInterceptClick(process: ApplicationProcess) {
+        if (process.window.isFocused) {
+            return;
+        }
+
+        this.focusWindow(process.window);
+    }
+
+    onProcessStart(appProcess: ApplicationProcess) {
+        this.addWindow(appProcess.window);
+    }
+
+    onProcessKill(appProcess: ApplicationProcess) {
+        this.closeWindow(appProcess.window);
+    }
+
+    onDesktopClick() {
+        this.clearFocus();
+    }
+
+    onShowAnyPanel() {
+        this.clearFocus();
+    }
+
+    onNavigateToRefererProcess(referer: NavigationReferer) {
+        const window = this.windows.find(
+            (item) => item.id === referer.refererWindowId,
+        );
+        if (window) {
+            this.focusWindow(window);
+        }
     }
 
     focusWindow(appWindow: ApplicationWindow) {
         try {
-            window.dispatchEvent(new CustomEvent(ShellEvents.FocusAnyWindow));
+            this.store.sharedEventBus.eventBus.dispatch(
+                ApplicationWindowEventType.OnFocusWindow,
+                appWindow,
+            );
 
             if (appWindow.isFocused) return;
 
@@ -82,20 +156,20 @@ export class WindowManagerStore {
             const minIndex = min(indexes);
 
             const maxIndex = max(indexes);
-
-            if (minIndex && maxIndex) {
+            if (minIndex !== undefined && maxIndex !== undefined) {
                 this.windows.forEach((item) => {
                     let index = 0;
                     if (item.id === appWindow.id) {
-                        index = maxIndex - minIndex + 2;
+                        index = maxIndex - minIndex + 1;
                         appWindow.setFocused(true);
                     } else {
-                        index = item.depthIndex - minIndex + 1;
+                        index = item.depthIndex - minIndex;
                         item.setFocused(false);
                     }
                     item.setDepthIndex(index);
                 });
             }
+
             this.focusedWindow = appWindow;
         } catch (e) {
             console.error(e);
@@ -111,12 +185,63 @@ export class WindowManagerStore {
         }
     }
 
+    startDragWindow(appWindow: ApplicationWindow) {
+        appWindow.setDragging(true);
+        this.store.sharedEventBus.eventBus.dispatch(
+            ApplicationWindowEventType.OnDragStart,
+            appWindow,
+        );
+    }
+
+    stopDragWindow(appWindow: ApplicationWindow) {
+        appWindow.setDragging(false);
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            ApplicationWindowEventType.OnDragStop,
+            appWindow,
+        );
+    }
+
     closeWindow(appWindow: ApplicationWindow) {
         try {
+            this.store.sharedEventBus.eventBus.dispatch(
+                ApplicationWindowEventType.OnClose,
+                appWindow,
+            );
             this.windows.splice(this.windows.indexOf(appWindow), 1);
         } catch (e) {
             console.error(e);
         }
+    }
+
+    applyCollapseToWindow(appWindow: ApplicationWindow, value: boolean) {
+        appWindow.setCollapsed(value);
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            ApplicationWindowEventType.OnCollapse,
+            appWindow,
+        );
+    }
+
+    applyFullscreenToWindow(appWindow: ApplicationWindow, value: boolean) {
+        appWindow.setFullScreen(value);
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            ApplicationWindowEventType.OnFullscreen,
+            appWindow,
+        );
+    }
+
+    applyTypeToWindow(
+        appWindow: ApplicationWindow,
+        value: ApplicationWindowType,
+    ) {
+        appWindow.setType(value);
+
+        this.store.sharedEventBus.eventBus.dispatch(
+            ApplicationWindowEventType.OnTypeChange,
+            appWindow,
+        );
     }
 
     closeAllWindows() {

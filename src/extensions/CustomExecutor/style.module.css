@@ -1,5 +1,7 @@
 .customExecutor {
     padding: 12px;
+    background: white;
+    height: 100vh;
 }
 .container {
     display: flex;

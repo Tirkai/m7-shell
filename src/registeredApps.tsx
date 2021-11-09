@@ -1,9 +1,9 @@
-import { rocket, terminal } from "assets/icons";
+import { terminal } from "assets/icons";
 import { CustomExecutor } from "extensions/CustomExecutor/CustomExecutor";
-import { LaunchQueryBuilder } from "extensions/LaunchQueryBuilder/LaunchQueryBuilder";
 import { strings } from "locale";
-import { Application } from "models/Application";
-import { ShellApplication } from "models/ShellApplication";
+import { Application } from "models/app/Application";
+import { ExternalApplication } from "models/app/ExternalApplication";
+import { ShellApplication } from "models/app/ShellApplication";
 import React from "react";
 import { v4 } from "uuid";
 
@@ -18,14 +18,11 @@ export const registeredApps: Application[] = [
         isVisibleInStartMenu: false,
         icon: terminal,
     }),
-    new ShellApplication({
+    new ExternalApplication({
         id: v4(),
-        name: strings.shellApps.launchQueryBuilder.title,
-        key: "LaunchQueryBuilder",
-        Component: <LaunchQueryBuilder />,
-        baseWidth: 600,
-        baseHeight: 700,
+        name: "app.dashboard",
+        key: "app.dashboard",
+        url: "http://shell.zab/ext/dashboard",
         isVisibleInStartMenu: false,
-        icon: rocket,
     }),
 ];

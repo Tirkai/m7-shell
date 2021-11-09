@@ -19,10 +19,7 @@
     width: 24px;
     height: 24px;
     margin-right: 6px;
-}
-
-.icon svg {
-    color: white;
-    width: 16px;
-    height: 16px;
+    --svgIconInjectedWidth: 16px;
+    --svgIconInjectedHeight: 16px;
+    --svgIconInjectedColor: white;
 }

@@ -1,0 +1,19 @@
+.virtualFrame {
+    /* display: none; */
+    height: 100%;
+    width: 100vw;
+    position: relative;
+    overflow: hidden;
+    /* opacity: 0; */
+    pointer-events: none;
+    transition: ease 0.3s;
+    /* transform: scale(-0); */
+}
+
+.active {
+    /* display: block; */
+    opacity: 1;
+    pointer-events: all;
+    transition: ease 0.3s 0.2s;
+    /* transform: scale(1); */
+}

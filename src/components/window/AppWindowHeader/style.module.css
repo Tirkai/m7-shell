@@ -1,12 +1,11 @@
 .appWindowHeader {
     height: 30px;
     background: #222;
-    display: none;
     width: 100%;
+    overflow: hidden;
+    position: relative;
 }
 .container {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
     height: 100%;
     width: 100%;
@@ -18,30 +17,13 @@
     height: 100%;
 }
 
-.icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 30px;
-    height: 100%;
-    margin-right: 5px;
-}
-.icon img {
-    height: 16px;
-    width: 16px;
-}
-
-.title {
-    display: flex;
-    align-items: center;
-    color: white;
-    line-height: 1em;
-}
-
 .actions {
+    position: absolute;
+    top: 0;
+    right: 0;
     display: flex;
     height: 100%;
-    position: relative;
+    justify-content: flex-end;
     z-index: 5;
 }
 .focused {

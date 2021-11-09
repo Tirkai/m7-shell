@@ -1,0 +1,25 @@
+.virtualViewport {
+    position: relative;
+    width: 100vw;
+    height: 100%;
+    transition: ease 0.3s;
+    display: none;
+    opacity: 0;
+}
+.control {
+    position: fixed;
+    bottom: 100px;
+    left: 300px;
+    z-index: 1000000;
+}
+
+.container {
+    height: 100%;
+    width: auto;
+    display: grid;
+}
+
+.displayed {
+    display: block;
+    opacity: 1;
+}

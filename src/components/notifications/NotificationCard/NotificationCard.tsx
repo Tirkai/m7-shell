@@ -1,9 +1,8 @@
 import { cross } from "assets/icons";
 import classNames from "classnames";
-import { PerformanceContext } from "contexts/PerformanceContext";
 import { observer } from "mobx-react";
 import moment from "moment";
-import React, { useContext } from "react";
+import React from "react";
 import style from "./style.module.css";
 
 interface INotificationCardProps {
@@ -16,11 +15,7 @@ interface INotificationCardProps {
 }
 
 export const NotificationCard = observer((props: INotificationCardProps) => {
-    const performanceMode = useContext(PerformanceContext);
-
-    const handleClick = (
-        event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    ) => {
+    const handleClick = () => {
         props.onClick();
         props.onClose();
     };

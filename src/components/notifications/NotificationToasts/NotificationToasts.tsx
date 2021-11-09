@@ -1,12 +1,11 @@
 import classNames from "classnames";
-import { ShellPanelType } from "enum/ShellPanelType";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import { ApplicationProcess } from "models/ApplicationProcess";
-import { ApplicationWindow } from "models/ApplicationWindow";
-import { ExternalApplication } from "models/ExternalApplication";
-import { NotificationModel } from "models/NotificationModel";
-import { ToastNotification } from "models/ToastNotification";
+import { ApplicationRunner } from "models/app/ApplicationRunner";
+import { ExternalApplication } from "models/app/ExternalApplication";
+import { NotificationModel } from "models/notification/NotificationModel";
+import { ToastNotification } from "models/notification/ToastNotification";
+import { ShellPanelType } from "models/panel/ShellPanelType";
 import React from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import style from "./style.module.css";
@@ -18,24 +17,16 @@ export const NotificationToasts = observer(() => {
             toast.notification.applicationId,
         );
         if (app instanceof ExternalApplication) {
-            store.shell.setActivePanel(ShellPanelType.None);
+            store.panelManager.setActivePanel(ShellPanelType.None);
 
-            if (!app.isExecuted) {
-                const appProcess = new ApplicationProcess({
-                    app,
-                    window: new ApplicationWindow(),
+            const runner = new ApplicationRunner(store);
+
+            runner.run(app, {
+                processOptions: {
                     url: toast.notification.url,
-                });
-                store.processManager.execute(appProcess);
-            } else {
-                const activeProcess = store.processManager.findProcessByApp(
-                    app,
-                );
-                if (activeProcess) {
-                    activeProcess.setUrl(toast.notification.url);
-                    store.windowManager.focusWindow(activeProcess.window);
-                }
-            }
+                },
+                focusWindowAfterInstantiate: true,
+            });
         }
 
         toast.setShow(false);
@@ -85,3 +76,5 @@ export const NotificationToasts = observer(() => {
         </div>
     );
 });
+
+export default NotificationToasts;

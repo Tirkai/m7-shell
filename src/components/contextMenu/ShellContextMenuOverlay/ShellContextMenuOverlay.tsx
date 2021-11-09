@@ -4,8 +4,6 @@ import { observer } from "mobx-react";
 import React from "react";
 import style from "./style.module.css";
 
-const className = style.shellContextMenuOverlay;
-
 export const ShellContextMenuOverlay = observer(() => {
     const store = useStore();
 

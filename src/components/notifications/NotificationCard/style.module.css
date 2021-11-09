@@ -63,3 +63,11 @@
     transition: ease 0.3s;
     margin: 0;
 }
+
+.contextActions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(50px, 100px));
+    grid-gap: 8px;
+    align-items: center;
+    padding-top: 10px;
+}

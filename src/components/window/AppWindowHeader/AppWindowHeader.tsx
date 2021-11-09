@@ -1,14 +1,18 @@
+import { MarkerType, useMarker } from "@algont/m7-react-marker";
 import { SVGIcon } from "@algont/m7-ui";
 import { collapse, cross, fullscreen, refresh } from "assets/icons";
 import classNames from "classnames";
+import { useStore } from "hooks/useStore";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
-import { computed } from "mobx";
-import { inject, observer } from "mobx-react";
-import { ContextMenuItemModel } from "models/ContextMenuItemModel";
-import { Point2D } from "models/Point2D";
-import React, { Component } from "react";
+import { observer } from "mobx-react";
+import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
+import { NavigationReferer } from "models/navigation/NavigationReferer";
+import { Point2D } from "models/shape/Point2D";
+import React from "react";
 import { AppWindowHeaderAction } from "../AppWindowHeaderAction/AppWindowHeaderAction";
+import { AppWindowHeaderReferer } from "../AppWindowHeaderReferer/AppWindowHeaderReferer";
+import { AppWindowHeaderTitle } from "../AppWindowHeaderTitle/AppWindowHeaderTitle";
 import style from "./style.module.css";
 
 interface IAppWindowHeaderProps extends IStore {
@@ -18,73 +22,87 @@ interface IAppWindowHeaderProps extends IStore {
     hasReload?: boolean;
     isFocused: boolean;
     onDoubleClick?: () => void;
-    onClose: () => void;
-    onFullscreen: () => void;
-    onCollapse: () => void;
-    onBackward: () => void;
-    onReload: () => void;
-    visible: boolean;
+    onClose?: () => void;
+    onFullscreen?: () => void;
+    onCollapse?: () => void;
+    onBackward?: () => void;
+    onNavigateToReferer: (referer: NavigationReferer) => void;
+    onReload?: () => void;
+    visible?: boolean;
+    referer?: NavigationReferer;
 }
 
-@inject("store")
-@observer
-export class AppWindowHeader extends Component<IAppWindowHeaderProps> {
-    @computed
-    get store() {
-        return this.props.store!;
-    }
+export const AppWindowHeader = observer((props: IAppWindowHeaderProps) => {
+    const store = useStore();
 
-    handleShowContextMenu = (e: React.MouseEvent) => {
-        this.store.contextMenu.showContextMenu(new Point2D(e.pageX, e.pageY), [
-            new ContextMenuItemModel({
-                icon: refresh,
-                content: strings.application.actions.hardReset,
-                onClick: this.props.onReload,
-            }),
-        ]);
+    const { createMemoizedMarker } = useMarker();
+
+    const handleShowContextMenu = (e: React.MouseEvent) => {
+        if (props.onReload) {
+            store.contextMenu.showContextMenu(new Point2D(e.pageX, e.pageY), [
+                new ContextMenuItemModel({
+                    icon: <SVGIcon source={refresh} color="white" />,
+                    content: strings.application.actions.hardReset,
+                    onClick: () =>
+                        props.onReload ? props.onReload() : undefined,
+                }),
+            ]);
+        }
     };
 
-    render() {
-        return (
-            <div
-                className={classNames(
-                    "appWindowHeader",
-                    style.appWindowHeader,
-                    { [style.focused]: this.props.isFocused },
-                    { [style.visible]: this.props.visible },
-                )}
-                onDoubleClick={this.props.onDoubleClick}
-            >
-                <div className={style.container}>
-                    <div className={classNames("appHeaderInfoBar", style.info)}>
-                        <div
-                            className={style.icon}
-                            onClick={this.handleShowContextMenu}
-                        >
-                            <SVGIcon
-                                source={this.props.icon}
-                                size={{ width: "16px", height: "16px" }}
-                                color="#ffffff"
-                            />
-                        </div>
-                        <div className={style.title}>{this.props.title}</div>
-                    </div>
-                    <div className={style.actions}>
+    const handleNavigateToReferer = () => {
+        if (props.referer) {
+            props.onNavigateToReferer(props.referer);
+        }
+    };
+
+    return (
+        <div
+            className={classNames(
+                "appWindowHeader",
+                style.appWindowHeader,
+                { [style.focused]: props.isFocused },
+                { [style.visible]: props.visible },
+            )}
+            {...createMemoizedMarker(MarkerType.Element, "AppWindowHeader")}
+            onDoubleClick={props.onDoubleClick}
+        >
+            <div className={style.container}>
+                <div className={classNames(style.info)}>
+                    {props.referer && (
+                        <AppWindowHeaderReferer
+                            title={props.referer.refererName}
+                            onBack={handleNavigateToReferer}
+                        />
+                    )}
+
+                    <AppWindowHeaderTitle
+                        title={props.title}
+                        icon={props.icon}
+                        onIconClick={handleShowContextMenu}
+                    />
+                </div>
+                <div className={style.actions}>
+                    {props.onCollapse && (
                         <AppWindowHeaderAction
                             icon={collapse}
-                            onClick={this.props.onCollapse}
+                            onClick={props.onCollapse}
                         />
+                    )}
+                    {props.onFullscreen && (
                         <AppWindowHeaderAction
                             icon={fullscreen}
-                            onClick={this.props.onFullscreen}
+                            onClick={props.onFullscreen}
                         />
+                    )}
+                    {props.onClose && (
                         <AppWindowHeaderAction
                             icon={cross}
-                            onClick={this.props.onClose}
+                            onClick={props.onClose}
                         />
-                    </div>
+                    )}
                 </div>
             </div>
-        );
-    }
-}
+        </div>
+    );
+});

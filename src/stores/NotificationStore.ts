@@ -5,25 +5,25 @@ import {
     JsonRpcResult,
     RequestListPayload,
 } from "@algont/m7-utils";
-import Axios from "axios";
+import Axios, { AxiosResponse } from "axios";
 import { AudioSource } from "constants/audio";
 import {
     AUTH_TOKEN_HEADER,
     NOTIFICATIONS_WEBSOCKET_URL,
 } from "constants/config";
-import { NotificationServiceConnectStatus } from "enum/NotificationServiceConnectStatus";
-import { ShellEvents } from "enum/ShellEvents";
 import { ApplicationFactory } from "factories/ApplicationFactory";
 import { NotificationFactory } from "factories/NotificationFactory";
 import { INotificationAppRelationResponse } from "interfaces/response/INotificationAppRelationResponse";
 import { INotificationCountResponse } from "interfaces/response/INotificationCountResponse";
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
 import { makeAutoObservable } from "mobx";
-import { AudioModel } from "models/AudioModel";
-import { ExternalApplication } from "models/ExternalApplication";
-import { NotificationGroupModel } from "models/NotificationGroupModel";
-import { NotificationModel } from "models/NotificationModel";
-import { ToastNotification } from "models/ToastNotification";
+import { ExternalApplication } from "models/app/ExternalApplication";
+import { AudioModel } from "models/audio/AudioModel";
+import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
+import { NotificationModel } from "models/notification/NotificationModel";
+import { NotificationServiceConnectStatus } from "models/notification/NotificationServiceConnectStatus";
+import { ToastNotification } from "models/notification/ToastNotification";
+import { ShellEvents } from "models/panel/ShellEvents";
 import io from "socket.io-client";
 import {
     notificationsAppsEndpoint,
@@ -32,7 +32,7 @@ import {
 import { AppStore } from "./AppStore";
 
 export class NotificationStore {
-    socket: SocketIOClient.Socket | null = null;
+    socket: any | null = null;
 
     toasts: ToastNotification[] = [];
 
@@ -74,9 +74,12 @@ export class NotificationStore {
         this.toasts = toasts;
     }
 
-    async loadCountByFilter(payload: object) {
+    async loadCountByFilter(payload: Record<string, unknown>) {
         try {
-            const response = await Axios.post<IJsonRpcResponse<number>>(
+            const response = await Axios.post<
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<number>>
+            >(
                 notificationsEndpoint.url,
                 new JsonRpcPayload("get_count_by_filter", payload),
             );
@@ -94,7 +97,8 @@ export class NotificationStore {
     async loadNotificationsByFilter(payload: RequestListPayload) {
         try {
             const response = await Axios.post<
-                IJsonRpcResponse<INotificationResponse[]>
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<INotificationResponse[]>>
             >(
                 notificationsEndpoint.url,
                 new JsonRpcPayload("get_list_by_filter", payload),
@@ -140,7 +144,7 @@ export class NotificationStore {
 
             if (notificationsResponse.result) {
                 const notifications = notificationsResponse.result.map((item) =>
-                    NotificationFactory.createNotification(item),
+                    NotificationFactory.createNotificationFromRawData(item),
                 );
 
                 group.setNotifications(notifications);
@@ -155,7 +159,8 @@ export class NotificationStore {
 
     async fetchTotalCount(login: string) {
         const notificationsCountResponse = await Axios.post<
-            IJsonRpcResponse<number>
+            JsonRpcPayload,
+            AxiosResponse<IJsonRpcResponse<number>>
         >(
             notificationsEndpoint.url,
             new JsonRpcPayload("get_count_by_filter", {
@@ -181,7 +186,8 @@ export class NotificationStore {
     async fetchApps(login: string) {
         try {
             const appsCountResponse = await Axios.post<
-                IJsonRpcResponse<number>
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse<number>>
             >(
                 notificationsAppsEndpoint.url,
                 new JsonRpcPayload("get_count_by_filter", {
@@ -192,7 +198,10 @@ export class NotificationStore {
             );
 
             const appsListResponse = await Axios.post<
-                IJsonRpcResponse<INotificationAppRelationResponse[]>
+                JsonRpcPayload,
+                AxiosResponse<
+                    IJsonRpcResponse<INotificationAppRelationResponse[]>
+                >
             >(
                 notificationsAppsEndpoint.url,
                 new JsonRpcPayload("get_list_by_filter", {
@@ -281,7 +290,7 @@ export class NotificationStore {
                         "add_notification",
                         (response: INotificationResponse) =>
                             this.addNotification(
-                                NotificationFactory.createNotification(
+                                NotificationFactory.createNotificationFromRawData(
                                     response,
                                 ),
                             ),
@@ -406,18 +415,21 @@ export class NotificationStore {
                 const count = countResponse.result!;
 
                 if (count > 0) {
-                    const notificationsResponse = await this.loadNotificationsByFilter(
-                        new RequestListPayload({
-                            filter: {
-                                app_id: {
-                                    values: [group.id],
+                    const notificationsResponse =
+                        await this.loadNotificationsByFilter(
+                            new RequestListPayload({
+                                filter: {
+                                    app_id: {
+                                        values: [group.id],
+                                    },
+                                    login: { values: [login] },
                                 },
-                                login: { values: [login] },
-                            },
-                            limit: deleteCount,
-                            order: [{ field: "ntf_date", direction: "desc" }],
-                        }),
-                    );
+                                limit: deleteCount,
+                                order: [
+                                    { field: "ntf_date", direction: "desc" },
+                                ],
+                            }),
+                        );
 
                     if (notificationsResponse.result) {
                         const removeResponse = await this.removeNotifications(
@@ -443,7 +455,10 @@ export class NotificationStore {
 
     async removeNotifications(ids: string[], login: string) {
         try {
-            const response = await Axios.post<IJsonRpcResponse>(
+            const response = await Axios.post<
+                JsonRpcPayload,
+                AxiosResponse<IJsonRpcResponse>
+            >(
                 notificationsEndpoint.url,
                 new JsonRpcPayload("drop_user_notifications", {
                     user_notifications: ids.map((item) => ({

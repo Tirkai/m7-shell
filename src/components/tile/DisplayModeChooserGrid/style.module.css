@@ -1,0 +1,7 @@
+.displayModeChooserGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 42px);
+    height: 100%;
+    grid-gap: 8px;
+    align-items: center;
+}

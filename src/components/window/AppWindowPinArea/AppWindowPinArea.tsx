@@ -26,21 +26,12 @@ export class AppWindowPinArea extends Component<IAppWindowPinAreaProps> {
         this.setState({
             hovered: true,
         });
-
-        const draggedWindow = this.store.windowManager.draggedWindow;
-        if (draggedWindow) {
-            draggedWindow.setPinArea(this.props.windowArea);
-        }
     };
 
     handleMouseOut = () => {
         this.setState({
             hovered: false,
         });
-        const draggedWindow = this.store.windowManager.draggedWindow;
-        if (draggedWindow) {
-            draggedWindow.setPinArea(null);
-        }
     };
 
     render() {
