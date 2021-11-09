@@ -94,11 +94,18 @@ export class ApplicationManagerStore {
     findByUrlPart(url: string) {
         try {
             const hostname = new URL(url).hostname;
-            return this.applications.find((app) =>
-                app instanceof ExternalApplication
-                    ? app.url.indexOf(hostname) > -1 && app.url.length > 0
-                    : false,
-            );
+
+            const findedApp = this.applications.find((app) => {
+                if (app instanceof ExternalApplication) {
+                    const appUrl = new URL(app.url);
+
+                    return (
+                        appUrl.hostname === hostname &&
+                        appUrl.hostname.length > 0
+                    );
+                }
+            });
+            return findedApp;
         } catch (e) {
             console.error(e);
         }
