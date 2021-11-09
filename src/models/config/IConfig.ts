@@ -109,5 +109,9 @@ export interface IConfig {
                 enabled: boolean;
             };
         };
+        devMode: {
+            enabled: boolean;
+            allowedRoles: string[];
+        };
     };
 }

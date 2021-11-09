@@ -11,7 +11,7 @@ import { Application } from "models/app/Application";
 import { ApplicationPlace } from "models/app/ApplicationPlace";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { AppsMenuViewMode } from "models/menu/AppsMenuViewMode";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AppsMenuListContainer } from "../AppsMenuListContainer/AppsMenuListContainer";
 import { AppsMenuSearch } from "../AppsMenuSearch/AppsMenuSearch";
 import { AppsMenuViewSwitcher } from "../AppsMenuViewSwitcher/AppsMenuViewSwitcher";
@@ -24,6 +24,8 @@ export const AppsMenu: React.FC = observer(() => {
     const store = useStore();
     const [search, setSearch] = useState("");
     const [isSearching, setSearching] = useState(false);
+
+    const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
 
     const handleSearch = (value: string) => {
         setSearch(value);
@@ -78,6 +80,14 @@ export const AppsMenu: React.FC = observer(() => {
               )
     ).filter((app) => !app.isExistedAppInstance);
 
+    useEffect(() => {
+        if (store.panelManager.appMenuShow && inputRef) {
+            inputRef.focus();
+        } else {
+            setTimeout(() => setSearch(""), 300);
+        }
+    }, [store.panelManager.appMenuShow]);
+
     const { config } = store.config;
     const appsMenuConfig = config.properties.layers.appsMenu;
     return (
@@ -112,6 +122,7 @@ export const AppsMenu: React.FC = observer(() => {
                         <AppsMenuSearch
                             value={search}
                             onChange={handleSearch}
+                            onRefInput={(ref) => setInputRef(ref)}
                         />
                     </div>
 

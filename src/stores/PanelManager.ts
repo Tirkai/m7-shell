@@ -30,6 +30,10 @@ export class PanelManager {
         return this.activePanel === ShellPanelType.AudioHub;
     }
 
+    get devModeHubShow(){
+        return this.activePanel === ShellPanelType.DevModeHub;
+    }
+
     enabledDevMode: boolean = process.env.NODE_ENV === "development";
 
     activePanel: ShellPanelType = ShellPanelType.None;
