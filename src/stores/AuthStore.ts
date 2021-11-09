@@ -291,14 +291,6 @@ export class AuthStore {
     }
 
     async login(login: string, password: string) {
-        // #region
-        // Отключение режима отладки при входе другого пользователя
-        // Фикс для версии 0.26.1
-        // Не вливать в основной develop, так как в
-        // более новых версиях это будет реализовано на EventBus
-        this.store.shell.setDevMode(false);
-        // #endregion
-
         try {
             const response = await Axios.post<
                 JsonRpcPayload,
