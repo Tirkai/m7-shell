@@ -1,0 +1,13 @@
+.devModeHub {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 400px;
+    height: 70px;
+    color: white;
+}
+
+.isShow {
+    display: block;
+}

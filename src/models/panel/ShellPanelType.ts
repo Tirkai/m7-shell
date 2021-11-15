@@ -5,4 +5,5 @@ export enum ShellPanelType {
     AudioHub = "audioHub",
     Virtual = "virtual",
     TileHub = "tileHub",
+    DevModeHub = "devModeHub",
 }

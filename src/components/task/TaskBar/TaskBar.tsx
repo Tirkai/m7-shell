@@ -12,6 +12,7 @@ import hash from "object-hash";
 import React from "react";
 import { TaskBarAppsMenuButton } from "../TaskBarAppsMenuButton/TaskBarAppsMenuButton";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
+import { TaskBarDevModeButton } from "../TaskBarDevModeButton/TaskBarDevModeButton";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
 import { TaskBarSoundButton } from "../TaskBarSoundButton/TaskBarSoundButton";
 import { TaskBarViewportButton } from "../TaskBarViewportButton/TaskBarViewportButton";
@@ -49,6 +50,7 @@ export const TaskBar = observer(() => {
         );
     };
 
+    // TODO : Refactor
     const handleShowAudioHub = () => {
         store.panelManager.setActivePanel(
             store.panelManager.activePanel !== ShellPanelType.AudioHub
@@ -65,6 +67,14 @@ export const TaskBar = observer(() => {
         store.panelManager.setActivePanel(
             store.panelManager.activePanel !== ShellPanelType.Virtual
                 ? ShellPanelType.Virtual
+                : ShellPanelType.None,
+        );
+    };
+
+    const handleShowDevModeHub = () => {
+        store.panelManager.setActivePanel(
+            store.panelManager.activePanel !== ShellPanelType.DevModeHub
+                ? ShellPanelType.DevModeHub
                 : ShellPanelType.None,
         );
     };
@@ -120,6 +130,18 @@ export const TaskBar = observer(() => {
                 </div>
 
                 <div className={style.actions}>
+                    <ConfigCondition
+                        condition={
+                            config.properties.devMode.enabled &&
+                            store.auth.isAdmin
+                        }
+                    >
+                        <TaskBarItem>
+                            <TaskBarDevModeButton
+                                onClick={handleShowDevModeHub}
+                            />
+                        </TaskBarItem>
+                    </ConfigCondition>
                     <ConfigCondition condition={layersConfig.audioHub.enabled}>
                         <TaskBarItem>
                             <TaskBarSoundButton
