@@ -1,52 +1,21 @@
-import { SVGIcon } from "@algont/m7-ui";
-import {
-    Button,
-    CircularProgress,
-    FormControlLabel,
-    Radio,
-    RadioGroup
-} from "@material-ui/core";
-import { empty } from "assets/icons";
 import classNames from "classnames";
-import { PanelInformer } from "components/informer/PanelInformer/PanelInformer";
-import { PanelInformerActions } from "components/informer/PanelInformerActions/PanelInformerActions";
-import { PanelInformerContent } from "components/informer/PanelInformerText/PanelInformerText";
-import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
-import { NOTIFICATION_APP_GUID } from "constants/config";
 import { useStore } from "hooks/useStore";
-import { strings } from "locale";
 import { observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/app/ExternalApplication";
-import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
 import { NotificationModel } from "models/notification/NotificationModel";
+import { NotificationTab } from "models/notification/NotificationTab";
 import { ShellPanelType } from "models/panel/ShellPanelType";
-import React, { useEffect, useState } from "react";
-import { NotificationCard } from "../NotificationCard/NotificationCard";
-import { NotificationClearDialogContainer } from "../NotificationClearDialogContainer/NotificationClearDialogContainer";
-import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
+import React, { useEffect } from "react";
+import { CommonNotificationsList } from "../CommonNotificationsList/CommonNotificationsList";
+import { ImportantNotificationsList } from "../ImportantNotificationsList/ImportantNotificationsList";
+import { InstructionDialog } from "../InstructionDialog/InstructionDialog";
 import { NotificationHubHeader } from "../NotificationHubHeader/NotificationHubHeader";
+import { NotificationsList } from "../NotificationsList/NotificationsList";
 import style from "./style.module.css";
-
-enum NotificationDeletionType {
-    DeleteVisible = "visible",
-    DeleteAll = "all",
-}
 
 export const NotificationHub = observer(() => {
     const store = useStore();
-
-    const [showClearGroupDialog, setShowClearGroupDialog] = useState<{
-        isShow: boolean;
-        group: NotificationGroupModel | null;
-    }>({
-        isShow: false,
-        group: null,
-    });
-
-    const [deletionType, setDeletionType] = useState(
-        NotificationDeletionType.DeleteVisible,
-    );
 
     const connectNotifications = async () => {
         await store.notification.fetchApps(store.auth.userLogin);
@@ -65,70 +34,64 @@ export const NotificationHub = observer(() => {
         return () => disconnectNotifications();
     };
 
-    const onChangeActivePanel = () => {
-        if (store.panelManager.activePanel !== ShellPanelType.NotificationHub) {
-            setShowClearGroupDialog({ isShow: false, group: null });
-        }
-    };
+    // const handleDeleteNotifications = (
+    //     group: NotificationGroupModel | null,
+    //     type: NotificationDeletionType,
+    // ) => {
+    //     if (group) {
+    //         if (type === NotificationDeletionType.DeleteVisible) {
+    //             handleClearVisibleNotifications(group);
+    //         }
+    //         if (type === NotificationDeletionType.DeleteAll) {
+    //             handleClearGroup(group);
+    //         }
+    //         setDeletionType(NotificationDeletionType.DeleteVisible);
+    //     }
+    // };
 
-    const handleDeleteNotifications = (
-        group: NotificationGroupModel | null,
-        type: NotificationDeletionType,
-    ) => {
-        if (group) {
-            if (type === NotificationDeletionType.DeleteVisible) {
-                handleClearVisibleNotifications(group);
-            }
-            if (type === NotificationDeletionType.DeleteAll) {
-                handleClearGroup(group);
-            }
-            setDeletionType(NotificationDeletionType.DeleteVisible);
-        }
-    };
+    // const handleClearGroup = async (group: NotificationGroupModel | null) => {
+    //     setShowClearGroupDialog({ isShow: false, group: null });
+    //     if (group) {
+    //         group.setFetching(true);
+    //         try {
+    //             await store.notification.removeNotificationsByGroup(
+    //                 group,
+    //                 store.auth.userLogin,
+    //             );
 
-    const handleClearGroup = async (group: NotificationGroupModel | null) => {
-        setShowClearGroupDialog({ isShow: false, group: null });
-        if (group) {
-            group.setFetching(true);
-            try {
-                await store.notification.removeNotificationsByGroup(
-                    group,
-                    store.auth.userLogin,
-                );
+    //             await store.notification.fetchGroup(
+    //                 group,
+    //                 store.auth.userLogin,
+    //             );
+    //         } catch (e) {
+    //             console.error(e);
+    //         } finally {
+    //             group.setFetching(false);
+    //         }
+    //     }
+    // };
 
-                await store.notification.fetchGroup(
-                    group,
-                    store.auth.userLogin,
-                );
-            } catch (e) {
-                console.error(e);
-            } finally {
-                group.setFetching(false);
-            }
-        }
-    };
-
-    const handleClearVisibleNotifications = async (
-        group: NotificationGroupModel | null,
-    ) => {
-        if (group) {
-            setShowClearGroupDialog({
-                isShow: false,
-                group: null,
-            });
-            group.setFetching(true);
-            try {
-                await store.notification.removeNotifications(
-                    group.notifications.map((item) => item.id),
-                    store.auth.userLogin,
-                );
-            } catch (e) {
-                console.error(e);
-            } finally {
-                group.setFetching(false);
-            }
-        }
-    };
+    // const handleClearVisibleNotifications = async (
+    //     group: NotificationGroupModel | null,
+    // ) => {
+    //     if (group) {
+    //         setShowClearGroupDialog({
+    //             isShow: false,
+    //             group: null,
+    //         });
+    //         group.setFetching(true);
+    //         try {
+    //             await store.notification.removeNotifications(
+    //                 group.notifications.map((item) => item.id),
+    //                 store.auth.userLogin,
+    //             );
+    //         } catch (e) {
+    //             console.error(e);
+    //         } finally {
+    //             group.setFetching(false);
+    //         }
+    //     }
+    // };
 
     const handleCloseNotification = (notification: NotificationModel) => {
         notification.setDisplayed(false);
@@ -156,108 +119,107 @@ export const NotificationHub = observer(() => {
         }
     };
 
-    const handleOpenNotificationGroup = (group: NotificationGroupModel) => {
-        const notificationApp = store.applicationManager.findById(
-            NOTIFICATION_APP_GUID,
-        );
+    // const handleOpenNotificationGroup = (group: NotificationGroupModel) => {
+    //     const notificationApp = store.applicationManager.findById(
+    //         NOTIFICATION_APP_GUID,
+    //     );
 
-        const runner = new ApplicationRunner(store);
+    //     const runner = new ApplicationRunner(store);
 
-        if (notificationApp) {
-            runner.run(notificationApp, {
-                processOptions: {
-                    params: new Map([["filterByAppId", group.id]]),
-                },
-                focusWindowAfterInstantiate: true,
-            });
-        }
-    };
+    //     if (notificationApp) {
+    //         runner.run(notificationApp, {
+    //             processOptions: {
+    //                 params: new Map([["filterByAppId", group.id]]),
+    //             },
+    //             focusWindowAfterInstantiate: true,
+    //         });
+    //     }
+    // };
 
-    const handleSetDeletionType = (
-        event: React.ChangeEvent<HTMLInputElement>,
-    ) => {
-        const value = event.target.value as NotificationDeletionType;
-        setDeletionType(value);
-    };
+    // const handleSetDeletionType = (
+    //     event: React.ChangeEvent<HTMLInputElement>,
+    // ) => {
+    //     const value = event.target.value as NotificationDeletionType;
+    //     setDeletionType(value);
+    // };
 
-    const getGroupOverlay = (group: NotificationGroupModel) => {
-        if (group.isFetching || group.isLocked) {
-            return <CircularProgress color="secondary" />;
-        }
-        if (
-            group.id === showClearGroupDialog?.group?.id &&
-            showClearGroupDialog.isShow
-        ) {
-            return (
-                <NotificationClearDialogContainer>
-                    <PanelInformer>
-                        <PanelInformerContent>
-                            Удалить группу уведомлений?
-                        </PanelInformerContent>
-                        {group.count > 5 && (
-                            <PanelInformerContent>
-                                <RadioGroup
-                                    color="primary"
-                                    name="deleteChoose"
-                                    value={deletionType}
-                                    onChange={handleSetDeletionType}
-                                >
-                                    <FormControlLabel
-                                        value={
-                                            NotificationDeletionType.DeleteVisible
-                                        }
-                                        control={<Radio color="primary" />}
-                                        label={
-                                            "Удалить " +
-                                            group.notifications.length +
-                                            " уведомлений"
-                                        }
-                                    />
+    // const getGroupOverlay = (group: NotificationGroupModel) => {
+    //     if (group.isFetching || group.isLocked) {
+    //         return <CircularProgress color="secondary" />;
+    //     }
+    //     if (
+    //         group.id === showClearGroupDialog?.group?.id &&
+    //         showClearGroupDialog.isShow
+    //     ) {
+    //         return (
+    //             <NotificationClearDialogContainer>
+    //                 <PanelInformer>
+    //                     <PanelInformerContent>
+    //                         Удалить группу уведомлений?
+    //                     </PanelInformerContent>
+    //                     {group.count > 5 && (
+    //                         <PanelInformerContent>
+    //                             <RadioGroup
+    //                                 color="primary"
+    //                                 name="deleteChoose"
+    //                                 value={deletionType}
+    //                                 onChange={handleSetDeletionType}
+    //                             >
+    //                                 <FormControlLabel
+    //                                     value={
+    //                                         NotificationDeletionType.DeleteVisible
+    //                                     }
+    //                                     control={<Radio color="primary" />}
+    //                                     label={
+    //                                         "Удалить " +
+    //                                         group.notifications.length +
+    //                                         " уведомлений"
+    //                                     }
+    //                                 />
 
-                                    <FormControlLabel
-                                        value={
-                                            NotificationDeletionType.DeleteAll
-                                        }
-                                        control={<Radio color="primary" />}
-                                        label="Удалить все"
-                                    />
-                                </RadioGroup>
-                            </PanelInformerContent>
-                        )}
+    //                                 <FormControlLabel
+    //                                     value={
+    //                                         NotificationDeletionType.DeleteAll
+    //                                     }
+    //                                     control={<Radio color="primary" />}
+    //                                     label="Удалить все"
+    //                                 />
+    //                             </RadioGroup>
+    //                         </PanelInformerContent>
+    //                     )}
 
-                        <PanelInformerActions>
-                            <Button
-                                onClick={() =>
-                                    setShowClearGroupDialog({
-                                        isShow: false,
-                                        group: null,
-                                    })
-                                }
-                            >
-                                Отмена
-                            </Button>
-                            <Button
-                                onClick={() => {
-                                    handleDeleteNotifications(
-                                        showClearGroupDialog.group,
-                                        deletionType,
-                                    );
-                                }}
-                                classes={{ root: style.deletionButton }}
-                            >
-                                Удалить
-                            </Button>
-                        </PanelInformerActions>
-                    </PanelInformer>
-                </NotificationClearDialogContainer>
-            );
-        }
+    //                     <PanelInformerActions>
+    //                         <Button
+    //                             onClick={() =>
+    //                                 setShowClearGroupDialog({
+    //                                     isShow: false,
+    //                                     group: null,
+    //                                 })
+    //                             }
+    //                         >
+    //                             Отмена
+    //                         </Button>
+    //                         <Button
+    //                             onClick={() => {
+    //                                 handleDeleteNotifications(
+    //                                     showClearGroupDialog.group,
+    //                                     deletionType,
+    //                                 );
+    //                             }}
+    //                             classes={{ root: style.deletionButton }}
+    //                         >
+    //                             Удалить
+    //                         </Button>
+    //                     </PanelInformerActions>
+    //                 </PanelInformer>
+    //             </NotificationClearDialogContainer>
+    //         );
+    //     }
 
-        return null;
-    };
+    //     return null;
+    // };
 
     useEffect(onMount, []);
-    useEffect(onChangeActivePanel, [store.panelManager.activePanel]);
 
     return (
         <div
@@ -268,9 +230,22 @@ export const NotificationHub = observer(() => {
             <div className={style.container}>
                 <div className={style.content}>
                     <NotificationHubHeader />
+                    <NotificationsList>
+                        {store.notification.tab === NotificationTab.All && (
+                            <CommonNotificationsList
+                                onCloseNotification={handleCloseNotification}
+                                onRunApplication={handleRunApplication}
+                            />
+                        )}
+                        {store.notification.tab ===
+                            NotificationTab.Important && (
+                            <ImportantNotificationsList
+                                onCloseNotification={handleCloseNotification}
+                                onRunApplication={handleRunApplication}
+                            />
+                        )}
 
-                    <div className={style.notificationsList}>
-                        {store.notification.groups
+                        {/* {store.notification.groups
                             .filter((group) => group.hasNotifications)
                             .map((group) => (
                                 <NotificationGroup
@@ -326,10 +301,15 @@ export const NotificationHub = observer(() => {
                                         strings.notification.noMoreNotifications
                                     }
                                 />
-                            )}
-                    </div>
+                            )} */}
+                    </NotificationsList>
                 </div>
             </div>
+            <InstructionDialog
+                text={store.notification.instructionText}
+                open={store.notification.isShowInstruction}
+                onClose={() => store.notification.showInstruction(false)}
+            />
         </div>
     );
 });

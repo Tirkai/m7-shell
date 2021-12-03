@@ -36,6 +36,10 @@ export class NotificationStore {
 
     toasts: ToastNotification[] = [];
 
+    isShowInstruction: boolean = false;
+
+    instructionText: string = "";
+
     // notifications: NotificationModel[] = [];
 
     groups: NotificationGroupModel[] = [];
@@ -331,6 +335,10 @@ export class NotificationStore {
                         (response: INotificationResponse) => {
                             const notificationId = response.ntf_id;
 
+                            this.fetchImportantNotifications(
+                                this.store.auth.userLogin,
+                            );
+
                             const group = this.groups.find((groupItem) =>
                                 groupItem.notifications.find(
                                     (notifyItem) =>
@@ -397,6 +405,10 @@ export class NotificationStore {
                 this.toasts.unshift(
                     new ToastNotification({ notification, expireTime }),
                 );
+            }
+
+            if (notification.isRequireConfirm) {
+                this.importantNotifications.push(notification);
             }
 
             const group = this.groups.find(
@@ -509,5 +521,12 @@ export class NotificationStore {
 
     setImportantNotifications(notifications: NotificationModel[]) {
         this.importantNotifications = notifications;
+    }
+
+    showInstruction(isShow: boolean, text?: string) {
+        this.isShowInstruction = isShow;
+        if (text) {
+            this.instructionText = text;
+        }
     }
 }

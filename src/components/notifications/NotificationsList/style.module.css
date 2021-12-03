@@ -1,0 +1,7 @@
+.notificationsList {
+    height: 100%;
+    align-items: flex-start;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 12px;
+}

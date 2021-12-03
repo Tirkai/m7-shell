@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import React from "react";
 import { NotificationConfirm } from "../NotificationConfirm/NotificationConfirm";
@@ -22,6 +23,7 @@ interface INotificationCardProps {
 }
 
 export const NotificationCard = observer((props: INotificationCardProps) => {
+    const store = useStore();
     const handleClick = () => {
         props.onClick();
         props.onClose();
@@ -30,6 +32,10 @@ export const NotificationCard = observer((props: INotificationCardProps) => {
     const handleClose = () => {
         // event.stopPropagation();
         props.onClose();
+    };
+
+    const handleConfirm = () => {
+        store.notification.showInstruction(true, props.instruction);
     };
 
     return (
@@ -51,7 +57,7 @@ export const NotificationCard = observer((props: INotificationCardProps) => {
                         <NotificationDate date={props.date} />
                     </div>
                     <NotificationConfirm
-                        onConfirm={() => alert("CONFIRM")}
+                        onConfirm={handleConfirm}
                         isShow={props.isRequireConfirm}
                     />
                 </div>

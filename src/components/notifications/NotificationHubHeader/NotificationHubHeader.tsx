@@ -26,19 +26,6 @@ export const NotificationHubHeader = observer(
                     <div className={style.tabs}>
                         <NotificationCategoryTabs>
                             <NotificationCategoryTab
-                                icon={<Warning />}
-                                label={"На подтверждение"}
-                                active={
-                                    store.notification.tab ===
-                                    NotificationTab.Important
-                                }
-                                onClick={() =>
-                                    store.notification.setTab(
-                                        NotificationTab.Important,
-                                    )
-                                }
-                            />
-                            <NotificationCategoryTab
                                 icon={
                                     <SVGIcon
                                         source={notifications}
@@ -54,6 +41,19 @@ export const NotificationHubHeader = observer(
                                 onClick={() =>
                                     store.notification.setTab(
                                         NotificationTab.All,
+                                    )
+                                }
+                            />
+                            <NotificationCategoryTab
+                                icon={<Warning />}
+                                label={"На подтверждение"}
+                                active={
+                                    store.notification.tab ===
+                                    NotificationTab.Important
+                                }
+                                onClick={() =>
+                                    store.notification.setTab(
+                                        NotificationTab.Important,
                                     )
                                 }
                             />
