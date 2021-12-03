@@ -2,10 +2,14 @@
     box-sizing: border-box;
     display: flex;
     align-self: center;
-    padding: 12px;
+    padding: 4px 12px 0 4px;
     border-bottom: 1px solid transparent;
     font-size: 18px;
     transition: ease 0.3s;
+    background: #2d2d2f;
+    width: 100%;
+    box-shadow: 0 0 15px #ffffff0d;
+    z-index: 100;
 }
 
 .isScrolled {
@@ -14,5 +18,10 @@
 
 .container {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    width: 100%;
+}
+
+.tabs {
+    width: 100%;
 }

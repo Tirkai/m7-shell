@@ -1,16 +1,13 @@
 .notificationHeader {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 14px;
+    gap: 4px;
+    font-size: 20px;
 }
 
 .icon {
-    display: flex;
-}
-
-.title {
-    color: white;
+    /* HIDDEN */
+    display: none;
 }
 
 .actions {

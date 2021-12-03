@@ -36,9 +36,11 @@ export class NotificationStore {
 
     toasts: ToastNotification[] = [];
 
-    notifications: NotificationModel[] = [];
+    // notifications: NotificationModel[] = [];
 
     groups: NotificationGroupModel[] = [];
+
+    importantNotifications: NotificationModel[] = [];
 
     totalCount = 0;
 
@@ -64,9 +66,9 @@ export class NotificationStore {
         this.status = status;
     }
 
-    setNotifications(notifications: NotificationModel[]) {
-        this.notifications = notifications;
-    }
+    // setNotifications(notifications: NotificationModel[]) {
+    //     this.notifications = notifications;
+    // }
 
     setTotalCount(count: number) {
         this.totalCount = count;
@@ -96,7 +98,7 @@ export class NotificationStore {
         }
     }
 
-    async loadNotificationsByFilter(payload: RequestListPayload) {
+    async loadNotificationsByFilter(payload: object) {
         try {
             const response = await Axios.post<
                 JsonRpcPayload,
@@ -175,8 +177,28 @@ export class NotificationStore {
         this.setTotalCount(notificationsCountResponse.data.result);
     }
 
-    fetchNotifications(login: string) {
+    async fetchImportantNotifications(login: string) {
+        const notificationsResponse = await this.loadNotificationsByFilter({
+            filter: {
+                confirm: { values: ["waiting"] },
+                login: { values: [login] },
+            },
+            limit: 1000,
+            offset: 0,
+            order: [{ field: "ntf_date", direction: "desc" }],
+        });
+
+        if (notificationsResponse.result) {
+            const notifications = notificationsResponse.result.map((item) =>
+                NotificationFactory.createNotificationFromRawData(item),
+            );
+            this.setImportantNotifications(notifications);
+        }
+    }
+
+    async fetchNotifications(login: string) {
         try {
+            await this.fetchImportantNotifications(login);
             this.groups.forEach((group) => {
                 this.fetchGroup(group, login);
             });
@@ -483,5 +505,9 @@ export class NotificationStore {
 
     setTab(value: NotificationTab) {
         this.tab = value;
+    }
+
+    setImportantNotifications(notifications: NotificationModel[]) {
+        this.importantNotifications = notifications;
     }
 }

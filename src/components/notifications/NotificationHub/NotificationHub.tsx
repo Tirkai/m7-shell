@@ -4,7 +4,7 @@ import {
     CircularProgress,
     FormControlLabel,
     Radio,
-    RadioGroup,
+    RadioGroup
 } from "@material-ui/core";
 import { empty } from "assets/icons";
 import classNames from "classnames";
@@ -35,7 +35,6 @@ enum NotificationDeletionType {
 
 export const NotificationHub = observer(() => {
     const store = useStore();
-    const [isScrolled, setScrolled] = useState(false);
 
     const [showClearGroupDialog, setShowClearGroupDialog] = useState<{
         isShow: boolean;
@@ -139,15 +138,6 @@ export const NotificationHub = observer(() => {
                 store.auth.userLogin,
             );
         }, 300);
-    };
-
-    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-        if (isScrolled && event.currentTarget.scrollTop <= 0) {
-            setScrolled(false);
-        }
-        if (!isScrolled && event.currentTarget.scrollTop > 0) {
-            setScrolled(true);
-        }
     };
 
     const handleRunApplication = (appId: string, url: string) => {
@@ -277,12 +267,9 @@ export const NotificationHub = observer(() => {
         >
             <div className={style.container}>
                 <div className={style.content}>
-                    <NotificationHubHeader isScrolled={isScrolled} />
+                    <NotificationHubHeader />
 
-                    <div
-                        className={style.notificationsList}
-                        onScroll={handleScroll}
-                    >
+                    <div className={style.notificationsList}>
                         {store.notification.groups
                             .filter((group) => group.hasNotifications)
                             .map((group) => (

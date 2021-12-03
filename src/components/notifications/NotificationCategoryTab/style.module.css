@@ -2,15 +2,39 @@
     position: relative;
     box-sizing: border-box;
     display: flex;
+    justify-content: center;
     gap: 8px;
-    padding: 8px 16px;
+    padding: 8px 0;
     border-radius: 8px;
     cursor: pointer;
-    background: #2d2d2f;
+    font-size: 16px;
+    flex-grow: 1;
+}
+
+.notificationCategoryTab:before {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    content: " ";
+    background: #97c2f1;
+    border-radius: 16px;
+    transition: ease 0.3s;
 }
 
 .active {
-    background: #096dd9;
+    color: #97c2f1;
+}
+
+.active svg {
+    color: #97c2f1;
+    fill: #97c2f1;
+}
+
+.active:before {
+    left: calc(50% - 45%);
+    width: 90%;
 }
 
 .active:hover {

@@ -14,7 +14,6 @@ const className = style.notificationHubHeader;
 
 interface INotificationHubHeaderProps {
     children?: React.ReactNode;
-    isScrolled: boolean;
 }
 
 export const NotificationHubHeader = observer(
@@ -22,14 +21,23 @@ export const NotificationHubHeader = observer(
         const store = useStore();
 
         return (
-            <div
-                className={classNames(className, {
-                    [style.isScrolled]: props.isScrolled,
-                })}
-            >
+            <div className={classNames(className)}>
                 <div className={style.container}>
                     <div className={style.tabs}>
                         <NotificationCategoryTabs>
+                            <NotificationCategoryTab
+                                icon={<Warning />}
+                                label={"На подтверждение"}
+                                active={
+                                    store.notification.tab ===
+                                    NotificationTab.Important
+                                }
+                                onClick={() =>
+                                    store.notification.setTab(
+                                        NotificationTab.Important,
+                                    )
+                                }
+                            />
                             <NotificationCategoryTab
                                 icon={
                                     <SVGIcon
@@ -38,7 +46,7 @@ export const NotificationHubHeader = observer(
                                         color="white"
                                     />
                                 }
-                                label={"Все"}
+                                label={"Все уведомления"}
                                 active={
                                     store.notification.tab ===
                                     NotificationTab.All
@@ -46,19 +54,6 @@ export const NotificationHubHeader = observer(
                                 onClick={() =>
                                     store.notification.setTab(
                                         NotificationTab.All,
-                                    )
-                                }
-                            />
-                            <NotificationCategoryTab
-                                icon={<Warning />}
-                                label={"Важные"}
-                                active={
-                                    store.notification.tab ===
-                                    NotificationTab.Important
-                                }
-                                onClick={() =>
-                                    store.notification.setTab(
-                                        NotificationTab.Important,
                                     )
                                 }
                             />
