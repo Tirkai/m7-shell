@@ -6,7 +6,6 @@ import {
     RequestListPayload,
 } from "@algont/m7-utils";
 import Axios, { AxiosResponse } from "axios";
-import { AudioSource } from "constants/audio";
 import {
     AUTH_TOKEN_HEADER,
     NOTIFICATIONS_WEBSOCKET_URL,
@@ -18,10 +17,11 @@ import { INotificationCountResponse } from "interfaces/response/INotificationCou
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
 import { makeAutoObservable } from "mobx";
 import { ExternalApplication } from "models/app/ExternalApplication";
-import { AudioModel } from "models/audio/AudioModel";
+import { NotificationExpireTime } from "models/notification/NotificationExpireTime";
 import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
 import { NotificationModel } from "models/notification/NotificationModel";
 import { NotificationServiceConnectStatus } from "models/notification/NotificationServiceConnectStatus";
+import { NotificationTab } from "models/notification/NotificationTab";
 import { ToastNotification } from "models/notification/ToastNotification";
 import { ShellEvents } from "models/panel/ShellEvents";
 import io from "socket.io-client";
@@ -50,6 +50,8 @@ export class NotificationStore {
 
     status: NotificationServiceConnectStatus =
         NotificationServiceConnectStatus.Default;
+
+    tab: NotificationTab = NotificationTab.All;
 
     private store: AppStore;
     constructor(store: AppStore) {
@@ -365,7 +367,15 @@ export class NotificationStore {
 
     addNotification(notification: NotificationModel) {
         try {
-            this.toasts.unshift(new ToastNotification(notification));
+            if (notification.isShowBanner) {
+                const expireTime = notification.isRequireConfirm
+                    ? NotificationExpireTime.Long
+                    : NotificationExpireTime.Short;
+
+                this.toasts.unshift(
+                    new ToastNotification({ notification, expireTime }),
+                );
+            }
 
             const group = this.groups.find(
                 (item) => item.id === notification.applicationId,
@@ -373,13 +383,6 @@ export class NotificationStore {
             if (group) {
                 this.fetchGroup(group, this.store.auth.userLogin);
             }
-
-            this.store.audio.playAudio(
-                new AudioModel({
-                    source: AudioSource.Notification,
-                    awaitQueue: false,
-                }),
-            );
         } catch (e) {
             console.error(e);
         }
@@ -476,5 +479,9 @@ export class NotificationStore {
             console.error(e);
             return new JsonRpcFailure();
         }
+    }
+
+    setTab(value: NotificationTab) {
+        this.tab = value;
     }
 }

@@ -28,13 +28,14 @@
 }
 
 .content {
-    display: block;
-    height: calc(100% - 30px);
+    display: grid;
+    grid-template-rows: 60px 1fr;
+    height: 100%;
 }
 .title {
     display: flex;
     align-self: center;
-    padding: 6px 12px;
+    padding: 12px;
     border-bottom: 1px solid transparent;
     font-size: 18px;
     transition: ease 0.3s;

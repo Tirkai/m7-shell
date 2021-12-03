@@ -37,7 +37,9 @@
 }
 
 .content {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     position: relative;
     min-height: 95px;
 }

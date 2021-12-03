@@ -25,6 +25,7 @@ import React, { useEffect, useState } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import { NotificationClearDialogContainer } from "../NotificationClearDialogContainer/NotificationClearDialogContainer";
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
+import { NotificationHubHeader } from "../NotificationHubHeader/NotificationHubHeader";
 import style from "./style.module.css";
 
 enum NotificationDeletionType {
@@ -276,13 +277,8 @@ export const NotificationHub = observer(() => {
         >
             <div className={style.container}>
                 <div className={style.content}>
-                    <div
-                        className={classNames(style.title, {
-                            [style.titleAfterScroll]: isScrolled,
-                        })}
-                    >
-                        {strings.notification.title}
-                    </div>
+                    <NotificationHubHeader isScrolled={isScrolled} />
+
                     <div
                         className={style.notificationsList}
                         onScroll={handleScroll}
@@ -309,7 +305,11 @@ export const NotificationHub = observer(() => {
                                     {group.notifications.map((notification) => (
                                         <NotificationCard
                                             key={notification.id}
+                                            icon={group.icon}
                                             {...notification}
+                                            hasInstruction={
+                                                notification.hasInstruction
+                                            }
                                             onClick={() =>
                                                 handleRunApplication(
                                                     notification.applicationId,

@@ -1,15 +1,22 @@
-import { cross } from "assets/icons";
 import classNames from "classnames";
 import { observer } from "mobx-react";
-import moment from "moment";
 import React from "react";
+import { NotificationConfirm } from "../NotificationConfirm/NotificationConfirm";
+import { NotificationDate } from "../NotificationDate/NotificationDate";
+import { NotificationHeader } from "../NotificationHeader/NotificationHeader";
+import { NotificationInstruction } from "../NotificationInstruction/NotificationInstruction";
+import { NotificationText } from "../NotificationText/NotificationText";
 import style from "./style.module.css";
 
 interface INotificationCardProps {
+    icon?: string;
     text: string;
     title: string;
     date: string;
+    isRequireConfirm: boolean;
     isDisplayed: boolean;
+    instruction: string;
+    hasInstruction: boolean;
     onClose: () => void;
     onClick: () => void;
 }
@@ -20,22 +27,41 @@ export const NotificationCard = observer((props: INotificationCardProps) => {
         props.onClose();
     };
 
-    const handleClose = (
-        event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    ) => {
-        event.stopPropagation();
+    const handleClose = () => {
+        // event.stopPropagation();
         props.onClose();
     };
 
-    const localizedDate = moment(props.date).fromNow();
     return (
         <div
             className={classNames(style.notificationCard, {
                 [style.isRemoving]: !props.isDisplayed,
             })}
-            onClick={handleClick}
         >
             <div className={style.container}>
+                <div className={style.content}>
+                    <div className={style.activeArea} onClick={handleClick}>
+                        <NotificationHeader
+                            icon={props.icon}
+                            title={props.title}
+                            onClose={handleClose}
+                            disableCloseAction={props.isRequireConfirm}
+                        />
+                        <NotificationText text={props.text} />
+                        <NotificationDate date={props.date} />
+                    </div>
+                    <NotificationConfirm
+                        onConfirm={() => alert("CONFIRM")}
+                        isShow={props.isRequireConfirm}
+                    />
+                </div>
+                <NotificationInstruction
+                    isShow={props.hasInstruction}
+                    title="Инструкция"
+                    content={props.instruction}
+                />
+            </div>
+            {/* <div className={style.container}>
                 <div className={style.header}>
                     <div className={style.actions}>
                         <div className={style.actionItem} onClick={handleClose}>
@@ -54,7 +80,7 @@ export const NotificationCard = observer((props: INotificationCardProps) => {
                 <div className={style.date}>
                     <div className={style.text}>{localizedDate}</div>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 });

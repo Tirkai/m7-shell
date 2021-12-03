@@ -1,0 +1,24 @@
+.notificationHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.icon {
+    display: flex;
+}
+
+.title {
+    color: white;
+}
+
+.actions {
+    display: flex;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.actions img {
+    width: 12px;
+}

@@ -1,0 +1,24 @@
+.notificationCategoryTab {
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #2d2d2f;
+}
+
+.active {
+    background: #096dd9;
+}
+
+.active:hover {
+    cursor: default;
+}
+
+.icon svg {
+    width: 16px;
+    height: 16px;
+    color: white;
+}

@@ -1,8 +1,6 @@
 import { SVGIcon } from "@algont/m7-ui";
 import { Avatar } from "@material-ui/core";
-import { settings } from "assets/icons";
 import { IStore } from "interfaces/common/IStore";
-import { strings } from "locale";
 import { computed } from "mobx";
 import { inject, observer } from "mobx-react";
 import { Application } from "models/app/Application";
@@ -42,21 +40,6 @@ export class AppsShellLogo extends Component<IAppsShellLogoProps> {
                         onClick: () => this.handleExecuteApp(app),
                     }),
             );
-        // TODO: Remove
-        if (this.store.auth.isAdmin) {
-            menu.push(
-                new ContextMenuItemModel({
-                    icon: <SVGIcon source={settings} color="white" />,
-                    content: strings.startMenu.devMode,
-                    onClick: () => {
-                        this.store.message.showMessage(
-                            "Внимание!",
-                            "Режим отладки переехал на панель задач. В дальнейшем данный пункт будет удален из меню.",
-                        );
-                    },
-                }),
-            );
-        }
 
         if (menu.length) {
             this.store.contextMenu.showContextMenu(

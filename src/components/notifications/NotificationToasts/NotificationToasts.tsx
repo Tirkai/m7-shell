@@ -68,6 +68,7 @@ export const NotificationToasts = observer(() => {
                 >
                     <NotificationCard
                         {...item.notification}
+                        hasInstruction={item.notification.hasInstruction}
                         onClick={() => handleRunApplication(item)}
                         onClose={() => handleClose(item)}
                     />

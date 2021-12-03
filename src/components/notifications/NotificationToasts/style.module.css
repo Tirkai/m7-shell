@@ -7,7 +7,7 @@
 }
 .toastItem {
     margin-bottom: 12px;
-    width: 300px;
+    width: 400px;
     animation: fadeIn 0.3s;
     transition: ease 0.3s;
 }

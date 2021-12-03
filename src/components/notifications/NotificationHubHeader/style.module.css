@@ -1,0 +1,18 @@
+.notificationHubHeader {
+    box-sizing: border-box;
+    display: flex;
+    align-self: center;
+    padding: 12px;
+    border-bottom: 1px solid transparent;
+    font-size: 18px;
+    transition: ease 0.3s;
+}
+
+.isScrolled {
+    border-bottom: 1px solid #ffffff0d;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+}

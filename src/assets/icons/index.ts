@@ -1,5 +1,5 @@
 import apps from "./apps.svg";
-import arrowBack from './arrowBack.svg';
+import arrowBack from "./arrowBack.svg";
 import backward from "./backward.svg";
 import collapse from "./collapse.svg";
 import cross from "./cross.svg";
@@ -10,6 +10,7 @@ import error from "./error.svg";
 import exit from "./exit.svg";
 import floatWindowMode from "./float-window-mode.svg";
 import fullscreen from "./fullscreen.svg";
+import instructionInfo from "./instruction-info.svg";
 import layout from "./layout.svg";
 import listMenu from "./list-menu.svg";
 import list from "./list.svg";
@@ -61,6 +62,6 @@ export {
     virtual,
     floatWindowMode,
     list,
-    arrowBack
+    arrowBack,
+    instructionInfo,
 };
-
