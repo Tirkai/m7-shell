@@ -20,7 +20,7 @@ const execCommand = async (command) =>
 
 const bootstrap = async () => {
     const assemblyId = v4();
-    const branch = escape(await execCommand("git rev-parse --abbrev-ref HEAD"));
+    const branch = escape(await execCommand("git symbolic-ref --short HEAD"));
     const commit = `https://192.168.0.3/m7/frontend/m7-shell/-/commit/${escape(
         await execCommand("git rev-parse HEAD"),
     )}`;
