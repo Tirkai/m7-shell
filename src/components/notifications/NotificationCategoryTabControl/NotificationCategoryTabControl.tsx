@@ -2,17 +2,17 @@ import classNames from "classnames";
 import React from "react";
 import style from "./style.module.css";
 
-const className = style.notificationCategoryTab;
+const className = style.notificationCategoryTabControl;
 
-interface INotificationCategoryTabProps {
+interface INotificationCategoryTabControlProps {
     label: React.ReactNode;
     icon?: React.ReactNode;
     active?: boolean;
     onClick: () => void;
 }
 
-export const NotificationCategoryTab = (
-    props: INotificationCategoryTabProps,
+export const NotificationCategoryTabControl = (
+    props: INotificationCategoryTabControlProps,
 ) => {
     return (
         <div

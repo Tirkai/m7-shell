@@ -1,5 +1,9 @@
+import { SVGIcon } from "@algont/m7-ui";
+import { empty } from "assets/icons";
 import classNames from "classnames";
+import { PlaceholderWithIcon } from "components/placeholder/PlaceholderWithIcon/PlaceholderWithIcon";
 import { useStore } from "hooks/useStore";
+import { strings } from "locale";
 import { observer } from "mobx-react-lite";
 import { NotificationModel } from "models/notification/NotificationModel";
 import React from "react";
@@ -32,11 +36,14 @@ export const ImportantNotificationsList = observer(
                                     notification.url,
                                 )
                             }
-                            onClose={() =>
-                                props.onCloseNotification(notification)
-                            }
                         />
                     ),
+                )}
+                {store.notification.importantNotifications.length <= 0 && (
+                    <PlaceholderWithIcon
+                        icon={<SVGIcon source={empty} color="white" />}
+                        content={strings.notification.noMoreNotifications}
+                    />
                 )}
             </div>
         );

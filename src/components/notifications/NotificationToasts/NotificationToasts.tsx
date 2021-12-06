@@ -71,6 +71,7 @@ export const NotificationToasts = observer(() => {
                         hasInstruction={item.notification.hasInstruction}
                         onClick={() => handleRunApplication(item)}
                         onClose={() => handleClose(item)}
+                        closeAfterClick={!item.notification.isRequireConfirm}
                     />
                 </div>
             ))}

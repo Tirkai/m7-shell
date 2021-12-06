@@ -10,6 +10,7 @@ import React, { useEffect } from "react";
 import { CommonNotificationsList } from "../CommonNotificationsList/CommonNotificationsList";
 import { ImportantNotificationsList } from "../ImportantNotificationsList/ImportantNotificationsList";
 import { InstructionDialog } from "../InstructionDialog/InstructionDialog";
+import { NotificationCategoryTabContent } from "../NotificationCategoryTabContent/NotificationCategoryTabContent";
 import { NotificationHubHeader } from "../NotificationHubHeader/NotificationHubHeader";
 import { NotificationsList } from "../NotificationsList/NotificationsList";
 import style from "./style.module.css";
@@ -33,65 +34,6 @@ export const NotificationHub = observer(() => {
         connectNotifications();
         return () => disconnectNotifications();
     };
-
-    // const handleDeleteNotifications = (
-    //     group: NotificationGroupModel | null,
-    //     type: NotificationDeletionType,
-    // ) => {
-    //     if (group) {
-    //         if (type === NotificationDeletionType.DeleteVisible) {
-    //             handleClearVisibleNotifications(group);
-    //         }
-    //         if (type === NotificationDeletionType.DeleteAll) {
-    //             handleClearGroup(group);
-    //         }
-    //         setDeletionType(NotificationDeletionType.DeleteVisible);
-    //     }
-    // };
-
-    // const handleClearGroup = async (group: NotificationGroupModel | null) => {
-    //     setShowClearGroupDialog({ isShow: false, group: null });
-    //     if (group) {
-    //         group.setFetching(true);
-    //         try {
-    //             await store.notification.removeNotificationsByGroup(
-    //                 group,
-    //                 store.auth.userLogin,
-    //             );
-
-    //             await store.notification.fetchGroup(
-    //                 group,
-    //                 store.auth.userLogin,
-    //             );
-    //         } catch (e) {
-    //             console.error(e);
-    //         } finally {
-    //             group.setFetching(false);
-    //         }
-    //     }
-    // };
-
-    // const handleClearVisibleNotifications = async (
-    //     group: NotificationGroupModel | null,
-    // ) => {
-    //     if (group) {
-    //         setShowClearGroupDialog({
-    //             isShow: false,
-    //             group: null,
-    //         });
-    //         group.setFetching(true);
-    //         try {
-    //             await store.notification.removeNotifications(
-    //                 group.notifications.map((item) => item.id),
-    //                 store.auth.userLogin,
-    //             );
-    //         } catch (e) {
-    //             console.error(e);
-    //         } finally {
-    //             group.setFetching(false);
-    //         }
-    //     }
-    // };
 
     const handleCloseNotification = (notification: NotificationModel) => {
         notification.setDisplayed(false);
@@ -119,106 +61,6 @@ export const NotificationHub = observer(() => {
         }
     };
 
-    // const handleOpenNotificationGroup = (group: NotificationGroupModel) => {
-    //     const notificationApp = store.applicationManager.findById(
-    //         NOTIFICATION_APP_GUID,
-    //     );
-
-    //     const runner = new ApplicationRunner(store);
-
-    //     if (notificationApp) {
-    //         runner.run(notificationApp, {
-    //             processOptions: {
-    //                 params: new Map([["filterByAppId", group.id]]),
-    //             },
-    //             focusWindowAfterInstantiate: true,
-    //         });
-    //     }
-    // };
-
-    // const handleSetDeletionType = (
-    //     event: React.ChangeEvent<HTMLInputElement>,
-    // ) => {
-    //     const value = event.target.value as NotificationDeletionType;
-    //     setDeletionType(value);
-    // };
-
-    // const getGroupOverlay = (group: NotificationGroupModel) => {
-    //     if (group.isFetching || group.isLocked) {
-    //         return <CircularProgress color="secondary" />;
-    //     }
-    //     if (
-    //         group.id === showClearGroupDialog?.group?.id &&
-    //         showClearGroupDialog.isShow
-    //     ) {
-    //         return (
-    //             <NotificationClearDialogContainer>
-    //                 <PanelInformer>
-    //                     <PanelInformerContent>
-    //                         Удалить группу уведомлений?
-    //                     </PanelInformerContent>
-    //                     {group.count > 5 && (
-    //                         <PanelInformerContent>
-    //                             <RadioGroup
-    //                                 color="primary"
-    //                                 name="deleteChoose"
-    //                                 value={deletionType}
-    //                                 onChange={handleSetDeletionType}
-    //                             >
-    //                                 <FormControlLabel
-    //                                     value={
-    //                                         NotificationDeletionType.DeleteVisible
-    //                                     }
-    //                                     control={<Radio color="primary" />}
-    //                                     label={
-    //                                         "Удалить " +
-    //                                         group.notifications.length +
-    //                                         " уведомлений"
-    //                                     }
-    //                                 />
-
-    //                                 <FormControlLabel
-    //                                     value={
-    //                                         NotificationDeletionType.DeleteAll
-    //                                     }
-    //                                     control={<Radio color="primary" />}
-    //                                     label="Удалить все"
-    //                                 />
-    //                             </RadioGroup>
-    //                         </PanelInformerContent>
-    //                     )}
-
-    //                     <PanelInformerActions>
-    //                         <Button
-    //                             onClick={() =>
-    //                                 setShowClearGroupDialog({
-    //                                     isShow: false,
-    //                                     group: null,
-    //                                 })
-    //                             }
-    //                         >
-    //                             Отмена
-    //                         </Button>
-    //                         <Button
-    //                             onClick={() => {
-    //                                 handleDeleteNotifications(
-    //                                     showClearGroupDialog.group,
-    //                                     deletionType,
-    //                                 );
-    //                             }}
-    //                             classes={{ root: style.deletionButton }}
-    //                         >
-    //                             Удалить
-    //                         </Button>
-    //                     </PanelInformerActions>
-    //                 </PanelInformer>
-    //             </NotificationClearDialogContainer>
-    //         );
-    //     }
-
-    //     return null;
-    // };
-
     useEffect(onMount, []);
 
     return (
@@ -231,77 +73,24 @@ export const NotificationHub = observer(() => {
                 <div className={style.content}>
                     <NotificationHubHeader />
                     <NotificationsList>
-                        {store.notification.tab === NotificationTab.All && (
+                        <NotificationCategoryTabContent
+                            currentTab={store.notification.tab}
+                            condition={NotificationTab.All}
+                        >
                             <CommonNotificationsList
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
                             />
-                        )}
-                        {store.notification.tab ===
-                            NotificationTab.Important && (
+                        </NotificationCategoryTabContent>
+                        <NotificationCategoryTabContent
+                            currentTab={store.notification.tab}
+                            condition={NotificationTab.Important}
+                        >
                             <ImportantNotificationsList
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
                             />
-                        )}
-
-                        {/* {store.notification.groups
-                            .filter((group) => group.hasNotifications)
-                            .map((group) => (
-                                <NotificationGroup
-                                    key={group.id}
-                                    onClear={() =>
-                                        setShowClearGroupDialog({
-                                            isShow: true,
-                                            group,
-                                        })
-                                    }
-                                    onTitleClick={() =>
-                                        handleOpenNotificationGroup(group)
-                                    }
-                                    icon={group.icon}
-                                    title={group.name}
-                                    count={group.count}
-                                    overlay={getGroupOverlay(group)}
-                                >
-                                    {group.notifications.map((notification) => (
-                                        <NotificationCard
-                                            key={notification.id}
-                                            icon={group.icon}
-                                            {...notification}
-                                            hasInstruction={
-                                                notification.hasInstruction
-                                            }
-                                            onClick={() =>
-                                                handleRunApplication(
-                                                    notification.applicationId,
-                                                    notification.url,
-                                                )
-                                            }
-                                            onClose={() =>
-                                                handleCloseNotification(
-                                                    notification,
-                                                )
-                                            }
-                                        />
-                                    ))}
-                                </NotificationGroup>
-                            ))}
-                        {store.notification.groups.every(
-                            (group) => !group.hasNotifications,
-                        ) &&
-                            store.notification.groups.every(
-                                (group) => !group.isFetching,
-                            ) && (
-                                <PlaceholderWithIcon
-                                    icon={
-                                        <SVGIcon source={empty} color="white" />
-                                    }
-                                    content={
-                                        strings.notification.noMoreNotifications
-                                    }
-                                />
-                            )} */}
+                        </NotificationCategoryTabContent>
                     </NotificationsList>
                 </div>
             </div>

@@ -446,6 +446,7 @@ export class NotificationStore {
                 filter: {
                     login: { values: [login] },
                     app_id: { values: [group.id] },
+                    confirm: { values: ["disabled"] },
                 },
             });
             if (countResponse.status) {
@@ -460,6 +461,7 @@ export class NotificationStore {
                                         values: [group.id],
                                     },
                                     login: { values: [login] },
+                                    confirm: { values: ["disabled"] },
                                 },
                                 limit: deleteCount,
                                 order: [

@@ -5,7 +5,6 @@ import React from "react";
 import { NotificationConfirm } from "../NotificationConfirm/NotificationConfirm";
 import { NotificationDate } from "../NotificationDate/NotificationDate";
 import { NotificationHeader } from "../NotificationHeader/NotificationHeader";
-import { NotificationInstruction } from "../NotificationInstruction/NotificationInstruction";
 import { NotificationText } from "../NotificationText/NotificationText";
 import style from "./style.module.css";
 
@@ -18,20 +17,26 @@ interface INotificationCardProps {
     isDisplayed: boolean;
     instruction: string;
     hasInstruction: boolean;
-    onClose: () => void;
+    closeAfterClick?: boolean;
+    onClose?: () => void;
     onClick: () => void;
 }
 
 export const NotificationCard = observer((props: INotificationCardProps) => {
     const store = useStore();
+
     const handleClick = () => {
         props.onClick();
-        props.onClose();
+        if (props.closeAfterClick) {
+            handleClose();
+        }
     };
 
     const handleClose = () => {
         // event.stopPropagation();
-        props.onClose();
+        if (props.onClose) {
+            props.onClose();
+        }
     };
 
     const handleConfirm = () => {
@@ -61,11 +66,11 @@ export const NotificationCard = observer((props: INotificationCardProps) => {
                         isShow={props.isRequireConfirm}
                     />
                 </div>
-                <NotificationInstruction
+                {/* <NotificationInstruction
                     isShow={props.hasInstruction}
                     title="Инструкция"
                     content={props.instruction}
-                />
+                /> */}
             </div>
             {/* <div className={style.container}>
                 <div className={style.header}>

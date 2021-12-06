@@ -105,7 +105,9 @@ export const CommonNotificationsList = observer(
                 group.setFetching(true);
                 try {
                     await store.notification.removeNotifications(
-                        group.notifications.map((item) => item.id),
+                        group.notifications
+                            .filter((item) => !item.isRequireConfirm)
+                            .map((item) => item.id),
                         store.auth.userLogin,
                     );
                 } catch (e) {
@@ -254,6 +256,9 @@ export const CommonNotificationsList = observer(
                                     icon={group.icon}
                                     {...notification}
                                     hasInstruction={notification.hasInstruction}
+                                    closeAfterClick={
+                                        !notification.isRequireConfirm
+                                    }
                                     onClick={() =>
                                         props.onRunApplication(
                                             notification.applicationId,
