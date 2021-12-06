@@ -6,7 +6,7 @@ import { ExternalApplication } from "models/app/ExternalApplication";
 import { NotificationModel } from "models/notification/NotificationModel";
 import { NotificationTab } from "models/notification/NotificationTab";
 import { ShellPanelType } from "models/panel/ShellPanelType";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { CommonNotificationsList } from "../CommonNotificationsList/CommonNotificationsList";
 import { ImportantNotificationsList } from "../ImportantNotificationsList/ImportantNotificationsList";
 import { InstructionDialog } from "../InstructionDialog/InstructionDialog";
@@ -17,6 +17,10 @@ import style from "./style.module.css";
 
 export const NotificationHub = observer(() => {
     const store = useStore();
+
+    const [currentTab, setCurrentTab] = useState<NotificationTab>(
+        NotificationTab.All,
+    );
 
     const connectNotifications = async () => {
         await store.notification.fetchApps(store.auth.userLogin);
@@ -61,6 +65,20 @@ export const NotificationHub = observer(() => {
         }
     };
 
+    const handleSelectTab = (tab: NotificationTab) => {
+        setCurrentTab(tab);
+    };
+
+    const handleConfirm = async (id: string) => {
+        const response = await store.notification.confirmUserNotifications(
+            [id],
+            store.auth.userLogin,
+        );
+        if (!response.error) {
+            store.instruction.setShowInstruction(false);
+        }
+    };
+
     useEffect(onMount, []);
 
     return (
@@ -71,10 +89,13 @@ export const NotificationHub = observer(() => {
         >
             <div className={style.container}>
                 <div className={style.content}>
-                    <NotificationHubHeader />
+                    <NotificationHubHeader
+                        currentTab={currentTab}
+                        onSelectTab={handleSelectTab}
+                    />
                     <NotificationsList>
                         <NotificationCategoryTabContent
-                            currentTab={store.notification.tab}
+                            currentTab={currentTab}
                             condition={NotificationTab.All}
                         >
                             <CommonNotificationsList
@@ -83,7 +104,7 @@ export const NotificationHub = observer(() => {
                             />
                         </NotificationCategoryTabContent>
                         <NotificationCategoryTabContent
-                            currentTab={store.notification.tab}
+                            currentTab={currentTab}
                             condition={NotificationTab.Important}
                         >
                             <ImportantNotificationsList
@@ -95,9 +116,10 @@ export const NotificationHub = observer(() => {
                 </div>
             </div>
             <InstructionDialog
-                text={store.notification.instructionText}
-                open={store.notification.isShowInstruction}
-                onClose={() => store.notification.showInstruction(false)}
+                instruction={store.instruction.instruction}
+                show={store.instruction.isShowInstruction}
+                onClose={() => store.instruction.setShowInstruction(false)}
+                onConfirm={handleConfirm}
             />
         </div>
     );

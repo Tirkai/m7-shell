@@ -3,6 +3,8 @@
     "version": "0.28.1",
     "private": true,
     "dependencies": {
+        "@algont/m7-crud-helper": "^0.2.0",
+        "@algont/m7-css-vars": "^0.1.2",
         "@algont/m7-keyboard": "^0.1.0",
         "@algont/m7-react-marker": "^0.1.2",
         "@algont/m7-shell-emitter": "^0.11.1",

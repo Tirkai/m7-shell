@@ -11,6 +11,7 @@ import { ApplicationWindow } from "models/window/ApplicationWindow";
 import hash from "object-hash";
 import React from "react";
 import { TaskBarAppsMenuButton } from "../TaskBarAppsMenuButton/TaskBarAppsMenuButton";
+import { TaskBarBadge } from "../TaskBarBadge/TaskBarBadge";
 import TaskBarDateTime from "../TaskBarDateTime/TaskBarDateTime";
 import { TaskBarDevModeButton } from "../TaskBarDevModeButton/TaskBarDevModeButton";
 import { TaskBarItem } from "../TaskBarItem/TaskBarItem";
@@ -158,22 +159,27 @@ export const TaskBar = observer(() => {
                         condition={layersConfig.notifications.enabled}
                     >
                         <TaskBarItem
+                            showBadge={store.notification.hasNotifications}
                             badge={
-                                store.notification.status ===
-                                NotificationServiceConnectStatus.Connected
-                                    ? store.notification.totalCount > 0
-                                        ? store.notification.totalCount.toString()
-                                        : undefined
-                                    : undefined
+                                <TaskBarBadge
+                                    size="medium"
+                                    severity={
+                                        !store.notification
+                                            .hasImportantNotifcations
+                                            ? "info"
+                                            : "attention"
+                                    }
+                                >
+                                    {store.notification.totalCount}
+                                </TaskBarBadge>
                             }
                         >
                             <TaskBarNotificationButton
                                 status={store.notification.status}
-                                exist={
+                                hasNotifications={
                                     store.notification.status ===
                                     NotificationServiceConnectStatus.Connected
-                                        ? store.notification
-                                              .isExistNotifications
+                                        ? store.notification.hasNotifications
                                         : false
                                 }
                                 onClick={() =>

@@ -15,7 +15,8 @@ interface ITaskBarItemProps extends IStore {
     executed?: boolean;
     focused?: boolean;
     name?: string;
-    badge?: string | number;
+    showBadge?: boolean;
+    badge?: React.ReactNode;
     menu?: ContextMenuItemModel[];
     hint?: React.ReactNode;
     children?: React.ReactNode;
@@ -55,7 +56,7 @@ export const TaskBarItem = observer((props: ITaskBarItemProps) => {
         setShowHint(false);
     };
 
-    const isBigNumber = +(props.badge ?? 0) >= 100;
+    // const isBigNumber = +(props.badge ?? 0) >= 100;
 
     return (
         <>
@@ -73,17 +74,7 @@ export const TaskBarItem = observer((props: ITaskBarItemProps) => {
                 ref={ref}
             >
                 {props.hint && isShowHint && props.hint}
-                {props.badge ? (
-                    <div
-                        className={classNames(style.badge, {
-                            [style.smallBadge]: isBigNumber,
-                        })}
-                    >
-                        {!isBigNumber ? props.badge : "99+"}
-                    </div>
-                ) : (
-                    ""
-                )}
+                {props.showBadge && props.badge && props.badge}
                 <div
                     onContextMenu={handleShowContextMenu}
                     className={style.content}

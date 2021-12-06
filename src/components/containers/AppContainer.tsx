@@ -1,3 +1,5 @@
+import { ServiceProvider } from "@algont/m7-crud-helper";
+import { CssVariablesProvider } from "@algont/m7-css-vars";
 import { LinearProgress } from "@material-ui/core";
 import { AuthScreen } from "components/layout/AuthScreen/AuthScreen";
 import { AwaitVerifyScreen } from "components/layout/AwaitVerifyScreen/AwaitVerifyScreen";
@@ -30,7 +32,7 @@ export const AppContainer = observer(() => {
     return (
         <Fragment>
             {store.config.isLoaded ? (
-                <Fragment>
+                <CssVariablesProvider>
                     <PerformanceProvider
                         mode={config.properties.performance.mode}
                     >
@@ -45,7 +47,13 @@ export const AppContainer = observer(() => {
                                     <Route path="/" exact>
                                         {store.auth.isAuthorized ? (
                                             store.auth.checkedAfterStart ? (
-                                                <ShellScreen />
+                                                <ServiceProvider
+                                                    token={
+                                                        store.auth.accessToken
+                                                    }
+                                                >
+                                                    <ShellScreen />
+                                                </ServiceProvider>
                                             ) : (
                                                 <AwaitVerifyScreen />
                                             )
@@ -57,7 +65,7 @@ export const AppContainer = observer(() => {
                             </Router>
                         </RootContainer>
                     </PerformanceProvider>
-                </Fragment>
+                </CssVariablesProvider>
             ) : (
                 <Fragment>
                     <LinearProgress />
@@ -65,7 +73,6 @@ export const AppContainer = observer(() => {
             )}
 
             <MessageDialog />
-            {/* </PerformanceContext.Provider> */}
         </Fragment>
     );
 });
