@@ -27,16 +27,12 @@ const bootstrap = async () => {
     const author = escape(
         await execCommand("git log -1 --pretty=format:'%ae'"),
     );
-    const tag = escape(
-        await execCommand("git tag -l --sort=-creatordate | head -n 1"),
-    );
 
     const result = {
         assemblyId,
         branch,
         commit,
         author,
-        tag,
     };
 
     await fs.writeJSON("./build/metadata.json", result);
