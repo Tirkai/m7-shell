@@ -1,0 +1,27 @@
+.notificationHubHeader {
+    box-sizing: border-box;
+    display: flex;
+    align-self: center;
+    padding: 4px 12px 0 4px;
+    border-bottom: 1px solid transparent;
+    font-size: 18px;
+    transition: ease 0.3s;
+    background: #2d2d2f;
+    width: 100%;
+    box-shadow: 0 0 15px #ffffff0d;
+    z-index: 100;
+}
+
+.isScrolled {
+    border-bottom: 1px solid #ffffff0d;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.tabs {
+    width: 100%;
+}

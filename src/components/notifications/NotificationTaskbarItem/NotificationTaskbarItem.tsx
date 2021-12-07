@@ -11,7 +11,7 @@ const className = style.notificationTaskbarItem;
 
 interface ITaskBarNotificationButtonProps {
     status: NotificationServiceConnectStatus;
-    exist: boolean;
+    hasNotifications: boolean;
     onClick: () => void;
 }
 
@@ -35,7 +35,7 @@ export const TaskBarNotificationButton = (
         if (props.status === NotificationServiceConnectStatus.Connected) {
             return (
                 <div className={style.statusConnected}>
-                    {props.exist ? (
+                    {props.hasNotifications ? (
                         <SVGIcon
                             key={"notificationsExist"}
                             source={notifications}
@@ -65,7 +65,7 @@ export const TaskBarNotificationButton = (
                 </div>
             );
         }
-    }, [props.status, props.exist]);
+    }, [props.status, props.hasNotifications]);
 
     return (
         <div

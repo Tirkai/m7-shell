@@ -1,0 +1,11 @@
+.instructionDialog {
+    box-sizing: border-box;
+}
+
+.title {
+    display: flex;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    box-sizing: border-box;
+}

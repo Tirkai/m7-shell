@@ -1,0 +1,59 @@
+.notificationInstruction {
+    box-sizing: border-box;
+    background: #262627;
+    color: #b2b2b3;
+}
+
+.container {
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: white;
+    cursor: pointer;
+}
+
+.icon {
+    display: flex;
+}
+
+.icon img {
+    width: 16px;
+}
+
+.title {
+    display: flex;
+}
+
+.actions {
+    display: flex;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.actions svg {
+    fill: white;
+}
+
+.content {
+    overflow: hidden;
+    max-height: 0;
+    transition: ease 0.3s;
+}
+
+.isExpand {
+    max-height: 200px;
+    overflow: auto;
+}
+
+.content ol {
+    padding: 0 16px;
+}
+
+.content ul {
+    padding: 0 16px;
+}

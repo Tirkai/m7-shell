@@ -7,6 +7,7 @@ import { DateTimeStore } from "./DateTimeStore";
 import { DisplayManager } from "./DisplayManager";
 import { HotkeyStore } from "./HotkeyStore";
 import { IncommingEventHandlerStore } from "./IncommingEventHandlerStore";
+import { InstructionStore } from "./InstructionStore";
 import { KioskStore } from "./KioskStore";
 import { LocaleStore } from "./LocaleStore";
 import { MessageStore } from "./MessageStore";
@@ -32,6 +33,7 @@ export class AppStore {
     windowManager: WindowManagerStore;
     panelManager: PanelManager;
     notification: NotificationStore;
+    instruction: InstructionStore;
     locale: LocaleStore;
     message: MessageStore;
     audio: AudioStore;
@@ -56,6 +58,7 @@ export class AppStore {
         this.windowManager = new WindowManagerStore(this);
         this.panelManager = new PanelManager(this);
         this.notification = new NotificationStore(this);
+        this.instruction = new InstructionStore(this);
         this.locale = new LocaleStore(this);
         this.message = new MessageStore(this);
         this.audio = new AudioStore(this);

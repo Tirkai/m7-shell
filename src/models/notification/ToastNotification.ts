@@ -1,13 +1,20 @@
 import { makeAutoObservable } from "mobx";
+import { NotificationExpireTime } from "./NotificationExpireTime";
 import { NotificationModel } from "./NotificationModel";
+
+interface IToastNotificationOptions {
+    notification: NotificationModel;
+    expireTime: NotificationExpireTime;
+}
 
 export class ToastNotification {
     isShow: boolean = true;
     notification: NotificationModel;
-    expireTime: number = 3000;
+    expireTime: number;
 
-    constructor(notification: NotificationModel) {
-        this.notification = notification;
+    constructor(options: IToastNotificationOptions) {
+        this.notification = options.notification;
+        this.expireTime = options.expireTime;
 
         makeAutoObservable(this);
 

@@ -8,7 +8,6 @@ import { makeAutoObservable } from "mobx";
 import { Application } from "models/app/Application";
 import { ApplicationEventType } from "models/app/ApplicationEventType";
 import { ExternalApplication } from "models/app/ExternalApplication";
-import { registeredApps } from "registeredApps";
 import { portalEndpoint } from "utils/endpoints";
 import { AppStore } from "./AppStore";
 
@@ -65,7 +64,6 @@ export class ApplicationManagerStore {
                 );
                 this.addApplicationsList(portalApplications);
             }
-            this.addApplicationsList(registeredApps);
 
             this.store.sharedEventBus.eventBus.dispatch(
                 ApplicationEventType.OnApplicationListLoaded,

@@ -1,60 +1,74 @@
-import { cross } from "assets/icons";
 import classNames from "classnames";
-import { observer } from "mobx-react";
-import moment from "moment";
-import React from "react";
+import React, { useState } from "react";
+import { NotificationConfirm } from "../NotificationConfirm/NotificationConfirm";
+import { NotificationDate } from "../NotificationDate/NotificationDate";
+import { NotificationHeader } from "../NotificationHeader/NotificationHeader";
+import { NotificationText } from "../NotificationText/NotificationText";
 import style from "./style.module.css";
 
 interface INotificationCardProps {
+    icon?: string;
     text: string;
     title: string;
     date: string;
+    isRequireConfirm: boolean;
     isDisplayed: boolean;
-    onClose: () => void;
+    closeAfterClick?: boolean;
+    onClose?: () => void;
     onClick: () => void;
+    onConfirm?: () => void;
 }
 
-export const NotificationCard = observer((props: INotificationCardProps) => {
+export const NotificationCard = (props: INotificationCardProps) => {
+    const [isHovered, setHovered] = useState(false);
+
     const handleClick = () => {
         props.onClick();
-        props.onClose();
+        if (props.closeAfterClick) {
+            handleClose();
+        }
     };
 
-    const handleClose = (
-        event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    ) => {
-        event.stopPropagation();
-        props.onClose();
+    const handleClose = () => {
+        // event.stopPropagation();
+        if (props.onClose) {
+            props.onClose();
+        }
     };
 
-    const localizedDate = moment(props.date).fromNow();
+    const handleConfirm = () => {
+        if (props.onConfirm) {
+            props.onConfirm();
+        }
+    };
+
     return (
         <div
             className={classNames(style.notificationCard, {
                 [style.isRemoving]: !props.isDisplayed,
             })}
-            onClick={handleClick}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
         >
             <div className={style.container}>
-                <div className={style.header}>
-                    <div className={style.actions}>
-                        <div className={style.actionItem} onClick={handleClose}>
-                            <img src={cross} alt="Close" />
-                        </div>
+                <div className={style.content}>
+                    <div className={style.activeArea} onClick={handleClick}>
+                        <NotificationHeader
+                            icon={props.icon}
+                            title={props.title}
+                            onClose={handleClose}
+                            disableCloseAction={props.isRequireConfirm}
+                            hovered={isHovered}
+                        />
+                        <NotificationText text={props.text} />
+                        <NotificationDate date={props.date} />
                     </div>
-                </div>
-                {props.title.length && (
-                    <div className={style.title}>{props.title}</div>
-                )}
-                {props.text && (
-                    <div className={style.content}>
-                        <div className={style.text}>{props.text}</div>
-                    </div>
-                )}
-                <div className={style.date}>
-                    <div className={style.text}>{localizedDate}</div>
+                    <NotificationConfirm
+                        onConfirm={handleConfirm}
+                        isShow={props.isRequireConfirm}
+                    />
                 </div>
             </div>
         </div>
     );
-});
+};

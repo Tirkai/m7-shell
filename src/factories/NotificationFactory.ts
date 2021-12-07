@@ -12,6 +12,9 @@ export class NotificationFactory {
             text: "Test",
             url: "",
             date: moment().toISOString(),
+            isPlaySound: false,
+            isShowBanner: false,
+            isRequireConfirm: false,
         });
         return notification;
     }
@@ -22,6 +25,11 @@ export class NotificationFactory {
         const title = notificationData.data?.CONTENT_TITLE ?? "Без заголовка";
         const text = notificationData.data?.CONTENT_TEXT ?? "";
         const url = notificationData.data?.ACTION_URL ?? "";
+        const isPlaySound = notificationData.data?.play_sound ?? false;
+        const isShowBanner = notificationData.data?.show_banner ?? false;
+        const isRequireConfirm =
+            notificationData.confirm === "waiting" ?? false;
+        const instruction = notificationData.data?.instruction ?? "";
 
         return new NotificationModel({
             id: notificationData.ntf_id,
@@ -30,6 +38,10 @@ export class NotificationFactory {
             text,
             url,
             date: notificationData.ntf_date,
+            isPlaySound,
+            isShowBanner,
+            isRequireConfirm,
+            instruction,
         });
     }
 }

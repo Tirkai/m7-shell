@@ -1,0 +1,19 @@
+.notificationConfirm {
+    box-sizing: border-box;
+}
+
+.container {
+    display: flex;
+}
+
+.button {
+    padding: 12px 24px;
+    color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    background: #343437;
+}
+
+.button:hover {
+    background: #47474a;
+}
