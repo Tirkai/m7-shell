@@ -1,6 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/app/ExternalApplication";
+import { AuthEventType } from "models/auth/AuthEventType";
 import { VirtualViewportEventType } from "models/virtual/VirtualViewportEventType";
 import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { AppStore } from "stores/AppStore";
@@ -21,6 +22,10 @@ export class KioskStore {
                 this.onSelectViewportFrame();
             },
         );
+
+        this.store.sharedEventBus.eventBus.add(AuthEventType.OnLogout, () => {
+            this.onLogout();
+        });
     }
 
     onSelectViewportFrame() {
@@ -36,6 +41,10 @@ export class KioskStore {
                 this.setIsInited(true);
             }
         }
+    }
+
+    onLogout() {
+        this.setIsInited(false);
     }
 
     startKioskApplication(app: ExternalApplication) {
