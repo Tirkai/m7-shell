@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React from "react";
+import React, { useState } from "react";
 import { NotificationConfirm } from "../NotificationConfirm/NotificationConfirm";
 import { NotificationDate } from "../NotificationDate/NotificationDate";
 import { NotificationHeader } from "../NotificationHeader/NotificationHeader";
@@ -13,8 +13,6 @@ interface INotificationCardProps {
     date: string;
     isRequireConfirm: boolean;
     isDisplayed: boolean;
-    instruction: string;
-    hasInstruction: boolean;
     closeAfterClick?: boolean;
     onClose?: () => void;
     onClick: () => void;
@@ -22,6 +20,8 @@ interface INotificationCardProps {
 }
 
 export const NotificationCard = (props: INotificationCardProps) => {
+    const [isHovered, setHovered] = useState(false);
+
     const handleClick = () => {
         props.onClick();
         if (props.closeAfterClick) {
@@ -47,6 +47,8 @@ export const NotificationCard = (props: INotificationCardProps) => {
             className={classNames(style.notificationCard, {
                 [style.isRemoving]: !props.isDisplayed,
             })}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
         >
             <div className={style.container}>
                 <div className={style.content}>
@@ -56,6 +58,7 @@ export const NotificationCard = (props: INotificationCardProps) => {
                             title={props.title}
                             onClose={handleClose}
                             disableCloseAction={props.isRequireConfirm}
+                            hovered={isHovered}
                         />
                         <NotificationText text={props.text} />
                         <NotificationDate date={props.date} />

@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { InstructionFactory } from "factories/InstructionFactory";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
@@ -54,6 +55,17 @@ export const NotificationToasts = observer(() => {
         );
     };
 
+    const handleShowInstruction = (
+        toast: ToastNotification,
+        notification: NotificationModel,
+    ) => {
+        store.instruction.setShowInstruction(true);
+        store.instruction.setInstruction(
+            InstructionFactory.createInstruction({ notification }),
+        );
+        toast.setShow(false);
+    };
+
     return (
         <div className={style.notificationToasts}>
             {store.notification.toasts.map((item) => (
@@ -68,10 +80,12 @@ export const NotificationToasts = observer(() => {
                 >
                     <NotificationCard
                         {...item.notification}
-                        hasInstruction={item.notification.hasInstruction}
                         onClick={() => handleRunApplication(item)}
                         onClose={() => handleClose(item)}
                         closeAfterClick={!item.notification.isRequireConfirm}
+                        onConfirm={() =>
+                            handleShowInstruction(item, item.notification)
+                        }
                     />
                 </div>
             ))}

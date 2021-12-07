@@ -2,6 +2,7 @@ export interface INotificationResponse {
     ntf_id: string;
     app_id: string;
     ntf_date: string;
+    confirm: "disabled" | "waiting" | "confirmed";
     data: {
         ACTION_URL: string;
         CONTENT_TEXT: string;

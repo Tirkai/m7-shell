@@ -10,6 +10,7 @@ const className = style.notificationHeader;
 interface INotificationHeaderProps {
     icon?: string;
     title: string;
+    hovered?: boolean;
     onClose: () => void;
     disableCloseAction?: boolean;
 }
@@ -21,7 +22,11 @@ export const NotificationHeader = (props: INotificationHeaderProps) => {
     };
 
     return (
-        <div className={classNames(className)}>
+        <div
+            className={classNames(className, {
+                [style.hovered]: props.hovered,
+            })}
+        >
             {props.icon && (
                 <div className={style.icon}>
                     <SVGIcon

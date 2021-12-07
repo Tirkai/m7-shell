@@ -28,7 +28,7 @@ export class NotificationFactory {
         const isPlaySound = notificationData.data?.play_sound ?? false;
         const isShowBanner = notificationData.data?.show_banner ?? false;
         const isRequireConfirm =
-            notificationData.data?.require_confirm ?? false;
+            notificationData.confirm === "waiting" ?? false;
         const instruction = notificationData.data?.instruction ?? "";
 
         return new NotificationModel({

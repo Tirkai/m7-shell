@@ -148,7 +148,7 @@ export class NotificationStore {
                     confirm: { values: ["waiting"] },
                     login: { values: [login] },
                 },
-                limit: 1000,
+                limit: 100,
                 offset: 0,
                 order: [{ field: "ntf_date", direction: "desc" }],
             },
@@ -246,14 +246,16 @@ export class NotificationStore {
         try {
             if (token.length > 0) {
                 if (this.socket === null) {
-                    this.socket = io.connect(NOTIFICATIONS_WEBSOCKET_URL, {
-                        transportOptions: {
-                            polling: {
-                                extraHeaders: {
-                                    [AUTH_TOKEN_HEADER]: token,
-                                },
+                    const transportOptions = {
+                        polling: {
+                            extraHeaders: {
+                                [AUTH_TOKEN_HEADER]: token,
                             },
                         },
+                    };
+
+                    this.socket = io.connect(NOTIFICATIONS_WEBSOCKET_URL, {
+                        transportOptions,
                     });
 
                     this.socket.on("connect", () => this.onConnect());
@@ -385,7 +387,6 @@ export class NotificationStore {
                     filter: {
                         login: { values: [login] },
                         app_id: { values: [group.id] },
-                        confirm: { values: ["disabled"] },
                     },
                 },
             });
@@ -401,7 +402,6 @@ export class NotificationStore {
                                         values: [group.id],
                                     },
                                     login: { values: [login] },
-                                    confirm: { values: ["disabled"] },
                                 },
                                 limit: deleteCount,
                                 order: [

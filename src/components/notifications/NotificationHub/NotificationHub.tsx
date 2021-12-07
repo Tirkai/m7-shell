@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { InstructionFactory } from "factories/InstructionFactory";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
@@ -79,7 +80,25 @@ export const NotificationHub = observer(() => {
         }
     };
 
+    const handleShowInstruction = (notification: NotificationModel) => {
+        store.instruction.setShowInstruction(true);
+        store.instruction.setInstruction(
+            InstructionFactory.createInstruction({ notification }),
+        );
+    };
+
     useEffect(onMount, []);
+
+    useEffect(() => {
+        setCurrentTab(
+            store.notification.hasImportantNotifcations
+                ? NotificationTab.Important
+                : NotificationTab.All,
+        );
+    }, [
+        store.notification.hasImportantNotifcations,
+        store.panelManager.activePanel,
+    ]);
 
     return (
         <div
@@ -101,6 +120,7 @@ export const NotificationHub = observer(() => {
                             <CommonNotificationsList
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
+                                onConfirm={handleShowInstruction}
                             />
                         </NotificationCategoryTabContent>
                         <NotificationCategoryTabContent
@@ -110,6 +130,7 @@ export const NotificationHub = observer(() => {
                             <ImportantNotificationsList
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
+                                onConfirm={handleShowInstruction}
                             />
                         </NotificationCategoryTabContent>
                     </NotificationsList>

@@ -37,6 +37,7 @@ interface ICommonNotificationsListProps {
     children?: React.ReactNode;
     onCloseNotification: (notification: NotificationModel) => void;
     onRunApplication: (appId: string, url: string) => void;
+    onConfirm: (notification: NotificationModel) => void;
 }
 
 export const CommonNotificationsList = observer(
@@ -105,9 +106,7 @@ export const CommonNotificationsList = observer(
                 group.setFetching(true);
                 try {
                     await store.notification.removeNotifications(
-                        group.notifications
-                            .filter((item) => !item.isRequireConfirm)
-                            .map((item) => item.id),
+                        group.notifications.map((item) => item.id),
                         store.auth.userLogin,
                     );
                 } catch (e) {
@@ -255,7 +254,7 @@ export const CommonNotificationsList = observer(
                                     key={notification.id}
                                     icon={group.icon}
                                     {...notification}
-                                    hasInstruction={notification.hasInstruction}
+                                    // hasInstruction={notification.hasInstruction}
                                     closeAfterClick={
                                         !notification.isRequireConfirm
                                     }
@@ -267,6 +266,9 @@ export const CommonNotificationsList = observer(
                                     }
                                     onClose={() =>
                                         props.onCloseNotification(notification)
+                                    }
+                                    onConfirm={() =>
+                                        props.onConfirm(notification)
                                     }
                                 />
                             ))}
