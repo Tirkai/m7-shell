@@ -3,6 +3,8 @@
     border-radius: 12px;
     overflow: hidden;
     color: white;
+    transition: ease 0.3s;
+    opacity: 1;
 }
 
 .container {
@@ -24,6 +26,11 @@
     flex-direction: column;
     gap: 12px;
     cursor: pointer;
+}
+
+.isRemoving {
+    opacity: 0.5;
+    pointer-events: none;
 }
 
 /* .notificationCard {

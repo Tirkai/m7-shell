@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
+import { NotificationCounter } from "components/notifications/NotificationCounter/NotificationCounter";
 import { TaskBarNotificationButton } from "components/notifications/NotificationTaskbarItem/NotificationTaskbarItem";
 import { useStore } from "hooks/useStore";
 import { strings } from "locale";
@@ -170,7 +171,9 @@ export const TaskBar = observer(() => {
                                             : "attention"
                                     }
                                 >
-                                    {store.notification.totalCount}
+                                    <NotificationCounter
+                                        count={store.notification.totalCount}
+                                    />
                                 </TaskBarBadge>
                             }
                         >

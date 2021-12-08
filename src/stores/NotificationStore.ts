@@ -20,12 +20,20 @@ import { NotificationGroupModel } from "models/notification/NotificationGroupMod
 import { NotificationModel } from "models/notification/NotificationModel";
 import { NotificationServiceConnectStatus } from "models/notification/NotificationServiceConnectStatus";
 import { ToastNotification } from "models/notification/ToastNotification";
+import { DebounceContainer } from "models/throttle/DebounceContainer";
+import { ThrottleContainer } from "models/throttle/ThrottleContainer";
 import io from "socket.io-client";
 import {
     notificationsAppsEndpoint,
     notificationsEndpoint,
 } from "utils/endpoints";
 import { AppStore } from "./AppStore";
+
+interface IDeleteNotificationPayload {
+    ntf_id: string;
+    app_id: string;
+    wait_next: boolean;
+}
 
 export class NotificationStore {
     socket: any | null = null;
@@ -51,6 +59,8 @@ export class NotificationStore {
     importantNotifications: NotificationModel[] = [];
 
     totalCount = 0;
+
+    // isLocked: boolean = false;
 
     applications: ExternalApplication[] = [];
 
@@ -274,8 +284,14 @@ export class NotificationStore {
 
                     this.socket.on(
                         "delete_notification",
-                        (response: INotificationResponse) =>
+                        (response: IDeleteNotificationPayload) =>
                             this.onDeleteNotification(response),
+                    );
+
+                    this.socket.on(
+                        "confirm_notification",
+                        (response: INotificationResponse) =>
+                            this.onConfirmNotification(response),
                     );
 
                     this.socket.on("disconnect", () => this.onDisconnect());
@@ -343,22 +359,37 @@ export class NotificationStore {
         this.totalCount = count;
     }
 
+    addingThrottleContainer: ThrottleContainer = new ThrottleContainer();
     onAddNotification(payload: INotificationResponse) {
-        this.addNotification(
-            NotificationFactory.createNotificationFromRawData(payload),
-        );
+        this.addingThrottleContainer.invoke(() => {
+            this.addNotification(
+                NotificationFactory.createNotificationFromRawData(payload),
+            );
+        }, 300);
     }
 
-    onDeleteNotification(payload: INotificationResponse) {
-        const notificationId = payload.ntf_id;
+    deletionDebounceContainer: DebounceContainer = new DebounceContainer();
+    onDeleteNotification(payload: IDeleteNotificationPayload) {
+        this.deletionDebounceContainer.invoke(() => {
+            const appId = payload.app_id;
+
+            const group = this.groups.find(
+                (groupItem) => groupItem.id === appId,
+            );
+
+            this.fetchImportantNotifications(this.store.auth.userLogin);
+
+            if (group) {
+                this.fetchGroup(group, this.store.auth.userLogin);
+            }
+        }, 300);
+    }
+
+    onConfirmNotification(payload: INotificationResponse) {
+        const appId = payload.app_id;
+        const group = this.groups.find((item) => item.id === appId);
 
         this.fetchImportantNotifications(this.store.auth.userLogin);
-
-        const group = this.groups.find((groupItem) =>
-            groupItem.notifications.find(
-                (notifyItem) => notifyItem.id === notificationId,
-            ),
-        );
 
         if (group) {
             this.fetchGroup(group, this.store.auth.userLogin);
@@ -378,10 +409,9 @@ export class NotificationStore {
         login: string,
     ) {
         group.setLocked(true);
+        const deleteCount = 100;
 
-        const loop = async () => {
-            const deleteCount = 100;
-
+        const getCount = async () => {
             const countResponse = await this.notificationService.getCount({
                 payload: {
                     filter: {
@@ -390,51 +420,49 @@ export class NotificationStore {
                     },
                 },
             });
-
-            if (countResponse.result) {
-                const count = countResponse.result;
-                if (count > 0) {
-                    const notificationsResponse =
-                        await this.notificationService.getList({
-                            payload: new GetListByFilterPayload({
-                                filter: {
-                                    app_id: {
-                                        values: [group.id],
-                                    },
-                                    login: { values: [login] },
-                                },
-                                limit: deleteCount,
-                                order: [
-                                    { field: "ntf_date", direction: "desc" },
-                                ],
-                            }),
-                        });
-
-                    if (notificationsResponse.result) {
-                        const removeResponse = await this.removeNotifications(
-                            notificationsResponse.result.items.map(
-                                (item) => item.ntf_id,
-                            ),
-                            login,
-                        );
-
-                        if (removeResponse.result) {
-                            loop();
-                        }
-                    }
-                }
-            } else {
-                group.setLocked(false);
-                this.fetchGroup(group, login);
-            }
+            return countResponse.result ?? 0;
         };
 
-        await loop();
+        let count = Infinity;
+
+        while (count > 0) {
+            count = await getCount();
+            const notificationsResponse =
+                await this.notificationService.getList({
+                    payload: new GetListByFilterPayload({
+                        filter: {
+                            app_id: {
+                                values: [group.id],
+                            },
+                            login: { values: [login] },
+                        },
+                        limit: deleteCount,
+                        order: [{ field: "ntf_date", direction: "desc" }],
+                    }),
+                });
+
+            if (notificationsResponse.result) {
+                const removeResponse = await this.removeNotifications(
+                    notificationsResponse.result.items.map(
+                        (item) => item.ntf_id,
+                    ),
+                    login,
+                );
+
+                if (removeResponse.result) {
+                    if (removeResponse.result.length <= 0) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        group.setLocked(false);
     }
 
     async removeNotifications(ids: string[], login: string) {
         try {
-            return await this.notificationService.invoke({
+            return await this.notificationService.invoke<any[]>({
                 method: "drop_user_notifications",
                 payload: {
                     user_notifications: ids.map((item) => ({
@@ -444,7 +472,10 @@ export class NotificationStore {
                 },
             });
         } catch (e) {
-            return new ServiceResponse({ error: new ServiceError({}) });
+            return new ServiceResponse({
+                error: new ServiceError({}),
+                result: [],
+            });
         }
     }
 
@@ -466,12 +497,5 @@ export class NotificationStore {
 
     setImportantNotifications(notifications: NotificationModel[]) {
         this.importantNotifications = notifications;
-    }
-
-    showInstruction(isShow: boolean, text?: string) {
-        this.isShowInstruction = isShow;
-        if (text) {
-            this.instructionText = text;
-        }
     }
 }

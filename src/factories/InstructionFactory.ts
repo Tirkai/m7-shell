@@ -12,6 +12,7 @@ export class InstructionFactory {
             notificationTitle: options.notification.title,
             notificationContent: options.notification.text,
             instructionContent: options.notification.instruction,
+            applicationId: options.notification.applicationId,
         });
     }
 }

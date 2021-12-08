@@ -17,15 +17,13 @@ interface IInstructionDialogProps {
     show: boolean;
     instruction: Instruction | null;
     onClose: () => void;
-    onConfirm: (id: string) => void;
+    onConfirm: (instruction: Instruction) => void;
 }
 
 export const InstructionDialog = (props: IInstructionDialogProps) => {
     const handleConfirm = () => {
-        // alert("CONFIRM");
-        // store.notification.confirmUserNotifications();
         if (props.instruction) {
-            props.onConfirm(props.instruction.notificationId);
+            props.onConfirm(props.instruction);
         }
     };
 

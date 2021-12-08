@@ -78,15 +78,20 @@ export const CommonNotificationsList = observer(
             if (group) {
                 group.setFetching(true);
                 try {
+                    // store.notification.setLocked(true);
+
                     await store.notification.removeNotificationsByGroup(
                         group,
                         store.auth.userLogin,
                     );
 
-                    await store.notification.fetchGroup(
-                        group,
-                        store.auth.userLogin,
-                    );
+                    // store.notification.setLocked(false);
+                    // store.notification.fetchGroup(group, store.auth.userLogin);
+
+                    // await store.notification.fetchGroup(
+                    //     group,
+                    //     store.auth.userLogin,
+                    // );
                 } catch (e) {
                     console.error(e);
                 } finally {

@@ -4,6 +4,7 @@ import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/app/ExternalApplication";
+import { Instruction } from "models/instruction/Instruction";
 import { NotificationModel } from "models/notification/NotificationModel";
 import { NotificationTab } from "models/notification/NotificationTab";
 import { ShellPanelType } from "models/panel/ShellPanelType";
@@ -70,13 +71,19 @@ export const NotificationHub = observer(() => {
         setCurrentTab(tab);
     };
 
-    const handleConfirm = async (id: string) => {
+    const handleConfirm = async (instruction: Instruction) => {
         const response = await store.notification.confirmUserNotifications(
-            [id],
+            [instruction.notificationId],
             store.auth.userLogin,
         );
         if (!response.error) {
             store.instruction.setShowInstruction(false);
+            const group = store.notification.groups.find(
+                (item) => item.id === instruction.applicationId,
+            );
+            if (group) {
+                store.notification.fetchGroup(group, store.auth.userLogin);
+            }
         }
     };
 
