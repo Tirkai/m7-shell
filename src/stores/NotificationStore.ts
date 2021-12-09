@@ -35,6 +35,10 @@ interface IDeleteNotificationPayload {
     wait_next: boolean;
 }
 
+interface IGroupedNotificaitonsPayload {
+    [key: string]: INotificationResponse[];
+}
+
 export class NotificationStore {
     socket: any | null = null;
 
@@ -176,9 +180,60 @@ export class NotificationStore {
     async fetchNotifications(login: string) {
         try {
             await this.fetchImportantNotifications(login);
-            this.groups.forEach((group) => {
-                this.fetchGroup(group, login);
-            });
+
+            const groupedNotificaions =
+                await this.notificationService.invoke<IGroupedNotificaitonsPayload>(
+                    {
+                        method: "get_lists_by_apps",
+                        payload: {
+                            filter: {
+                                login: { values: [this.store.auth.userLogin] },
+                            },
+                            limit: 5,
+                        },
+                    },
+                );
+
+            if (groupedNotificaions.result) {
+                Object.entries(groupedNotificaions.result).map(
+                    async ([appId, notifications]) => {
+                        const group = this.groups.find(
+                            (group) => group.id === appId,
+                        );
+                        if (group) {
+                            const countRequestPayload = {
+                                filter: {
+                                    app_id: {
+                                        values: [appId],
+                                    },
+                                    login: {
+                                        values: [this.store.auth.userLogin],
+                                    },
+                                },
+                            };
+
+                            const countNotificationsInGroupResponse =
+                                await this.notificationService.getCount({
+                                    payload: countRequestPayload,
+                                });
+
+                            if (countNotificationsInGroupResponse.result) {
+                                group.setCount(
+                                    countNotificationsInGroupResponse.result,
+                                );
+                            }
+
+                            group.setNotifications(
+                                notifications.map((item) =>
+                                    NotificationFactory.createNotificationFromRawData(
+                                        item,
+                                    ),
+                                ),
+                            );
+                        }
+                    },
+                );
+            }
         } catch (e) {
             console.error(e);
         }
