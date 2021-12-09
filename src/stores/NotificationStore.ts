@@ -64,8 +64,6 @@ export class NotificationStore {
 
     totalCount = 0;
 
-    // isLocked: boolean = false;
-
     applications: ExternalApplication[] = [];
 
     get hasNotifications() {
@@ -481,34 +479,41 @@ export class NotificationStore {
         let count = Infinity;
 
         while (count > 0) {
-            count = await getCount();
-            const notificationsResponse =
-                await this.notificationService.getList({
-                    payload: new GetListByFilterPayload({
-                        filter: {
-                            app_id: {
-                                values: [group.id],
+            try {
+                count = await getCount();
+                const notificationsResponse =
+                    await this.notificationService.getList({
+                        payload: new GetListByFilterPayload({
+                            filter: {
+                                app_id: {
+                                    values: [group.id],
+                                },
+                                login: { values: [login] },
                             },
-                            login: { values: [login] },
-                        },
-                        limit: deleteCount,
-                        order: [{ field: "ntf_date", direction: "desc" }],
-                    }),
-                });
+                            limit: deleteCount,
+                            order: [{ field: "ntf_date", direction: "desc" }],
+                        }),
+                    });
 
-            if (notificationsResponse.result) {
-                const removeResponse = await this.removeNotifications(
-                    notificationsResponse.result.items.map(
-                        (item) => item.ntf_id,
-                    ),
-                    login,
-                );
+                if (notificationsResponse.result) {
+                    const removeResponse = await this.removeNotifications(
+                        notificationsResponse.result.items.map(
+                            (item) => item.ntf_id,
+                        ),
+                        login,
+                    );
 
-                if (removeResponse.result) {
-                    if (removeResponse.result.length <= 0) {
+                    if (removeResponse.result) {
+                        if (removeResponse.result.length <= 0) {
+                            break;
+                        }
+                    } else {
                         break;
                     }
                 }
+            } catch (e) {
+                console.error(e);
+                break;
             }
         }
 
