@@ -39,6 +39,10 @@ interface IGroupedNotificaitonsPayload {
     [key: string]: INotificationResponse[];
 }
 
+interface IGroupedCountsPayload {
+    [key: string]: number;
+}
+
 export class NotificationStore {
     socket: any | null = null;
 
@@ -96,13 +100,13 @@ export class NotificationStore {
         this.toasts = toasts;
     }
 
-    async fetchGroup(group: NotificationGroupModel, login: string) {
+    async fetchGroup(group: NotificationGroupModel) {
         group.setFetching(true);
 
         const countResponse = await this.notificationService.getCount({
             payload: {
                 filter: {
-                    login: { values: [login] },
+                    login: { values: [this.store.auth.userLogin] },
                     app_id: { values: [group.id] },
                 },
             },
@@ -120,7 +124,7 @@ export class NotificationStore {
                     app_id: {
                         values: [group.id],
                     },
-                    login: { values: [login] },
+                    login: { values: [this.store.auth.userLogin] },
                 },
             }),
         });
@@ -139,11 +143,11 @@ export class NotificationStore {
         group.setFetching(false);
     }
 
-    async fetchTotalCount(login: string) {
+    async fetchTotalCount() {
         const countResponse = await this.notificationService.getCount({
             payload: {
                 filter: {
-                    login: { values: [login] },
+                    login: { values: [this.store.auth.userLogin] },
                 },
             },
         });
@@ -153,12 +157,12 @@ export class NotificationStore {
         }
     }
 
-    async fetchImportantNotifications(login: string) {
+    async fetchImportantNotifications() {
         const notificationsResponse = await this.notificationService.getList({
             payload: {
                 filter: {
                     confirm: { values: ["waiting"] },
-                    login: { values: [login] },
+                    login: { values: [this.store.auth.userLogin] },
                 },
                 limit: 100,
                 offset: 0,
@@ -175,9 +179,31 @@ export class NotificationStore {
         }
     }
 
-    async fetchNotifications(login: string) {
+    async fetchInitialCounts() {
+        const groupedCounts =
+            await this.notificationService.invoke<IGroupedCountsPayload>({
+                method: "get_counts_by_apps",
+                payload: {
+                    filter: {
+                        login: { values: [this.store.auth.userLogin] },
+                    },
+                },
+            });
+
+        if (groupedCounts.result) {
+            Object.entries(groupedCounts.result).map(([appId, count]) => {
+                const group = this.groups.find((group) => group.id === appId);
+
+                if (group) {
+                    group.setCount(count);
+                }
+            });
+        }
+    }
+
+    async fetchInitialNotifications() {
         try {
-            await this.fetchImportantNotifications(login);
+            await this.fetchImportantNotifications();
 
             const groupedNotificaions =
                 await this.notificationService.invoke<IGroupedNotificaitonsPayload>(
@@ -194,33 +220,11 @@ export class NotificationStore {
 
             if (groupedNotificaions.result) {
                 Object.entries(groupedNotificaions.result).map(
-                    async ([appId, notifications]) => {
+                    ([appId, notifications]) => {
                         const group = this.groups.find(
                             (group) => group.id === appId,
                         );
                         if (group) {
-                            const countRequestPayload = {
-                                filter: {
-                                    app_id: {
-                                        values: [appId],
-                                    },
-                                    login: {
-                                        values: [this.store.auth.userLogin],
-                                    },
-                                },
-                            };
-
-                            const countNotificationsInGroupResponse =
-                                await this.notificationService.getCount({
-                                    payload: countRequestPayload,
-                                });
-
-                            if (countNotificationsInGroupResponse.result) {
-                                group.setCount(
-                                    countNotificationsInGroupResponse.result,
-                                );
-                            }
-
                             group.setNotifications(
                                 notifications.map((item) =>
                                     NotificationFactory.createNotificationFromRawData(
@@ -237,12 +241,12 @@ export class NotificationStore {
         }
     }
 
-    async fetchApps(login: string) {
+    async fetchApps() {
         try {
             const appsCountResponse = await this.applicationService.getCount({
                 payload: {
                     filter: {
-                        login: { values: [login] },
+                        login: { values: [this.store.auth.userLogin] },
                     },
                 },
             });
@@ -393,7 +397,7 @@ export class NotificationStore {
                 (item) => item.id === notification.applicationId,
             );
             if (group) {
-                this.fetchGroup(group, this.store.auth.userLogin);
+                this.fetchGroup(group);
             }
         } catch (e) {
             console.error(e);
@@ -430,10 +434,10 @@ export class NotificationStore {
                 (groupItem) => groupItem.id === appId,
             );
 
-            this.fetchImportantNotifications(this.store.auth.userLogin);
+            this.fetchImportantNotifications();
 
             if (group) {
-                this.fetchGroup(group, this.store.auth.userLogin);
+                this.fetchGroup(group);
             }
         }, 300);
     }
@@ -442,10 +446,10 @@ export class NotificationStore {
         const appId = payload.app_id;
         const group = this.groups.find((item) => item.id === appId);
 
-        this.fetchImportantNotifications(this.store.auth.userLogin);
+        this.fetchImportantNotifications();
 
         if (group) {
-            this.fetchGroup(group, this.store.auth.userLogin);
+            this.fetchGroup(group);
         }
     }
 

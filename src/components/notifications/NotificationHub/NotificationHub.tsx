@@ -25,9 +25,10 @@ export const NotificationHub = observer(() => {
     );
 
     const connectNotifications = async () => {
-        await store.notification.fetchApps(store.auth.userLogin);
-        await store.notification.fetchTotalCount(store.auth.userLogin);
-        store.notification.fetchNotifications(store.auth.userLogin);
+        await store.notification.fetchApps();
+        await store.notification.fetchTotalCount();
+        await store.notification.fetchInitialCounts();
+        await store.notification.fetchInitialNotifications();
 
         store.notification.connectToNotificationsSocket(store.auth.accessToken);
     };
@@ -82,7 +83,7 @@ export const NotificationHub = observer(() => {
                 (item) => item.id === instruction.applicationId,
             );
             if (group) {
-                store.notification.fetchGroup(group, store.auth.userLogin);
+                store.notification.fetchGroup(group);
             }
         }
     };
