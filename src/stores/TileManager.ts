@@ -1,3 +1,4 @@
+import { DEFAULT_TILE_PRESET_ALIAS } from "constants/config";
 import { makeAutoObservable } from "mobx";
 import { AuthEventType } from "models/auth/AuthEventType";
 import { DisplayMode } from "models/display/DisplayMode";
@@ -113,15 +114,17 @@ export class TileManager {
     }
 
     onLogout() {
-        const template = this.findTileTemplateByAlias("1x1");
+        const template = this.findTileTemplateByAlias(
+            DEFAULT_TILE_PRESET_ALIAS,
+        );
         if (template) {
             this.setDefaultTileTemplate(template);
         }
     }
 
     onDragStop(tileWindow: ApplicationWindow) {
-        const currentPreset = this.store.virtualViewport.currentViewport
-            .tilePreset;
+        const currentPreset =
+            this.store.virtualViewport.currentViewport.tilePreset;
 
         const sourceCell = currentPreset?.cells.find(
             (cell) => cell.attachedAppWindow?.id === tileWindow.id,
@@ -224,7 +227,9 @@ export class TileManager {
             // TODO
             // Т.к. работа выполняется в основном с viewport, вынести отдельным событием и обрабатывать в ViewportManager
             const currentViewport = this.store.virtualViewport.currentViewport;
-            const template = this.store.tile.findTileTemplateByAlias("1x1");
+            const template = this.store.tile.findTileTemplateByAlias(
+                DEFAULT_TILE_PRESET_ALIAS,
+            );
             const newViewport = new VirtualViewportModel({
                 displayMode,
             });

@@ -1,4 +1,5 @@
 import { JsonRpcFailure, JsonRpcSuccess } from "@algont/m7-utils";
+import { DEFAULT_TILE_PRESET_ALIAS } from "constants/config";
 import { TileFactory } from "factories/TileFactory";
 import { isEmpty } from "lodash";
 import { makeAutoObservable } from "mobx";
@@ -161,7 +162,8 @@ export class RecoveryStore {
                 .filter((item) => item.state.savable)
                 .map((item) => ({
                     viewportId: item.id,
-                    templateAlias: item.tilePreset?.alias ?? "1x1",
+                    templateAlias:
+                        item.tilePreset?.alias ?? DEFAULT_TILE_PRESET_ALIAS,
                     // TODO: Remove default display mode
                     displayModeType:
                         item.displayMode?.type ?? DisplayModeType.Tile,

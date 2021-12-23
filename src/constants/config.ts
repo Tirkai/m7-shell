@@ -24,6 +24,8 @@ export const NOTIFICATIONS_WEBSOCKET_URL = `http://notifications.${UPPER_LEVEL_D
 
 export const NOTIFICATION_APP_GUID = "be02305e-a748-4b9f-806f-ae95c1cbed0e";
 
+export const DEFAULT_TILE_PRESET_ALIAS = "1x2-1x2";
+
 export const defaultConfig: IConfig = {
     name: "default",
     properties: {
