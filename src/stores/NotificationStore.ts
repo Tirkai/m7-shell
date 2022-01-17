@@ -126,6 +126,12 @@ export class NotificationStore {
                     },
                     login: { values: [this.store.auth.userLogin] },
                 },
+                order: [
+                    {
+                        field: "ntf_date",
+                        direction: "desc",
+                    },
+                ],
             }),
         });
 
