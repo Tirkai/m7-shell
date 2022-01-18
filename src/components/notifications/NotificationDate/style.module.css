@@ -1,4 +1,31 @@
 .notificationDate {
     font-size: 14px;
-    color: #ffffff80;
+    color: hsla(0, 0%, 100%, 0.502);
+    height: 20px;
+    position: relative;
+}
+
+.date {
+    position: absolute;
+    top: 0;
+    transition: ease 0.3s 0.3s;
+}
+
+.notificationDate .localizedDate {
+    display: block;
+}
+
+.notificationDate:hover .localizedDate {
+    transform: translateY(20px);
+    opacity: 0;
+}
+
+.notificationDate .formatedDate {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+.notificationDate:hover .formatedDate {
+    opacity: 1;
+    transform: translateX(0);
 }

@@ -12,5 +12,16 @@ interface INotificationDateProps {
 export const NotificationDate = (props: INotificationDateProps) => {
     const localizedDate = moment(props.date).fromNow();
 
-    return <div className={classNames(className)}>{localizedDate}</div>;
+    const formattedDate = moment(props.date).format("DD.MM.YYYY HH:mm:ss");
+
+    return (
+        <div className={classNames(className)}>
+            <div className={classNames(style.date, style.localizedDate)}>
+                {localizedDate}
+            </div>
+            <div className={classNames(style.date, style.formatedDate)}>
+                {formattedDate}
+            </div>
+        </div>
+    );
 };
