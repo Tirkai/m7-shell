@@ -6,6 +6,7 @@ import { DevModeHub } from "components/debug/DevModeHub/DevModeHub";
 import { DesktopContainer } from "components/desktop/DesktopContainer/DesktopContainer";
 import { DesktopLayer } from "components/layer/DesktopLayer/DesktopLayer";
 import { AppsMenu } from "components/menu/AppsMenu/AppsMenu";
+import { NotificationReminder } from "components/notifications/NotificationReminder/NotificationReminder";
 import { RecoveryLayer } from "components/recovery/RecoveryLayer/RecoveryLayer";
 import { TaskBar } from "components/task/TaskBar/TaskBar";
 import { VirtualFrame } from "components/virtual/VirtualFrame/VirtualFrame";
@@ -259,6 +260,22 @@ export class ShellScreen extends Component<IStore> {
                                         <AudioHub />
                                     </DesktopLayer>
                                 </Suspense>
+                            </ConfigCondition>
+
+                            <ConfigCondition
+                                condition={
+                                    config.properties.layers
+                                        .notificationReminder.enabled
+                                }
+                            >
+                                <DesktopLayer enabled priority={3}>
+                                    <NotificationReminder
+                                        active={
+                                            this.store.notification
+                                                .isActiveReminder
+                                        }
+                                    />
+                                </DesktopLayer>
                             </ConfigCondition>
 
                             <DesktopLayer enabled={false} priority={4}>

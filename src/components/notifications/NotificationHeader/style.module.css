@@ -23,6 +23,6 @@
     transition: ease 0.3s;
 }
 
-.actions img {
-    width: 12px;
+.actions svg {
+    fill: white;
 }

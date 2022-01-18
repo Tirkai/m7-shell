@@ -96,6 +96,10 @@ export interface IConfig {
             notifications: {
                 enabled: boolean;
             };
+            notificationReminder: {
+                enabled: boolean;
+                delay: number;
+            };
             audioHub: {
                 enabled: boolean;
             };

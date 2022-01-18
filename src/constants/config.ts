@@ -107,6 +107,10 @@ export const defaultConfig: IConfig = {
             notifications: {
                 enabled: true,
             },
+            notificationReminder: {
+                enabled: true,
+                delay: 30000,
+            },
             audioHub: {
                 enabled: true,
             },

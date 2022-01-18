@@ -1,0 +1,60 @@
+.notificationReminder {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 300px;
+    height: 100px;
+    background: #000000cc;
+    border-radius: 4px;
+    transition: ease 0.3s;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.5);
+    transform-origin: center center;
+    width: 80px;
+}
+
+.notificationReminder::after {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: 100%;
+    right: 10px;
+    background: #000000cc;
+    content: "";
+    clip-path: polygon(100% 0%, 0 0, 50% 100%);
+}
+
+.container {
+    padding: 16px;
+    box-sizing: border-box;
+    color: white;
+    display: grid;
+    grid-template-columns: 48px 205px;
+    grid-gap: 16px;
+    overflow: hidden;
+}
+
+.isActive {
+    pointer-events: all;
+    opacity: 1;
+    transition: ease opacity 0.3s 1s, ease transform 0.3s 1s, width 0.3s 2s;
+    transform: scale(1);
+    width: 300px;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content {
+    color: transparent;
+    transition: ease 0.1s;
+}
+
+.notificationReminder.isActive .content {
+    color: white;
+    transition: ease 0.3s 1s;
+}

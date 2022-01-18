@@ -1,0 +1,22 @@
+.notificationBell {
+    --svgIconInjectedColor: white;
+}
+
+.animator {
+    animation-name: swing;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease;
+}
+
+@keyframes swing {
+    0% {
+        transform: rotate(-20deg);
+    }
+    50% {
+        transform: rotate(20deg);
+    }
+    100% {
+        transform: rotate(-20deg);
+    }
+}

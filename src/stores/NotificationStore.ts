@@ -78,6 +78,10 @@ export class NotificationStore {
         return this.importantNotifications.length > 0;
     }
 
+    get isActiveReminder() {
+        return this.hasImportantNotifcations && this.toasts.length <= 0;
+    }
+
     status: NotificationServiceConnectStatus =
         NotificationServiceConnectStatus.Default;
 

@@ -1,5 +1,5 @@
 import { IconButton } from "@material-ui/core";
-import { collapse, cross } from "assets/icons";
+import { ArrowForward, Clear } from "@material-ui/icons";
 import classNames from "classnames";
 import React, { Fragment, useMemo, useState } from "react";
 import { NotificationConfirm } from "../NotificationConfirm/NotificationConfirm";
@@ -37,10 +37,6 @@ export const NotificationCard = (props: INotificationCardProps) => {
         }
 
         props.onClose();
-
-        // if (props.closeAfterClick && props.onClose) {
-        //     props.onClose();
-        // }
     };
 
     const handleClose = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -80,7 +76,7 @@ export const NotificationCard = (props: INotificationCardProps) => {
             return (
                 <div onClick={handleCollapse}>
                     <IconButton size="small">
-                        <img src={collapse} alt="Collapse" />
+                        <ArrowForward />
                     </IconButton>
                 </div>
             );
@@ -88,7 +84,7 @@ export const NotificationCard = (props: INotificationCardProps) => {
             return (
                 <div onClick={handleClose}>
                     <IconButton size="small">
-                        <img src={cross} alt="Close" />
+                        <Clear />
                     </IconButton>
                 </div>
             );

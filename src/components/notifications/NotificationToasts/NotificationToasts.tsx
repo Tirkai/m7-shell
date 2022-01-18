@@ -13,10 +13,9 @@ import style from "./style.module.css";
 
 export const NotificationToasts = observer(() => {
     const store = useStore();
-    const handleRunApplication = (toast: ToastNotification) => {
-        const app = store.applicationManager.findById(
-            toast.notification.applicationId,
-        );
+
+    const runApplication = (appId: string, url: string) => {
+        const app = store.applicationManager.findById(appId);
         if (app instanceof ExternalApplication) {
             store.panelManager.setActivePanel(ShellPanelType.None);
 
@@ -24,14 +23,11 @@ export const NotificationToasts = observer(() => {
 
             runner.run(app, {
                 processOptions: {
-                    url: toast.notification.url,
+                    url,
                 },
                 focusWindowAfterInstantiate: true,
             });
         }
-
-        toast.setShow(false);
-        handleRemoveNotification(toast.notification);
     };
 
     const handleFadeOutAnimationEnd = (
@@ -70,6 +66,19 @@ export const NotificationToasts = observer(() => {
         toast.setShow(false);
     };
 
+    const handleNotificationCardClick = (toast: ToastNotification) => {
+        runApplication(
+            toast.notification.applicationId,
+            toast.notification.url,
+        );
+
+        if (toast.notification.isRequireConfirm) {
+            return;
+        }
+        toast.setShow(false);
+        handleRemoveNotification(toast.notification);
+    };
+
     return (
         <div className={style.notificationToasts}>
             {store.notification.toasts.map((item) => (
@@ -84,7 +93,7 @@ export const NotificationToasts = observer(() => {
                 >
                     <NotificationCard
                         {...item.notification}
-                        onClick={() => handleRunApplication(item)}
+                        onClick={() => handleNotificationCardClick(item)}
                         onClose={() => handleClose(item)}
                         onCollapse={() => handleCollapse(item)}
                         closeAfterClick={!item.notification.isRequireConfirm}
