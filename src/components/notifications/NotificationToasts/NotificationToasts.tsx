@@ -48,6 +48,10 @@ export const NotificationToasts = observer(() => {
         handleRemoveNotification(toast.notification);
     };
 
+    const handleCollapse = (toast: ToastNotification) => {
+        toast.setShow(false);
+    };
+
     const handleRemoveNotification = (notification: NotificationModel) => {
         store.notification.removeNotifications(
             [notification.id],
@@ -82,6 +86,7 @@ export const NotificationToasts = observer(() => {
                         {...item.notification}
                         onClick={() => handleRunApplication(item)}
                         onClose={() => handleClose(item)}
+                        onCollapse={() => handleCollapse(item)}
                         closeAfterClick={!item.notification.isRequireConfirm}
                         onConfirm={() =>
                             handleShowInstruction(item, item.notification)

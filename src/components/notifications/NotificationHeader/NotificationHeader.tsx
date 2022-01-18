@@ -1,6 +1,4 @@
 import { SVGIcon } from "@algont/m7-ui";
-import { IconButton } from "@material-ui/core";
-import { cross } from "assets/icons";
 import classNames from "classnames";
 import React from "react";
 import style from "./style.module.css";
@@ -11,15 +9,16 @@ interface INotificationHeaderProps {
     icon?: string;
     title: string;
     hovered?: boolean;
-    onClose: () => void;
-    disableCloseAction?: boolean;
+    // onClose: () => void;
+    action?: React.ReactNode;
+    // disableCloseAction?: boolean;
 }
 
 export const NotificationHeader = (props: INotificationHeaderProps) => {
-    const handleClose = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        e.stopPropagation();
-        props.onClose();
-    };
+    // const handleClose = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    //     e.stopPropagation();
+    //     props.onClose();
+    // };
 
     return (
         <div
@@ -38,13 +37,14 @@ export const NotificationHeader = (props: INotificationHeaderProps) => {
             )}
             <div className={style.title}>{props.title}</div>
             <div className={style.actions}>
-                {!props.disableCloseAction && (
+                {props.action}
+                {/* {!props.disableCloseAction && (
                     <div onClick={handleClose}>
                         <IconButton size="small">
                             <img src={cross} alt="Close" />
                         </IconButton>
                     </div>
-                )}
+                )} */}
             </div>
         </div>
     );

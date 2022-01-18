@@ -386,17 +386,21 @@ export class NotificationStore {
     addNotification(notification: NotificationModel) {
         try {
             if (notification.isShowBanner) {
-                const expireTime = notification.isRequireConfirm
-                    ? NotificationExpireTime.Long
-                    : NotificationExpireTime.Short;
+                const expireTime = NotificationExpireTime.Short;
 
-                this.toasts.unshift(
-                    new ToastNotification({ notification, expireTime }),
-                );
+                if (notification.isRequireConfirm) {
+                    this.toasts.unshift(
+                        new ToastNotification({ notification }),
+                    );
+                } else {
+                    this.toasts.unshift(
+                        new ToastNotification({ notification, expireTime }),
+                    );
+                }
             }
 
             if (notification.isRequireConfirm) {
-                this.importantNotifications.push(notification);
+                this.importantNotifications.unshift(notification);
             }
 
             const group = this.groups.find(

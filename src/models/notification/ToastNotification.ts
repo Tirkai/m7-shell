@@ -4,23 +4,24 @@ import { NotificationModel } from "./NotificationModel";
 
 interface IToastNotificationOptions {
     notification: NotificationModel;
-    expireTime: NotificationExpireTime;
+    expireTime?: NotificationExpireTime;
 }
 
 export class ToastNotification {
     isShow: boolean = true;
     notification: NotificationModel;
-    expireTime: number;
+    expireTime?: number;
 
     constructor(options: IToastNotificationOptions) {
         this.notification = options.notification;
-        this.expireTime = options.expireTime;
+        if (options.expireTime) {
+            this.expireTime = options.expireTime;
+            setTimeout(() => {
+                this.setShow(false);
+            }, this.expireTime);
+        }
 
         makeAutoObservable(this);
-
-        setTimeout(() => {
-            this.setShow(false);
-        }, this.expireTime);
     }
 
     setShow(value: boolean) {
