@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NotificationBell } from "../NotificationBell/NotificationBell";
 import style from "./style.module.css";
 
@@ -11,6 +11,8 @@ interface INotificationReminderProps {
 
 export const NotificationReminder = observer(
     (props: INotificationReminderProps) => {
+        let timeout = useRef<NodeJS.Timeout | null>(null);
+
         const store = useStore();
         const { config } = store.config;
         const [isVisible, setVisible] = useState(true);
@@ -22,10 +24,20 @@ export const NotificationReminder = observer(
 
             setVisible(false);
 
-            setTimeout(() => {
+            timeout.current = setTimeout(() => {
                 setVisible(true);
             }, config.properties.layers.notificationReminder.delay);
         };
+
+        useEffect(
+            () => () => {
+                if (!timeout.current) {
+                    return;
+                }
+                clearTimeout(timeout.current);
+            },
+            [],
+        );
 
         return (
             <div
