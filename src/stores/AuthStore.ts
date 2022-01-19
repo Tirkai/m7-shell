@@ -239,7 +239,6 @@ export class AuthStore {
             );
 
             if (Axios.defaults?.headers?.common) {
-                // const t = AUTH_TOKEN_HEADER;
                 Axios.defaults.headers[AUTH_TOKEN_HEADER] = this.accessToken;
             }
         } catch (e) {

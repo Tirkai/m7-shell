@@ -10,7 +10,6 @@ import { ApplicationWindowType } from "models/window/ApplicationWindowType";
 import { AppStore } from "stores/AppStore";
 
 interface IApplicationRunnerOptions {
-    // url?: string;
     focusWindowAfterInstantiate?: boolean;
     windowOptions?: IApplicationWindowOptions;
     processOptions?: IApplicationProcessOptionalOptions;

@@ -7,20 +7,12 @@ const className = style.contextMenu;
 interface IContextMenuOptions {
     position: Point2D;
     isShow: boolean;
-    // ref: React.MutableRefObject<HTMLDivElement | null>;
     children: React.ReactNode;
 }
 
 export const ShellContextMenu = (props: IContextMenuOptions) => {
-    // const store = useStore();
     const [x, setX] = useState(0);
     const [y, setY] = useState(0);
-
-    // const handleClick = (item: ContextMenuItemModel) => {
-    //     store.contextMenu.hideContextMenu();
-
-    //     item.onClick();
-    // };
 
     const ref = useRef<HTMLDivElement | null>(null);
 

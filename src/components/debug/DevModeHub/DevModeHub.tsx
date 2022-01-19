@@ -24,8 +24,6 @@ export const DevModeHub = observer(() => {
             key: `${id}`,
         });
 
-        // store.applicationManager.addApplication(app);
-
         new ApplicationRunner(store).run(app, {
             focusWindowAfterInstantiate: true,
         });

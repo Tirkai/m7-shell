@@ -56,8 +56,6 @@ export const TaskBarItem = observer((props: ITaskBarItemProps) => {
         setShowHint(false);
     };
 
-    // const isBigNumber = +(props.badge ?? 0) >= 100;
-
     return (
         <>
             {props.displayHint && isShowHint && (

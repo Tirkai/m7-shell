@@ -116,9 +116,7 @@ export const NotificationCard = (props: INotificationCardProps) => {
                         <NotificationHeader
                             icon={props.icon}
                             title={props.title}
-                            // onClose={handleClose}
                             action={notificationAction}
-                            // disableCloseAction={props.isRequireConfirm}
                             hovered={isHovered}
                         />
                         <NotificationText text={props.text} />

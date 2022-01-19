@@ -6,7 +6,7 @@ import { PanelInformerContent } from "components/informer/PanelInformerText/Pane
 import { TimerWrapper } from "components/timer/TimerWrapper/TimerWrapper";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import React, { useEffect } from "react";
+import React from "react";
 import style from "./style.module.css";
 
 const className = style.recoveryLayer;
@@ -20,38 +20,20 @@ export const RecoveryLayer = observer(() => {
 
     const handleClose = () => {
         store.panelManager.setShowRecoveryPanel(false);
-        // store.recovery.setIsRecoveredDynamicSnapshot(true);
     };
 
     const handleStartRecovery = () => {
         store.panelManager.setShowRecoveryPanel(false);
         if (store.recovery.dynamicSessionSnapshot) {
-            // store.recovery.setIsRecoveredDynamicSnapshot(true);
             store.recovery.startRecovery(store.recovery.dynamicSessionSnapshot);
         }
-    };
-
-    const onShowRecoveryPanel = () => {
-        // const delay =
-        //     store.config.config.properties.layers.recovery.dialog
-        //         .delayBeforeClose;
-        // if (store.panelManager.isShowRecoveryPanel) {
-        //     const timer = setTimeout(() => {
-        //         store.panelManager.setShowRecoveryPanel(false);
-        //         // store.recovery.setIsRecoveredDynamicSnapshot(true);
-        //     }, delay);
-        //     return () => clearTimeout(timer);
-        // }
     };
 
     const handleDoneTimer = () => {
         store.panelManager.setShowRecoveryPanel(false);
     };
 
-    useEffect(onShowRecoveryPanel, [store.panelManager.isShowRecoveryPanel]);
-
     const isShow = store.panelManager.isShowRecoveryPanel;
-    // const isShow = true;
 
     return isShow ? (
         <div className={className}>

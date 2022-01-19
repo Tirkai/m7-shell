@@ -91,7 +91,6 @@ export class ShellScreen extends Component<IStore> {
         if (recovery.dynamicSessionSnapshot) {
             recovery.startRecovery(recovery.dynamicSessionSnapshot);
         }
-        // recovery.setDisplayRecoveryDialog(false);
     };
 
     handleRecoveryFreezeSnapshot = () => {
@@ -99,7 +98,6 @@ export class ShellScreen extends Component<IStore> {
         if (recovery.freezedSessionSnapshot) {
             recovery.startRecovery(recovery.freezedSessionSnapshot);
         }
-        // recovery.setDisplayRecoveryDialog(false);
     };
 
     render() {

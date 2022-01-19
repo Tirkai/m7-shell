@@ -123,21 +123,8 @@ export class VirtualViewportManager {
             ),
         );
 
-        // this.init();
-
         makeAutoObservable(this);
     }
-
-    // init() {
-    //     const dashboardViewport = new VirtualViewportModel({
-    //         state: new ViewportStandState(),
-    //         key: "DashboardViewport",
-    //         displayMode: this.store.display.findDisplayModeByType(
-    //             DisplayModeType.Tile,
-    //         ),
-    //     });
-    //     this.addViewport(dashboardViewport);
-    // }
 
     onEntry() {
         const { config } = this.store.config;
@@ -187,8 +174,6 @@ export class VirtualViewportManager {
         // const viewport = this.viewports.find(
         //     (item) => item.key === "DashboardViewport",
         // );
-
-        // console.log({ viewport });
     }
 
     setViewports(viewports: VirtualViewportModel[]) {
