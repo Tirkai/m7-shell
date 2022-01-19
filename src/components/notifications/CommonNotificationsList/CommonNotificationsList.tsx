@@ -250,6 +250,7 @@ export const CommonNotificationsList = observer(
                                     icon={group.icon}
                                     {...notification}
                                     // hasInstruction={notification.hasInstruction}
+                                    instruction={notification.instruction}
                                     closeAfterClick={
                                         !notification.isRequireConfirm
                                     }

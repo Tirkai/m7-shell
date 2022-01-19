@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import { InstructionFactory } from "factories/InstructionFactory";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
@@ -55,15 +54,23 @@ export const NotificationToasts = observer(() => {
         );
     };
 
-    const handleShowInstruction = (
-        toast: ToastNotification,
+    const handleConfirm = async (
         notification: NotificationModel,
+        toast: ToastNotification,
     ) => {
-        store.instruction.setShowInstruction(true);
-        store.instruction.setInstruction(
-            InstructionFactory.createInstruction({ notification }),
+        const response = await store.notification.confirmUserNotifications(
+            [notification.id],
+            store.auth.userLogin,
         );
-        toast.setShow(false);
+        if (!response.error) {
+            const group = store.notification.groups.find(
+                (item) => item.id === notification.applicationId,
+            );
+            if (group) {
+                store.notification.fetchGroup(group);
+            }
+            toast.setShow(false);
+        }
     };
 
     const handleNotificationCardClick = (toast: ToastNotification) => {
@@ -97,9 +104,7 @@ export const NotificationToasts = observer(() => {
                         onClose={() => handleClose(item)}
                         onCollapse={() => handleCollapse(item)}
                         closeAfterClick={!item.notification.isRequireConfirm}
-                        onConfirm={() =>
-                            handleShowInstruction(item, item.notification)
-                        }
+                        onConfirm={() => handleConfirm(item.notification, item)}
                     />
                 </div>
             ))}

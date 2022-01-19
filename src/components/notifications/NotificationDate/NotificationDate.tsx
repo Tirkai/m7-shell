@@ -16,11 +16,13 @@ export const NotificationDate = (props: INotificationDateProps) => {
 
     return (
         <div className={classNames(className)}>
-            <div className={classNames(style.date, style.localizedDate)}>
-                {localizedDate}
-            </div>
-            <div className={classNames(style.date, style.formatedDate)}>
-                {formattedDate}
+            <div className={style.container}>
+                <div className={classNames(style.date, style.localizedDate)}>
+                    {localizedDate}
+                </div>
+                <div className={classNames(style.date, style.formatedDate)}>
+                    {formattedDate}
+                </div>
             </div>
         </div>
     );

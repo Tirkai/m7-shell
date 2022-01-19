@@ -5,6 +5,7 @@ import React, { Fragment, useMemo, useState } from "react";
 import { NotificationConfirm } from "../NotificationConfirm/NotificationConfirm";
 import { NotificationDate } from "../NotificationDate/NotificationDate";
 import { NotificationHeader } from "../NotificationHeader/NotificationHeader";
+import { NotificationInstruction } from "../NotificationInstruction/NotificationInstruction";
 import { NotificationText } from "../NotificationText/NotificationText";
 import style from "./style.module.css";
 
@@ -16,6 +17,7 @@ interface INotificationCardProps {
     isRequireConfirm: boolean;
     isDisplayed: boolean;
     closeAfterClick?: boolean;
+    instruction?: string;
     onClose?: () => void;
     onCollapse?: () => void;
     onClick: () => void;
@@ -111,13 +113,17 @@ export const NotificationCard = (props: INotificationCardProps) => {
                             hovered={isHovered}
                         />
                         <NotificationText text={props.text} />
-                        <NotificationDate date={props.date} />
                     </div>
-                    <NotificationConfirm
-                        onConfirm={handleConfirm}
-                        isShow={props.isRequireConfirm}
-                    />
                 </div>
+                <NotificationInstruction
+                    content={props.instruction}
+                    isShow={!!props.instruction}
+                />
+                <NotificationDate date={props.date} />
+                <NotificationConfirm
+                    onConfirm={handleConfirm}
+                    isShow={props.isRequireConfirm}
+                />
             </div>
         </div>
     );

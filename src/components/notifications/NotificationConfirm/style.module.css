@@ -1,5 +1,7 @@
 .notificationConfirm {
     box-sizing: border-box;
+    padding: 16px;
+    padding-top: 0;
 }
 
 .container {

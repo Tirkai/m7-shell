@@ -1,17 +1,14 @@
 import classNames from "classnames";
-import { InstructionFactory } from "factories/InstructionFactory";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/app/ExternalApplication";
-import { Instruction } from "models/instruction/Instruction";
 import { NotificationModel } from "models/notification/NotificationModel";
 import { NotificationTab } from "models/notification/NotificationTab";
 import { ShellPanelType } from "models/panel/ShellPanelType";
 import React, { useEffect, useState } from "react";
 import { CommonNotificationsList } from "../CommonNotificationsList/CommonNotificationsList";
 import { ImportantNotificationsList } from "../ImportantNotificationsList/ImportantNotificationsList";
-import { InstructionDialog } from "../InstructionDialog/InstructionDialog";
 import { NotificationCategoryTabContent } from "../NotificationCategoryTabContent/NotificationCategoryTabContent";
 import { NotificationHubHeader } from "../NotificationHubHeader/NotificationHubHeader";
 import { NotificationsList } from "../NotificationsList/NotificationsList";
@@ -72,27 +69,19 @@ export const NotificationHub = observer(() => {
         setCurrentTab(tab);
     };
 
-    const handleConfirm = async (instruction: Instruction) => {
+    const handleConfirm = async (notification: NotificationModel) => {
         const response = await store.notification.confirmUserNotifications(
-            [instruction.notificationId],
+            [notification.id],
             store.auth.userLogin,
         );
         if (!response.error) {
-            store.instruction.setShowInstruction(false);
             const group = store.notification.groups.find(
-                (item) => item.id === instruction.applicationId,
+                (item) => item.id === notification.applicationId,
             );
             if (group) {
                 store.notification.fetchGroup(group);
             }
         }
-    };
-
-    const handleShowInstruction = (notification: NotificationModel) => {
-        store.instruction.setShowInstruction(true);
-        store.instruction.setInstruction(
-            InstructionFactory.createInstruction({ notification }),
-        );
     };
 
     useEffect(onMount, []);
@@ -128,7 +117,7 @@ export const NotificationHub = observer(() => {
                             <CommonNotificationsList
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
-                                onConfirm={handleShowInstruction}
+                                onConfirm={handleConfirm}
                             />
                         </NotificationCategoryTabContent>
                         <NotificationCategoryTabContent
@@ -138,18 +127,18 @@ export const NotificationHub = observer(() => {
                             <ImportantNotificationsList
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
-                                onConfirm={handleShowInstruction}
+                                onConfirm={handleConfirm}
                             />
                         </NotificationCategoryTabContent>
                     </NotificationsList>
                 </div>
             </div>
-            <InstructionDialog
+            {/* <InstructionDialog
                 instruction={store.instruction.instruction}
                 show={store.instruction.isShowInstruction}
                 onClose={() => store.instruction.setShowInstruction(false)}
                 onConfirm={handleConfirm}
-            />
+            /> */}
         </div>
     );
 });

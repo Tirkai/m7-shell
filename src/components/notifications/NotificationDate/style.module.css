@@ -1,10 +1,19 @@
 .notificationDate {
+    display: flex;
+    align-items: center;
     font-size: 14px;
-    color: hsla(0, 0%, 100%, 0.502);
-    height: 20px;
+    color: #b2b2b3;
     position: relative;
+    box-sizing: border-box;
+    padding: 12px;
 }
 
+.container {
+    display: flex;
+    position: relative;
+    width: 100%;
+    min-height: 20px;
+}
 .date {
     position: absolute;
     top: 0;

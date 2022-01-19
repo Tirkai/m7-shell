@@ -1,19 +1,20 @@
 .notificationInstruction {
     box-sizing: border-box;
-    background: #262627;
-    color: #b2b2b3;
+    /* background: #262627; */
+    /* color: #b2b2b3; */
 }
 
 .container {
-    padding: 16px;
+    padding: 12px;
     box-sizing: border-box;
 }
 
 .header {
-    display: flex;
+    display: grid;
+    grid-template-columns: 24px 1fr 24px;
     gap: 8px;
-    align-items: center;
-    color: white;
+    align-items: flex-start;
+    color: #b2b2b3;
     cursor: pointer;
 }
 
