@@ -22,6 +22,7 @@ interface INotificationCardProps {
     onCollapse?: () => void;
     onClick: () => void;
     onConfirm?: () => void;
+    onConfirmAndDrop?: () => void;
 }
 
 export const NotificationCard = (props: INotificationCardProps) => {
@@ -67,6 +68,14 @@ export const NotificationCard = (props: INotificationCardProps) => {
         }
 
         props.onConfirm();
+    };
+
+    const handleConfirmAndDrop = () => {
+        if (!props.onConfirmAndDrop) {
+            return;
+        }
+
+        props.onConfirmAndDrop();
     };
 
     const notificationAction = useMemo(() => {
@@ -122,6 +131,7 @@ export const NotificationCard = (props: INotificationCardProps) => {
                 <NotificationDate date={props.date} />
                 <NotificationConfirm
                     onConfirm={handleConfirm}
+                    onConfirmAndDrop={handleConfirmAndDrop}
                     isShow={props.isRequireConfirm}
                 />
             </div>

@@ -62,15 +62,50 @@ export const NotificationToasts = observer(() => {
             [notification.id],
             store.auth.userLogin,
         );
-        if (!response.error) {
-            const group = store.notification.groups.find(
-                (item) => item.id === notification.applicationId,
-            );
-            if (group) {
-                store.notification.fetchGroup(group);
-            }
-            toast.setShow(false);
+
+        if (response.error) {
+            return;
         }
+
+        const group = store.notification.groups.find(
+            (item) => item.id === notification.applicationId,
+        );
+        if (group) {
+            store.notification.fetchGroup(group);
+        }
+        toast.setShow(false);
+    };
+
+    const handleConfirmAndDrop = async (
+        notification: NotificationModel,
+        toast: ToastNotification,
+    ) => {
+        const confirmResponse =
+            await store.notification.confirmUserNotifications(
+                [notification.id],
+                store.auth.userLogin,
+            );
+
+        if (confirmResponse.error) {
+            return;
+        }
+
+        const removeResponse = await store.notification.removeNotifications(
+            [notification.id],
+            store.auth.userLogin,
+        );
+
+        if (removeResponse.error) {
+            return;
+        }
+
+        const group = store.notification.groups.find(
+            (item) => item.id === notification.applicationId,
+        );
+        if (group) {
+            store.notification.fetchGroup(group);
+        }
+        toast.setShow(false);
     };
 
     const handleNotificationCardClick = (toast: ToastNotification) => {
@@ -105,6 +140,9 @@ export const NotificationToasts = observer(() => {
                         onCollapse={() => handleCollapse(item)}
                         closeAfterClick={!item.notification.isRequireConfirm}
                         onConfirm={() => handleConfirm(item.notification, item)}
+                        onConfirmAndDrop={() =>
+                            handleConfirmAndDrop(item.notification, item)
+                        }
                     />
                 </div>
             ))}

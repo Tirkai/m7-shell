@@ -84,6 +84,34 @@ export const NotificationHub = observer(() => {
         }
     };
 
+    const handleConfirmAndDrop = async (notification: NotificationModel) => {
+        const confirmResponse =
+            await store.notification.confirmUserNotifications(
+                [notification.id],
+                store.auth.userLogin,
+            );
+
+        if (confirmResponse.error) {
+            return;
+        }
+
+        const removeResponse = await store.notification.removeNotifications(
+            [notification.id],
+            store.auth.userLogin,
+        );
+
+        if (removeResponse.error) {
+            return;
+        }
+
+        const group = store.notification.groups.find(
+            (item) => item.id === notification.applicationId,
+        );
+        if (group) {
+            store.notification.fetchGroup(group);
+        }
+    };
+
     useEffect(onMount, []);
 
     useEffect(() => {
@@ -118,6 +146,7 @@ export const NotificationHub = observer(() => {
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
                                 onConfirm={handleConfirm}
+                                onConfirmAndDrop={handleConfirmAndDrop}
                             />
                         </NotificationCategoryTabContent>
                         <NotificationCategoryTabContent
@@ -128,6 +157,7 @@ export const NotificationHub = observer(() => {
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
                                 onConfirm={handleConfirm}
+                                onConfirmAndDrop={handleConfirmAndDrop}
                             />
                         </NotificationCategoryTabContent>
                     </NotificationsList>

@@ -13,9 +13,14 @@
     color: white;
     border-radius: 8px;
     font-size: 16px;
-    background: #343437;
+    background: #47474a;
 }
 
 .button:hover {
-    background: #47474a;
+    background: #404040;
+}
+
+.additionalButton {
+    border-left: 1px solid #2d2d2f;
+    padding: 12px;
 }

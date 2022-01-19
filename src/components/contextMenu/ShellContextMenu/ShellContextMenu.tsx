@@ -1,31 +1,35 @@
 import classNames from "classnames";
-import { useStore } from "hooks/useStore";
-import { observer } from "mobx-react";
-import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
+import { Point2D } from "models/shape/Point2D";
 import React, { useEffect, useRef, useState } from "react";
-import { ShellContextMenuItem } from "../ShellContextMenuItem/ShellContextMenuItem";
 import style from "./style.module.css";
 const className = style.contextMenu;
 
-export const ShellContextMenu: React.FC = observer(() => {
-    const store = useStore();
+interface IContextMenuOptions {
+    position: Point2D;
+    isShow: boolean;
+    // ref: React.MutableRefObject<HTMLDivElement | null>;
+    children: React.ReactNode;
+}
+
+export const ShellContextMenu = (props: IContextMenuOptions) => {
+    // const store = useStore();
     const [x, setX] = useState(0);
     const [y, setY] = useState(0);
 
-    const handleClick = (item: ContextMenuItemModel) => {
-        store.contextMenu.hideContextMenu();
+    // const handleClick = (item: ContextMenuItemModel) => {
+    //     store.contextMenu.hideContextMenu();
 
-        item.onClick();
-    };
+    //     item.onClick();
+    // };
 
     const ref = useRef<HTMLDivElement | null>(null);
 
     const onShowContextMenu = () => {
-        if (ref.current && store.contextMenu.isShow) {
+        if (ref.current) {
             const bounds = ref.current.getBoundingClientRect();
 
-            const currentX = store.contextMenu.point.x;
-            const currentY = store.contextMenu.point.y;
+            const currentX = props.position.x;
+            const currentY = props.position.y;
 
             if (currentX + bounds.width > window.innerWidth) {
                 setX(window.innerWidth - bounds.width);
@@ -37,12 +41,12 @@ export const ShellContextMenu: React.FC = observer(() => {
         }
     };
 
-    useEffect(onShowContextMenu, [store.contextMenu.isShow]);
+    useEffect(onShowContextMenu, [props.position]);
 
     return (
         <div
             className={classNames(className, {
-                [style.show]: store.contextMenu.isShow,
+                [style.show]: props.isShow,
             })}
             style={{
                 top: y + "px",
@@ -51,16 +55,7 @@ export const ShellContextMenu: React.FC = observer(() => {
             id="context-menu"
             ref={ref}
         >
-            <div className={classNames(style.container)}>
-                {store.contextMenu.items.map((item) => (
-                    <ShellContextMenuItem
-                        key={item.id}
-                        icon={item.icon}
-                        content={item.content}
-                        onClick={() => handleClick(item)}
-                    />
-                ))}
-            </div>
+            <div className={classNames(style.container)}>{props.children}</div>
         </div>
     );
-});
+};

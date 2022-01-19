@@ -7,12 +7,10 @@ const className = style.shellContextMenuItem;
 interface IShellContextMenuItemProps {
     icon?: React.ReactNode;
     content: string | JSX.Element;
-    onClick: () => void;
+    onClick: (_opts?: any) => any;
 }
 
-export class ShellContextMenuItem extends Component<
-    IShellContextMenuItemProps
-> {
+export class ShellContextMenuItem extends Component<IShellContextMenuItemProps> {
     render() {
         return (
             <div className={classNames(className)} onClick={this.props.onClick}>

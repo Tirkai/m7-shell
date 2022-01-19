@@ -1,6 +1,4 @@
 import { ConfigCondition } from "components/config/ConfigCondition/ConfigCondition";
-import { ShellContextMenu } from "components/contextMenu/ShellContextMenu/ShellContextMenu";
-import { ShellContextMenuOverlay } from "components/contextMenu/ShellContextMenuOverlay/ShellContextMenuOverlay";
 import { BuildVersion } from "components/debug/BuildVersion/BuildVersion";
 import { DevModeHub } from "components/debug/DevModeHub/DevModeHub";
 import { DesktopContainer } from "components/desktop/DesktopContainer/DesktopContainer";
@@ -315,8 +313,8 @@ export class ShellScreen extends Component<IStore> {
                     }
                 />
 
-                <ShellContextMenuOverlay />
-                <ShellContextMenu />
+                {/* <ShellContextMenuOverlay />
+                <ShellContextMenu /> */}
             </div>
         );
     }

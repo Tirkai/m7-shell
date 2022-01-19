@@ -17,6 +17,7 @@ interface IImportantNotificationsListProps {
     onCloseNotification: (notification: NotificationModel) => void;
     onRunApplication: (appId: string, url: string) => void;
     onConfirm: (notification: NotificationModel) => void;
+    onConfirmAndDrop: (notification: NotificationModel) => void;
 }
 
 export const ImportantNotificationsList = observer(
@@ -37,6 +38,9 @@ export const ImportantNotificationsList = observer(
                                 )
                             }
                             onConfirm={() => props.onConfirm(notification)}
+                            onConfirmAndDrop={() =>
+                                props.onConfirmAndDrop(notification)
+                            }
                         />
                     ),
                 )}

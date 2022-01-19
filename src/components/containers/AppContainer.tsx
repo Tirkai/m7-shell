@@ -1,6 +1,7 @@
 import { ServiceProvider } from "@algont/m7-crud-helper";
 import { CssVariablesProvider } from "@algont/m7-css-vars";
 import { LinearProgress } from "@material-ui/core";
+import { ContextMenuProvider } from "components/contextMenu/ContextMenuProvider/ContextMenuProvider";
 import { AuthScreen } from "components/layout/AuthScreen/AuthScreen";
 import { AwaitVerifyScreen } from "components/layout/AwaitVerifyScreen/AwaitVerifyScreen";
 import { ShellScreen } from "components/layout/ShellScreen/ShellScreen";
@@ -42,27 +43,30 @@ export const AppContainer = observer(() => {
                         />
                         <DocumentEventsBinder />
                         <RootContainer>
-                            <Router history={history}>
-                                <Switch>
-                                    <Route path="/" exact>
-                                        {store.auth.isAuthorized ? (
-                                            store.auth.checkedAfterStart ? (
-                                                <ServiceProvider
-                                                    token={
-                                                        store.auth.accessToken
-                                                    }
-                                                >
-                                                    <ShellScreen />
-                                                </ServiceProvider>
+                            <ContextMenuProvider>
+                                <Router history={history}>
+                                    <Switch>
+                                        <Route path="/" exact>
+                                            {store.auth.isAuthorized ? (
+                                                store.auth.checkedAfterStart ? (
+                                                    <ServiceProvider
+                                                        token={
+                                                            store.auth
+                                                                .accessToken
+                                                        }
+                                                    >
+                                                        <ShellScreen />
+                                                    </ServiceProvider>
+                                                ) : (
+                                                    <AwaitVerifyScreen />
+                                                )
                                             ) : (
-                                                <AwaitVerifyScreen />
-                                            )
-                                        ) : (
-                                            <AuthScreen />
-                                        )}
-                                    </Route>
-                                </Switch>
-                            </Router>
+                                                <AuthScreen />
+                                            )}
+                                        </Route>
+                                    </Switch>
+                                </Router>
+                            </ContextMenuProvider>
                         </RootContainer>
                     </PerformanceProvider>
                 </CssVariablesProvider>

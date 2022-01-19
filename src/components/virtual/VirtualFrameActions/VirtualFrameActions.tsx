@@ -1,10 +1,10 @@
 import { IconButton } from "@material-ui/core";
 import { Add, Clear, MoreVert, Restore, Save } from "@material-ui/icons";
+import { ShellContextMenuItem } from "components/contextMenu/ShellContextMenuItem/ShellContextMenuItem";
+import { ContextMenuContext } from "contexts/ContextMenuContext";
 import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
-import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
-import { Point2D } from "models/shape/Point2D";
-import React from "react";
+import React, { Fragment, useContext } from "react";
 import { VirtualFramePreviewBase } from "../VirtualFramePreviewBase/VirtualFramePreviewBase";
 import { VirtualFramePreviewLayout } from "../VirtualFramePreviewLayout/VirtualFramePreviewLayout";
 import style from "./style.module.css";
@@ -18,6 +18,8 @@ const className = style.virtualFrameActions;
 export const VirtualFrameActions = observer(
     (props: IVirtualFrameActionsProps) => {
         const store = useStore();
+        const { showMenu, invokeWithClose, transformEventAnchorToPoint } =
+            useContext(ContextMenuContext);
 
         const handleSaveUserSession = () => {
             store.recovery.saveFreezeSnapshot();
@@ -35,27 +37,33 @@ export const VirtualFrameActions = observer(
             store.virtualViewport.resetViewports({ atLeastOne: true });
         };
 
-        const handleShowMenu = (e: React.MouseEvent) => {
-            const x = e.pageX;
-            const y = e.pageY;
-
-            store.contextMenu.showContextMenu(new Point2D(x, y), [
-                new ContextMenuItemModel({
-                    icon: <Save />,
-                    content: "Сохранить сессию",
-                    onClick: () => handleSaveUserSession(),
-                }),
-                new ContextMenuItemModel({
-                    icon: <Restore />,
-                    content: "Восстановить сессию",
-                    onClick: () => handleRestoreUserSession(),
-                }),
-                new ContextMenuItemModel({
-                    icon: <Clear />,
-                    content: "Очистить все",
-                    onClick: () => handleClearAll(),
-                }),
-            ]);
+        const handleShowMenu = (
+            e: React.MouseEvent<HTMLElement, MouseEvent>,
+        ) => {
+            showMenu(
+                transformEventAnchorToPoint(e),
+                <Fragment>
+                    <ShellContextMenuItem
+                        icon={<Save />}
+                        content={"Сохранить сессию"}
+                        onClick={() =>
+                            invokeWithClose(() => handleSaveUserSession())
+                        }
+                    />
+                    <ShellContextMenuItem
+                        icon={<Restore />}
+                        content={"Восстановить сессию"}
+                        onClick={() =>
+                            invokeWithClose(() => handleRestoreUserSession())
+                        }
+                    />
+                    <ShellContextMenuItem
+                        icon={<Clear />}
+                        content={"Очистить все"}
+                        onClick={() => invokeWithClose(() => handleClearAll())}
+                    />
+                </Fragment>,
+            );
         };
 
         return (

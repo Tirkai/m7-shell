@@ -38,6 +38,7 @@ interface ICommonNotificationsListProps {
     onCloseNotification: (notification: NotificationModel) => void;
     onRunApplication: (appId: string, url: string) => void;
     onConfirm: (notification: NotificationModel) => void;
+    onConfirmAndDrop: (notification: NotificationModel) => void;
 }
 
 export const CommonNotificationsList = observer(
@@ -265,6 +266,9 @@ export const CommonNotificationsList = observer(
                                     }
                                     onConfirm={() =>
                                         props.onConfirm(notification)
+                                    }
+                                    onConfirmAndDrop={() =>
+                                        props.onConfirmAndDrop(notification)
                                     }
                                 />
                             ))}
