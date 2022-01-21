@@ -20,8 +20,12 @@ interface IAppsProfilePreviewProps {
 export const AppsProfilePreview = observer(
     (props: IAppsProfilePreviewProps) => {
         const store = useStore();
-        const { showMenu, transformEventAnchorToPoint, invokeWithClose } =
-            useContext(ContextMenuContext);
+        const {
+            showMenu,
+            getClickPointFromEvent,
+            getAnchorPointFromEvent,
+            invokeWithClose,
+        } = useContext(ContextMenuContext);
 
         const handleExecuteApp = (app: Application) => {
             new ApplicationRunner(store).run(app, {
@@ -33,7 +37,7 @@ export const AppsProfilePreview = observer(
             event: React.MouseEvent<HTMLDivElement, MouseEvent>,
         ) => {
             showMenu(
-                transformEventAnchorToPoint(event),
+                getAnchorPointFromEvent(event),
                 <Fragment>
                     {props.apps.map((app) => (
                         <ShellContextMenuItem

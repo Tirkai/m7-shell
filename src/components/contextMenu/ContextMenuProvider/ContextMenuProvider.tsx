@@ -28,18 +28,27 @@ export const ContextMenuProvider = (props: IContextMenuProviderProps) => {
         closeMenu();
     };
 
-    const transformEventAnchorToPoint = (
+    const getClickPointFromEvent = (
         event: React.MouseEvent<HTMLElement, MouseEvent>,
     ) => {
         const { pageX, pageY } = event;
         return new Point2D(pageX, pageY);
     };
 
+    const getAnchorPointFromEvent = (
+        event: React.MouseEvent<HTMLElement, MouseEvent>,
+    ) => {
+        const element = event.currentTarget;
+        const rect = element.getBoundingClientRect();
+        return new Point2D(rect.x, rect.y + rect.height);
+    };
+
     return (
         <ContextMenuContext.Provider
             value={{
                 showMenu,
-                transformEventAnchorToPoint,
+                getClickPointFromEvent,
+                getAnchorPointFromEvent,
                 closeMenu,
                 invokeWithClose,
             }}

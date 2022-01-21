@@ -18,8 +18,12 @@ const className = style.virtualFrameActions;
 export const VirtualFrameActions = observer(
     (props: IVirtualFrameActionsProps) => {
         const store = useStore();
-        const { showMenu, invokeWithClose, transformEventAnchorToPoint } =
-            useContext(ContextMenuContext);
+        const {
+            showMenu,
+            invokeWithClose,
+            getClickPointFromEvent,
+            getAnchorPointFromEvent,
+        } = useContext(ContextMenuContext);
 
         const handleSaveUserSession = () => {
             store.recovery.saveFreezeSnapshot();
@@ -41,7 +45,7 @@ export const VirtualFrameActions = observer(
             e: React.MouseEvent<HTMLElement, MouseEvent>,
         ) => {
             showMenu(
-                transformEventAnchorToPoint(e),
+                getAnchorPointFromEvent(e),
                 <Fragment>
                     <ShellContextMenuItem
                         icon={<Save />}

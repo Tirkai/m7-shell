@@ -16,8 +16,12 @@ interface IAppsShellLogoProps {
 
 export const AppsShellLogo = observer((props: IAppsShellLogoProps) => {
     const store = useStore();
-    const { showMenu, invokeWithClose, transformEventAnchorToPoint } =
-        useContext(ContextMenuContext);
+    const {
+        showMenu,
+        invokeWithClose,
+        getClickPointFromEvent,
+        getAnchorPointFromEvent,
+    } = useContext(ContextMenuContext);
 
     const handleExecuteApp = (app: Application) => {
         new ApplicationRunner(store).run(app, {
@@ -29,7 +33,7 @@ export const AppsShellLogo = observer((props: IAppsShellLogoProps) => {
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     ) => {
         showMenu(
-            transformEventAnchorToPoint(e),
+            getAnchorPointFromEvent(e),
             <Fragment>
                 {props.apps
                     .filter((app) => !app.isOnlyAdmin || store.auth.isAdmin)

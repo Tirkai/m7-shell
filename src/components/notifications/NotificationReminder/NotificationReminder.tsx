@@ -51,7 +51,7 @@ export const NotificationReminder = observer(
                         <NotificationBell />
                     </div>
                     <div className={style.content}>
-                        У вас есть непрочитанные уведомления требующие
+                        У вас есть непрочитанные уведомления, требующие
                         подтверждения
                     </div>
                 </div>

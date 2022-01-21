@@ -29,16 +29,17 @@
     min-width: 200px;
     max-width: 600px;
     overflow: auto;
-    transform: scale(0.7);
+    transform: scale(0.9);
 
-    transform: ease 0.3s;
-    transform-origin: top left;
+    /* transition: ease 0.3s; */
+    transform-origin: center center;
 }
 
 .show {
     opacity: 1;
     pointer-events: all;
 }
+
 .show .container {
     transform: scale(1);
 }

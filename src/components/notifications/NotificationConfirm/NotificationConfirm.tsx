@@ -1,5 +1,5 @@
 import { ButtonBase, ButtonGroup } from "@material-ui/core";
-import { Clear, MoreVert } from "@material-ui/icons";
+import { ArrowDropDown, Clear } from "@material-ui/icons";
 import classNames from "classnames";
 import { ShellContextMenuItem } from "components/contextMenu/ShellContextMenuItem/ShellContextMenuItem";
 import { ContextMenuContext } from "contexts/ContextMenuContext";
@@ -15,8 +15,31 @@ interface INotificationConfirmProps {
 }
 
 export const NotificationConfirm = (props: INotificationConfirmProps) => {
-    const { showMenu, transformEventAnchorToPoint, invokeWithClose } =
-        useContext(ContextMenuContext);
+    const {
+        showMenu,
+        getClickPointFromEvent,
+        getAnchorPointFromEvent,
+        invokeWithClose,
+    } = useContext(ContextMenuContext);
+
+    const handleShowMenu = (
+        event: React.MouseEvent<HTMLElement, MouseEvent>,
+    ) => {
+        // getAnchorPointFromEvent(event);
+
+        showMenu(
+            getAnchorPointFromEvent(event),
+            <Fragment>
+                <ShellContextMenuItem
+                    onClick={() =>
+                        invokeWithClose(() => props.onConfirmAndDrop())
+                    }
+                    icon={<Clear />}
+                    content={"Подтвердить и сбросить"}
+                />
+            </Fragment>,
+        );
+    };
 
     return props.isShow ? (
         <div className={classNames(className)}>
@@ -31,22 +54,7 @@ export const NotificationConfirm = (props: INotificationConfirmProps) => {
                         Подтвердить
                     </ButtonBase>
                     <ButtonBase
-                        onClick={(event) =>
-                            showMenu(
-                                transformEventAnchorToPoint(event),
-                                <Fragment>
-                                    <ShellContextMenuItem
-                                        onClick={() =>
-                                            invokeWithClose(() =>
-                                                props.onConfirmAndDrop(),
-                                            )
-                                        }
-                                        icon={<Clear />}
-                                        content={"Подтвердить и сбросить"}
-                                    />
-                                </Fragment>,
-                            )
-                        }
+                        onClick={handleShowMenu}
                         classes={{
                             root: classNames(
                                 style.button,
@@ -54,7 +62,7 @@ export const NotificationConfirm = (props: INotificationConfirmProps) => {
                             ),
                         }}
                     >
-                        <MoreVert />
+                        <ArrowDropDown />
                     </ButtonBase>
                 </ButtonGroup>
             </div>

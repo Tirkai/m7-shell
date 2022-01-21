@@ -6,7 +6,11 @@ interface IContextMenuContextOptions {
     closeMenu: () => void;
     invokeWithClose: (callback: () => void) => void;
 
-    transformEventAnchorToPoint: (
+    getClickPointFromEvent: (
+        event: React.MouseEvent<HTMLElement, MouseEvent>,
+    ) => Point2D;
+
+    getAnchorPointFromEvent: (
         event: React.MouseEvent<HTMLElement, MouseEvent>,
     ) => Point2D;
 }
@@ -15,7 +19,10 @@ interface IContextMenuContextOptions {
 export const ContextMenuContext =
     React.createContext<IContextMenuContextOptions>({
         showMenu: (_position: Point2D, _items: React.ReactNode) => undefined,
-        transformEventAnchorToPoint: (
+        getClickPointFromEvent: (
+            _event: React.MouseEvent<HTMLElement, MouseEvent>,
+        ) => new Point2D(0, 0),
+        getAnchorPointFromEvent: (
             _event: React.MouseEvent<HTMLElement, MouseEvent>,
         ) => new Point2D(0, 0),
         closeMenu: () => undefined,
