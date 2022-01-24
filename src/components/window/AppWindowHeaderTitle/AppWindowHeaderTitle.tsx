@@ -6,7 +6,7 @@ import style from "./style.module.css";
 interface IAppWindowHeaderTitleProps {
     title: string;
     icon: string;
-    onIconClick: (e: React.MouseEvent) => void;
+    onIconClick: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }
 
 export const AppWindowHeaderTitle = (props: IAppWindowHeaderTitleProps) => (

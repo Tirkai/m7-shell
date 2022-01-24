@@ -2,14 +2,12 @@ import { MarkerType, useMarker } from "@algont/m7-react-marker";
 import { SVGIcon } from "@algont/m7-ui";
 import { collapse, cross, fullscreen, refresh } from "assets/icons";
 import classNames from "classnames";
-import { useStore } from "hooks/useStore";
+import { ShellContextMenuItem } from "components/contextMenu/ShellContextMenuItem/ShellContextMenuItem";
+import { ContextMenuContext } from "contexts/ContextMenuContext";
 import { IStore } from "interfaces/common/IStore";
 import { strings } from "locale";
-import { observer } from "mobx-react";
-import { ContextMenuItemModel } from "models/contextMenu/ContextMenuItemModel";
 import { NavigationReferer } from "models/navigation/NavigationReferer";
-import { Point2D } from "models/shape/Point2D";
-import React from "react";
+import React, { Fragment, useContext } from "react";
 import { AppWindowHeaderAction } from "../AppWindowHeaderAction/AppWindowHeaderAction";
 import { AppWindowHeaderReferer } from "../AppWindowHeaderReferer/AppWindowHeaderReferer";
 import { AppWindowHeaderTitle } from "../AppWindowHeaderTitle/AppWindowHeaderTitle";
@@ -32,21 +30,34 @@ interface IAppWindowHeaderProps extends IStore {
     referer?: NavigationReferer;
 }
 
-export const AppWindowHeader = observer((props: IAppWindowHeaderProps) => {
-    const store = useStore();
+export const AppWindowHeader = (props: IAppWindowHeaderProps) => {
+    const { getAnchorPointFromEvent, showMenu, invokeWithClose } =
+        useContext(ContextMenuContext);
 
     const { createMemoizedMarker } = useMarker();
 
-    const handleShowContextMenu = (e: React.MouseEvent) => {
+    const handleReload = () => {
+        const onReload = props.onReload;
+        if (!onReload) {
+            return;
+        }
+        invokeWithClose(() => onReload());
+    };
+
+    const handleShowContextMenu = (
+        e: React.MouseEvent<HTMLElement, MouseEvent>,
+    ) => {
         if (props.onReload) {
-            store.contextMenu.showContextMenu(new Point2D(e.pageX, e.pageY), [
-                new ContextMenuItemModel({
-                    icon: <SVGIcon source={refresh} color="white" />,
-                    content: strings.application.actions.hardReset,
-                    onClick: () =>
-                        props.onReload ? props.onReload() : undefined,
-                }),
-            ]);
+            showMenu(
+                getAnchorPointFromEvent(e),
+                <Fragment>
+                    <ShellContextMenuItem
+                        icon={<SVGIcon source={refresh} color="white" />}
+                        content={strings.application.actions.hardReset}
+                        onClick={handleReload}
+                    />
+                </Fragment>,
+            );
         }
     };
 
@@ -105,4 +116,4 @@ export const AppWindowHeader = observer((props: IAppWindowHeaderProps) => {
             </div>
         </div>
     );
-});
+};
