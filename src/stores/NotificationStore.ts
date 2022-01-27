@@ -15,6 +15,8 @@ import { INotificationCountResponse } from "interfaces/response/INotificationCou
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
 import { makeAutoObservable } from "mobx";
 import { ExternalApplication } from "models/app/ExternalApplication";
+import { NotificationCategory } from "models/notification/NotificationCategory";
+import { NotificationCategoryType } from "models/notification/NotificationCategoryType";
 import { NotificationExpireTime } from "models/notification/NotificationExpireTime";
 import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
 import { NotificationModel } from "models/notification/NotificationModel";
@@ -62,24 +64,52 @@ export class NotificationStore {
 
     instructionText: string = "";
 
-    groups: NotificationGroupModel[] = [];
-
-    importantNotifications: NotificationModel[] = [];
+    categories: Map<NotificationCategoryType, NotificationCategory> = new Map([
+        [
+            NotificationCategoryType.Common,
+            new NotificationCategory({
+                type: NotificationCategoryType.Common,
+                name: "Все уведомления",
+            }),
+        ],
+        [
+            NotificationCategoryType.Confirmation,
+            new NotificationCategory({
+                type: NotificationCategoryType.Confirmation,
+                name: "На подтверждение",
+                filter: { confirm: { values: ["waiting"] } },
+            }),
+        ],
+    ]);
 
     totalCount = 0;
 
     applications: ExternalApplication[] = [];
 
     get hasNotifications() {
-        return this.groups.some((group) => group.hasNotifications);
+        const category = this.categories.get(NotificationCategoryType.Common);
+
+        if (!category) {
+            return false;
+        }
+
+        return category.hasItems;
     }
 
-    get hasImportantNotifcations() {
-        return this.importantNotifications.length > 0;
+    get hasConfirmationNotifcations() {
+        const category = this.categories.get(
+            NotificationCategoryType.Confirmation,
+        );
+
+        if (!category) {
+            return false;
+        }
+
+        return category.hasItems;
     }
 
     get isActiveReminder() {
-        return this.hasImportantNotifcations && this.toasts.length <= 0;
+        return this.hasConfirmationNotifcations && this.toasts.length <= 0;
     }
 
     status: NotificationServiceConnectStatus =
@@ -104,7 +134,7 @@ export class NotificationStore {
         this.toasts = toasts;
     }
 
-    async fetchGroup(group: NotificationGroupModel) {
+    async fetchGroup(group: NotificationGroupModel, additionalFilter?: any) {
         group.setFetching(true);
 
         const countResponse = await this.notificationService.getCount({
@@ -112,6 +142,7 @@ export class NotificationStore {
                 filter: {
                     login: { values: [this.store.auth.userLogin] },
                     app_id: { values: [group.id] },
+                    ...additionalFilter,
                 },
             },
         });
@@ -129,6 +160,7 @@ export class NotificationStore {
                         values: [group.id],
                     },
                     login: { values: [this.store.auth.userLogin] },
+                    ...additionalFilter,
                 },
                 order: [
                     {
@@ -139,16 +171,16 @@ export class NotificationStore {
             }),
         });
 
-        if (notificationsResponse.result) {
-            const notifications = notificationsResponse.result.items.map(
-                (item) =>
-                    NotificationFactory.createNotificationFromRawData(item),
-            );
-
-            group.setNotifications(notifications);
-        } else {
-            console.warn("No notifications list result");
+        if (!notificationsResponse.result) {
+            group.setFetching(false);
+            return;
         }
+
+        const notifications = notificationsResponse.result.items.map(
+            NotificationFactory.createNotificationFromRawData,
+        );
+
+        group.setNotifications(notifications);
 
         group.setFetching(false);
     }
@@ -162,90 +194,95 @@ export class NotificationStore {
             },
         });
 
-        if (countResponse.result) {
-            this.setTotalCount(countResponse.result);
+        if (!countResponse.result) {
+            return;
         }
-    }
-
-    async fetchImportantNotifications() {
-        const notificationsResponse = await this.notificationService.getList({
-            payload: {
-                filter: {
-                    confirm: { values: ["waiting"] },
-                    login: { values: [this.store.auth.userLogin] },
-                },
-                limit: 100,
-                offset: 0,
-                order: [{ field: "ntf_date", direction: "desc" }],
-            },
-        });
-
-        if (notificationsResponse.result) {
-            const notifications = notificationsResponse.result.items.map(
-                (item) =>
-                    NotificationFactory.createNotificationFromRawData(item),
-            );
-            this.setImportantNotifications(notifications);
-        }
-    }
-
-    async fetchInitialCounts() {
-        const groupedCounts =
-            await this.notificationService.invoke<IGroupedCountsPayload>({
-                method: "get_counts_by_apps",
-                payload: {
-                    filter: {
-                        login: { values: [this.store.auth.userLogin] },
-                    },
-                },
-            });
-
-        if (groupedCounts.result) {
-            Object.entries(groupedCounts.result).map(([appId, count]) => {
-                const group = this.groups.find((group) => group.id === appId);
-
-                if (group) {
-                    group.setCount(count);
-                }
-            });
-        }
+        this.setTotalCount(countResponse.result);
     }
 
     async fetchInitialNotifications() {
         try {
-            await this.fetchImportantNotifications();
-
-            const groupedNotificaions =
-                await this.notificationService.invoke<IGroupedNotificaitonsPayload>(
-                    {
-                        method: "get_lists_by_apps",
-                        payload: {
-                            filter: {
-                                login: { values: [this.store.auth.userLogin] },
+            const fillCounts = async (
+                groups: NotificationGroupModel[],
+                additionalFilter?: any,
+            ) => {
+                const groupedCounts =
+                    await this.notificationService.invoke<IGroupedCountsPayload>(
+                        {
+                            method: "get_counts_by_apps",
+                            payload: {
+                                filter: {
+                                    login: {
+                                        values: [this.store.auth.userLogin],
+                                    },
+                                    ...additionalFilter,
+                                },
                             },
-                            limit: 5,
                         },
-                    },
-                );
+                    );
 
-            if (groupedNotificaions.result) {
-                Object.entries(groupedNotificaions.result).map(
+                if (!groupedCounts.result) {
+                    return;
+                }
+                Object.entries(groupedCounts.result).map(([appId, count]) => {
+                    const group = groups.find((group) => group.id === appId);
+
+                    if (!group) {
+                        return;
+                    }
+
+                    group.setCount(count);
+                });
+            };
+
+            const fillGroups = async (
+                groups: NotificationGroupModel[],
+                additionalFilter?: any,
+            ) => {
+                const groupedCommonNotificaions =
+                    await this.notificationService.invoke<IGroupedNotificaitonsPayload>(
+                        {
+                            method: "get_lists_by_apps",
+                            payload: {
+                                filter: {
+                                    login: {
+                                        values: [this.store.auth.userLogin],
+                                    },
+                                    ...additionalFilter,
+                                },
+                                limit: 5,
+                            },
+                        },
+                    );
+
+                if (!groupedCommonNotificaions.result) {
+                    return;
+                }
+
+                Object.entries(groupedCommonNotificaions.result).map(
                     ([appId, notifications]) => {
-                        const group = this.groups.find(
+                        const group = groups.find(
                             (group) => group.id === appId,
                         );
-                        if (group) {
-                            group.setNotifications(
-                                notifications.map((item) =>
-                                    NotificationFactory.createNotificationFromRawData(
-                                        item,
-                                    ),
-                                ),
-                            );
+
+                        if (!group) {
+                            return;
                         }
+                        group.setNotifications(
+                            notifications.map((item) =>
+                                NotificationFactory.createNotificationFromRawData(
+                                    item,
+                                ),
+                            ),
+                        );
                     },
                 );
-            }
+            };
+
+            this.categories.forEach((category) => {
+                fillCounts(category.groups, category.filter);
+                fillGroups(category.groups, category.filter);
+            });
         } catch (e) {
             console.error(e);
         }
@@ -275,18 +312,17 @@ export class NotificationStore {
                     ),
                 );
 
-                this.setGroups(
+                const createEmptyGroups = () =>
                     this.applications.map(
-                        (app) =>
-                            new NotificationGroupModel({
-                                id: app.id,
-                                name: app.name,
-                                icon: app.icon,
-                                count: 0,
-                                notifications: [],
-                            }),
-                    ),
-                );
+                        NotificationFactory.createNotificationGroup,
+                    );
+
+                this.categories.forEach((category) => {
+                    category.setGroups(createEmptyGroups());
+                });
+
+                // this.setCommonGroups(createEmptyGroups());
+                // this.setConfirmationGroups(createEmptyGroups());
             }
         } catch (e) {
             console.error(e);
@@ -403,16 +439,14 @@ export class NotificationStore {
                 }
             }
 
-            if (notification.isRequireConfirm) {
-                this.importantNotifications.unshift(notification);
-            }
-
-            const group = this.groups.find(
-                (item) => item.id === notification.applicationId,
-            );
-            if (group) {
-                this.fetchGroup(group);
-            }
+            this.categories.forEach((category) => {
+                const group = category.groups.find(
+                    (item) => item.id === notification.applicationId,
+                );
+                if (group) {
+                    this.fetchGroup(group, category.filter);
+                }
+            });
         } catch (e) {
             console.error(e);
         }
@@ -444,36 +478,46 @@ export class NotificationStore {
         this.deletionDebounceContainer.invoke(() => {
             const appId = payload.app_id;
 
-            const group = this.groups.find(
-                (groupItem) => groupItem.id === appId,
-            );
+            this.categories.forEach((category) => {
+                const group = category.groups.find(
+                    (groupItem) => groupItem.id === appId,
+                );
 
-            this.fetchImportantNotifications();
+                if (!group) {
+                    return;
+                }
 
-            if (group) {
-                this.fetchGroup(group);
-            }
+                this.fetchGroup(group, category.filter);
+            });
         }, 300);
     }
 
     onConfirmNotification(payload: INotificationResponse) {
         const appId = payload.app_id;
-        const group = this.groups.find((item) => item.id === appId);
+        this.categories.forEach((category) => {
+            const group = category.groups.find(
+                (groupItem) => groupItem.id === appId,
+            );
 
-        this.fetchImportantNotifications();
+            if (!group) {
+                return;
+            }
 
-        if (group) {
-            this.fetchGroup(group);
-        }
+            this.fetchGroup(group, category.filter);
+        });
     }
 
     setApplications(apps: ExternalApplication[]) {
         this.applications = apps;
     }
 
-    setGroups(groups: NotificationGroupModel[]) {
-        this.groups = groups;
-    }
+    // setCommonGroups(groups: NotificationGroupModel[]) {
+    //     this.commonGroups = groups;
+    // }
+
+    // setConfirmationGroups(groups: NotificationGroupModel[]) {
+    //     this.confirmationGroups = groups;
+    // }
 
     async removeNotificationsByGroup(
         group: NotificationGroupModel,
@@ -573,7 +617,7 @@ export class NotificationStore {
         }
     }
 
-    setImportantNotifications(notifications: NotificationModel[]) {
-        this.importantNotifications = notifications;
-    }
+    // setConfirmationNotifications(notifications: NotificationModel[]) {
+    //     this.confirmationNotifications = notifications;
+    // }
 }

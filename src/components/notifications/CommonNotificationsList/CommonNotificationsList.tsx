@@ -4,7 +4,7 @@ import {
     CircularProgress,
     FormControlLabel,
     Radio,
-    RadioGroup,
+    RadioGroup
 } from "@material-ui/core";
 import { empty } from "assets/icons";
 import classNames from "classnames";
@@ -17,6 +17,7 @@ import { useStore } from "hooks/useStore";
 import { strings } from "locale";
 import { observer } from "mobx-react-lite";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
+import { NotificationCategory } from "models/notification/NotificationCategory";
 import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
 import { NotificationModel } from "models/notification/NotificationModel";
 import { ShellPanelType } from "models/panel/ShellPanelType";
@@ -39,6 +40,7 @@ interface ICommonNotificationsListProps {
     onRunApplication: (appId: string, url: string) => void;
     onConfirm: (notification: NotificationModel) => void;
     onConfirmAndDrop: (notification: NotificationModel) => void;
+    category?: NotificationCategory;
 }
 
 export const CommonNotificationsList = observer(
@@ -226,7 +228,7 @@ export const CommonNotificationsList = observer(
 
         return (
             <div className={classNames(className)}>
-                {store.notification.groups
+                {props.category?.groups
                     .filter((group) => group.hasNotifications)
                     .map((group) => (
                         <NotificationGroup
@@ -250,7 +252,6 @@ export const CommonNotificationsList = observer(
                                     key={notification.id}
                                     icon={group.icon}
                                     {...notification}
-                                    // hasInstruction={notification.hasInstruction}
                                     instruction={notification.instruction}
                                     closeAfterClick={
                                         !notification.isRequireConfirm
@@ -274,10 +275,8 @@ export const CommonNotificationsList = observer(
                             ))}
                         </NotificationGroup>
                     ))}
-                {store.notification.groups.every(
-                    (group) => !group.hasNotifications,
-                ) &&
-                    store.notification.groups.every(
+                {!props.category?.hasItems &&
+                    props.category?.groups.every(
                         (group) => !group.isFetching,
                     ) && (
                         <PlaceholderWithIcon

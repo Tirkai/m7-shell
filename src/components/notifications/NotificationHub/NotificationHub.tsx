@@ -3,12 +3,11 @@ import { useStore } from "hooks/useStore";
 import { observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/app/ExternalApplication";
+import { NotificationCategoryType } from "models/notification/NotificationCategoryType";
 import { NotificationModel } from "models/notification/NotificationModel";
-import { NotificationTab } from "models/notification/NotificationTab";
 import { ShellPanelType } from "models/panel/ShellPanelType";
 import React, { useEffect, useState } from "react";
 import { CommonNotificationsList } from "../CommonNotificationsList/CommonNotificationsList";
-import { ImportantNotificationsList } from "../ImportantNotificationsList/ImportantNotificationsList";
 import { NotificationCategoryTabContent } from "../NotificationCategoryTabContent/NotificationCategoryTabContent";
 import { NotificationHubHeader } from "../NotificationHubHeader/NotificationHubHeader";
 import { NotificationsList } from "../NotificationsList/NotificationsList";
@@ -17,14 +16,13 @@ import style from "./style.module.css";
 export const NotificationHub = observer(() => {
     const store = useStore();
 
-    const [currentTab, setCurrentTab] = useState<NotificationTab>(
-        NotificationTab.All,
+    const [currentTab, setCurrentTab] = useState<NotificationCategoryType>(
+        NotificationCategoryType.Common,
     );
 
     const connectNotifications = async () => {
         await store.notification.fetchApps();
         await store.notification.fetchTotalCount();
-        await store.notification.fetchInitialCounts();
         await store.notification.fetchInitialNotifications();
 
         store.notification.connectToNotificationsSocket(store.auth.accessToken);
@@ -65,23 +63,15 @@ export const NotificationHub = observer(() => {
         }
     };
 
-    const handleSelectTab = (tab: NotificationTab) => {
+    const handleSelectTab = (tab: NotificationCategoryType) => {
         setCurrentTab(tab);
     };
 
     const handleConfirm = async (notification: NotificationModel) => {
-        const response = await store.notification.confirmUserNotifications(
+        await store.notification.confirmUserNotifications(
             [notification.id],
             store.auth.userLogin,
         );
-        if (!response.error) {
-            const group = store.notification.groups.find(
-                (item) => item.id === notification.applicationId,
-            );
-            if (group) {
-                store.notification.fetchGroup(group);
-            }
-        }
     };
 
     const handleConfirmAndDrop = async (notification: NotificationModel) => {
@@ -95,33 +85,22 @@ export const NotificationHub = observer(() => {
             return;
         }
 
-        const removeResponse = await store.notification.removeNotifications(
+        await store.notification.removeNotifications(
             [notification.id],
             store.auth.userLogin,
         );
-
-        if (removeResponse.error) {
-            return;
-        }
-
-        const group = store.notification.groups.find(
-            (item) => item.id === notification.applicationId,
-        );
-        if (group) {
-            store.notification.fetchGroup(group);
-        }
     };
 
     useEffect(onMount, []);
 
     useEffect(() => {
         setCurrentTab(
-            store.notification.hasImportantNotifcations
-                ? NotificationTab.Important
-                : NotificationTab.All,
+            store.notification.hasConfirmationNotifcations
+                ? NotificationCategoryType.Confirmation
+                : NotificationCategoryType.Common,
         );
     }, [
-        store.notification.hasImportantNotifcations,
+        store.notification.hasConfirmationNotifcations,
         store.panelManager.activePanel,
     ]);
 
@@ -140,35 +119,41 @@ export const NotificationHub = observer(() => {
                     <NotificationsList>
                         <NotificationCategoryTabContent
                             currentTab={currentTab}
-                            condition={NotificationTab.All}
+                            condition={NotificationCategoryType.Common}
                         >
                             <CommonNotificationsList
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
                                 onConfirm={handleConfirm}
                                 onConfirmAndDrop={handleConfirmAndDrop}
+                                category={store.notification.categories.get(
+                                    NotificationCategoryType.Common,
+                                )}
                             />
                         </NotificationCategoryTabContent>
                         <NotificationCategoryTabContent
                             currentTab={currentTab}
-                            condition={NotificationTab.Important}
+                            condition={NotificationCategoryType.Confirmation}
                         >
-                            <ImportantNotificationsList
+                            <CommonNotificationsList
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
                                 onConfirm={handleConfirm}
                                 onConfirmAndDrop={handleConfirmAndDrop}
+                                category={store.notification.categories.get(
+                                    NotificationCategoryType.Confirmation,
+                                )}
                             />
+                            {/* <ConfirmationNotificationsList
+                                onCloseNotification={handleCloseNotification}
+                                onRunApplication={handleRunApplication}
+                                onConfirm={handleConfirm}
+                                onConfirmAndDrop={handleConfirmAndDrop}
+                            /> */}
                         </NotificationCategoryTabContent>
                     </NotificationsList>
                 </div>
             </div>
-            {/* <InstructionDialog
-                instruction={store.instruction.instruction}
-                show={store.instruction.isShowInstruction}
-                onClose={() => store.instruction.setShowInstruction(false)}
-                onConfirm={handleConfirm}
-            /> */}
         </div>
     );
 });

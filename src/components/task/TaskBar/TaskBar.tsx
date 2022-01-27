@@ -166,7 +166,7 @@ export const TaskBar = observer(() => {
                                     size="medium"
                                     severity={
                                         !store.notification
-                                            .hasImportantNotifcations
+                                            .hasConfirmationNotifcations
                                             ? "info"
                                             : "attention"
                                     }

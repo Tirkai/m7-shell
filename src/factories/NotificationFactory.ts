@@ -1,22 +1,17 @@
 import { INotificationResponse } from "interfaces/response/INotificationResponse";
+import { ExternalApplication } from "models/app/ExternalApplication";
+import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
 import { NotificationModel } from "models/notification/NotificationModel";
-import moment from "moment";
-import { v4 } from "uuid";
 
 export class NotificationFactory {
-    static createNotificationBySystem() {
-        const notification = new NotificationModel({
-            id: v4(),
-            applicationId: v4(),
-            title: "Test",
-            text: "Test",
-            url: "",
-            date: moment().toISOString(),
-            isPlaySound: false,
-            isShowBanner: false,
-            isRequireConfirm: false,
+    static createNotificationGroup(app: ExternalApplication) {
+        return new NotificationGroupModel({
+            id: app.id,
+            name: app.name,
+            icon: app.icon,
+            count: 0,
+            notifications: [],
         });
-        return notification;
     }
 
     static createNotificationFromRawData(

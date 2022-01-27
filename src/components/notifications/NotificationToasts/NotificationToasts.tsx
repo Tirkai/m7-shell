@@ -58,21 +58,11 @@ export const NotificationToasts = observer(() => {
         notification: NotificationModel,
         toast: ToastNotification,
     ) => {
-        const response = await store.notification.confirmUserNotifications(
+        await store.notification.confirmUserNotifications(
             [notification.id],
             store.auth.userLogin,
         );
 
-        if (response.error) {
-            return;
-        }
-
-        const group = store.notification.groups.find(
-            (item) => item.id === notification.applicationId,
-        );
-        if (group) {
-            store.notification.fetchGroup(group);
-        }
         toast.setShow(false);
     };
 
@@ -90,21 +80,11 @@ export const NotificationToasts = observer(() => {
             return;
         }
 
-        const removeResponse = await store.notification.removeNotifications(
+        await store.notification.removeNotifications(
             [notification.id],
             store.auth.userLogin,
         );
 
-        if (removeResponse.error) {
-            return;
-        }
-
-        const group = store.notification.groups.find(
-            (item) => item.id === notification.applicationId,
-        );
-        if (group) {
-            store.notification.fetchGroup(group);
-        }
         toast.setShow(false);
     };
 
