@@ -1,9 +1,11 @@
 .notificationReminder {
+    display: flex;
+    align-items: center;
     position: absolute;
     right: 10px;
     bottom: 10px;
-    width: 300px;
-    height: 100px;
+    width: 320px;
+    height: 80px;
     background: #000000cc;
     border-radius: 8px;
     transition: ease 0.3s;
@@ -30,7 +32,7 @@
     box-sizing: border-box;
     color: white;
     display: grid;
-    grid-template-columns: 48px 205px;
+    grid-template-columns: 48px 250px;
     grid-gap: 16px;
     overflow: hidden;
 }
@@ -40,7 +42,7 @@
     opacity: 1;
     transition: ease opacity 0.3s 1s, ease transform 0.3s 1s, width 0.3s 2s;
     transform: scale(1);
-    width: 300px;
+    width: 320px;
 }
 
 .icon {

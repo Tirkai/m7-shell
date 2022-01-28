@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 import { ApplicationRunner } from "models/app/ApplicationRunner";
 import { ExternalApplication } from "models/app/ExternalApplication";
 import { NotificationCategoryType } from "models/notification/NotificationCategoryType";
+import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
 import { NotificationModel } from "models/notification/NotificationModel";
 import { ShellPanelType } from "models/panel/ShellPanelType";
 import React, { useEffect, useState } from "react";
@@ -39,12 +40,46 @@ export const NotificationHub = observer(() => {
 
     const handleCloseNotification = (notification: NotificationModel) => {
         notification.setDisplayed(false);
-        setTimeout(() => {
-            store.notification.removeNotifications(
-                [notification.id],
-                store.auth.userLogin,
-            );
-        }, 300);
+        store.notification.removeNotifications(
+            [notification.id],
+            store.auth.userLogin,
+        );
+    };
+
+    const handleClearGroupAllContent = async (
+        group: NotificationGroupModel,
+    ) => {
+        if (group) {
+            group.setFetching(true);
+            try {
+                await store.notification.removeNotificationsByGroup(
+                    group,
+                    store.auth.userLogin,
+                );
+            } catch (e) {
+                console.error(e);
+            } finally {
+                group.setFetching(false);
+            }
+        }
+    };
+
+    const handleClearGroupVisibleContent = async (
+        group: NotificationGroupModel,
+    ) => {
+        if (group) {
+            group.setFetching(true);
+            try {
+                await store.notification.removeNotifications(
+                    group.notifications.map((item) => item.id),
+                    store.auth.userLogin,
+                );
+            } catch (e) {
+                console.error(e);
+            } finally {
+                group.setFetching(false);
+            }
+        }
     };
 
     const handleRunApplication = (appId: string, url: string) => {
@@ -125,6 +160,12 @@ export const NotificationHub = observer(() => {
                                 onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
                                 onConfirm={handleConfirm}
+                                onClearGroupAllContent={
+                                    handleClearGroupAllContent
+                                }
+                                onClearGroupVisibleContent={
+                                    handleClearGroupVisibleContent
+                                }
                                 onConfirmAndDrop={handleConfirmAndDrop}
                                 category={store.notification.categories.get(
                                     NotificationCategoryType.Common,
@@ -136,7 +177,6 @@ export const NotificationHub = observer(() => {
                             condition={NotificationCategoryType.Confirmation}
                         >
                             <CommonNotificationsList
-                                onCloseNotification={handleCloseNotification}
                                 onRunApplication={handleRunApplication}
                                 onConfirm={handleConfirm}
                                 onConfirmAndDrop={handleConfirmAndDrop}
@@ -144,12 +184,6 @@ export const NotificationHub = observer(() => {
                                     NotificationCategoryType.Confirmation,
                                 )}
                             />
-                            {/* <ConfirmationNotificationsList
-                                onCloseNotification={handleCloseNotification}
-                                onRunApplication={handleRunApplication}
-                                onConfirm={handleConfirm}
-                                onConfirmAndDrop={handleConfirmAndDrop}
-                            /> */}
                         </NotificationCategoryTabContent>
                     </NotificationsList>
                 </div>

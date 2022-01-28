@@ -1,5 +1,5 @@
 import { ButtonBase, ButtonGroup } from "@material-ui/core";
-import { ArrowDropDown, Clear } from "@material-ui/icons";
+import { ArrowDropDown } from "@material-ui/icons";
 import classNames from "classnames";
 import { ShellContextMenuItem } from "components/contextMenu/ShellContextMenuItem/ShellContextMenuItem";
 import { ContextMenuContext } from "contexts/ContextMenuContext";
@@ -34,7 +34,6 @@ export const NotificationConfirm = (props: INotificationConfirmProps) => {
                     onClick={() =>
                         invokeWithClose(() => props.onConfirmAndDrop())
                     }
-                    icon={<Clear />}
                     content={"Подтвердить и сбросить"}
                 />
             </Fragment>,

@@ -4,7 +4,7 @@ import {
     CircularProgress,
     FormControlLabel,
     Radio,
-    RadioGroup
+    RadioGroup,
 } from "@material-ui/core";
 import { empty } from "assets/icons";
 import classNames from "classnames";
@@ -21,7 +21,7 @@ import { NotificationCategory } from "models/notification/NotificationCategory";
 import { NotificationGroupModel } from "models/notification/NotificationGroupModel";
 import { NotificationModel } from "models/notification/NotificationModel";
 import { ShellPanelType } from "models/panel/ShellPanelType";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { NotificationCard } from "../NotificationCard/NotificationCard";
 import { NotificationClearDialogContainer } from "../NotificationClearDialogContainer/NotificationClearDialogContainer";
 import { NotificationGroup } from "../NotificationGroup/NotificationGroup";
@@ -36,10 +36,12 @@ enum NotificationDeletionType {
 
 interface ICommonNotificationsListProps {
     children?: React.ReactNode;
-    onCloseNotification: (notification: NotificationModel) => void;
+    onCloseNotification?: (notification: NotificationModel) => void;
     onRunApplication: (appId: string, url: string) => void;
     onConfirm: (notification: NotificationModel) => void;
     onConfirmAndDrop: (notification: NotificationModel) => void;
+    onClearGroupAllContent?: (group: NotificationGroupModel) => void;
+    onClearGroupVisibleContent?: (group: NotificationGroupModel) => void;
     category?: NotificationCategory;
 }
 
@@ -74,45 +76,29 @@ export const CommonNotificationsList = observer(
             }
         };
 
-        const handleClearGroup = async (
-            group: NotificationGroupModel | null,
-        ) => {
-            setShowClearGroupDialog({ isShow: false, group: null });
-            if (group) {
-                group.setFetching(true);
-                try {
-                    await store.notification.removeNotificationsByGroup(
-                        group,
-                        store.auth.userLogin,
-                    );
-                } catch (e) {
-                    console.error(e);
-                } finally {
-                    group.setFetching(false);
-                }
+        const handleClearGroup = async (group: NotificationGroupModel) => {
+            if (!props.onClearGroupAllContent) {
+                return;
             }
+
+            setShowClearGroupDialog({ isShow: false, group: null });
+
+            props.onClearGroupAllContent(group);
         };
 
         const handleClearVisibleNotifications = async (
-            group: NotificationGroupModel | null,
+            group: NotificationGroupModel,
         ) => {
-            if (group) {
-                setShowClearGroupDialog({
-                    isShow: false,
-                    group: null,
-                });
-                group.setFetching(true);
-                try {
-                    await store.notification.removeNotifications(
-                        group.notifications.map((item) => item.id),
-                        store.auth.userLogin,
-                    );
-                } catch (e) {
-                    console.error(e);
-                } finally {
-                    group.setFetching(false);
-                }
+            if (!props.onClearGroupVisibleContent) {
+                return;
             }
+
+            setShowClearGroupDialog({
+                isShow: false,
+                group: null,
+            });
+
+            props.onClearGroupVisibleContent(group);
         };
 
         const handleSetDeletionType = (
@@ -224,6 +210,19 @@ export const CommonNotificationsList = observer(
             }
         };
 
+        const isShowClearGroupAction = useMemo(
+            () => !!props.onCloseNotification,
+            [props.onCloseNotification],
+        );
+
+        const handleCloseNotification = (notification: NotificationModel) => {
+            if (!props.onCloseNotification) {
+                return;
+            }
+
+            props.onCloseNotification(notification);
+        };
+
         useEffect(onChangeActivePanel, [store.panelManager.activePanel]);
 
         return (
@@ -233,6 +232,7 @@ export const CommonNotificationsList = observer(
                     .map((group) => (
                         <NotificationGroup
                             key={group.id}
+                            showClearAction={isShowClearGroupAction}
                             onClear={() =>
                                 setShowClearGroupDialog({
                                     isShow: true,
@@ -263,7 +263,7 @@ export const CommonNotificationsList = observer(
                                         )
                                     }
                                     onClose={() =>
-                                        props.onCloseNotification(notification)
+                                        handleCloseNotification(notification)
                                     }
                                     onConfirm={() =>
                                         props.onConfirm(notification)

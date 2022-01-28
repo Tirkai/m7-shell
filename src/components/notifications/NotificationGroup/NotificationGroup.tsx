@@ -8,6 +8,7 @@ interface INotificationGroupProps {
     title: string;
     count?: number;
     children: React.ReactNode;
+    showClearAction: boolean;
     onClear: () => void;
     onTitleClick: () => void;
     overlay: React.ReactNode | null;
@@ -26,18 +27,20 @@ export const NotificationGroup = (props: INotificationGroupProps) => {
                     <div className={style.titleText}>{props.title}</div>
                     <div className={style.count}>{props.count}</div>
                 </div>
-                <div
-                    className={classNames(style.actions, {
-                        [style.disabledActions]: props.overlay !== null,
-                    })}
-                >
+                {props.showClearAction && (
                     <div
-                        className={style.actionItem}
-                        onClick={handleClearGroup}
+                        className={classNames(style.actions, {
+                            [style.disabledActions]: props.overlay !== null,
+                        })}
                     >
-                        <SVGIcon source={cross} color="white" />
+                        <div
+                            className={style.actionItem}
+                            onClick={handleClearGroup}
+                        >
+                            <SVGIcon source={cross} color="white" />
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
             <div className={style.content}>
                 {props.children}
