@@ -292,9 +292,7 @@ export class NotificationStore {
         try {
             const appsCountResponse = await this.applicationService.getCount({
                 payload: {
-                    filter: {
-                        login: { values: [this.store.auth.userLogin] },
-                    },
+                    filter: {},
                 },
             });
 
