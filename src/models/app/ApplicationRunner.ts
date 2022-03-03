@@ -67,14 +67,26 @@ export class ApplicationRunner {
             const activeProcess =
                 this.store.processManager.findProcessByApp(app);
             if (activeProcess) {
-                if (options?.processOptions?.url) {
+                const processUrl = options?.processOptions?.url;
+
+                if (processUrl) {
                     activeProcess.setLockedUrl("");
-                    activeProcess.setUrl(options.processOptions.url);
+                    activeProcess.setUrl(processUrl);
                     activeProcess.rerollHash();
                 }
-                if (options?.processOptions?.params) {
-                    activeProcess.setParams(options.processOptions.params);
+
+                const refererProcess = options?.processOptions?.refererProcess;
+
+                if (refererProcess) {
+                    activeProcess.setRefererProcess(refererProcess);
                 }
+
+                const params = options?.processOptions?.params;
+
+                if (params) {
+                    activeProcess.setParams(params);
+                }
+
                 if (options?.focusWindowAfterInstantiate) {
                     this.store.windowManager.focusWindow(activeProcess.window);
                 }
